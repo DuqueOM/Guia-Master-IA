@@ -17,15 +17,50 @@ from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
 
 BASE_DIR = Path(__file__).parent
-OUTPUT_DIR = BASE_DIR  # Dejar el PDF final en la raíz
-FINAL_FILENAME = "MS_AI_ACADEMIC_PATH_v1.pdf"
+OUTPUT_DIR = BASE_DIR / "pdf"
+FINAL_FILENAME = "GUIA_MLOPS_COMPLETA_v5.pdf"
 
 ORDERED_FILES = [
-    # Ruta académica paralela (plan de alto nivel)
-    "README.md",
-    "PLAN_DETALLADO.md",
-    "RUTINA_ESTUDIO.md",
-    "RECURSOS_Y_LINKS.md",
+    "00_INDICE.md",
+    "SYLLABUS.md",
+    "PLAN_ESTUDIOS.md",
+    "01_PYTHON_MODERNO.md",
+    "02_DISENO_SISTEMAS.md",
+    "03_ESTRUCTURA_PROYECTO.md",
+    "04_ENTORNOS.md",
+    "05_GIT_PROFESIONAL.md",
+    "06_VERSIONADO_DATOS.md",
+    "SIMULACRO_ENTREVISTA_JUNIOR.md",
+    "07_SKLEARN_PIPELINES.md",
+    "08_INGENIERIA_FEATURES.md",
+    "09_TRAINING_PROFESIONAL.md",
+    "10_EXPERIMENT_TRACKING.md",
+    "11_TESTING_ML.md",
+    "12_CI_CD.md",
+    "13_DOCKER.md",
+    "14_FASTAPI.md",
+    "15_STREAMLIT.md",
+    "SIMULACRO_ENTREVISTA_MID.md",
+    "16_OBSERVABILIDAD.md",
+    "17_DESPLIEGUE.md",
+    "18_INFRAESTRUCTURA.md",
+    "19_DOCUMENTACION.md",
+    "20_PROYECTO_INTEGRADOR.md",
+    "SIMULACRO_ENTREVISTA_SENIOR_PARTE1.md",
+    "SIMULACRO_ENTREVISTA_SENIOR_PARTE2.md",
+    "21_GLOSARIO.md",
+    "22_CHECKLIST.md",
+    "23_RECURSOS.md",
+    "RECURSOS_POR_MODULO.md",
+    "EJERCICIOS.md",
+    "EJERCICIOS_SOLUCIONES.md",
+    "PLANTILLAS.md",
+    "DECISIONES_TECH.md",
+    "RUBRICA_EVALUACION.md",
+    "APENDICE_A_SPEECH_PORTAFOLIO.md",
+    "APENDICE_B_TALKING_POINTS.md",
+    "GUIA_AUDIOVISUAL.md",
+    "MAINTENANCE_GUIDE.md",
 ]
 
 # Mapa de Emojis a Símbolos Unicode
@@ -114,10 +149,46 @@ EMOJI_TO_SYMBOL = {
 }
 
 FILE_TITLES = {
-    "README.md": "Visión General del Plan MS AI",
-    "PLAN_DETALLADO.md": "Plan Detallado (6 Meses)",
-    "RUTINA_ESTUDIO.md": "Rutina Diaria de Estudio",
-    "RECURSOS_Y_LINKS.md": "Recursos y Enlaces Clave",
+    "00_INDICE.md": "ÍNDICE",
+    "SYLLABUS.md": "SYLLABUS",
+    "PLAN_ESTUDIOS.md": "PLAN DE ESTUDIOS",
+    "01_PYTHON_MODERNO.md": "PYTHON MODERNO",
+    "02_DISENO_SISTEMAS.md": "DISEÑO DE SISTEMAS",
+    "03_ESTRUCTURA_PROYECTO.md": "ESTRUCTURA DE PROYECTO",
+    "04_ENTORNOS.md": "ENTORNOS",
+    "05_GIT_PROFESIONAL.md": "GIT PROFESIONAL",
+    "06_VERSIONADO_DATOS.md": "VERSIONADO DE DATOS",
+    "SIMULACRO_ENTREVISTA_JUNIOR.md": "SIMULACRO ENTREVISTA JUNIOR",
+    "07_SKLEARN_PIPELINES.md": "SKLEARN PIPELINES",
+    "08_INGENIERIA_FEATURES.md": "INGENIERÍA DE FEATURES",
+    "09_TRAINING_PROFESIONAL.md": "TRAINING PROFESIONAL",
+    "10_EXPERIMENT_TRACKING.md": "EXPERIMENT TRACKING",
+    "11_TESTING_ML.md": "TESTING ML",
+    "12_CI_CD.md": "CI/CD",
+    "13_DOCKER.md": "DOCKER",
+    "14_FASTAPI.md": "FASTAPI",
+    "15_STREAMLIT.md": "STREAMLIT",
+    "SIMULACRO_ENTREVISTA_MID.md": "SIMULACRO ENTREVISTA MID",
+    "16_OBSERVABILIDAD.md": "OBSERVABILIDAD",
+    "17_DESPLIEGUE.md": "DESPLIEGUE",
+    "18_INFRAESTRUCTURA.md": "INFRAESTRUCTURA",
+    "19_DOCUMENTACION.md": "DOCUMENTACIÓN",
+    "20_PROYECTO_INTEGRADOR.md": "PROYECTO INTEGRADOR",
+    "SIMULACRO_ENTREVISTA_SENIOR_PARTE1.md": "SIMULACRO SENIOR (PARTE 1)",
+    "SIMULACRO_ENTREVISTA_SENIOR_PARTE2.md": "SIMULACRO SENIOR (PARTE 2)",
+    "21_GLOSARIO.md": "GLOSARIO",
+    "22_CHECKLIST.md": "CHECKLIST",
+    "23_RECURSOS.md": "RECURSOS",
+    "RECURSOS_POR_MODULO.md": "RECURSOS POR MÓDULO",
+    "EJERCICIOS.md": "EJERCICIOS",
+    "EJERCICIOS_SOLUCIONES.md": "SOLUCIONES DE EJERCICIOS",
+    "PLANTILLAS.md": "PLANTILLAS",
+    "DECISIONES_TECH.md": "DECISIONES TÉCNICAS",
+    "RUBRICA_EVALUACION.md": "RÚBRICA DE EVALUACIÓN",
+    "APENDICE_A_SPEECH_PORTAFOLIO.md": "APÉNDICE A: SPEECH PORTAFOLIO",
+    "APENDICE_B_TALKING_POINTS.md": "APÉNDICE B: TALKING POINTS",
+    "GUIA_AUDIOVISUAL.md": "GUÍA AUDIOVISUAL",
+    "MAINTENANCE_GUIDE.md": "GUÍA DE MANTENIMIENTO",
 }
 
 # CSS Optimizado para WeasyPrint (Estilo Compacto y Profesional)
@@ -410,6 +481,7 @@ h2 + *, h3 + *, h4 + * {
 
 class PDFGenerator:
     def __init__(self):
+        OUTPUT_DIR.mkdir(exist_ok=True)
         self.font_config = FontConfiguration()
         self.css = CSS(string=CONTENT_CSS, font_config=self.font_config)
 
@@ -559,10 +631,10 @@ class PDFGenerator:
         <body>
             <div class="cover-page global-cover">
                 <div class="cover-content" style="border-color:rgba(96,165,250,0.3);background:rgba(15,23,42,0.6);">
-                    <div style="font-size:60pt;margin-bottom:30px;">🎓</div>
-                    <div class="global-title">MS IN ARTIFICIAL INTELLIGENCE</div>
-                    <div class="cover-subtitle" style="color:#94a3b8;margin-bottom:40px;">Academic Preparation Pathway</div>
-                    <div class="cover-badge" style="background:linear-gradient(90deg,#3b82f6,#8b5cf6);border:none;padding:10px 30px;">CU BOULDER · 6-MONTH STUDY PLAN</div>
+                    <div style="font-size:60pt;margin-bottom:30px;">🚀</div>
+                    <div class="global-title">GUÍA MLOPS</div>
+                    <div class="cover-subtitle" style="color:#94a3b8;margin-bottom:40px;">De Cero a Senior / Staff</div>
+                    <div class="cover-badge" style="background:linear-gradient(90deg,#3b82f6,#8b5cf6);border:none;padding:10px 30px;">VERSION 5.0 — PORTFOLIO EDITION</div>
                 </div>
                 <div style="position:absolute;bottom:30px;font-size:11pt;color:#64748b;">DUQUEOM | 2025</div>
             </div>
@@ -705,7 +777,7 @@ def main():
 
     # Generar PDF único
     print("\n[4] Generando PDF final...")
-    final_path = OUTPUT_DIR / FINAL_FILENAME
+    final_path = OUTPUT_DIR / "GUIA_MLOPS_COMPLETA_v5.pdf"
 
     HTML(string=full_html, base_url=str(BASE_DIR)).write_pdf(
         target=final_path, stylesheets=[gen.css]

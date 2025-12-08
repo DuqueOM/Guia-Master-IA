@@ -29,9 +29,8 @@ LANG = "es"
 # Usar velocidad lenta (más clara para educación)
 SLOW = False
 
-# Directorios relativos al proyecto Archimedes (respecto a este script)
-DOCS_DIR = Path("guia_archimedes/docs")
-OUTPUT_DIR = Path("guia_archimedes/audio")
+# Directorio de salida
+OUTPUT_DIR = "audio"
 
 # Archivos a procesar (orden correcto) - v5.0 Senior Edition
 MODULE_FILES = [
@@ -422,25 +421,23 @@ def main():
         show_install_instructions()
         return
 
-    # Directorios base
+    # Directorio actual
     script_dir = Path(__file__).parent
-    docs_dir = script_dir / DOCS_DIR
     output_dir = script_dir / OUTPUT_DIR
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(exist_ok=True)
 
-    # Determinar archivos a procesar (desde guia_archimedes/docs)
+    # Determinar archivos a procesar
     if len(sys.argv) > 1 and not sys.argv[1].startswith("--"):
-        # Archivo específico (nombre relativo al directorio docs)
-        files_to_process = [docs_dir / sys.argv[1]]
+        # Archivo específico
+        files_to_process = [script_dir / sys.argv[1]]
     else:
-        # Todos los .md actuales en la carpeta docs (excepto scripts auxiliares)
+        # Todos los .md actuales en la carpeta (excepto scripts auxiliares)
         files_to_process = sorted(
-            p for p in docs_dir.glob("*.md") if not p.name.startswith("generate")
+            p for p in script_dir.glob("*.md") if not p.name.startswith("generate")
         )
 
     print(f"📁 Archivos a procesar: {len(files_to_process)}")
     print("🗣️ Motor: Google Text-to-Speech (español)")
-    print(f"📂 Input:  {docs_dir}")
     print(f"📂 Output: {output_dir}\n")
 
     # Procesar

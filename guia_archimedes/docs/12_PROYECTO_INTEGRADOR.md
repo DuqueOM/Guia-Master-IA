@@ -1,33 +1,33 @@
-# 12 - Proyecto Integrador: Archimedes Indexer
+# Módulo 10 - Proyecto Final: ML Pipeline Completo
 
-> **🎯 Objetivo:** Ensamblar todos los componentes en un motor de búsqueda funcional con análisis Big O.
+> **🎯 Objetivo:** Construir un sistema de ML end-to-end que integre clasificación, clustering, análisis probabilístico y una red neuronal  
+> **Fase:** Integración | **Demuestra dominio de los 6 cursos del Pathway**
 
 ---
 
-## 🧠 Metodología Feynman: ¿Qué Estamos Construyendo?
+## 🧠 ¿Qué Estamos Construyendo?
 
-### Explicación para un Niño de 10 Años
+### El Proyecto Demuestra Dominio de las 2 Líneas del Pathway
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                                                                             │
-│   IMAGINA UNA BIBLIOTECA MÁGICA                                             │
-│   ─────────────────────────────                                             │
+│   PROYECTO: SISTEMA DE CLASIFICACIÓN DE TEXTO CON ML COMPLETO               │
+│   ─────────────────────────────────────────────────────────────             │
 │                                                                             │
-│   Tienes 1000 libros y quieres encontrar todos los que hablan de "dragones" │ 
+│   LÍNEA 1: MACHINE LEARNING (3 créditos)                                    │
+│   ├── Clasificador Naive Bayes (ML Supervisado)                             │
+│   ├── Clustering K-Means de documentos (ML No Supervisado)                  │
+│   └── Red Neuronal MLP para clasificación (Deep Learning)                   │
 │                                                                             │
-│   SIN MAGIA (búsqueda lineal):                                              │
-│   📚 Abrir libro 1, leer todo, ¿tiene "dragones"? No.                       │
-│   📚 Abrir libro 2, leer todo, ¿tiene "dragones"? No.                       │
-│   📚 ... repetir 1000 veces ... ¡MUY LENTO!                                 │
+│   LÍNEA 2: PROBABILIDAD Y ESTADÍSTICA (3 créditos)                          │
+│   ├── Análisis Bayesiano (Fundamentos de Probabilidad)                      │
+│   ├── Generador de texto con cadenas de Markov (MCMC)                       │
+│   └── Evaluación estadística con intervalos de confianza (Estimación)       │
 │                                                                             │
-│   CON MAGIA (índice invertido):                                             │
-│   📋 El bibliotecario tiene una lista secreta:                              │
-│      "dragones" → libros 23, 156, 789                                       │
-│   📚 ¡Vas directo a esos 3 libros! ¡INSTANTÁNEO!                            │
-│                                                                             │
-│   ESO ES ARCHIMEDES INDEXER:                                                │
-│   Un bibliotecario mágico para documentos de texto.                         │
+│   RESULTADO:                                                                │
+│   Un pipeline que clasifica documentos usando 3 enfoques diferentes,        │
+│   compara su rendimiento estadísticamente, y genera texto sintético.        │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -35,26 +35,39 @@
 ### Explicación Técnica Progresiva
 
 **Nivel 1 - Concepto:**
-Un motor de búsqueda que encuentra documentos relevantes para una consulta.
+Un sistema que clasifica textos automáticamente usando diferentes técnicas de ML.
 
 **Nivel 2 - Componentes:**
-- **Tokenizer:** Divide texto en palabras
-- **Índice Invertido:** Mapea palabra → documentos
-- **TF-IDF:** Calcula importancia de palabras
-- **Cosine Similarity:** Mide qué tan similar es query a cada documento
+- **Preprocesamiento:** Tokenización, TF-IDF vectorization
+- **Naive Bayes:** Clasificador probabilístico (usa Teorema de Bayes)
+- **K-Means:** Agrupa documentos similares (no supervisado)
+- **MLP:** Red neuronal multicapa (deep learning)
+- **Markov Chain:** Genera texto sintético
+- **Evaluación estadística:** Intervalos de confianza, cross-validation
 
 **Nivel 3 - Flujo Completo:**
 ```
-INDEXACIÓN (una vez):
-documento → tokenizar → actualizar índice → calcular TF-IDF
+ENTRENAMIENTO:
+datos → preprocesar → vectorizar → entrenar modelos → evaluar
 
-BÚSQUEDA (cada query):
-query → tokenizar → buscar en índice → calcular similitud → ordenar → resultados
+PREDICCIÓN:
+nuevo texto → vectorizar → predecir con cada modelo → comparar
+
+GENERACIÓN:
+corpus → construir cadena de Markov → generar texto nuevo
+
+ANÁLISIS:
+resultados → intervalos de confianza → comparación estadística
 ```
 
-**Nivel 4 - Complejidad:**
-- Indexación: O(N × T) donde N=docs, T=tokens promedio
-- Búsqueda: O(V + R × V) donde V=vocabulario, R=resultados
+**Nivel 4 - Conexión con Pathway:**
+| Componente | Curso del Pathway |
+|------------|-------------------|
+| Naive Bayes | Supervised Learning + Probability Foundations |
+| K-Means | Unsupervised Algorithms |
+| MLP | Introduction to Deep Learning |
+| Markov Chain | Discrete-Time Markov Chains |
+| Evaluación | Statistical Estimation |
 
 ---
 
@@ -62,36 +75,42 @@ query → tokenizar → buscar en índice → calcular similitud → ordenar →
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           ARCHIMEDES INDEXER                                │
+│                       ML TEXT CLASSIFICATION PIPELINE                       │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌──────────────┐                                                           │
-│  │   ENTRADA    │                                                           │
-│  │  Documentos  │                                                           │
+│  │   DATOS      │                                                           │
+│  │  (X, y)      │                                                           │
 │  └──────┬───────┘                                                           │
 │         │                                                                   │
 │         ▼                                                                   │
-│  ┌──────────────┐       ┌──────────────┐      ┌──────────────┐              │
-│  │  Tokenizer   │─────▶│   Corpus     │─────▶│  Inverted    │              │
-│  │              │       │  (Document)  │      │   Index      │              │
-│  └──────────────┘       └──────────────┘      └──────┬───────┘              │
-│                                                      │                      │
-│                                                      ▼                      │
-│                                               ┌──────────────┐              │
-│                                               │    TF-IDF    │              │
-│                                               │  Vectorizer  │              │
-│                                               └──────┬───────┘              │
-│                                                      │                      │
-│  ┌──────────────┐       ┌──────────────┐              │                     │
-│  │    Query     │─────▶│  Similarity  │◀────────────┘                      │
-│  │              │       │   (Cosine)   │                                    │
-│  └──────────────┘       └──────┬───────┘                                    │
-│                               │                                             │
-│                               ▼                                             │
-│                        ┌──────────────┐       ┌──────────────┐              │
-│                        │   QuickSort  │─────▶│  Resultados  │              │
-│                        │   (ranking)  │       │   Ordenados  │              │
-│                        └──────────────┘       └──────────────┘              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                        PREPROCESAMIENTO                              │   │
+│  │  Tokenizer → TF-IDF Vectorizer → Train/Test Split                    │   │
+│  └──────────────────────────────┬───────────────────────────────────────┘   │
+│                                 │                                           │
+│         ┌───────────────────────┼───────────────────────┐                   │
+│         ▼                       ▼                       ▼                   │
+│  ┌──────────────┐       ┌──────────────┐       ┌──────────────┐             │
+│  │ NAIVE BAYES  │       │   K-MEANS    │       │     MLP      │             │
+│  │ (Supervisado)│       │(No Supervis.)│       │(Deep Learn.) │             │
+│  │              │       │              │       │              │             │
+│  │ P(y|x)=      │       │ Clustering   │       │ Backprop     │             │
+│  │ P(x|y)P(y)   │       │ + Asignar    │       │ + SGD        │             │
+│  └──────┬───────┘       └──────┬───────┘       └──────┬───────┘             │
+│         │                       │                     │                     │
+│         └───────────────────────┼─────────────────────┘                     │
+│                                 ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                     EVALUACIÓN ESTADÍSTICA                           │   │
+│  │  Accuracy, Precision, Recall, F1, Cross-Validation                   │   │
+│  │  Intervalos de Confianza, Comparación de Modelos                     │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                     GENERADOR MARKOV (Bonus)                         │   │
+│  │  Corpus → Matriz de Transición → Generar Texto Sintético             │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -101,294 +120,349 @@ query → tokenizar → buscar en índice → calcular similitud → ordenar →
 ## 📁 Estructura de Archivos del Proyecto
 
 ```
-archimedes-indexer/
+ml-text-classifier/
 ├── src/
-│   ├── __init__.py              # Package marker
-│   ├── document.py              # Módulos 01-02: Document, Corpus
-│   ├── tokenizer.py             # Módulos 03-04: Tokenizer
-│   ├── inverted_index.py        # Módulos 05-06: InvertedIndex
-│   ├── sorting.py               # Módulos 07-08: quicksort, mergesort
-│   ├── searching.py             # Módulo 09: binary_search
-│   ├── linear_algebra.py        # Módulo 10: Vector operations
-│   ├── vectorizer.py            # Módulo 11: TFIDFVectorizer
-│   ├── similarity.py            # Módulo 11: cosine_similarity
-│   └── search_engine.py         # Módulo 12: SearchEngine (integración)
-├── tests/
 │   ├── __init__.py
-│   ├── test_document.py
-│   ├── test_tokenizer.py
-│   ├── test_inverted_index.py
-│   ├── test_sorting.py
-│   ├── test_searching.py
-│   ├── test_linear_algebra.py
-│   ├── test_vectorizer.py
-│   ├── test_similarity.py
-│   └── test_search_engine.py    # Tests de integración
+│   │
+│   ├── # PREPROCESAMIENTO (Módulos 04-06, 10-11)
+│   ├── preprocessing.py         # Tokenizer, TF-IDF Vectorizer
+│   ├── data_utils.py            # Train/test split, data loading
+│   │
+│   ├── # PROBABILIDAD (Módulos 19-21)
+│   ├── probability.py           # Distribuciones, Bayes
+│   ├── statistics.py            # MLE, intervalos de confianza
+│   ├── markov.py                # Cadenas de Markov, generador de texto
+│   │
+│   ├── # MACHINE LEARNING (Módulos 22-23)
+│   ├── naive_bayes.py           # Clasificador Naive Bayes
+│   ├── kmeans.py                # Clustering K-Means
+│   ├── evaluation.py            # Métricas, cross-validation
+│   │
+│   ├── # DEEP LEARNING (Módulo 24)
+│   ├── neural_network.py        # MLP desde cero
+│   ├── activations.py           # Sigmoid, ReLU, Softmax
+│   ├── optimizers.py            # SGD, Adam
+│   │
+│   └── # INTEGRACIÓN
+│   └── pipeline.py              # Pipeline completo que usa todo
+│
+├── tests/
+│   ├── test_preprocessing.py
+│   ├── test_probability.py
+│   ├── test_naive_bayes.py
+│   ├── test_kmeans.py
+│   ├── test_neural_network.py
+│   ├── test_markov.py
+│   └── test_pipeline.py         # Tests de integración
+│
 ├── data/
-│   └── sample_corpus/
-│       ├── doc_001.txt
-│       ├── doc_002.txt
-│       └── ...
+│   └── sample_dataset/          # Dataset de clasificación de texto
+│       ├── train.csv
+│       └── test.csv
+│
+├── notebooks/
+│   └── demo.ipynb               # Demo interactivo del pipeline
+│
 ├── docs/
-│   ├── COMPLEXITY_ANALYSIS.md   # Análisis Big O de todo el sistema
-│   └── API_REFERENCE.md         # Documentación de la API
+│   ├── MODEL_COMPARISON.md      # Comparación estadística de modelos
+│   └── PATHWAY_ALIGNMENT.md     # Cómo el proyecto cubre el Pathway
+│
 ├── README.md                    # Documentación principal (inglés)
-├── pyproject.toml               # Configuración del proyecto
-└── requirements-dev.txt         # pytest, mypy, ruff
+├── pyproject.toml
+└── requirements-dev.txt
 ```
 
 ---
 
-## 💻 Implementación Guiada: SearchEngine
+## 💻 Implementación Guiada: ML Pipeline
 
-### Paso 1: La Clase Principal
+### Paso 1: Pipeline Principal
 
 ```python
-# src/search_engine.py
-"""Main search engine orchestrating all components."""
+# src/pipeline.py
+"""ML Pipeline integrating all components for the Pathway project."""
 
-from typing import NamedTuple
-from .document import Document, Corpus
-from .tokenizer import Tokenizer
-from .inverted_index import InvertedIndex
-from .vectorizer import TFIDFVectorizer
-from .similarity import cosine_similarity
-from .sorting import quicksort
+from typing import Dict, List, Tuple
+from .preprocessing import TFIDFVectorizer, train_test_split
+from .naive_bayes import NaiveBayesClassifier
+from .kmeans import KMeans
+from .neural_network import NeuralNetwork
+from .evaluation import accuracy, precision, recall, f1_score, cross_validate
+from .statistics import confidence_interval
+from .markov import MarkovTextGenerator
 
 
-class SearchResult(NamedTuple):
-    """A search result with document info and relevance score.
+class MLPipeline:
+    """Complete ML pipeline demonstrating Pathway competencies.
     
-    Attributes:
-        doc_id: Unique document identifier.
-        title: Document title.
-        score: Relevance score (0.0 to 1.0).
-        snippet: Preview of document content.
-    """
-    doc_id: int
-    title: str
-    score: float
-    snippet: str
-
-
-class SearchEngine:
-    """Full-text search engine using TF-IDF and cosine similarity.
-    
-    This class integrates all components:
-    - Tokenizer for text processing
-    - InvertedIndex for fast term lookup
-    - TFIDFVectorizer for document representation
-    - Cosine similarity for ranking
+    This class integrates:
+    - Naive Bayes (Supervised Learning + Probability)
+    - K-Means (Unsupervised Learning)
+    - Neural Network (Deep Learning)
+    - Statistical evaluation (Statistical Estimation)
+    - Markov text generation (Markov Chains)
     
     Example:
-        >>> engine = SearchEngine()
-        >>> engine.add_document(1, "Python Guide", "Learn Python programming...")
-        >>> engine.add_document(2, "Java Tutorial", "Java programming basics...")
-        >>> engine.build_index()
-        >>> results = engine.search("python programming")
-        >>> for r in results:
-        ...     print(f"{r.title}: {r.score:.3f}")
-        Python Guide: 0.847
-        Java Tutorial: 0.213
-    
-    Complexity:
-        - add_document: O(1)
-        - build_index: O(N × T) where N=docs, T=avg tokens
-        - search: O(V + R × V + R log R) where V=vocab, R=results
+        >>> pipeline = MLPipeline()
+        >>> pipeline.load_data(texts, labels)
+        >>> pipeline.train_all_models()
+        >>> results = pipeline.compare_models()
+        >>> print(results)
+        {'naive_bayes': 0.85, 'kmeans': 0.72, 'neural_net': 0.88}
     """
     
-    def __init__(self) -> None:
-        """Initialize search engine with empty corpus."""
-        self.corpus = Corpus()
-        self.tokenizer = Tokenizer()
-        self.index = InvertedIndex()
+    def __init__(self, n_classes: int = 2) -> None:
+        """Initialize pipeline with empty models."""
         self.vectorizer = TFIDFVectorizer()
+        self.naive_bayes = NaiveBayesClassifier()
+        self.kmeans = KMeans(n_clusters=n_classes)
+        self.neural_net: NeuralNetwork = None  # Initialized after vectorization
+        self.markov_generator = MarkovTextGenerator()
         
-        self._document_vectors: list[list[float]] = []
-        self._indexed: bool = False
+        self.n_classes = n_classes
+        self.X_train: List[List[float]] = []
+        self.X_test: List[List[float]] = []
+        self.y_train: List[int] = []
+        self.y_test: List[int] = []
     
-    def add_document(self, doc_id: int, title: str, content: str) -> None:
-        """Add a document to the corpus.
+    def load_data(
+        self, 
+        texts: List[str], 
+        labels: List[int],
+        test_size: float = 0.2
+    ) -> None:
+        """Load and preprocess data.
         
         Args:
-            doc_id: Unique identifier for the document.
-            title: Document title for display.
-            content: Full text content to index.
-        
-        Raises:
-            ValueError: If doc_id already exists.
-        
-        Note:
-            Documents are not searchable until build_index() is called.
+            texts: List of text documents.
+            labels: List of class labels.
+            test_size: Fraction for test set.
         """
-        if self.corpus.contains(doc_id):
-            raise ValueError(f"Document {doc_id} already exists")
+        # Vectorize texts
+        X = self.vectorizer.fit_transform(texts)
         
-        doc = Document(doc_id=doc_id, title=title, content=content)
-        self.corpus.add(doc)
-        self._indexed = False  # Mark index as stale
+        # Split data
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+            X, labels, test_size=test_size
+        )
+        
+        # Initialize neural network with correct input size
+        n_features = len(X[0]) if X else 0
+        self.neural_net = NeuralNetwork(
+            layer_sizes=[n_features, 64, 32, self.n_classes],
+            activations=['relu', 'relu', 'softmax']
+        )
+        
+        # Train Markov generator on all texts
+        self.markov_generator.fit(texts)
     
-    def build_index(self) -> None:
-        """Build inverted index and TF-IDF vectors.
-        
-        Must be called after adding documents and before searching.
-        Can be called again to rebuild after adding more documents.
-        
-        Complexity: O(N × T) where N=documents, T=avg tokens per doc
-        """
-        # Reset index
-        self.index = InvertedIndex()
-        tokenized_docs: list[list[str]] = []
-        
-        # Process each document
-        for doc in self.corpus:
-            tokens = self.tokenizer.tokenize(doc.content)
-            doc.tokens = tokens
-            tokenized_docs.append(tokens)
-            self.index.add_document(doc.doc_id, tokens)
-        
-        # Build TF-IDF vectors
-        self._document_vectors = self.vectorizer.fit_transform(tokenized_docs)
-        self._indexed = True
-    
-    def search(self, query: str, top_k: int = 10) -> list[SearchResult]:
-        """Search for documents matching the query.
-        
-        Args:
-            query: Search query string.
-            top_k: Maximum number of results to return.
+    def train_all_models(self, verbose: bool = True) -> Dict[str, float]:
+        """Train all three models and return training metrics.
         
         Returns:
-            List of SearchResult sorted by relevance (descending).
-        
-        Raises:
-            RuntimeError: If build_index() hasn't been called.
-        
-        Complexity: O(V + R × V + R log R)
-            - O(V): Transform query to vector
-            - O(R × V): Calculate similarity for R candidate docs
-            - O(R log R): Sort results
+            Dictionary with training accuracy for each model.
         """
-        if not self._indexed:
-            raise RuntimeError("Must call build_index() before searching")
+        results = {}
         
-        # Tokenize query
-        query_tokens = self.tokenizer.tokenize(query)
-        if not query_tokens:
-            return []
+        # 1. Train Naive Bayes (Módulo 19 + 22)
+        if verbose:
+            print("Training Naive Bayes...")
+        self.naive_bayes.fit(self.X_train, self.y_train)
+        nb_pred = self.naive_bayes.predict(self.X_train)
+        results['naive_bayes_train'] = accuracy(self.y_train, nb_pred)
         
-        # Get candidate documents (those containing at least one query term)
-        candidates = self.index.search_or(query_tokens)
-        if not candidates:
-            return []
+        # 2. Train K-Means (Módulo 23)
+        if verbose:
+            print("Training K-Means...")
+        self.kmeans.fit(self.X_train)
+        # Assign cluster labels to classes (majority voting)
+        km_pred = self._kmeans_predict_with_labels(self.X_train, self.y_train)
+        results['kmeans_train'] = accuracy(self.y_train, km_pred)
         
-        # Transform query to TF-IDF vector
-        query_vector = self.vectorizer.transform_query(query_tokens)
+        # 3. Train Neural Network (Módulo 24)
+        if verbose:
+            print("Training Neural Network...")
+        self.neural_net.fit(self.X_train, self.y_train, epochs=100)
+        nn_pred = self.neural_net.predict(self.X_train)
+        results['neural_net_train'] = accuracy(self.y_train, nn_pred)
         
-        # Calculate similarity for each candidate
-        results: list[tuple[int, float]] = []
-        for doc_idx, doc in enumerate(self.corpus):
-            if doc.doc_id in candidates:
-                score = cosine_similarity(query_vector, self._document_vectors[doc_idx])
-                if score > 0:
-                    results.append((doc_idx, score))
-        
-        # Sort by score (descending) using our quicksort
-        results = quicksort(results, key=lambda x: -x[1])
-        
-        # Convert to SearchResult objects
-        search_results: list[SearchResult] = []
-        for doc_idx, score in results[:top_k]:
-            doc = self.corpus.get_by_index(doc_idx)
-            snippet = doc.content[:200] + "..." if len(doc.content) > 200 else doc.content
-            search_results.append(SearchResult(
-                doc_id=doc.doc_id,
-                title=doc.title,
-                score=round(score, 4),
-                snippet=snippet
-            ))
-        
-        return search_results
+        return results
     
-    def get_stats(self) -> dict:
-        """Get statistics about the search engine.
+    def evaluate_all_models(self) -> Dict[str, Dict[str, float]]:
+        """Evaluate all models on test set.
         
-        Returns:
-            Dictionary with corpus and index statistics.
+        Returns metrics and confidence intervals (Módulo 20).
         """
+        results = {}
+        
+        for name, model in [
+            ('naive_bayes', self.naive_bayes),
+            ('neural_net', self.neural_net)
+        ]:
+            y_pred = model.predict(self.X_test)
+            
+            acc = accuracy(self.y_test, y_pred)
+            prec = precision(self.y_test, y_pred)
+            rec = recall(self.y_test, y_pred)
+            f1 = f1_score(self.y_test, y_pred)
+            
+            # Confidence interval for accuracy (Módulo 20)
+            ci_low, ci_high = confidence_interval(
+                successes=int(acc * len(self.y_test)),
+                trials=len(self.y_test),
+                confidence=0.95
+            )
+            
+            results[name] = {
+                'accuracy': acc,
+                'precision': prec,
+                'recall': rec,
+                'f1': f1,
+                'accuracy_ci_95': (ci_low, ci_high)
+            }
+        
+        return results
+    
+    def cross_validate_models(self, k: int = 5) -> Dict[str, List[float]]:
+        """K-fold cross-validation for all models (Módulo 20)."""
+        X_all = self.X_train + self.X_test
+        y_all = self.y_train + self.y_test
+        
         return {
-            "documents": len(self.corpus),
-            "vocabulary_size": self.vectorizer.vocabulary_size if self._indexed else 0,
-            "indexed": self._indexed,
+            'naive_bayes': cross_validate(NaiveBayesClassifier, X_all, y_all, k),
+            'neural_net': cross_validate(NeuralNetwork, X_all, y_all, k)
         }
+    
+    def generate_text(self, seed: str = None, length: int = 50) -> str:
+        """Generate synthetic text using Markov chain (Módulo 21)."""
+        return self.markov_generator.generate(seed=seed, length=length)
+    
+    def _kmeans_predict_with_labels(
+        self, 
+        X: List[List[float]], 
+        y: List[int]
+    ) -> List[int]:
+        """Assign class labels to K-Means clusters via majority voting."""
+        cluster_labels = self.kmeans.predict(X)
+        
+        # Map cluster -> most common class
+        from collections import Counter
+        cluster_to_class = {}
+        for k in range(self.n_classes):
+            cluster_points = [y[i] for i in range(len(y)) if cluster_labels[i] == k]
+            if cluster_points:
+                cluster_to_class[k] = Counter(cluster_points).most_common(1)[0][0]
+            else:
+                cluster_to_class[k] = 0
+        
+        return [cluster_to_class[c] for c in cluster_labels]
 ```
 
-### Paso 2: Clases de Soporte
+### Paso 2: Generador de Texto Markov (Módulo 21)
 
 ```python
-# src/document.py
-"""Document and Corpus classes."""
+# src/markov.py
+"""Markov Chain text generator - demonstrates Discrete-Time Markov Chains."""
 
-from dataclasses import dataclass, field
-from typing import Iterator
+from typing import Dict, List, Optional
+import random
+from collections import defaultdict
 
 
-@dataclass
-class Document:
-    """A searchable document.
+class MarkovTextGenerator:
+    """Text generator using Markov Chains.
     
-    Attributes:
-        doc_id: Unique identifier.
-        title: Document title.
-        content: Full text content.
-        tokens: Tokenized content (populated by SearchEngine).
+    Demonstrates:
+    - Discrete-time Markov Chains (Pathway course)
+    - Transition probability matrices
+    - Random sampling from distributions
+    
+    Example:
+        >>> generator = MarkovTextGenerator(order=2)
+        >>> generator.fit(["The quick brown fox", "The quick dog"])
+        >>> generator.generate(seed="The quick", length=10)
+        "The quick brown fox jumps..."
     """
-    doc_id: int
-    title: str
-    content: str
-    tokens: list[str] = field(default_factory=list)
     
-    def __post_init__(self) -> None:
-        if self.doc_id < 0:
-            raise ValueError("doc_id must be non-negative")
-        if not self.content.strip():
-            raise ValueError("content cannot be empty")
-
-
-class Corpus:
-    """Collection of documents."""
+    def __init__(self, order: int = 2) -> None:
+        """Initialize with n-gram order."""
+        self.order = order
+        self.transitions: Dict[tuple, Dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        self.start_states: List[tuple] = []
     
-    def __init__(self) -> None:
-        self._documents: list[Document] = []
-        self._id_to_index: dict[int, int] = {}
+    def fit(self, texts: List[str]) -> 'MarkovTextGenerator':
+        """Build transition matrix from corpus.
+        
+        For each n-gram, count how often each word follows it.
+        """
+        for text in texts:
+            words = text.split()
+            if len(words) < self.order + 1:
+                continue
+            
+            # Store starting states
+            self.start_states.append(tuple(words[:self.order]))
+            
+            # Build transitions
+            for i in range(len(words) - self.order):
+                state = tuple(words[i:i + self.order])
+                next_word = words[i + self.order]
+                self.transitions[state][next_word] += 1
+        
+        return self
     
-    def add(self, doc: Document) -> None:
-        """Add document to corpus."""
-        if doc.doc_id in self._id_to_index:
-            raise ValueError(f"Document {doc.doc_id} already exists")
-        self._id_to_index[doc.doc_id] = len(self._documents)
-        self._documents.append(doc)
+    def _sample_next(self, state: tuple) -> Optional[str]:
+        """Sample next word given current state.
+        
+        Uses counts as unnormalized probabilities.
+        """
+        if state not in self.transitions:
+            return None
+        
+        choices = self.transitions[state]
+        total = sum(choices.values())
+        
+        r = random.random() * total
+        cumulative = 0
+        
+        for word, count in choices.items():
+            cumulative += count
+            if r <= cumulative:
+                return word
+        
+        return list(choices.keys())[-1]
     
-    def get(self, doc_id: int) -> Document:
-        """Get document by ID."""
-        idx = self._id_to_index.get(doc_id)
-        if idx is None:
-            raise KeyError(f"Document {doc_id} not found")
-        return self._documents[idx]
-    
-    def get_by_index(self, index: int) -> Document:
-        """Get document by internal index."""
-        return self._documents[index]
-    
-    def contains(self, doc_id: int) -> bool:
-        """Check if document exists."""
-        return doc_id in self._id_to_index
-    
-    def __len__(self) -> int:
-        return len(self._documents)
-    
-    def __iter__(self) -> Iterator[Document]:
-        return iter(self._documents)
+    def generate(self, seed: str = None, length: int = 50) -> str:
+        """Generate text using the Markov chain.
+        
+        Args:
+            seed: Starting words (must match order)
+            length: Number of words to generate
+            
+        Returns:
+            Generated text string
+        """
+        if seed:
+            words = seed.split()
+            if len(words) < self.order:
+                # Pad with random start
+                start = random.choice(self.start_states) if self.start_states else ()
+                words = list(start)[:self.order - len(words)] + words
+            state = tuple(words[-self.order:])
+        else:
+            if not self.start_states:
+                return ""
+            state = random.choice(self.start_states)
+            words = list(state)
+        
+        for _ in range(length):
+            next_word = self._sample_next(state)
+            if next_word is None:
+                break
+            words.append(next_word)
+            state = tuple(words[-self.order:])
+        
+        return " ".join(words)
 ```
 
 ---
@@ -398,12 +472,12 @@ class Corpus:
 ### Template COMPLEXITY_ANALYSIS.md
 
 ```markdown
-# Complexity Analysis - Archimedes Indexer
+# Complexity Analysis - ML Text Classification Pipeline
 
 ## Overview
 
-This document analyzes the time and space complexity of all operations
-in the Archimedes Indexer search engine.
+This document analyzes the time and space complexity of all models
+in the ML Pipeline for the MS in AI Pathway project.
 
 ## Notation
 
@@ -618,91 +692,122 @@ addopts = "-v --cov=src"
 
 ## 📋 Checklist de Entrega (100 puntos)
 
-### Estructura y Código (40 pts)
-- [ ] Clase `Document` y `Corpus` (5 pts)
-- [ ] `Tokenizer` con stop words (5 pts)
-- [ ] `InvertedIndex` con AND/OR (10 pts)
-- [ ] `quicksort()` implementado (5 pts)
-- [ ] `binary_search()` implementado (5 pts)
-- [ ] `TFIDFVectorizer` desde cero (5 pts)
-- [ ] `cosine_similarity()` implementado (5 pts)
+### Línea 1: Machine Learning (40 pts)
+- [ ] `NaiveBayesClassifier` desde cero (10 pts) - Módulo 19 + 22
+- [ ] `KMeans` clustering desde cero (10 pts) - Módulo 23
+- [ ] `NeuralNetwork` MLP con backprop (15 pts) - Módulo 24
+- [ ] Preprocesamiento TF-IDF (5 pts) - Módulo 11
 
-### Testing (20 pts)
-- [ ] Tests unitarios para cada módulo (10 pts)
-- [ ] Tests de integración (5 pts)
-- [ ] Coverage > 80% (5 pts)
+### Línea 2: Probabilidad y Estadística (30 pts)
+- [ ] Análisis Bayesiano en Naive Bayes (10 pts) - Módulo 19
+- [ ] `MarkovTextGenerator` funcional (10 pts) - Módulo 21
+- [ ] Evaluación con intervalos de confianza (5 pts) - Módulo 20
+- [ ] Cross-validation implementado (5 pts) - Módulo 20
 
-### Documentación (20 pts)
-- [ ] README.md profesional en inglés (10 pts)
-- [ ] `COMPLEXITY_ANALYSIS.md` con Big O (10 pts)
+### Testing y Documentación (20 pts)
+- [ ] Tests unitarios para cada modelo (10 pts)
+- [ ] README.md profesional en inglés (5 pts)
+- [ ] `MODEL_COMPARISON.md` con análisis estadístico (5 pts)
 
-### Funcionalidad (20 pts)
-- [ ] Motor busca y retorna resultados (10 pts)
-- [ ] Resultados ordenados por relevancia (5 pts)
-- [ ] Demo funcional (5 pts)
+### Funcionalidad (10 pts)
+- [ ] Pipeline entrena y predice correctamente (5 pts)
+- [ ] Demo interactivo funcional (5 pts)
 
 ---
 
-## 🏗️ Arquitectura
+## 🏗️ Arquitectura Final
 
 ```
-SearchEngine
-    ├── Corpus (Document collection)
-    ├── Tokenizer (text → tokens)
-    ├── InvertedIndex (term → doc_ids)
-    ├── TFIDFVectorizer (docs → vectors)
-    └── Ranker (cosine similarity + quicksort)
+MLPipeline (Proyecto Integrador)
+    │
+    ├── Preprocesamiento
+    │   ├── Tokenizer (text → tokens)
+    │   └── TFIDFVectorizer (tokens → vectors)
+    │
+    ├── LÍNEA 1: Machine Learning
+    │   ├── NaiveBayesClassifier (Supervisado + Bayes)
+    │   ├── KMeans (No Supervisado)
+    │   └── NeuralNetwork (Deep Learning)
+    │
+    ├── LÍNEA 2: Probabilidad/Estadística
+    │   ├── MarkovTextGenerator (Cadenas de Markov)
+    │   ├── confidence_interval() (Estimación)
+    │   └── cross_validate() (Evaluación)
+    │
+    └── Evaluación
+        ├── accuracy, precision, recall, f1
+        └── Comparación estadística de modelos
 ```
 
 ---
 
 ## 📊 Análisis de Complejidad Requerido
 
-Documenta en `COMPLEXITY_ANALYSIS.md`:
+Documenta en `MODEL_COMPARISON.md`:
 
-| Operación | Tu Análisis |
-|-----------|-------------|
-| `add_document()` | O(?) |
-| `build_index()` | O(?) |
-| `search(query)` | O(?) |
-| `quicksort()` | O(?) promedio, O(?) peor |
-| `cosine_similarity()` | O(?) |
+| Modelo | Train | Predict | Space |
+|--------|-------|---------|-------|
+| `NaiveBayes.fit()` | O(N × V) | O(V × C) | O(V × C) |
+| `KMeans.fit()` | O(N × K × V × I) | O(K × V) | O(K × V) |
+| `NeuralNetwork.fit()` | O(E × N × L) | O(N × L) | O(L) |
+| `MarkovGenerator.fit()` | O(T) | O(L) | O(V²) |
+
+Donde: N=samples, V=features, C=classes, K=clusters, I=iterations, E=epochs, L=layers, T=tokens
 
 ---
 
 ## 📝 Template README.md
 
 ```markdown
-# Archimedes Indexer
+# ML Text Classification Pipeline
 
-A search engine built from scratch in pure Python.
+A complete ML pipeline built from scratch in pure Python for the MS in AI Pathway.
+
+## Pathway Alignment
+
+This project demonstrates competency in both Pathway lines:
+
+### Machine Learning (3 credits)
+- ✅ Naive Bayes Classifier (Supervised Learning)
+- ✅ K-Means Clustering (Unsupervised Learning)
+- ✅ Neural Network with Backpropagation (Deep Learning)
+
+### Probability & Statistics (3 credits)
+- ✅ Bayesian Analysis in Naive Bayes (Probability Foundations)
+- ✅ Markov Chain Text Generator (Discrete-Time Markov Chains)
+- ✅ Confidence Intervals & Cross-Validation (Statistical Estimation)
 
 ## Features
-- Inverted index for fast term lookup
-- TF-IDF vectorization
-- Cosine similarity ranking
-- No external dependencies (no numpy, pandas, sklearn)
+- All models implemented from scratch (no sklearn, no pytorch)
+- TF-IDF text vectorization
+- Statistical model comparison with confidence intervals
+- Markov chain text generation
 
 ## Installation
 \`\`\`bash
 git clone <repo>
-cd archimedes-indexer
+cd ml-text-classifier
 python -m venv venv
 source venv/bin/activate
 \`\`\`
 
 ## Usage
 \`\`\`python
-from src.search_engine import SearchEngine
+from src.pipeline import MLPipeline
 
-engine = SearchEngine()
-engine.add_document(1, "Python Tutorial", "Learn Python...")
-engine.build_index()
-results = engine.search("python programming")
+pipeline = MLPipeline(n_classes=2)
+pipeline.load_data(texts, labels)
+pipeline.train_all_models()
+results = pipeline.evaluate_all_models()
+print(results)
+# {'naive_bayes': {'accuracy': 0.85, 'accuracy_ci_95': (0.78, 0.92)}, ...}
+
+# Generate synthetic text
+generated = pipeline.generate_text(seed="The model", length=20)
 \`\`\`
 
-## Complexity Analysis
-See [COMPLEXITY_ANALYSIS.md](docs/COMPLEXITY_ANALYSIS.md)
+## Model Comparison
+See [MODEL_COMPARISON.md](docs/MODEL_COMPARISON.md)
 
 ## Testing
 \`\`\`bash
@@ -714,12 +819,25 @@ python -m pytest tests/ -v --cov=src
 
 ## ✅ Criterios de Aprobación
 
-| Puntuación | Nivel |
-|------------|-------|
-| 90-100 | Listo para Pathway |
-| 75-89 | Reforzar áreas débiles |
-| 60-74 | Más práctica necesaria |
-| <60 | Revisar módulos |
+| Puntuación | Nivel | Significado |
+|------------|-------|-------------|
+| 90-100 | 🏆 Listo para Pathway | Dominas ambas líneas |
+| 75-89 | ✅ Buen nivel | Reforzar gaps menores |
+| 60-74 | ⚠️ Necesita trabajo | Revisar módulos 19-24 |
+| <60 | ❌ Insuficiente | Volver a estudiar fundamentos |
+
+---
+
+## 🎯 Verificación de Competencias del Pathway
+
+| Curso del Pathway | ¿Cubierto? | Evidencia en el Proyecto |
+|-------------------|------------|--------------------------|
+| **ML: Supervised Learning** | ✅ | NaiveBayesClassifier, evaluación |
+| **ML: Unsupervised Algorithms** | ✅ | KMeans clustering |
+| **ML: Deep Learning** | ✅ | NeuralNetwork con backprop |
+| **Prob: Foundations** | ✅ | Bayes en clasificador, distribuciones |
+| **Prob: Markov Chains** | ✅ | MarkovTextGenerator |
+| **Prob: Statistical Estimation** | ✅ | Intervalos de confianza, cross-val |
 
 ---
 
@@ -727,4 +845,4 @@ python -m pytest tests/ -v --cov=src
 
 | ← Anterior | Índice |
 |------------|--------|
-| [11_TFIDF_COSENO](11_TFIDF_COSENO.md) | [00_INDICE](00_INDICE.md) |
+| [24_INTRO_DEEP_LEARNING](24_INTRO_DEEP_LEARNING.md) | [00_INDICE](00_INDICE.md) |

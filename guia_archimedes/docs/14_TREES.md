@@ -1,6 +1,7 @@
-# 14 - Árboles y Binary Search Trees
+# Anexo DSA - Árboles y Binary Search Trees
 
-> **🎯 Objetivo:** Dominar árboles binarios, BST y sus traversals - **tema CRÍTICO del Pathway**.
+> **⚠️ MÓDULO OPCIONAL:** Este módulo NO es requerido para el Pathway. Es útil para entrevistas técnicas.  
+> **🎯 Objetivo:** Dominar árboles binarios, BST y sus traversals.
 
 ---
 

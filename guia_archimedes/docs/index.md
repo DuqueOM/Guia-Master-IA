@@ -1,98 +1,70 @@
-# Archimedes Indexer - Guía Educativa
+# Guía 0→100: MS in AI Pathway
 
-> **Un Motor de Búsqueda y Recomendación Construido desde Cero**
-
-Esta guía es un programa de formación intensivo de 6 meses diseñado para transformar un perfil de Python básico en un candidato preparado para el [MS in Artificial Intelligence de CU Boulder](https://www.coursera.org/degrees/ms-artificial-intelligence-boulder).
-
----
-
-## 📚 Índice Principal
-
-👉 **[Ir al Índice Completo →](00_INDICE.md)**
+> **De Python Básico a Candidato del MS in AI de CU Boulder**  
+> **6 meses | 6h/día | 100% enfocado en las 6 materias del Pathway**
 
 ---
 
-## 🎯 ¿Qué es Archimedes Indexer?
+## 🎯 Objetivo Único
 
-Un proyecto integral que te obliga a:
+Prepararte para aprobar las **6 materias obligatorias** del Performance-Based Admission Pathway:
 
-| Componente | Habilidad Desarrollada |
-|------------|----------------------|
-| Arquitectura OOP | Diseño de clases profesional |
-| Índice Invertido | Hash Maps, Memoria, DSA |
-| Algoritmos de Búsqueda | QuickSort, Binary Search, Recursión |
-| Ranking ML | TF-IDF, Similitud de Coseno, Álgebra Lineal |
-| Análisis de Complejidad | Big O Notation, Matemáticas Discretas |
+### ⭐ Línea 1: Machine Learning (3 créditos)
+- Introduction to ML: Supervised Learning
+- Unsupervised Algorithms in ML
+- Introduction to Deep Learning
 
-**Restricción crítica:** Todo en Python puro. Sin `numpy`, `pandas`, `sklearn`.
-
----
-
-## 🗂️ Estructura de la Guía
-
-### Fases del Proyecto
-
-| Fase | Módulos | Enfoque |
-|------|---------|---------|
-| **I. Fundamentos** | 01-03 | Python profesional, OOP, Lógica |
-| **II. Estructuras de Datos** | 04-06 | Hash Maps, Índices, Memoria |
-| **III. Algoritmos** | 07-09 | Sorting, Searching, Recursión |
-| **IV. Matemáticas para ML** | 10-11 | Álgebra Lineal, TF-IDF, Coseno |
-| **V. Integración** | 12 | Proyecto completo, Análisis Big O |
-
-### Material Complementario
-
-- 📝 [Ejercicios Prácticos](EJERCICIOS.md)
-- ✅ [Soluciones Detalladas](EJERCICIOS_SOLUCIONES.md)
-- 📊 [Rúbrica de Evaluación](RUBRICA_EVALUACION.md)
-- 📖 [Glosario Técnico](GLOSARIO.md)
-- ☑️ [Checklist Final](CHECKLIST.md)
-- 🎯 [Simulacro de Entrevista](SIMULACRO_ENTREVISTA.md)
+### ⭐ Línea 2: Probabilidad y Estadística (3 créditos)
+- Probability Fundamentals for Data Science and AI
+- Discrete-Time Markov Chains and Monte Carlo Methods
+- Statistical Estimation for Data Science and AI
 
 ---
 
-## 🚀 Quick Start
+## 📚 Índice Completo
 
-```bash
-# Clonar el repositorio
-git clone <repo-url>
-cd archimedes-indexer
-
-# Crear entorno virtual
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# o: venv\Scripts\activate  # Windows
-
-# Verificar Python puro (sin dependencias externas)
-python -c "print('Ready to build from scratch!')"
-```
-
-### Levantar la documentación localmente
-
-```bash
-pip install mkdocs mkdocs-material
-mkdocs serve
-# Abrir http://localhost:8000
-```
+👉 **[Ver todos los módulos →](00_INDICE.md)**
 
 ---
 
-## 📅 Tiempo Estimado
+## 📋 Los 10 Módulos Obligatorios
 
-| Dedicación | Duración Total |
-|------------|----------------|
-| 6 horas/día (L-S) | 6 meses |
-| 3 horas/día | 10-12 meses |
-| Fin de semana intensivo | 12-15 meses |
+| # | Módulo | Fase | Semanas |
+|---|--------|------|---------|
+| 01 | Python Profesional | Fundamentos | 2 |
+| 02 | OOP desde Cero | Fundamentos | 2 |
+| 03 | Álgebra Lineal para ML | Fundamentos | 2 |
+| **04** | **Fundamentos de Probabilidad** | ⭐ Pathway L2 | 3 |
+| **05** | **Estadística Inferencial** | ⭐ Pathway L2 | 3 |
+| **06** | **Markov y Monte Carlo** | ⭐ Pathway L2 | 2 |
+| **07** | **ML Supervisado** | ⭐ Pathway L1 | 3 |
+| **08** | **ML No Supervisado** | ⭐ Pathway L1 | 2 |
+| **09** | **Deep Learning** | ⭐ Pathway L1 | 3 |
+| 10 | Proyecto Integrador | Final | 4 |
+
+**Total: 26 semanas = 6 meses**
 
 ---
 
-## 🔗 Enlaces Clave
+## 📌 Restricciones
+
+- ✅ **Python puro** - Sin numpy, pandas, sklearn
+- ✅ **100% local** - Todo se ejecuta en tu máquina
+- ✅ **Desde cero** - Cada algoritmo implementado manualmente
+
+---
+
+## 🔗 Enlaces
 
 - [MS in AI - CU Boulder](https://www.coursera.org/degrees/ms-artificial-intelligence-boulder)
 - [Pathway de Admisión](https://www.coursera.org/degrees/ms-artificial-intelligence-boulder/admissions)
-- [Mathematics for ML Specialization](https://www.coursera.org/specializations/mathematics-machine-learning)
 
 ---
 
-> 💡 **Filosofía:** Si puedes construir un motor de búsqueda desde cero y defender su análisis Big O, cualquier reclutador o comité de admisión sabrá que dominas los cimientos de CS.
+## 🚀 Comenzar
+
+**[→ Módulo 01: Python Profesional](01_PYTHON_PROFESIONAL.md)**
+
+---
+
+> 💡 **Filosofía:** Si puedes implementar Naive Bayes, K-Means, MLP y Markov desde cero, estás listo para el Pathway.

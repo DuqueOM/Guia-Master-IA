@@ -1,20 +1,36 @@
-# 📅 Plan de Estudios - Cronograma Detallado
+# 📅 Plan de Estudios - 10 Módulos Obligatorios
 
-> **6 Meses | 6 horas/día | Lunes a Sábado**
+> **6 Meses | 6 horas/día | Lunes a Sábado** - Preparación para MS in AI Pathway
 
 ---
 
-## 🗓️ Vista General
+## 🗓️ Vista General: 26 Semanas
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ MES 1        │ MES 2        │ MES 3        │ MES 4        │ MES 5-6         │
-│ Fundamentos  │ Estructuras  │ Estructuras  │ Algoritmos   │ Math + Integ.   │
-│ Mod 01-03    │ Mod 04-05    │ Mod 06       │ Mod 07-09    │ Mod 10-12       │
+│ SEMANAS 1-6       │ SEMANAS 7-14      │ SEMANAS 15-22    │ SEMANAS 23-26    │
+│ FUNDAMENTOS       │ PROB/STAT ⭐      │ MACHINE L. ⭐    │ PROYECTO        │
+│ Módulos 01-03     │ Módulos 04-06     │ Módulos 07-09    │ Módulo 10        │
+│ Python + Álgebra  │ PATHWAY LÍNEA 2   │ PATHWAY LÍNEA 1  │ INTEGRACIÓN      │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Dedicación total:** 36 horas/semana × 24 semanas = **864 horas** (con margen)
+**Dedicación total:** 36 horas/semana × 26 semanas = **~936 horas**
+
+### Los 10 Módulos Obligatorios
+
+| Semanas | Módulo | Tema | Curso del Pathway |
+|---------|--------|------|-------------------|
+| 1-2 | 01 | Python Profesional | - |
+| 3-4 | 02 | OOP desde Cero | - |
+| 5-6 | 03 | Álgebra Lineal para ML | - |
+| 7-9 | 04 | Fundamentos de Probabilidad | Probability Fundamentals |
+| 10-12 | 05 | Estadística Inferencial | Statistical Estimation |
+| 13-14 | 06 | Markov y Monte Carlo | Markov Chains & MC |
+| 15-17 | 07 | ML Supervisado | Supervised Learning |
+| 18-19 | 08 | ML No Supervisado | Unsupervised Algorithms |
+| 20-22 | 09 | Deep Learning | Intro to Deep Learning |
+| 23-26 | 10 | Proyecto Final | - |
 
 ---
 
@@ -408,35 +424,150 @@
 | V | **Demo final grabada** |
 | S | **Autoevaluación final** |
 
-**Entregable Final:**
-1. ✅ Motor de búsqueda funcional
-2. ✅ Análisis de complejidad completo
-3. ✅ README en inglés
-4. ✅ Tests con >80% coverage
-5. ✅ Demo grabada (opcional)
+**Entregable Prerrequisitos:** Motor de búsqueda funcional con TF-IDF
+
+---
+
+# ⭐ FASE PATHWAY (Semanas 25-35)
+
+## 🗓️ Semanas 25-28: Probabilidad y Estadística [PATHWAY LÍNEA 2]
+
+### Semana 25-26: Fundamentos de Probabilidad (Módulo 19)
+
+| Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
+|-----|-----------------|-------------------|------------------|
+| L | Probabilidad básica, axiomas | Simular dados, monedas | Ejercicio 19.1 |
+| M | Probabilidad condicional | Implementar P(A|B) | Ejercicio 19.2 |
+| X | Teorema de Bayes | Bayes desde cero | Ejercicio 19.3 |
+| J | Variables aleatorias | Distribuciones discretas | Ejercicio 19.4 |
+| V | Distribuciones continuas | Normal, exponencial | Ejercicio 19.5 |
+| S | **Repaso** | Naive Bayes simple | Simulacro Prob |
+
+### Semana 27-28: Estadística Inferencial (Módulo 20)
+
+| Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
+|-----|-----------------|-------------------|------------------|
+| L | Estimación puntual | MLE Bernoulli | Ejercicio 20.1 |
+| M | MLE general | MLE Normal | Ejercicio 20.2 |
+| X | Intervalos de confianza | CI desde cero | Ejercicio 20.3 |
+| J | Tests de hipótesis | Z-test, T-test | Ejercicio 20.4 |
+| V | Cross-validation | K-fold desde cero | Ejercicio 20.5 |
+| S | **Repaso** | Bootstrap | Simulacro Estadística |
+
+### Semana 29: Cadenas de Markov (Módulo 21)
+
+| Día | Actividad |
+|-----|-----------|
+| L | Teoría: Cadenas de Markov, matrices de transición |
+| M | Código: Construir matriz de transición |
+| X | Teoría: Distribución estacionaria, PageRank |
+| J | Código: PageRank desde cero |
+| V | Teoría: Monte Carlo, MCMC |
+| S | Código: Metropolis-Hastings, generador de texto |
+
+**Checkpoint:** Simulacro Probabilidad (20 preguntas)
+
+---
+
+## 🗓️ Semanas 30-33: Machine Learning [PATHWAY LÍNEA 1]
+
+### Semana 30-31: ML Supervisado (Módulo 22)
+
+| Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
+|-----|-----------------|-------------------|------------------|
+| L | Pipeline de ML, bias-variance | Regresión lineal | Ejercicio 22.1 |
+| M | Gradiente descendente | Regresión con GD | Ejercicio 22.2 |
+| X | Clasificación logística | Logistic regression | Ejercicio 22.3 |
+| J | Árboles de decisión | Decision tree | Ejercicio 22.4 |
+| V | KNN | KNN desde cero | Ejercicio 22.5 |
+| S | **Repaso** | Métricas de evaluación | Simulacro ML |
+
+### Semana 32: ML No Supervisado (Módulo 23)
+
+| Día | Actividad |
+|-----|-----------|
+| L | Teoría: Clustering, K-Means |
+| M | Código: K-Means desde cero |
+| X | Teoría: PCA, reducción de dimensionalidad |
+| J | Código: PCA desde cero |
+| V | Teoría: Detección de anomalías |
+| S | Código: LOF, evaluación de clusters |
+
+### Semana 33: Deep Learning (Módulo 24)
+
+| Día | Actividad |
+|-----|-----------|
+| L | Teoría: Perceptrón, neurona artificial |
+| M | Código: Perceptrón, funciones de activación |
+| X | Teoría: MLP, backpropagation |
+| J | Código: MLP que resuelve XOR |
+| V | Teoría: SGD, Adam, regularización |
+| S | Código: Red neuronal completa |
+
+**Checkpoint:** Simulacro Machine Learning (20 preguntas)
+
+---
+
+## 🗓️ Semanas 34-35: Proyecto Final e Integración
+
+### Semana 34: ML Pipeline (Módulo 12)
+
+| Día | Actividad |
+|-----|-----------|
+| L | Integrar NaiveBayesClassifier |
+| M | Integrar KMeans |
+| X | Integrar NeuralNetwork |
+| J | Integrar MarkovTextGenerator |
+| V | Evaluación estadística con CI |
+| S | Tests de integración |
+
+### Semana 35: Defensa y Preparación Final
+
+| Día | Actividad |
+|-----|-----------|
+| L | Comparación estadística de modelos |
+| M | Documentar MODEL_COMPARISON.md |
+| X | README.md profesional en inglés |
+| J | Simulacro completo (120 preguntas) |
+| V | **Demo final del pipeline** |
+| S | **Autoevaluación + Preparar auditar cursos del Pathway** |
 
 ---
 
 ## ✅ Checklist de Finalización
 
-- [ ] Módulos 01-12 completados
-- [ ] Proyecto `archimedes-indexer` funcional
-- [ ] Todos los tests pasando
-- [ ] Coverage >80%
-- [ ] `COMPLEXITY_ANALYSIS.md` completo
-- [ ] README.md en inglés
-- [ ] Simulacro de entrevista aprobado
-- [ ] Capaz de explicar Big O de cada componente
+### Prerrequisitos (Módulos 01-18)
+- [ ] Módulos 01-11 completados
+- [ ] Módulos 13-18 (DSA) completados
+- [ ] Motor de búsqueda TF-IDF funcional
+
+### ⭐ Pathway Línea 2: Probabilidad (Módulos 19-21)
+- [ ] Módulo 19: Fundamentos de Probabilidad
+- [ ] Módulo 20: Estadística Inferencial
+- [ ] Módulo 21: Cadenas de Markov
+
+### ⭐ Pathway Línea 1: Machine Learning (Módulos 22-24)
+- [ ] Módulo 22: ML Supervisado
+- [ ] Módulo 23: ML No Supervisado
+- [ ] Módulo 24: Deep Learning
+
+### Proyecto Final (Módulo 12)
+- [ ] ML Pipeline completo funcionando
+- [ ] Comparación estadística de modelos
+- [ ] README en inglés
+- [ ] Tests con >80% coverage
+
+### Preparación Final
+- [ ] Simulacro completo aprobado (100+ preguntas)
+- [ ] Capaz de explicar cada modelo en inglés
+- [ ] Listo para auditar cursos del Pathway
 
 ---
 
-## 📚 Recursos Generales
+## 📚 Recursos
 
-- [Mathematics for ML Specialization](https://www.coursera.org/specializations/mathematics-machine-learning)
-- [Grokking Algorithms](https://www.manning.com/books/grokking-algorithms)
-- [LeetCode](https://leetcode.com/) - Práctica de algoritmos
-- [Python Type Hints](https://docs.python.org/3/library/typing.html)
+Ver **[RECURSOS.md](RECURSOS.md)** para la lista completa de cursos, libros y videos.
 
 ---
 
-> 💡 **Tip:** Si un día no puedes completar todo, prioriza la **implementación** sobre la lectura. El código te enseña más que la teoría sola.
+> 💡 **Tip:** Prioriza los módulos 19-24 y el proyecto 12. Son el **foco del Pathway**. Los prerrequisitos (01-18) son base, no el objetivo.

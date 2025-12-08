@@ -1,197 +1,127 @@
 # 🔗 Mapa de Referencias Cruzadas
 
-> Navegación completa entre todos los documentos de la guía.
+> Navegación entre los 10 módulos obligatorios de la guía.
 
 ---
 
-## 📊 Matriz de Dependencias de Módulos
+## 📊 Flujo de los 10 Módulos Obligatorios
 
 ```
-ORDEN ÓPTIMO DE ESTUDIO (Flujo de Dependencias):
-
-01 Python Profesional
- ↓
-02 OOP desde Cero
- ↓
-03 Lógica Discreta ──────────────────────┐
- ↓                                        │
-04 Arrays y Strings                       │ Fundamentos
- ↓                                        │ de Big O
-05 Hash Maps y Sets ←─────────────────────┘
- ↓
-06 Índice Invertido
- ↓
 ┌──────────────────────────────────────────┐
-│ BLOQUE DSA AVANZADO (Pathway Critical)   │
+│ FASE 1: FUNDAMENTOS (Semanas 1-6)        │
 ├──────────────────────────────────────────┤
-│ 13 Linked Lists, Stacks, Queues          │
+│ Módulo 01 - Python Profesional           │
 │  ↓                                       │
-│ 14 Trees y BST                           │
+│ Módulo 02 - OOP desde Cero               │
 │  ↓                                       │
-│ 15 Graphs, BFS, DFS                      │
+│ Módulo 03 - Álgebra Lineal para ML       │
 └──────────────────────────────────────────┘
  ↓
 ┌──────────────────────────────────────────┐
-│ BLOQUE ALGORITMOS (Pathway Critical)     │
+│ FASE 2: PROBABILIDAD ⭐ PATHWAY L2       │
+│ (Semanas 7-14)                           │
 ├──────────────────────────────────────────┤
-│ 07 Recursión ─────────────┐              │
-│  ↓                        ↓              │
-│ 08 Sorting           16 Dynamic Prog     │
-│  ↓                        ↓              │
-│ 09 Binary Search     17 Greedy           │
-│                           ↓              │
-│                      18 Heaps            │
+│ Módulo 04 - Fundamentos de Probabilidad  │
+│  ↓                                       │
+│ Módulo 05 - Estadística Inferencial      │
+│  ↓                                       │
+│ Módulo 06 - Markov y Monte Carlo         │
 └──────────────────────────────────────────┘
  ↓
-10 Álgebra Lineal
+┌──────────────────────────────────────────┐
+│ FASE 3: MACHINE LEARNING ⭐ PATHWAY L1   │
+│ (Semanas 15-22)                          │
+├──────────────────────────────────────────┤
+│ Módulo 07 - ML Supervisado               │
+│  ↓                                       │
+│ Módulo 08 - ML No Supervisado            │
+│  ↓                                       │
+│ Módulo 09 - Deep Learning                │
+└──────────────────────────────────────────┘
  ↓
-11 TF-IDF y Coseno
- ↓
-12 PROYECTO INTEGRADOR
+┌──────────────────────────────────────────┐
+│ FASE 4: PROYECTO FINAL (Semanas 23-26)   │
+├──────────────────────────────────────────┤
+│ Módulo 10 - ML Pipeline Completo         │
+│    (integra módulos 04-09)               │
+└──────────────────────────────────────────┘
 ```
 
 ---
 
-## 📖 Referencias por Módulo
+## ⚠️ Anexos DSA (OPCIONALES - Solo para entrevistas)
 
-### 01_PYTHON_PROFESIONAL.md
-| Referencia a | Tipo |
-|--------------|------|
-| [GLOSARIO.md#type-hint](GLOSARIO.md#type-hint) | Término |
-| [GLOSARIO.md#pep8](GLOSARIO.md#pep8) | Término |
-| [EJERCICIOS.md#módulo-01](EJERCICIOS.md#módulo-01-python-profesional) | Ejercicios |
+```
+┌──────────────────────────────────────────┐
+│ ANEXOS DSA - NO requeridos para Pathway  │
+├──────────────────────────────────────────┤
+│ Arrays y Strings                         │
+│ Hash Maps y Sets                         │
+│ Recursión                                │
+│ Sorting                                  │
+│ Trees y BST                              │
+│ Graphs, BFS, DFS                         │
+│ Dynamic Programming                      │
+└──────────────────────────────────────────┘
+```
 
-### 02_OOP_DESDE_CERO.md
-| Referencia a | Tipo |
-|--------------|------|
-| 01_PYTHON_PROFESIONAL.md | Prerrequisito |
-| [GLOSARIO.md#clase](GLOSARIO.md#clase) | Término |
-| [GLOSARIO.md#oop](GLOSARIO.md#oop-object-oriented-programming) | Término |
-| [GLOSARIO.md#solid](GLOSARIO.md#solid) | Término |
+Estos módulos son útiles si quieres prepararte para **entrevistas técnicas de código**, pero **NO son necesarios** para:
+- Completar el proyecto de la guía
+- Aprobar las materias del Pathway de CU Boulder
 
-### 03_LOGICA_DISCRETA.md
-| Referencia a | Tipo |
-|--------------|------|
-| [GLOSARIO.md#big-o-notation](GLOSARIO.md#big-o-notation) | Término |
-| [GLOSARIO.md#set](GLOSARIO.md#set) | Término |
+---
 
-### 04_ARRAYS_STRINGS.md
-| Referencia a | Tipo |
-|--------------|------|
-| [GLOSARIO.md#array](GLOSARIO.md#array) | Término |
-| 03_LOGICA_DISCRETA.md (Big O) | Prerrequisito |
+## 📖 Referencias de los 10 Módulos Obligatorios
 
-### 05_HASHMAPS_SETS.md
-| Referencia a | Tipo |
-|--------------|------|
-| [GLOSARIO.md#hash-map](GLOSARIO.md#hash-map--hash-table) | Término |
-| [GLOSARIO.md#colision](GLOSARIO.md#colisión-hash) | Término |
+### Módulo 01 - Python Profesional
+| Prerrequisito | Siguiente |
+|---------------|-----------|
+| Ninguno | Módulo 02 |
 
-### 06_INVERTED_INDEX.md
-| Referencia a | Tipo |
-|--------------|------|
-| 05_HASHMAPS_SETS.md | Prerrequisito |
-| [GLOSARIO.md#indice-invertido](GLOSARIO.md#índice-invertido) | Término |
-| 12_PROYECTO_INTEGRADOR.md | Uso en proyecto |
+### Módulo 02 - OOP desde Cero
+| Prerrequisito | Siguiente |
+|---------------|-----------|
+| Módulo 01 | Módulo 03 |
 
-### 07_RECURSION.md
-| Referencia a | Tipo |
-|--------------|------|
-| [GLOSARIO.md#recursion](GLOSARIO.md#recursión) | Término |
-| [GLOSARIO.md#caso-base](GLOSARIO.md#caso-base) | Término |
-| [GLOSARIO.md#memoization](GLOSARIO.md#memoization) | Término |
-| 13_LINKED_LISTS.md (call stack) | Concepto relacionado |
+### Módulo 03 - Álgebra Lineal para ML
+| Prerrequisito | Siguiente |
+|---------------|-----------|
+| Módulos 01-02 | Módulo 04 |
 
-### 08_SORTING.md
-| Referencia a | Tipo |
-|--------------|------|
-| 07_RECURSION.md | Prerrequisito |
-| [GLOSARIO.md#quicksort](GLOSARIO.md#quicksort) | Término |
-| [GLOSARIO.md#divide-conquer](GLOSARIO.md#divide--conquer) | Término |
-| 12_PROYECTO_INTEGRADOR.md | Uso en proyecto |
+### Módulo 04 - Fundamentos de Probabilidad ⭐
+| Prerrequisito | Siguiente | Curso Pathway |
+|---------------|-----------|---------------|
+| Módulo 03 | Módulo 05 | Probability Fundamentals |
 
-### 09_BINARY_SEARCH.md
-| Referencia a | Tipo |
-|--------------|------|
-| 08_SORTING.md | Prerrequisito (datos ordenados) |
-| [GLOSARIO.md#binary-search](GLOSARIO.md#binary-search) | Término |
-| [GLOSARIO.md#off-by-one](GLOSARIO.md#off-by-one-error) | Término |
+### Módulo 05 - Estadística Inferencial ⭐
+| Prerrequisito | Siguiente | Curso Pathway |
+|---------------|-----------|---------------|
+| Módulo 04 | Módulo 06 | Statistical Estimation |
 
-### 10_ALGEBRA_LINEAL.md
-| Referencia a | Tipo |
-|--------------|------|
-| [GLOSARIO.md#vector](GLOSARIO.md#vector) | Término |
-| [GLOSARIO.md#producto-punto](GLOSARIO.md#producto-punto-dot-product) | Término |
-| [GLOSARIO.md#norma](GLOSARIO.md#norma-vector) | Término |
-| 11_TFIDF_COSENO.md | Siguiente |
+### Módulo 06 - Markov y Monte Carlo ⭐
+| Prerrequisito | Siguiente | Curso Pathway |
+|---------------|-----------|---------------|
+| Módulos 04-05 | Módulo 07 | Markov Chains & MC |
 
-### 11_TFIDF_COSENO.md
-| Referencia a | Tipo |
-|--------------|------|
-| 10_ALGEBRA_LINEAL.md | Prerrequisito |
-| [GLOSARIO.md#tf](GLOSARIO.md#term-frequency-tf) | Término |
-| [GLOSARIO.md#idf](GLOSARIO.md#idf-inverse-document-frequency) | Término |
-| [GLOSARIO.md#cosine-similarity](GLOSARIO.md#cosine-similarity) | Término |
-| 12_PROYECTO_INTEGRADOR.md | Uso en proyecto |
+### Módulo 07 - ML Supervisado ⭐
+| Prerrequisito | Siguiente | Curso Pathway |
+|---------------|-----------|---------------|
+| Módulos 03-06 | Módulo 08 | Supervised Learning |
 
-### 12_PROYECTO_INTEGRADOR.md
-| Referencia a | Tipo |
-|--------------|------|
-| Todos los módulos 01-11 | Prerrequisitos |
-| CHECKLIST.md | Verificación |
-| RUBRICA_EVALUACION.md | Evaluación |
+### Módulo 08 - ML No Supervisado ⭐
+| Prerrequisito | Siguiente | Curso Pathway |
+|---------------|-----------|---------------|
+| Módulo 07 | Módulo 09 | Unsupervised Algorithms |
 
-### 13_LINKED_LISTS_STACKS_QUEUES.md
-| Referencia a | Tipo |
-|--------------|------|
-| [GLOSARIO.md#linked-list](GLOSARIO.md#linked-list) | Término |
-| [GLOSARIO.md#stack](GLOSARIO.md#stack) | Término |
-| [GLOSARIO.md#queue](GLOSARIO.md#queue) | Término |
-| [GLOSARIO.md#lifo](GLOSARIO.md#lifo-last-in-first-out) | Término |
-| [GLOSARIO.md#fifo](GLOSARIO.md#fifo-first-in-first-out) | Término |
-| 14_TREES.md | Siguiente |
-| 15_GRAPHS.md | Siguiente (Queue para BFS) |
+### Módulo 09 - Deep Learning ⭐
+| Prerrequisito | Siguiente | Curso Pathway |
+|---------------|-----------|---------------|
+| Módulos 07-08 | Módulo 10 | Intro to Deep Learning |
 
-### 14_TREES.md
-| Referencia a | Tipo |
-|--------------|------|
-| 13_LINKED_LISTS.md | Prerrequisito (nodos, punteros) |
-| [GLOSARIO.md#tree](GLOSARIO.md#tree-árbol) | Término |
-| [GLOSARIO.md#bst](GLOSARIO.md#binary-search-tree-bst) | Término |
-| [GLOSARIO.md#inorder](GLOSARIO.md#inorder-traversal) | Término |
-| 15_GRAPHS.md | Siguiente |
-
-### 15_GRAPHS.md
-| Referencia a | Tipo |
-|--------------|------|
-| 13_LINKED_LISTS.md (Queue, Stack) | Prerrequisito |
-| 14_TREES.md (conceptos de nodos) | Prerrequisito |
-| [GLOSARIO.md#graph](GLOSARIO.md#graph-grafo) | Término |
-| [GLOSARIO.md#bfs](GLOSARIO.md#bfs-breadth-first-search) | Término |
-| [GLOSARIO.md#dfs](GLOSARIO.md#dfs-depth-first-search) | Término |
-
-### 16_DYNAMIC_PROGRAMMING.md
-| Referencia a | Tipo |
-|--------------|------|
-| 07_RECURSION.md | Prerrequisito |
-| [GLOSARIO.md#dynamic-programming](GLOSARIO.md#dynamic-programming-dp) | Término |
-| [GLOSARIO.md#memoization](GLOSARIO.md#memoization) | Término |
-| [GLOSARIO.md#tabulation](GLOSARIO.md#tabulation) | Término |
-| [GLOSARIO.md#optimal-substructure](GLOSARIO.md#optimal-substructure) | Término |
-
-### 17_GREEDY.md
-| Referencia a | Tipo |
-|--------------|------|
-| 16_DYNAMIC_PROGRAMMING.md (comparación) | Relacionado |
-| [GLOSARIO.md#greedy](GLOSARIO.md#greedy-algorithm) | Término |
-| 18_HEAPS.md (Huffman usa heap) | Siguiente |
-
-### 18_HEAPS.md
-| Referencia a | Tipo |
-|--------------|------|
-| 14_TREES.md (árbol binario completo) | Prerrequisito |
-| [GLOSARIO.md#heap](GLOSARIO.md#heap) | Término |
-| [GLOSARIO.md#priority-queue](GLOSARIO.md#priority-queue) | Término |
+### Módulo 10 - Proyecto Final
+| Prerrequisito | Entregable |
+|---------------|------------|
+| Módulos 01-09 | Pipeline ML completo |
 
 ---
 
@@ -245,21 +175,30 @@ grep -r "\[.*\](.*\.md)" guia_archimedes/*.md | \
 
 ---
 
-## 🗺️ Flujo de Navegación Recomendado
+## 🗺️ Flujo de Navegación: 10 Módulos Obligatorios
 
-### Para Principiante (Ruta Completa)
 ```
-index.md → 00_INDICE.md → 01 → 02 → 03 → 04 → 05 → 06 → 
-13 → 14 → 15 → 07 → 08 → 09 → 16 → 17 → 18 → 10 → 11 → 12
+index.md → 00_INDICE.md
+
+     Módulo 01 (Python)
+           ↓
+     Módulo 02 (OOP)
+           ↓
+     Módulo 03 (Álgebra Lineal)
+           ↓
+     Módulo 04 (Probabilidad) ⭐
+           ↓
+     Módulo 05 (Estadística) ⭐
+           ↓
+     Módulo 06 (Markov/MC) ⭐
+           ↓
+     Módulo 07 (ML Supervisado) ⭐
+           ↓
+     Módulo 08 (ML No Supervisado) ⭐
+           ↓
+     Módulo 09 (Deep Learning) ⭐
+           ↓
+     Módulo 10 (Proyecto Final)
 ```
 
-### Para Pathway (Solo DSA)
-```
-00_INDICE.md → 04 → 05 → 13 → 14 → 15 → 07 → 08 → 09 → 16 → 17 → 18 → 
-SIMULACRO_ENTREVISTA.md
-```
-
-### Para Referencia Rápida
-```
-GLOSARIO.md (términos) → Módulo específico → EJERCICIOS.md
-```
+**Tiempo total: 26 semanas = 6 meses**

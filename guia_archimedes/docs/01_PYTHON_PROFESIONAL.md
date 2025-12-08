@@ -1,6 +1,7 @@
-# 01 - Python Profesional
+# Módulo 01 - Python Profesional
 
-> **🎯 Objetivo:** Transformar código Python funcional en código profesional con type hints, funciones puras y estándares de la industria.
+> **🎯 Objetivo:** Transformar código Python funcional en código profesional con type hints, funciones puras y estándares de la industria  
+> **Fase:** Fundamentos | **Prerrequisito para:** Todos los módulos siguientes
 
 ---
 

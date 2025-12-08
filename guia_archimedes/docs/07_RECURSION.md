@@ -1,6 +1,7 @@
-# 07 - Recursión y Divide & Conquer
+# Anexo DSA - Recursión y Divide & Conquer
 
-> **🎯 Objetivo:** Dominar el pensamiento recursivo como base para implementar QuickSort y otros algoritmos fundamentales.
+> **⚠️ MÓDULO OPCIONAL:** Este módulo NO es requerido para el Pathway. Es útil para entrevistas técnicas.  
+> **🎯 Objetivo:** Dominar el pensamiento recursivo.
 
 ---
 

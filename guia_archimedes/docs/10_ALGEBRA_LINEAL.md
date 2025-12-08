@@ -1,6 +1,7 @@
-# 10 - Álgebra Lineal sin NumPy
+# Módulo 03 - Álgebra Lineal para ML
 
-> **🎯 Objetivo:** Implementar operaciones vectoriales y matriciales desde cero para entender la matemática detrás del TF-IDF.
+> **🎯 Objetivo:** Implementar operaciones vectoriales y matriciales desde cero  
+> **Fase:** Fundamentos | **Prerrequisito para:** Módulos 04-09
 
 ---
 

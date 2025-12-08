@@ -21,87 +21,77 @@ from weasyprint import CSS, HTML
 
 BASE_DIR = Path(__file__).parent
 OUTPUT_DIR = BASE_DIR / "pdf"
-FINAL_FILENAME = "GUIA_ARCHIMEDES_COMPLETA_v1.pdf"
+FINAL_FILENAME = "GUIA_MS_AI_PATHWAY_v2.pdf"
 
-# Orden lógico de la guía Archimedes
+# Carpeta donde están los archivos markdown
+DOCS_DIR = BASE_DIR / "docs"
+
+# Orden lógico de la guía: 10 MÓDULOS OBLIGATORIOS + Material complementario
+# 100% enfocado en las 6 materias del Pathway
 ORDERED_FILES: List[str] = [
+    # === INTRODUCCIÓN ===
     "index.md",
     "00_INDICE.md",
-    "SYLLABUS.md",
-    "PLAN_ESTUDIOS.md",
-    # Bloque Fundamentos
-    "01_PYTHON_PROFESIONAL.md",
-    "02_OOP_DESDE_CERO.md",
-    "03_LOGICA_DISCRETA.md",
+    # === FASE 1: FUNDAMENTOS (Módulos 01-03) ===
+    "01_PYTHON_PROFESIONAL.md",  # Módulo 01
+    "02_OOP_DESDE_CERO.md",  # Módulo 02
+    "10_ALGEBRA_LINEAL.md",  # Módulo 03 (Álgebra Lineal para ML)
+    # === FASE 2: PROBABILIDAD Y ESTADÍSTICA - PATHWAY LÍNEA 2 (Módulos 04-06) ===
+    "19_PROBABILIDAD_FUNDAMENTOS.md",  # Módulo 04
+    "20_ESTADISTICA_INFERENCIAL.md",  # Módulo 05
+    "21_CADENAS_MARKOV_MONTECARLO.md",  # Módulo 06
+    # === FASE 3: MACHINE LEARNING - PATHWAY LÍNEA 1 (Módulos 07-09) ===
+    "22_ML_SUPERVISADO.md",  # Módulo 07
+    "23_ML_NO_SUPERVISADO.md",  # Módulo 08
+    "24_INTRO_DEEP_LEARNING.md",  # Módulo 09
+    # === FASE 4: PROYECTO FINAL (Módulo 10) ===
+    "12_PROYECTO_INTEGRADOR.md",  # Módulo 10
+    # === MATERIAL COMPLEMENTARIO (Opcional) ===
+    "EJERCICIOS.md",
+    "GLOSARIO.md",
+    "SIMULACRO_ENTREVISTA.md",
+    "RECURSOS.md",
+    # === ANEXOS: DSA (Solo para entrevistas técnicas, NO requerido para Pathway) ===
     "04_ARRAYS_STRINGS.md",
     "05_HASHMAPS_SETS.md",
-    "06_INVERTED_INDEX.md",
-    # Bloque Estructuras de Datos
-    "13_LINKED_LISTS_STACKS_QUEUES.md",
-    "14_TREES.md",
-    "15_GRAPHS.md",
-    # Bloque Algoritmos
     "07_RECURSION.md",
     "08_SORTING.md",
-    "09_BINARY_SEARCH.md",
+    "14_TREES.md",
+    "15_GRAPHS.md",
     "16_DYNAMIC_PROGRAMMING.md",
-    "17_GREEDY.md",
-    "18_HEAPS.md",
-    # Bloque Matemáticas y Proyecto
-    "10_ALGEBRA_LINEAL.md",
-    "11_TFIDF_COSENO.md",
-    "12_PROYECTO_INTEGRADOR.md",
-    # Transversales
-    "EJERCICIOS.md",
-    "EJERCICIOS_SOLUCIONES.md",
-    "GLOSARIO.md",
-    "CHECKLIST.md",
-    "RECURSOS.md",
-    "SIMULACRO_ENTREVISTA.md",
-    "DECISIONES_TECH.md",
-    "RUBRICA_EVALUACION.md",
-    "REFERENCIAS_CRUZADAS.md",
-    "EVALUACION_GUIA.md",
-    # Anexos
-    "DEMO_SCRIPT.md",
-    "MAINTENANCE_GUIDE.md",
 ]
 
 FILE_TITLES = {
-    "index.md": "Landing Page",
-    "00_INDICE.md": "Índice Principal",
-    "SYLLABUS.md": "Syllabus Archimedes",
-    "PLAN_ESTUDIOS.md": "Plan de Estudios (6 meses)",
-    "01_PYTHON_PROFESIONAL.md": "01 - Python Profesional",
-    "02_OOP_DESDE_CERO.md": "02 - OOP desde Cero",
-    "03_LOGICA_DISCRETA.md": "03 - Lógica y Big O",
-    "04_ARRAYS_STRINGS.md": "04 - Arrays y Strings",
-    "05_HASHMAPS_SETS.md": "05 - Hash Maps y Sets",
-    "06_INVERTED_INDEX.md": "06 - Índice Invertido",
-    "07_RECURSION.md": "07 - Recursión",
-    "08_SORTING.md": "08 - Algoritmos de Ordenamiento",
-    "09_BINARY_SEARCH.md": "09 - Búsqueda Binaria",
-    "10_ALGEBRA_LINEAL.md": "10 - Álgebra Lineal",
-    "11_TFIDF_COSENO.md": "11 - TF-IDF y Similitud de Coseno",
-    "12_PROYECTO_INTEGRADOR.md": "12 - Proyecto Integrador",
-    "13_LINKED_LISTS_STACKS_QUEUES.md": "13 - Linked Lists, Stacks, Queues",
-    "14_TREES.md": "14 - Trees y BST",
-    "15_GRAPHS.md": "15 - Graphs, BFS, DFS",
-    "16_DYNAMIC_PROGRAMMING.md": "16 - Dynamic Programming",
-    "17_GREEDY.md": "17 - Greedy Algorithms",
-    "18_HEAPS.md": "18 - Heaps y Priority Queues",
-    "EJERCICIOS.md": "Ejercicios",
-    "EJERCICIOS_SOLUCIONES.md": "Soluciones de Ejercicios",
-    "GLOSARIO.md": "Glosario",
-    "CHECKLIST.md": "Checklist Final",
-    "RECURSOS.md": "Recursos Recomendados",
+    # Introducción
+    "index.md": "Guía MS in AI Pathway",
+    "00_INDICE.md": "Índice de Módulos",
+    # Fase 1: Fundamentos
+    "01_PYTHON_PROFESIONAL.md": "Módulo 01 - Python Profesional",
+    "02_OOP_DESDE_CERO.md": "Módulo 02 - OOP desde Cero",
+    "10_ALGEBRA_LINEAL.md": "Módulo 03 - Álgebra Lineal para ML",
+    # Fase 2: Probabilidad (Pathway L2)
+    "19_PROBABILIDAD_FUNDAMENTOS.md": "Módulo 04 - Fundamentos de Probabilidad ⭐",
+    "20_ESTADISTICA_INFERENCIAL.md": "Módulo 05 - Estadística Inferencial ⭐",
+    "21_CADENAS_MARKOV_MONTECARLO.md": "Módulo 06 - Markov y Monte Carlo ⭐",
+    # Fase 3: Machine Learning (Pathway L1)
+    "22_ML_SUPERVISADO.md": "Módulo 07 - ML Supervisado ⭐",
+    "23_ML_NO_SUPERVISADO.md": "Módulo 08 - ML No Supervisado ⭐",
+    "24_INTRO_DEEP_LEARNING.md": "Módulo 09 - Deep Learning ⭐",
+    # Fase 4: Proyecto
+    "12_PROYECTO_INTEGRADOR.md": "Módulo 10 - Proyecto Final",
+    # Material Complementario
+    "EJERCICIOS.md": "Ejercicios Prácticos",
+    "GLOSARIO.md": "Glosario Técnico",
     "SIMULACRO_ENTREVISTA.md": "Simulacro de Entrevista",
-    "DECISIONES_TECH.md": "Decisiones Técnicas",
-    "RUBRICA_EVALUACION.md": "Rúbrica de Evaluación",
-    "REFERENCIAS_CRUZADAS.md": "Referencias Cruzadas",
-    "EVALUACION_GUIA.md": "Evaluación de la Guía",
-    "DEMO_SCRIPT.md": "Demo Script - Archimedes Indexer",
-    "MAINTENANCE_GUIDE.md": "Guía de Mantenimiento",
+    "RECURSOS.md": "Recursos Recomendados",
+    # Anexos DSA (Opcional)
+    "04_ARRAYS_STRINGS.md": "Anexo DSA - Arrays y Strings",
+    "05_HASHMAPS_SETS.md": "Anexo DSA - Hash Maps y Sets",
+    "07_RECURSION.md": "Anexo DSA - Recursión",
+    "08_SORTING.md": "Anexo DSA - Ordenamiento",
+    "14_TREES.md": "Anexo DSA - Trees y BST",
+    "15_GRAPHS.md": "Anexo DSA - Graphs, BFS, DFS",
+    "16_DYNAMIC_PROGRAMMING.md": "Anexo DSA - Dynamic Programming",
 }
 
 # CSS sencillo pero legible
@@ -280,17 +270,20 @@ def build_html() -> str:
     parts.append(
         """
         <div class="cover-page">
-            <div class="cover-title">Archimedes Indexer</div>
-            <div class="cover-subtitle">De Python Básico a Pathway MS AI (CU Boulder)</div>
-            <div class="cover-meta">DUQUEOM · 2025 · Versión 1.0</div>
+            <div class="cover-title">Guía 0→100: MS in AI Pathway</div>
+            <div class="cover-subtitle">De Python Básico a Machine Learning y Deep Learning<br/>
+            Preparación para CU Boulder MS in Artificial Intelligence</div>
+            <div class="cover-meta">DUQUEOM · 2025 · Versión 2.0<br/>
+            ⭐ Enfoque: Probabilidad, Estadística, ML, Deep Learning</div>
         </div>
         """
     )
 
     # Contenido (cada archivo con portada propia + contenido)
     for fname in ORDERED_FILES:
-        path = BASE_DIR / fname
+        path = DOCS_DIR / fname
         if not path.exists():
+            print(f"  [WARN] No encontrado: {fname}")
             continue
 
         md_raw = path.read_text(encoding="utf-8")
@@ -308,7 +301,7 @@ def build_html() -> str:
         section = f"""
         <div id="{module_id}" class="cover-page">
             <div class="cover-title">{title}</div>
-            <div class="cover-subtitle">Guía Archimedes Indexer</div>
+            <div class="cover-subtitle">Guía MS in AI Pathway</div>
             <div class="cover-meta">DUQUEOM · 2025</div>
         </div>
         <section>
@@ -321,7 +314,7 @@ def build_html() -> str:
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Archimedes Indexer - Guía Completa</title>
+    <title>Guía MS in AI Pathway - De Python a ML/DL</title>
 </head>
 <body>
     {''.join(parts)}
@@ -333,7 +326,7 @@ def build_html() -> str:
 
 def main() -> None:
     print("=" * 60)
-    print("GENERADOR PDF - ARCHIMEDES INDEXER")
+    print("GENERADOR PDF - GUÍA MS IN AI PATHWAY")
     print("=" * 60)
 
     OUTPUT_DIR.mkdir(exist_ok=True)

@@ -1,6 +1,7 @@
-# 05 - Hash Maps y Sets
+# Anexo DSA - Hash Maps y Sets
 
-> **🎯 Objetivo:** Dominar diccionarios y sets en Python, entendiendo por qué son O(1) para búsquedas y cómo usarlos eficientemente.
+> **⚠️ MÓDULO OPCIONAL:** Este módulo NO es requerido para el Pathway. Es útil para entrevistas técnicas.  
+> **🎯 Objetivo:** Dominar diccionarios y sets en Python.
 
 ---
 

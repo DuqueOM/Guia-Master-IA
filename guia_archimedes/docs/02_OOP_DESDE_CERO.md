@@ -1,6 +1,7 @@
-# 02 - OOP desde Cero
+# Módulo 02 - OOP desde Cero
 
-> **🎯 Objetivo:** Diseñar clases profesionales que representen documentos y colecciones, aplicando principios SOLID básicos.
+> **🎯 Objetivo:** Diseñar clases profesionales que representen documentos y colecciones, aplicando principios SOLID básicos  
+> **Fase:** Fundamentos | **Prerrequisito para:** Todos los módulos siguientes
 
 ---
 

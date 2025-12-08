@@ -25,6 +25,12 @@
 | 16 | Dynamic Programming | 🔴 Avanzado | 5 |
 | 17 | Greedy Algorithms | 🟡 Intermedio | 4 |
 | 18 | Heaps | 🔴 Avanzado | 4 |
+| **19** | **Probabilidad** ⭐ PATHWAY | 🔴 Avanzado | 5 |
+| **20** | **Estadística Inferencial** ⭐ PATHWAY | 🔴 Avanzado | 5 |
+| **21** | **Markov y Monte Carlo** ⭐ PATHWAY | 🔴 Avanzado | 5 |
+| **22** | **ML Supervisado** ⭐ PATHWAY | 🔴 Avanzado | 5 |
+| **23** | **ML No Supervisado** ⭐ PATHWAY | 🔴 Avanzado | 5 |
+| **24** | **Deep Learning** ⭐ PATHWAY | 🔴 Avanzado | 5 |
 
 ---
 
@@ -364,6 +370,189 @@ def recursive(n):
 
 ---
 
+---
+
+## Módulo 19: Fundamentos de Probabilidad ⭐ PATHWAY
+
+### Ejercicio 19.1: Teorema de Bayes
+**Objetivo:** Implementar función que calcule probabilidad posterior usando Bayes.
+
+```python
+# Dado:
+# - P(enfermedad) = 0.001 (prior)
+# - P(test_positivo | enfermedad) = 0.99 (sensitivity)
+# - P(test_positivo | no_enfermedad) = 0.05 (false positive rate)
+# 
+# Calcular: P(enfermedad | test_positivo)
+def bayes_posterior(prior, likelihood, false_positive_rate):
+    # Tu implementación
+    pass
+```
+
+### Ejercicio 19.2: Distribución Normal
+**Objetivo:** Implementar PDF de distribución normal sin scipy.
+
+### Ejercicio 19.3: Esperanza y Varianza
+**Objetivo:** Calcular E[X] y Var(X) de una distribución discreta.
+
+### Ejercicio 19.4: Naive Bayes Simple
+**Objetivo:** Implementar clasificador Naive Bayes para spam detection.
+
+### Ejercicio 19.5: Sampling de Distribución
+**Objetivo:** Implementar muestreo de distribución categórica.
+
+---
+
+## Módulo 20: Estadística Inferencial ⭐ PATHWAY
+
+### Ejercicio 20.1: Maximum Likelihood Estimation
+**Objetivo:** Estimar parámetro de distribución Bernoulli usando MLE.
+
+```python
+# Dado un conjunto de observaciones [0, 1, 1, 1, 0, 1, 0, 1]
+# Encontrar el parámetro p que maximiza la likelihood
+def mle_bernoulli(observations):
+    # Tu implementación
+    pass
+```
+
+### Ejercicio 20.2: Intervalo de Confianza
+**Objetivo:** Calcular intervalo de confianza al 95% para media muestral.
+
+### Ejercicio 20.3: Z-Test
+**Objetivo:** Implementar test de hipótesis Z-test.
+
+### Ejercicio 20.4: Bootstrap
+**Objetivo:** Implementar bootstrap para estimar varianza de estimador.
+
+### Ejercicio 20.5: Cross-Validation
+**Objetivo:** Implementar k-fold cross-validation desde cero.
+
+---
+
+## Módulo 21: Cadenas de Markov y Monte Carlo ⭐ PATHWAY
+
+### Ejercicio 21.1: Matriz de Transición
+**Objetivo:** Construir matriz de transición de cadena de Markov.
+
+```python
+# Dada una secuencia de estados: ["A", "B", "A", "A", "B", "C", "A"]
+# Construir matriz de transición P[i][j] = P(next=j | current=i)
+def build_transition_matrix(sequence):
+    # Tu implementación
+    pass
+```
+
+### Ejercicio 21.2: Distribución Estacionaria
+**Objetivo:** Calcular distribución estacionaria π tal que π = πP.
+
+### Ejercicio 21.3: PageRank Simple
+**Objetivo:** Implementar algoritmo PageRank usando power iteration.
+
+### Ejercicio 21.4: Monte Carlo π
+**Objetivo:** Estimar π usando Monte Carlo (puntos en círculo/cuadrado).
+
+### Ejercicio 21.5: Metropolis-Hastings
+**Objetivo:** Implementar sampler Metropolis-Hastings para distribución normal.
+
+---
+
+## Módulo 22: ML Supervisado ⭐ PATHWAY
+
+### Ejercicio 22.1: Regresión Lineal
+**Objetivo:** Implementar regresión lineal con gradient descent.
+
+```python
+# Implementar clase LinearRegression con fit() y predict()
+# Sin usar sklearn, solo Python puro
+class LinearRegression:
+    def fit(self, X, y, lr=0.01, epochs=1000):
+        # Tu implementación
+        pass
+    
+    def predict(self, X):
+        pass
+```
+
+### Ejercicio 22.2: Regresión Logística
+**Objetivo:** Implementar clasificador logístico con sigmoid y cross-entropy.
+
+### Ejercicio 22.3: Árbol de Decisión
+**Objetivo:** Implementar árbol de decisión con information gain.
+
+### Ejercicio 22.4: K-Nearest Neighbors
+**Objetivo:** Implementar KNN con distancia euclidiana.
+
+### Ejercicio 22.5: Métricas de Evaluación
+**Objetivo:** Implementar accuracy, precision, recall, F1 desde cero.
+
+---
+
+## Módulo 23: ML No Supervisado ⭐ PATHWAY
+
+### Ejercicio 23.1: K-Means
+**Objetivo:** Implementar K-Means clustering completo.
+
+```python
+# Implementar clase KMeans con fit() y predict()
+class KMeans:
+    def __init__(self, n_clusters=3, max_iters=100):
+        pass
+    
+    def fit(self, X):
+        # 1. Inicializar centroides
+        # 2. Asignar puntos al centroide más cercano
+        # 3. Actualizar centroides
+        # 4. Repetir hasta convergencia
+        pass
+```
+
+### Ejercicio 23.2: Elbow Method
+**Objetivo:** Implementar elbow method para selección de k.
+
+### Ejercicio 23.3: Silhouette Score
+**Objetivo:** Implementar cálculo de silhouette score.
+
+### Ejercicio 23.4: PCA desde Cero
+**Objetivo:** Implementar PCA calculando eigenvectors de covarianza.
+
+### Ejercicio 23.5: Detección de Anomalías
+**Objetivo:** Implementar detector de anomalías basado en distancia.
+
+---
+
+## Módulo 24: Deep Learning ⭐ PATHWAY
+
+### Ejercicio 24.1: Perceptrón
+**Objetivo:** Implementar perceptrón simple con regla de aprendizaje.
+
+```python
+# Implementar perceptrón que aprenda función AND
+class Perceptron:
+    def __init__(self, n_inputs):
+        pass
+    
+    def predict(self, x):
+        pass
+    
+    def train(self, X, y, epochs=100):
+        pass
+```
+
+### Ejercicio 24.2: Funciones de Activación
+**Objetivo:** Implementar sigmoid, ReLU, tanh, softmax con sus derivadas.
+
+### Ejercicio 24.3: MLP Forward Pass
+**Objetivo:** Implementar forward pass de MLP de 2 capas.
+
+### Ejercicio 24.4: Backpropagation
+**Objetivo:** Implementar backprop para MLP que resuelva XOR.
+
+### Ejercicio 24.5: Mini-batch SGD
+**Objetivo:** Implementar entrenamiento con mini-batches y learning rate decay.
+
+---
+
 ## 📚 Soluciones
 
 Ver [EJERCICIOS_SOLUCIONES.md](EJERCICIOS_SOLUCIONES.md) para soluciones detalladas.
@@ -376,3 +565,5 @@ Ver [EJERCICIOS_SOLUCIONES.md](EJERCICIOS_SOLUCIONES.md) para soluciones detalla
 2. **Escribe tests:** Antes de implementar, escribe casos de prueba.
 3. **Analiza complejidad:** Para cada solución, determina su Big O.
 4. **Compara:** Después de resolver, compara con la solución oficial.
+5. **Sin sklearn:** Implementa TODO desde cero, sin librerías de ML.
+6. **Conexión con Pathway:** Cada ejercicio prepara para un concepto del Pathway.

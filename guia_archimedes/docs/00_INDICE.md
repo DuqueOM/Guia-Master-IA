@@ -1,19 +1,72 @@
-# 📚 Archimedes Indexer - Índice Principal
+# 📚 Guía 0→100: MS in AI Pathway
 
-> **De Python Básico a Ingeniero de IA: Construyendo un Motor de Búsqueda desde Cero**
+> **De Python Básico a Candidato del MS in AI de CU Boulder**  
+> **6 meses | 6h/día | 100% enfocado en las 6 materias del Pathway**
 
 ---
 
-## 🎯 ¿Qué Lograrás al Completar Esta Guía?
+## 🎯 Objetivo Único de Esta Guía
 
-| Habilidad | Nivel Alcanzado | Evidencia |
-|-----------|-----------------|-----------|
-| **OOP Profesional** | Avanzado | Clases `Document`, `Corpus`, `InvertedIndex` con diseño SOLID |
-| **Estructuras de Datos** | Intermedio-Avanzado | Hash Maps, Tries, Listas enlazadas implementadas desde cero |
-| **Algoritmos** | Intermedio-Avanzado | QuickSort, Binary Search, recursión dominada |
-| **Álgebra Lineal Aplicada** | Intermedio | TF-IDF y Similitud de Coseno sin numpy |
-| **Análisis de Complejidad** | Intermedio | Documentación Big O de todo el sistema |
-| **Inglés Técnico** | B2+ | Todo el material y código en inglés |
+Prepararte para aprobar las **6 materias obligatorias** del Performance-Based Admission Pathway:
+
+### ⭐ Línea 1: Aprendizaje Automático (3 créditos)
+| Curso del Pathway | Módulo de Esta Guía |
+|-------------------|---------------------|
+| Introduction to Machine Learning: Supervised Learning | **07_ML_SUPERVISADO** |
+| Unsupervised Algorithms in Machine Learning | **08_ML_NO_SUPERVISADO** |
+| Introduction to Deep Learning | **09_INTRO_DEEP_LEARNING** |
+
+### ⭐ Línea 2: Probabilidad y Estadística (3 créditos)
+| Curso del Pathway | Módulo de Esta Guía |
+|-------------------|---------------------|
+| Probability Fundamentals for Data Science and AI | **04_PROBABILIDAD** |
+| Discrete-Time Markov Chains and Monte Carlo Methods | **06_MARKOV_MONTECARLO** |
+| Statistical Estimation for Data Science and AI | **05_ESTADISTICA** |
+
+---
+
+## 📋 Estructura del Programa (TODO OBLIGATORIO)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  FASE 1: FUNDAMENTOS (Semanas 1-6)                              │
+│  Objetivo: Python profesional + base matemática para ML         │
+├─────────────────────────────────────────────────────────────────┤
+│  01_PYTHON_PROFESIONAL    Type hints, funciones puras, PEP8     │
+│  02_OOP_DESDE_CERO        Clases, herencia, composición         │
+│  03_ALGEBRA_LINEAL        Vectores, matrices, operaciones       │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  FASE 2: PROBABILIDAD Y ESTADÍSTICA (Semanas 7-14)              │
+│  ⭐ PATHWAY LÍNEA 2 - 3 CRÉDITOS                                │
+├─────────────────────────────────────────────────────────────────┤
+│  04_PROBABILIDAD          Bayes, distribuciones, esperanza      │
+│  05_ESTADISTICA           MLE, MAP, intervalos, hipótesis       │
+│  06_MARKOV_MONTECARLO     Cadenas Markov, MCMC, PageRank        │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  FASE 3: MACHINE LEARNING (Semanas 15-22)                       │
+│  ⭐ PATHWAY LÍNEA 1 - 3 CRÉDITOS                                │
+├─────────────────────────────────────────────────────────────────┤
+│  07_ML_SUPERVISADO        Regresión, clasificación, árboles     │
+│  08_ML_NO_SUPERVISADO     K-Means, PCA, clustering              │
+│  09_INTRO_DEEP_LEARNING   MLP, backprop, CNN/RNN conceptos      │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  FASE 4: PROYECTO FINAL (Semanas 23-26)                         │
+│  Integración de todo el Pathway                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  10_PROYECTO_FINAL        Pipeline ML completo desde cero       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Total: 10 módulos obligatorios | 26 semanas | ~6 meses**
 
 ---
 
@@ -33,258 +86,141 @@
 
 ---
 
-## 🔄 Metodología de Aprendizaje
+---
+
+## 📖 Módulos Obligatorios
+
+### FASE 1: Fundamentos (Semanas 1-6)
+*Base de programación profesional necesaria para implementar ML*
+
+| # | Módulo | Descripción | Tiempo | Archivo |
+|---|--------|-------------|--------|---------|
+| 01 | Python Profesional | Type hints, funciones puras, PEP8 | 2 sem | [01_PYTHON_PROFESIONAL.md](01_PYTHON_PROFESIONAL.md) |
+| 02 | OOP desde Cero | Clases, herencia, composición | 2 sem | [02_OOP_DESDE_CERO.md](02_OOP_DESDE_CERO.md) |
+| 03 | Álgebra Lineal para ML | Vectores, matrices, operaciones | 2 sem | [10_ALGEBRA_LINEAL.md](10_ALGEBRA_LINEAL.md) |
+
+**Entregable:** Clase `Vector` y `Matrix` con operaciones básicas desde cero.
+
+---
+
+### FASE 2: Probabilidad y Estadística (Semanas 7-14) ⭐ PATHWAY LÍNEA 2
+*Preparación directa para los 3 cursos de Probability & Statistics*
+
+| # | Módulo | Curso del Pathway | Tiempo | Archivo |
+|---|--------|-------------------|--------|---------|
+| 04 | Fundamentos de Probabilidad | Probability Fundamentals for DS and AI | 3 sem | [19_PROBABILIDAD_FUNDAMENTOS.md](19_PROBABILIDAD_FUNDAMENTOS.md) |
+| 05 | Estadística Inferencial | Statistical Estimation for DS and AI | 3 sem | [20_ESTADISTICA_INFERENCIAL.md](20_ESTADISTICA_INFERENCIAL.md) |
+| 06 | Markov y Monte Carlo | Discrete-Time Markov Chains and Monte Carlo | 2 sem | [21_CADENAS_MARKOV_MONTECARLO.md](21_CADENAS_MARKOV_MONTECARLO.md) |
+
+**Entregable:** Implementación de Bayes, MLE, MCMC, PageRank desde cero.
+
+---
+
+### FASE 3: Machine Learning (Semanas 15-22) ⭐ PATHWAY LÍNEA 1
+*Preparación directa para los 3 cursos de Machine Learning*
+
+| # | Módulo | Curso del Pathway | Tiempo | Archivo |
+|---|--------|-------------------|--------|---------|
+| 07 | ML Supervisado | Introduction to ML: Supervised Learning | 3 sem | [22_ML_SUPERVISADO.md](22_ML_SUPERVISADO.md) |
+| 08 | ML No Supervisado | Unsupervised Algorithms in ML | 2 sem | [23_ML_NO_SUPERVISADO.md](23_ML_NO_SUPERVISADO.md) |
+| 09 | Deep Learning | Introduction to Deep Learning | 3 sem | [24_INTRO_DEEP_LEARNING.md](24_INTRO_DEEP_LEARNING.md) |
+
+**Entregable:** Regresión, Naive Bayes, K-Means, MLP con backprop desde cero.
+
+---
+
+### FASE 4: Proyecto Final (Semanas 23-26)
+*Integración de todo lo aprendido en un pipeline ejecutable*
+
+| # | Módulo | Descripción | Tiempo | Archivo |
+|---|--------|-------------|--------|---------|
+| 10 | Proyecto Integrador | Pipeline ML completo | 4 sem | [12_PROYECTO_INTEGRADOR.md](12_PROYECTO_INTEGRADOR.md) |
+
+**Entregable:** Sistema que clasifica texto usando NB, KMeans, MLP y genera texto con Markov.
+
+---
+
+## 🔨 Proyecto Final: ML Pipeline
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                    CICLO DE APRENDIZAJE                              │
-│                                                                      │
-│    ┌─────────┐    ┌─────────┐    ┌─────────┐      ┌─────────┐        │
-│    │  LEER   │───▶│ ENTENDER│───▶│CODIFICAR│───▶│ ANALIZAR│        │
-│    │ Teoría  │    │ Analogía│    │ Scratch │      │  Big O  │        │
-│    └─────────┘    └─────────┘    └─────────┘      └─────────┘        │
-│         │                                              │             │
-│         └──────────────────────────────────────────────┘             │
-│                        ITERAR                                        │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
-**Leer:** Estudiar el concepto teórico y su contexto.
-**Entender:** Asimilar mediante analogías y ejemplos visuales.
-**Codificar:** Implementar desde cero en Python puro.
-**Analizar:** Documentar la complejidad y eficiencia.
-
----
-
-## 🗺️ Roadmap Visual (6 Meses)
-
-```
-MES 1            MES 2          MES 3          MES 4          MES 5          MES 6
-┌────────┐     ┌────────┐    ┌────────┐     ┌────────┐    ┌────────┐     ┌────────┐
-│FUNDAMEN│     │ESTRUCTU│    │DSA     │     │DSA     │    │MATEMÁT-│     │INTEGRA-│
-│  TOS   │───▶│RAS I   │───▶│AVANZADO│───▶│AVANZADO│───▶│  ICAS  │───▶│  CIÓN  │
-│01-03   │     │04-06   │    │13-15   │     │07-09   │    │10-11   │     │  12    │
-│        │     │        │    │        │     │16-18   │    │        │     │        │
-└────────┘     └────────┘    └────────┘     └────────┘    └────────┘     └────────┘
-    │              │              │              │              │              │
-    ▼              ▼              ▼              ▼              ▼              ▼
- Python        HashMap        LinkedList     Trees+DP       TF-IDF       PROYECTO
-  +OOP          +Index        +Stack+Queue   +Greedy+Heap   +Coseno      COMPLETO
-```
-
----
-
-## 📖 Módulos de la Guía
-
-### FASE I: Fundamentos (Mes 1)
-*Objetivo: Establecer bases sólidas de Python profesional y pensamiento computacional*
-
-| # | Módulo | Descripción | Tiempo |
-|---|--------|-------------|--------|
-| 01 | [Python Profesional](01_PYTHON_PROFESIONAL.md) | Type hints, funciones puras, estilo PEP8 | 2 semanas |
-| 02 | [OOP desde Cero](02_OOP_DESDE_CERO.md) | Clases, herencia, composición, SOLID básico | 1.5 semanas |
-| 03 | [Lógica y Matemáticas Discretas](03_LOGICA_DISCRETA.md) | Conjuntos, lógica proposicional, demostraciones | 0.5 semanas |
-
-**Checkpoint Fase I:** [Simulacro Fundamentos](SIMULACRO_ENTREVISTA.md)
-
----
-
-### FASE II: Estructuras de Datos (Mes 2-3)
-*Objetivo: Dominar las estructuras que hacen rápidos a los sistemas reales*
-
-| # | Módulo | Descripción | Tiempo |
-|---|--------|-------------|--------|
-| 04 | [Arrays, Strings y Memoria](04_ARRAYS_STRINGS.md) | Manipulación de secuencias, complejidad básica | 1.5 semanas |
-| 05 | [Hash Maps y Sets](05_HASHMAPS_SETS.md) | Diccionarios, hashing, colisiones, O(1) lookup | 2 semanas |
-| 06 | [Índice Invertido](06_INVERTED_INDEX.md) | Construcción del núcleo del motor de búsqueda | 2.5 semanas |
-
-**Checkpoint Fase II:** [Simulacro Estructuras](SIMULACRO_ENTREVISTA.md)
-
----
-
-### FASE III: Estructuras de Datos Avanzadas (Mes 3) ⭐ CRÍTICO PATHWAY
-*Objetivo: Dominar estructuras que aparecen en el Pathway*
-
-| # | Módulo | Descripción | Tiempo |
-|---|--------|-------------|--------|
-| 13 | [Linked Lists, Stacks, Queues](13_LINKED_LISTS_STACKS_QUEUES.md) | Estructuras lineales fundamentales | 1.5 semanas |
-| 14 | [Árboles y BST](14_TREES.md) | Binary trees, traversals, BST | 2 semanas |
-| 15 | [Grafos, BFS, DFS](15_GRAPHS.md) | Representación, recorridos | 2 semanas |
-
-**Checkpoint Fase III:** [Simulacro DSA Avanzado](SIMULACRO_ENTREVISTA.md)
-
----
-
-### FASE IV: Algoritmos (Mes 4) ⭐ CRÍTICO PATHWAY
-*Objetivo: Implementar algoritmos clásicos de ordenamiento, búsqueda y optimización*
-
-| # | Módulo | Descripción | Tiempo |
-|---|--------|-------------|--------|
-| 07 | [Recursión y Divide & Conquer](07_RECURSION.md) | Pensamiento recursivo, casos base, call stack | 1 semana |
-| 08 | [Algoritmos de Ordenamiento](08_SORTING.md) | QuickSort, MergeSort desde cero | 1 semana |
-| 09 | [Búsqueda Binaria](09_BINARY_SEARCH.md) | Implementación perfecta, variantes | 1 semana |
-| 16 | [Dynamic Programming](16_DYNAMIC_PROGRAMMING.md) | Memoization, tabulation, problemas clásicos | 2 semanas |
-| 17 | [Greedy Algorithms](17_GREEDY.md) | Cuándo y cómo usar estrategia greedy | 1 semana |
-| 18 | [Heaps y Priority Queues](18_HEAPS.md) | Top K, merge K lists | 1 semana |
-
-**Checkpoint Fase IV:** [Simulacro Algoritmos](SIMULACRO_ENTREVISTA.md)
-
----
-
-### FASE V: Matemáticas para ML (Mes 5)
-*Objetivo: Implementar la matemática del ranking sin librerías*
-
-| # | Módulo | Descripción | Tiempo |
-|---|--------|-------------|--------|
-| 10 | [Álgebra Lineal sin NumPy](10_ALGEBRA_LINEAL.md) | Vectores, matrices, operaciones desde cero | 2 semanas |
-| 11 | [TF-IDF y Similitud de Coseno](11_TFIDF_COSENO.md) | Vectorización de texto, ranking por relevancia | 2 semanas |
-
-**Checkpoint Fase V:** [Simulacro Matemáticas](SIMULACRO_ENTREVISTA.md)
-
----
-
-### FASE VI: Integración (Mes 6)
-*Objetivo: Ensamblar todo en un proyecto defendible*
-
-| # | Módulo | Descripción | Tiempo |
-|---|--------|-------------|--------|
-| 12 | [Proyecto Integrador](12_PROYECTO_INTEGRADOR.md) | Motor de búsqueda completo + análisis Big O | 4 semanas |
-
-**Checkpoint Final:** [Simulacro Entrevista Completo](SIMULACRO_ENTREVISTA.md)
-
----
-
-## 📦 Material Complementario
-
-### Práctica y Evaluación
-| Documento | Descripción |
-|-----------|-------------|
-| [EJERCICIOS.md](EJERCICIOS.md) | Ejercicios prácticos por módulo (3-5 por módulo) |
-| [EJERCICIOS_SOLUCIONES.md](EJERCICIOS_SOLUCIONES.md) | Soluciones detalladas con explicación |
-| [RUBRICA_EVALUACION.md](RUBRICA_EVALUACION.md) | Criterios de evaluación (100 puntos) |
-
-### Referencia
-| Documento | Descripción |
-|-----------|-------------|
-| [GLOSARIO.md](GLOSARIO.md) | 80+ definiciones técnicas A-Z con analogías |
-| [CHECKLIST.md](CHECKLIST.md) | Verificación final del proyecto |
-| [DECISIONES_TECH.md](DECISIONES_TECH.md) | Por qué Python puro y cada decisión de diseño |
-| [REFERENCIAS_CRUZADAS.md](REFERENCIAS_CRUZADAS.md) | Mapa de navegación entre documentos |
-| [EVALUACION_GUIA.md](EVALUACION_GUIA.md) | Autoevaluación de completitud (99/100) |
-
-### Planificación
-| Documento | Descripción |
-|-----------|-------------|
-| [SYLLABUS.md](SYLLABUS.md) | Programa detallado con objetivos y entregables |
-| [PLAN_ESTUDIOS.md](PLAN_ESTUDIOS.md) | Cronograma día a día (6 meses) |
-
-### Preparación para Entrevistas/Pathway
-| Documento | Descripción |
-|-----------|-------------|
-| [SIMULACRO_ENTREVISTA.md](SIMULACRO_ENTREVISTA.md) | 50+ preguntas tipo Pathway con respuestas |
-| [RECURSOS.md](RECURSOS.md) | Cursos, libros, videos recomendados |
-
----
-
-## 🔨 Proyecto de Referencia
-
-```
-archimedes-indexer/
+ml-pathway-project/
 ├── src/
 │   ├── __init__.py
-│   ├── document.py          # Clase Document
-│   ├── corpus.py            # Clase Corpus (colección)
-│   ├── tokenizer.py         # Tokenización manual
-│   ├── inverted_index.py    # Índice invertido (HashMap)
-│   ├── sorting.py           # QuickSort, MergeSort
-│   ├── searching.py         # Binary Search
-│   ├── vectorizer.py        # TF-IDF desde cero
-│   ├── similarity.py        # Similitud de coseno
-│   └── search_engine.py     # Motor completo
+│   ├── vector.py              # Álgebra lineal (Módulo 03)
+│   ├── probability.py         # Bayes, distribuciones (Módulo 04)
+│   ├── statistics.py          # MLE, intervalos (Módulo 05)
+│   ├── markov.py              # Cadenas Markov, MCMC (Módulo 06)
+│   ├── naive_bayes.py         # Clasificador NB (Módulo 07)
+│   ├── linear_regression.py   # Regresión (Módulo 07)
+│   ├── kmeans.py              # Clustering (Módulo 08)
+│   ├── pca.py                 # Reducción dim (Módulo 08)
+│   ├── neural_network.py      # MLP + backprop (Módulo 09)
+│   ├── activations.py         # Funciones activación (Módulo 09)
+│   └── pipeline.py            # Integración (Módulo 10)
 ├── tests/
-│   ├── test_document.py
-│   ├── test_tokenizer.py
-│   ├── test_sorting.py
-│   ├── test_similarity.py
-│   └── test_engine.py
-├── docs/
-│   └── COMPLEXITY_ANALYSIS.md  # Análisis Big O
+│   └── test_*.py              # Tests para cada módulo
 ├── data/
-│   └── sample_corpus/          # Documentos de prueba
+│   └── sample_texts/          # Datos de prueba
+├── notebooks/
+│   └── demo.ipynb             # Demo interactivo
 ├── README.md
-└── pyproject.toml
-```
-
-### Mapeo Módulos → Código
-
-| Módulos | Archivos del Proyecto |
-|---------|----------------------|
-| 01-02 | `document.py`, `corpus.py` |
-| 04-05 | `tokenizer.py` |
-| 06 | `inverted_index.py` |
-| 07-08 | `sorting.py` |
-| 09 | `searching.py` |
-| 10-11 | `vectorizer.py`, `similarity.py` |
-| 12 | `search_engine.py`, `COMPLEXITY_ANALYSIS.md` |
-
----
-
-## ⏱️ Tiempo Total Estimado
-
-| Componente | Horas |
-|------------|-------|
-| Lectura de módulos | ~80 horas |
-| Ejercicios prácticos | ~120 horas |
-| Implementación del proyecto | ~200 horas |
-| Análisis y documentación | ~40 horas |
-| Preparación entrevistas | ~40 horas |
-| **TOTAL** | **~480 horas** |
-
-Con 6 horas/día (L-S) = 36 horas/semana → **~14 semanas efectivas** (margen incluido en 6 meses)
-
----
-
-## 📌 Convenciones de la Guía
-
-| Icono | Significado |
-|-------|-------------|
-| 💡 | Tip o consejo práctico |
-| ⚠️ | Advertencia importante |
-| ✅ | Buena práctica |
-| ❌ | Anti-patrón a evitar |
-| 🔧 | Ejercicio práctico |
-| 🎯 | Objetivo del módulo/sección |
-| 📊 | Análisis de complejidad |
-| 🧠 | Concepto clave para memorizar |
-| 🔗 | Referencia cruzada |
-
----
-
-## 🛤️ Rutas de Aprendizaje
-
-### Ruta Completa (Recomendada)
-```
-01 → 02 → 03 → 04 → 05 → 06 → 13 → 14 → 15 → 07 → 08 → 09 → 16 → 17 → 18 → 10 → 11 → 12
-```
-
-### Ruta Acelerada (Ya sabes OOP)
-```
-03 → 04 → 05 → 06 → 13 → 14 → 15 → 07 → 08 → 09 → 16 → 17 → 18 → 10 → 11 → 12
-```
-
-### Ruta Solo Pathway (Foco en DSA) ⭐
-```
-04 → 05 → 13 → 14 → 15 → 07 → 08 → 09 → 16 → 17 → 18 → SIMULACRO_ENTREVISTA
+└── requirements.txt           # Solo pytest (sin numpy/sklearn)
 ```
 
 ---
 
-## 🚀 Siguiente Paso
+## ⏱️ Tiempo Total
 
-**[Comenzar con Módulo 01: Python Profesional →](01_PYTHON_PROFESIONAL.md)**
+| Fase | Semanas | Horas (~36h/sem) |
+|------|---------|------------------|
+| Fundamentos (01-03) | 6 | ~216h |
+| Probabilidad (04-06) | 8 | ~288h |
+| Machine Learning (07-09) | 8 | ~288h |
+| Proyecto Final (10) | 4 | ~144h |
+| **TOTAL** | **26** | **~936h** |
+
+**Duración:** 6 meses con 6h/día (L-S)
 
 ---
 
-> *"Give me a lever long enough and a fulcrum on which to place it, and I shall move the world."* — Archimedes
->
-> Este proyecto es tu palanca. Los fundamentos son tu fulcro.
+## 📦 Material Complementario (Opcional)
+
+| Documento | Descripción | Obligatorio |
+|-----------|-------------|-------------|
+| [EJERCICIOS.md](EJERCICIOS.md) | Práctica adicional por módulo | Recomendado |
+| [GLOSARIO.md](GLOSARIO.md) | Definiciones técnicas | Consulta |
+| [SIMULACRO_ENTREVISTA.md](SIMULACRO_ENTREVISTA.md) | Preguntas tipo Pathway | Recomendado |
+| [RECURSOS.md](RECURSOS.md) | Cursos y libros externos | Consulta |
+
+### DSA Avanzado (Solo si necesitas para entrevistas técnicas)
+
+Estos módulos **NO son necesarios para el Pathway**, pero pueden ser útiles para entrevistas de trabajo:
+
+| Documento | Tema |
+|-----------|------|
+| [04_ARRAYS_STRINGS.md](04_ARRAYS_STRINGS.md) | Arrays y manipulación |
+| [05_HASHMAPS_SETS.md](05_HASHMAPS_SETS.md) | Hash tables |
+| [07_RECURSION.md](07_RECURSION.md) | Recursión |
+| [08_SORTING.md](08_SORTING.md) | Ordenamiento |
+| [14_TREES.md](14_TREES.md) | Árboles y BST |
+| [15_GRAPHS.md](15_GRAPHS.md) | Grafos, BFS, DFS |
+| [16_DYNAMIC_PROGRAMMING.md](16_DYNAMIC_PROGRAMMING.md) | DP |
+
+---
+
+## 🚀 Comenzar
+
+**[→ Módulo 01: Python Profesional](01_PYTHON_PROFESIONAL.md)**
+
+---
+
+## 📌 Restricciones del Proyecto
+
+- ✅ **Python puro** - Sin numpy, pandas, sklearn, tensorflow
+- ✅ **100% local** - Todo se ejecuta en tu máquina
+- ✅ **Desde cero** - Cada algoritmo implementado manualmente
+- ✅ **Enfocado** - Solo lo necesario para el Pathway
+
+---
+
+> 💡 **Filosofía:** Si puedes implementar Naive Bayes, K-Means, MLP y Markov desde cero, estás listo para los cursos del Pathway. DSA avanzado es útil para entrevistas, pero **no es el objetivo de esta guía**.

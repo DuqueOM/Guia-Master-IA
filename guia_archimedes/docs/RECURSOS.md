@@ -1,27 +1,68 @@
-# 📚 Recursos de Aprendizaje
+# 📚 Recursos de Aprendizaje - MS in AI Pathway
 
-> Cursos, libros, videos y herramientas recomendados.
+> Cursos y recursos organizados por prioridad para aprobar el Pathway.
 
 ---
 
-## 🎓 Cursos Online
+## 🎯 CURSOS DEL PATHWAY (OBLIGATORIOS)
 
-### Matemáticas para ML (Obligatorios)
+Estos son los **6 cursos exactos** que debes aprobar para el Pathway:
 
-| Curso | Plataforma | Duración |
-|-------|------------|----------|
-| [Mathematics for ML: Linear Algebra](https://www.coursera.org/learn/linear-algebra-machine-learning) | Coursera | 5 semanas |
-| [Mathematics for ML: Multivariate Calculus](https://www.coursera.org/learn/multivariate-calculus-machine-learning) | Coursera | 6 semanas |
-| [Probability & Statistics for ML](https://www.coursera.org/learn/machine-learning-probability-statistics) | Coursera | 4 semanas |
+### Línea 1: Machine Learning (3 créditos)
 
-### Algoritmos y DSA (Obligatorios)
+| Curso | Enlace | Preparación en Esta Guía |
+|-------|--------|--------------------------|
+| **Introduction to Machine Learning: Supervised Learning** | [Coursera](https://www.coursera.org/learn/introduction-to-machine-learning-supervised-learning) | Módulo 22 |
+| **Unsupervised Algorithms in Machine Learning** | [Coursera](https://www.coursera.org/learn/unsupervised-algorithms-in-machine-learning) | Módulo 23 |
+| **Introduction to Deep Learning** | [Coursera](https://www.coursera.org/learn/introduction-to-deep-learning-boulder) | Módulo 24 |
 
-| Curso | Plataforma | Duración |
-|-------|------------|----------|
-| [Algorithms Specialization](https://www.coursera.org/specializations/algorithms) | Coursera (Stanford) | 4 meses |
-| [Data Structures & Algorithms](https://www.coursera.org/specializations/data-structures-algorithms) | Coursera (UCSD) | 8 meses |
+### Línea 2: Probabilidad y Estadística (3 créditos)
 
-### Python (Recomendados)
+| Curso | Enlace | Preparación en Esta Guía |
+|-------|--------|--------------------------|
+| **Probability Theory: Foundation for Data Science** | [Coursera](https://www.coursera.org/learn/probability-theory-foundation-for-data-science) | Módulo 19 |
+| **Discrete-Time Markov Chains and Monte Carlo Methods** | [Coursera](https://www.coursera.org/learn/discrete-time-markov-chains) | Módulo 21 |
+| **Statistical Inference for Estimation in Data Science** | [Coursera](https://www.coursera.org/learn/statistical-inference-for-estimation-in-data-science) | Módulo 20 |
+
+> ⚠️ **IMPORTANTE:** Puedes auditar estos cursos GRATIS en Coursera para ver el contenido antes de inscribirte oficialmente.
+
+---
+
+## 🔥 CURSOS DE PREPARACIÓN (MUY RECOMENDADOS)
+
+### Machine Learning Foundations
+
+| Curso | Plataforma | Por Qué |
+|-------|------------|---------|
+| [Machine Learning Specialization](https://www.coursera.org/specializations/machine-learning-introduction) | Coursera (Andrew Ng) | El mejor curso de ML, usa Python |
+| [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning) | Coursera (Andrew Ng) | Profundiza en redes neuronales |
+
+### Probabilidad y Estadística
+
+| Curso | Plataforma | Por Qué |
+|-------|------------|---------|
+| [Probability & Statistics for ML](https://www.coursera.org/learn/machine-learning-probability-and-statistics) | Coursera (DeepLearning.AI) | Enfocado en ML |
+| [Bayesian Statistics](https://www.coursera.org/learn/bayesian-statistics) | Coursera (Duke) | Profundiza en Bayes |
+
+### Matemáticas Fundamentales
+
+| Curso | Plataforma | Por Qué |
+|-------|------------|---------|
+| [Mathematics for ML: Linear Algebra](https://www.coursera.org/learn/linear-algebra-machine-learning) | Coursera (Imperial) | Base para todo ML |
+| [Mathematics for ML: Multivariate Calculus](https://www.coursera.org/learn/multivariate-calculus-machine-learning) | Coursera (Imperial) | Gradientes y optimización |
+
+---
+
+## 📚 PRERREQUISITOS (Complementarios)
+
+### Algoritmos y DSA (Base, no foco)
+
+| Curso | Plataforma | Prioridad |
+|-------|------------|-----------|
+| [Algorithms Specialization](https://www.coursera.org/specializations/algorithms) | Coursera (Stanford) | Media |
+| [Data Structures & Algorithms](https://www.coursera.org/specializations/data-structures-algorithms) | Coursera (UCSD) | Media |
+
+### Python
 
 | Curso | Plataforma | Nivel |
 |-------|------------|-------|
@@ -32,48 +73,64 @@
 
 ## 📖 Libros
 
-### Algoritmos (Altamente Recomendados)
+### Machine Learning (Prioridad Alta)
 
 | Libro | Autor | Por Qué |
 |-------|-------|---------|
-| **Grokking Algorithms** | Aditya Bhargava | Visual, accesible, perfecto para empezar |
-| **Introduction to Algorithms (CLRS)** | Cormen et al. | La biblia de algoritmos, referencia completa |
-| **Algorithm Design Manual** | Skiena | Práctico, con problemas reales |
+| **Hands-On Machine Learning** | Aurélien Géron | Práctico, con código, muy completo |
+| **Pattern Recognition and ML** | Christopher Bishop | Teórico, excelente para fundamentos |
+| **The Hundred-Page ML Book** | Andriy Burkov | Resumen conciso de todo ML |
 
-### Python
-
-| Libro | Autor | Por Qué |
-|-------|-------|---------|
-| **Fluent Python** | Luciano Ramalho | Python avanzado y pythonic |
-| **Python Cookbook** | Beazley & Jones | Recetas prácticas |
-
-### Matemáticas
+### Deep Learning
 
 | Libro | Autor | Por Qué |
 |-------|-------|---------|
+| **Deep Learning** | Goodfellow et al. | La biblia de DL, [gratis online](https://www.deeplearningbook.org/) |
+| **Neural Networks and Deep Learning** | Michael Nielsen | [Gratis online](http://neuralnetworksanddeeplearning.com/), muy didáctico |
+
+### Probabilidad y Estadística
+
+| Libro | Autor | Por Qué |
+|-------|-------|---------|
+| **Think Stats** | Allen Downey | [Gratis online](https://greenteapress.com/thinkstats2/), práctico con Python |
+| **Think Bayes** | Allen Downey | [Gratis online](https://greenteapress.com/wp/think-bayes/), Bayesiano |
+| **All of Statistics** | Larry Wasserman | Referencia completa |
+
+### Matemáticas para ML
+
+| Libro | Autor | Por Qué |
+|-------|-------|---------|
+| **Mathematics for ML** | Deisenroth et al. | [Gratis online](https://mml-book.github.io/), fundamental |
 | **Linear Algebra Done Right** | Axler | Álgebra lineal rigurosa |
-| **Mathematics for ML** | Deisenroth et al. | [Gratis online](https://mml-book.github.io/) |
+
+### Algoritmos (Complementario)
+
+| Libro | Autor | Por Qué |
+|-------|-------|---------|
+| **Grokking Algorithms** | Aditya Bhargava | Visual, accesible, para empezar |
+| **Introduction to Algorithms (CLRS)** | Cormen et al. | Referencia completa |
 
 ---
 
 ## 🎥 Videos
 
-### Canales de YouTube
+### Canales de YouTube (ML/DL/Probabilidad)
 
 | Canal | Tema | Por Qué |
 |-------|------|---------|
-| [3Blue1Brown](https://www.youtube.com/c/3blue1brown) | Matemáticas visuales | Intuición geométrica increíble |
-| [Abdul Bari](https://www.youtube.com/c/AbdulBari) | Algoritmos | Explicaciones claras |
-| [Corey Schafer](https://www.youtube.com/c/Coreyms) | Python | Tutoriales prácticos |
-| [MIT OpenCourseWare](https://www.youtube.com/c/mitocw) | CS general | Clases de MIT gratis |
+| [3Blue1Brown](https://www.youtube.com/c/3blue1brown) | Matemáticas + DL | Neural networks playlist es EXCELENTE |
+| [StatQuest](https://www.youtube.com/user/joshstarmer) | Estadística + ML | Explicaciones claras de conceptos complejos |
+| [Sentdex](https://www.youtube.com/c/sentdex) | ML práctico | Implementaciones desde cero |
+| [Two Minute Papers](https://www.youtube.com/c/TwoMinutePapers) | Investigación IA | Para mantenerte motivado |
 
-### Videos Específicos
+### Playlists Esenciales
 
-| Video | Tema | Link |
-|-------|------|------|
-| Linear Algebra Essence | Álgebra lineal | [3B1B Playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab) |
-| QuickSort Visualization | Sorting | [Visualgo](https://visualgo.net/en/sorting) |
-| TF-IDF Explained | Information Retrieval | [StatQuest](https://www.youtube.com/watch?v=IIi6e5oDZ68) |
+| Playlist | Tema | Link |
+|----------|------|------|
+| Neural Networks | Deep Learning | [3B1B Neural Networks](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) |
+| Linear Algebra | Matemáticas | [3B1B Linear Algebra](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab) |
+| Probability | Probabilidad | [StatQuest Probability](https://www.youtube.com/playlist?list=PLblh5JKOoLUIcdlgu78MnlATeyx4cEVeR) |
+| Machine Learning | ML | [StatQuest ML](https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF) |
 
 ---
 
@@ -141,55 +198,71 @@
 
 ---
 
-## 🎯 Pathway de CU Boulder
+## 🎯 Pathway de CU Boulder - CURSOS EXACTOS
 
-### Cursos del Pathway
+### Las 2 Líneas del Pathway (6 créditos total)
 
-El pathway típico incluye:
+**LÍNEA 1: Machine Learning (3 créditos)**
+| Curso | Créditos | Módulo Preparación |
+|-------|----------|-------------------|
+| Introduction to Machine Learning: Supervised Learning | 1 | 22 |
+| Unsupervised Algorithms in Machine Learning | 1 | 23 |
+| Introduction to Deep Learning | 1 | 24 |
 
-| Curso | Tema |
-|-------|------|
-| Algorithms for Searching, Sorting, and Indexing | DSA básico |
-| Trees and Graphs: Basics | Estructuras de datos |
-| Dynamic Programming, Greedy Algorithms | Algoritmos avanzados |
+**LÍNEA 2: Probability & Statistics (3 créditos)**
+| Curso | Créditos | Módulo Preparación |
+|-------|----------|-------------------|
+| Probability Theory: Foundation for Data Science | 1 | 19 |
+| Discrete-Time Markov Chains and Monte Carlo Methods | 1 | 21 |
+| Statistical Inference for Estimation in Data Science | 1 | 20 |
 
 ### Preparación Específica
 
-1. **Auditar los cursos** en Coursera (gratis)
-2. **Practicar** problemas de LeetCode nivel Easy/Medium
-3. **Dominar** sorting y searching (el foco del examen)
-4. **Entender** Big O profundamente
+1. **Estudiar esta guía** - Módulos 19-24 cubren TODO el contenido
+2. **Auditar los cursos** en Coursera (gratis) para ver el formato
+3. **Practicar implementaciones** desde cero (sin sklearn)
+4. **Dominar** Bayes, MLE, backpropagation, K-Means
+5. **Completar el proyecto integrador** (Módulo 12)
 
 ---
 
-## 📅 Ruta de Aprendizaje Sugerida
+## 📅 Ruta de Aprendizaje Sugerida (8 meses)
 
-### Semana 1-2: Fundamentos
+### Mes 1-2: Fundamentos
+- Guía: Módulos 01-06 (Python, OOP, Estructuras básicas)
 - Curso: Mathematics for ML: Linear Algebra
-- Libro: Grokking Algorithms (Cap 1-2)
 - Videos: 3B1B Linear Algebra
 
-### Semana 3-4: DSA Básico
-- Libro: Grokking Algorithms (Cap 3-5)
-- LeetCode: 10 problemas Easy de arrays
-- Video: Abdul Bari sorting algorithms
+### Mes 3-4: Prerrequisitos Avanzados
+- Guía: Módulos 07-11, 13-18 (Algoritmos, Álgebra Lineal)
+- Libro: Mathematics for ML (gratis)
+- Práctica: Implementar sorting, trees, graphs
 
-### Semana 5-8: DSA Avanzado
-- Curso: Algorithms Specialization (Parte 1)
-- LeetCode: 20 problemas Easy-Medium
-- Implementar: QuickSort, MergeSort, Binary Search
+### Mes 5: Probabilidad y Estadística ⭐
+- Guía: Módulos 19-21
+- Curso: Probability & Statistics for ML (Coursera)
+- Videos: StatQuest Probability playlist
+- Libro: Think Stats, Think Bayes
 
-### Semana 9-12: Proyecto
-- Construir Archimedes Indexer
-- Documentar análisis Big O
+### Mes 6-7: Machine Learning ⭐
+- Guía: Módulos 22-24
+- Curso: Machine Learning Specialization (Andrew Ng)
+- Videos: 3B1B Neural Networks
+- Libro: Hands-On Machine Learning
+
+### Mes 8: Proyecto e Integración
+- Guía: Módulo 12 (Proyecto Integrador)
+- Auditar cursos del Pathway
 - Practicar explicar en inglés
+- Simulacros de entrevista
 
 ---
 
 ## 🔗 Links Directos
 
 - [MS in AI - CU Boulder](https://www.coursera.org/degrees/ms-artificial-intelligence-boulder)
-- [Pathway Details](https://www.coursera.org/degrees/ms-artificial-intelligence-boulder/admissions)
+- [Pathway Admissions](https://www.coursera.org/degrees/ms-artificial-intelligence-boulder/admissions)
 - [Mathematics for ML Book (Free)](https://mml-book.github.io/)
-- [Big O Cheat Sheet](https://www.bigocheatsheet.com/)
-- [Python Time Complexity](https://wiki.python.org/moin/TimeComplexity)
+- [Deep Learning Book (Free)](https://www.deeplearningbook.org/)
+- [Think Stats (Free)](https://greenteapress.com/thinkstats2/)
+- [Think Bayes (Free)](https://greenteapress.com/wp/think-bayes/)

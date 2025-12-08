@@ -1,6 +1,7 @@
-# 16 - Dynamic Programming
+# Anexo DSA - Dynamic Programming
 
-> **🎯 Objetivo:** Dominar la técnica de DP para resolver problemas de optimización - **tema CRÍTICO del Pathway**.
+> **⚠️ MÓDULO OPCIONAL:** Este módulo NO es requerido para el Pathway. Es útil para entrevistas técnicas.  
+> **🎯 Objetivo:** Dominar la técnica de DP para resolver problemas de optimización.
 
 ---
 

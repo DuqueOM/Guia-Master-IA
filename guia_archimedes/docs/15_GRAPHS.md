@@ -1,6 +1,7 @@
-# 15 - Grafos, BFS y DFS
+# Anexo DSA - Grafos, BFS y DFS
 
-> **🎯 Objetivo:** Dominar grafos y sus algoritmos de recorrido - **tema CRÍTICO del Pathway**.
+> **⚠️ MÓDULO OPCIONAL:** Este módulo NO es requerido para el Pathway. Es útil para entrevistas técnicas.  
+> **🎯 Objetivo:** Dominar grafos y sus algoritmos de recorrido.
 
 ---
 

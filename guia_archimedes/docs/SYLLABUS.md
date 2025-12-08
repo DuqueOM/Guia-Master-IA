@@ -1,83 +1,72 @@
-# 📋 Syllabus - Archimedes Indexer
+# 📋 Syllabus - MS in AI Pathway
 
-> **Programa de Formación: De Python Básico a Candidato MS in AI**
-
----
-
-## 🎯 Objetivos del Programa
-
-Al completar este programa, el estudiante será capaz de:
-
-1. **Diseñar** sistemas de software usando principios OOP y SOLID
-2. **Implementar** estructuras de datos fundamentales (Hash Maps, Índices) desde cero
-3. **Codificar** algoritmos clásicos (QuickSort, Binary Search) sin librerías
-4. **Aplicar** álgebra lineal para ranking de documentos (TF-IDF, Similitud de Coseno)
-5. **Analizar** la complejidad algorítmica usando notación Big O
-6. **Defender** decisiones técnicas en inglés a nivel técnico
+> **10 Módulos Obligatorios | 6 Meses | 100% Enfocado en el Pathway**
 
 ---
 
-## 📊 Estructura del Programa
+## 🎯 Objetivo Único
 
-### Macro-Módulos
-
-| # | Macro-Módulo | Duración | Mini-Proyecto Asociado |
-|---|--------------|----------|----------------------|
-| I | Fundamentos de Python Profesional | 4 semanas | Clases `Document` y `Corpus` |
-| II | Estructuras de Datos Core | 6 semanas | `InvertedIndex` funcional |
-| III | Algoritmos Clásicos | 4 semanas | `sorting.py` y `searching.py` |
-| IV | Matemáticas Aplicadas | 4 semanas | `vectorizer.py` + `similarity.py` |
-| V | Integración y Defensa | 4 semanas | Motor de búsqueda completo |
-
-**Total: 22 semanas** (con margen para repaso = 6 meses)
+Prepararte para aprobar las **6 materias** del Performance-Based Admission Pathway de CU Boulder.
 
 ---
 
-## 📚 Mapeo Macro-Módulos → Módulos → Código
+## 📊 Estructura: 10 Módulos Obligatorios
+
+| Módulo | Nombre | Semanas | Fase | Curso del Pathway |
+|--------|--------|---------|------|-------------------|
+| **01** | Python Profesional | 2 | Fundamentos | - |
+| **02** | OOP desde Cero | 2 | Fundamentos | - |
+| **03** | Álgebra Lineal para ML | 2 | Fundamentos | - |
+| **04** | Fundamentos de Probabilidad | 3 | ⭐ Pathway L2 | Probability Fundamentals |
+| **05** | Estadística Inferencial | 3 | ⭐ Pathway L2 | Statistical Estimation |
+| **06** | Markov y Monte Carlo | 2 | ⭐ Pathway L2 | Markov Chains & Monte Carlo |
+| **07** | ML Supervisado | 3 | ⭐ Pathway L1 | Intro to ML: Supervised |
+| **08** | ML No Supervisado | 2 | ⭐ Pathway L1 | Unsupervised Algorithms |
+| **09** | Deep Learning | 3 | ⭐ Pathway L1 | Intro to Deep Learning |
+| **10** | Proyecto Final | 4 | Integración | - |
+
+**Total: 26 semanas = 6 meses** (6h/día, L-S)
+
+---
+
+## 📚 Mapeo Módulos → Código → Cursos
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ MACRO-MÓDULO I: FUNDAMENTOS                                                 │
+│ FASE 1: FUNDAMENTOS (Semanas 1-6)                                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ Módulos: 01, 02, 03                                                         │
-│ Código:  src/document.py, src/corpus.py                                     │
-│ Tests:   tests/test_document.py                                             │
+│ Código:  src/vector.py, src/matrix.py                                       │
+│ Entregable: Clases Vector y Matrix con operaciones desde cero               │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ MACRO-MÓDULO II: ESTRUCTURAS DE DATOS                                       │
+│ FASE 2: PROBABILIDAD Y ESTADÍSTICA ⭐ PATHWAY LÍNEA 2 (Semanas 7-14)        │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ Módulos: 04, 05, 06                                                         │
-│ Código:  src/tokenizer.py, src/inverted_index.py                            │
-│ Tests:   tests/test_tokenizer.py, tests/test_index.py                       │
+│ Código:  src/probability.py, src/statistics.py, src/markov.py               │
+│ Cursos:  Probability, Statistical Estimation, Markov Chains                 │
+│ Entregable: Bayes, MLE, MCMC, PageRank desde cero                           │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ MACRO-MÓDULO III: ALGORITMOS                                                │
+│ FASE 3: MACHINE LEARNING ⭐ PATHWAY LÍNEA 1 (Semanas 15-22)                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ Módulos: 07, 08, 09                                                         │
-│ Código:  src/sorting.py, src/searching.py                                   │
-│ Tests:   tests/test_sorting.py, tests/test_searching.py                     │
+│ Código:  src/naive_bayes.py, src/kmeans.py, src/neural_network.py           │
+│ Cursos:  Supervised Learning, Unsupervised, Deep Learning                   │
+│ Entregable: Regresión, NB, K-Means, MLP con backprop desde cero             │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ MACRO-MÓDULO IV: MATEMÁTICAS APLICADAS                                      │
+│ FASE 4: PROYECTO FINAL (Semanas 23-26)                                      │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ Módulos: 10, 11                                                             │
-│ Código:  src/vectorizer.py, src/similarity.py                               │
-│ Tests:   tests/test_vectorizer.py, tests/test_similarity.py                 │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ MACRO-MÓDULO V: INTEGRACIÓN                                                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ Módulos: 12                                                                 │
-│ Código:  src/search_engine.py                                               │
-│ Docs:    docs/COMPLEXITY_ANALYSIS.md, README.md                             │
+│ Módulo: 10                                                                  │
+│ Código:  src/pipeline.py (integra todo)                                     │
+│ Entregable: Pipeline ML completo + comparación estadística de modelos       │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -298,26 +287,41 @@ Al completar este programa, el estudiante será capaz de:
 
 ---
 
-## 🎯 Preparación para Pathway
+## 🎯 Preparación para Pathway - CURSOS EXACTOS
 
-El curso de entrada típico del Pathway es **"Algorithms for Searching, Sorting, and Indexing"**.
+El Pathway tiene **2 líneas con 6 cursos específicos**:
 
-Este programa cubre directamente:
-- ✅ Sorting (QuickSort, MergeSort)
-- ✅ Searching (Binary Search)
-- ✅ Indexing (Inverted Index)
-- ✅ Análisis de complejidad (Big O)
-- ✅ Python profesional
+### LÍNEA 1: Machine Learning (3 créditos)
 
-### Alineación con el Pathway
+| Curso del Pathway | Módulo Preparación | Temas Cubiertos |
+|-------------------|-------------------|-----------------|
+| **Introduction to ML: Supervised Learning** | 22 | Regresión, clasificación, árboles, SVM, evaluación |
+| **Unsupervised Algorithms in ML** | 23 | K-Means, clustering jerárquico, PCA, anomalías |
+| **Introduction to Deep Learning** | 24 | Perceptrón, MLP, backprop, CNN/RNN conceptos |
 
-| Tema del Pathway | Módulo de esta Guía |
-|------------------|---------------------|
-| Algorithm Analysis | 03, 08, 09, 12 |
-| Sorting Algorithms | 08 |
-| Binary Search | 09 |
-| Hash Tables | 05, 06 |
-| Basic Data Structures | 04, 05 |
+### LÍNEA 2: Probability & Statistics (3 créditos)
+
+| Curso del Pathway | Módulo Preparación | Temas Cubiertos |
+|-------------------|-------------------|-----------------|
+| **Probability Theory: Foundation** | 19 | Bayes, distribuciones, esperanza, varianza |
+| **Discrete-Time Markov Chains** | 21 | Cadenas de Markov, PageRank, MCMC |
+| **Statistical Inference** | 20 | MLE, MAP, intervalos, hipótesis |
+
+### Cobertura de esta Guía
+
+| Componente del Pathway | ¿Cubierto? | Evidencia |
+|------------------------|------------|-----------|
+| Naive Bayes | ✅ | Módulo 19 + 22 |
+| Regresión Lineal/Logística | ✅ | Módulo 22 |
+| Árboles de Decisión | ✅ | Módulo 22 |
+| K-Means Clustering | ✅ | Módulo 23 |
+| PCA | ✅ | Módulo 23 |
+| Redes Neuronales | ✅ | Módulo 24 |
+| Backpropagation | ✅ | Módulo 24 |
+| Teorema de Bayes | ✅ | Módulo 19 |
+| Cadenas de Markov | ✅ | Módulo 21 |
+| MLE/MAP | ✅ | Módulo 20 |
+| Intervalos de Confianza | ✅ | Módulo 20 |
 
 ---
 
@@ -329,14 +333,35 @@ Ver [PLAN_ESTUDIOS.md](PLAN_ESTUDIOS.md) para el cronograma día a día.
 
 ## ✅ Checklist de Finalización del Programa
 
-- [ ] Todos los módulos completados
-- [ ] Proyecto `archimedes-indexer` funcional
-- [ ] Tests pasando con >80% coverage
-- [ ] `COMPLEXITY_ANALYSIS.md` completo
+### Prerrequisitos (Módulos 01-18)
+- [ ] Python profesional con type hints
+- [ ] OOP y diseño SOLID
+- [ ] Estructuras de datos implementadas
+- [ ] Algoritmos clásicos dominados
+
+### Línea 2: Probabilidad (Módulos 19-21)
+- [ ] Teorema de Bayes explicado y aplicado
+- [ ] MLE y MAP implementados
+- [ ] Cadenas de Markov y MCMC entendidos
+- [ ] Intervalos de confianza calculados
+
+### Línea 1: Machine Learning (Módulos 22-24)
+- [ ] Regresión lineal/logística desde cero
+- [ ] K-Means y PCA implementados
+- [ ] Red neuronal con backpropagation
+- [ ] Métricas de evaluación dominadas
+
+### Proyecto Integrador (Módulo 12)
+- [ ] Pipeline ML completo funcional
+- [ ] Comparación estadística de modelos
 - [ ] README en inglés
-- [ ] Simulacro de entrevista completado
-- [ ] Capaz de explicar el proyecto en inglés (5 min)
+- [ ] Demo presentable
+
+### Preparación Final
+- [ ] Simulacro de entrevista completado (100+ preguntas)
+- [ ] Capaz de explicar cada modelo en inglés
+- [ ] Cursos del Pathway auditados en Coursera
 
 ---
 
-> 💡 **Recuerda:** El objetivo no es solo construir el motor, sino poder *defenderlo* técnicamente. Practica explicar cada decisión.
+> 💡 **Recuerda:** El objetivo es aprobar los 6 cursos del Pathway. Esta guía te prepara para todos ellos. ¡No uses sklearn hasta dominar las implementaciones desde cero!

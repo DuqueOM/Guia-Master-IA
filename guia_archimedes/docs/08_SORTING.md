@@ -1,6 +1,7 @@
-# 08 - Algoritmos de Ordenamiento
+# Anexo DSA - Algoritmos de Ordenamiento
 
-> **🎯 Objetivo:** Implementar QuickSort y MergeSort desde cero, entendiendo su funcionamiento y complejidad.
+> **⚠️ MÓDULO OPCIONAL:** Este módulo NO es requerido para el Pathway. Es útil para entrevistas técnicas.  
+> **🎯 Objetivo:** Implementar QuickSort y MergeSort desde cero.
 
 ---
 

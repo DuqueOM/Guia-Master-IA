@@ -1,6 +1,7 @@
-# 04 - Arrays, Strings y Memoria
+# Anexo DSA - Arrays, Strings y Memoria
 
-> **🎯 Objetivo:** Dominar la manipulación de listas y strings en Python, entendiendo su complejidad y construyendo un tokenizador básico.
+> **⚠️ MÓDULO OPCIONAL:** Este módulo NO es requerido para el Pathway. Es útil para entrevistas técnicas.  
+> **🎯 Objetivo:** Dominar la manipulación de listas y strings en Python.
 
 ---
 

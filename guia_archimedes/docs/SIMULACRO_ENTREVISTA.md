@@ -1,24 +1,34 @@
-# 🎯 Simulacro de Entrevista - Pathway Prep
+# 🎯 Simulacro de Entrevista - MS in AI Pathway
 
-> 80 preguntas tipo Pathway con respuestas detalladas.
+> 120+ preguntas con respuestas detalladas para las **2 líneas del Pathway**
 
 ---
 
 ## 📋 Estructura del Simulacro
 
-| Sección | Preguntas | Tiempo Sugerido |
-|---------|-----------|-----------------|
-| Python y OOP | 10 | 15 min |
-| Estructuras de Datos Básicas | 15 | 25 min |
-| Trees y Graphs | 15 | 30 min |
-| Algoritmos y DP | 20 | 40 min |
-| Matemáticas y Big O | 20 | 30 min |
+| Sección | Categoría | Preguntas | Tiempo |
+|---------|-----------|-----------|--------|
+| 1. Python y OOP | [PRERREQUISITO] | 10 | 15 min |
+| 2. Estructuras de Datos | [PRERREQUISITO] | 15 | 25 min |
+| 3. Trees y Graphs | [PRERREQUISITO] | 15 | 30 min |
+| 4. Algoritmos y DP | [PRERREQUISITO] | 20 | 40 min |
+| 5. Matemáticas y Big O | [PRERREQUISITO] | 20 | 30 min |
+| **6. Probabilidad y Estadística** | ⭐ [PATHWAY LÍNEA 2] | 20 | 30 min |
+| **7. Machine Learning** | ⭐ [PATHWAY LÍNEA 1] | 20 | 35 min |
 
-**Total:** 80 preguntas, ~140 minutos
+**Total:** 120+ preguntas, ~205 minutos
 
 ---
 
-## Sección 1: Python y OOP
+## ✅ Checklist Mínimo Pathway
+
+Si tienes poco tiempo, **prioriza las secciones 6 y 7**:
+- [ ] Sección 6: 20 preguntas de Probabilidad/Estadística
+- [ ] Sección 7: 20 preguntas de Machine Learning
+
+---
+
+## Sección 1: Python y OOP [PRERREQUISITO]
 
 ### P1: ¿Qué son los type hints y por qué usarlos?
 **R:** Anotaciones que indican tipos esperados. Beneficios: documentación viva, detección de errores con mypy, mejor autocompletado.
@@ -62,7 +72,7 @@ def greet(name: str) -> str:
 
 ---
 
-## Sección 2: Estructuras de Datos Básicas
+## Sección 2: Estructuras de Datos [PRERREQUISITO]
 
 ### P11: ¿Cuál es la complejidad de buscar en una lista vs en un set?
 **R:** Lista: O(n), Set: O(1) promedio. Set usa hashing.
@@ -113,7 +123,7 @@ def greet(name: str) -> str:
 
 ---
 
-## Sección 3: Trees y Graphs ⭐ CRÍTICO PATHWAY
+## Sección 3: Trees y Graphs [PRERREQUISITO]
 
 ### P26: ¿Qué es un Binary Tree?
 **R:** Árbol donde cada nodo tiene máximo 2 hijos (left y right).
@@ -177,7 +187,7 @@ def greet(name: str) -> str:
 
 ---
 
-## Sección 4: Algoritmos y DP ⭐ CRÍTICO PATHWAY
+## Sección 4: Algoritmos y DP [PRERREQUISITO]
 
 ### P41: Explica cómo funciona QuickSort.
 **R:** 
@@ -276,7 +286,7 @@ Complejidad: O(n log n) siempre.
 
 ---
 
-## Sección 5: Matemáticas y Big O
+## Sección 5: Matemáticas y Big O [PRERREQUISITO]
 
 ### P56: ¿Qué significa O(n)?
 **R:** El tiempo crece linealmente con el tamaño de entrada. Duplicar n duplica el tiempo.
@@ -310,14 +320,188 @@ Complejidad: O(n log n) siempre.
 
 ---
 
+---
+
+## Sección 6: Probabilidad y Estadística ⭐ [PATHWAY LÍNEA 2]
+
+### P60: ¿Qué es el Teorema de Bayes y para qué se usa en ML?
+**R:** P(A|B) = P(B|A) × P(A) / P(B). Permite actualizar creencias (prior) dado nueva evidencia (likelihood). Base de clasificadores Naive Bayes y modelos probabilísticos.
+
+### P61: ¿Cuál es la diferencia entre probabilidad y likelihood?
+**R:** 
+- Probabilidad: P(data|params) - probabilidad de datos dados parámetros fijos
+- Likelihood: L(params|data) - qué tan probables son los parámetros dados los datos
+
+### P62: ¿Qué es MLE (Maximum Likelihood Estimation)?
+**R:** Encontrar los parámetros θ que maximizan la probabilidad de observar los datos: θ̂ = argmax P(data|θ). Es cómo se entrenan la mayoría de modelos de ML.
+
+### P63: ¿Qué es MAP y cómo se relaciona con regularización?
+**R:** Maximum A Posteriori incorpora un prior: θ̂ = argmax P(θ|data) ∝ P(data|θ) × P(θ). Prior gaussiano → L2 regularization. Prior laplaciano → L1 regularization.
+
+### P64: ¿Qué es la distribución normal y por qué es importante?
+**R:** Distribución "campana de Gauss". Importante por el Teorema del Límite Central: la suma de muchas variables independientes tiende a normal. Muchos errores en ML se asumen normales.
+
+### P65: ¿Qué es esperanza y varianza?
+**R:** 
+- E[X] = Σ x × P(x) = "valor promedio esperado"
+- Var(X) = E[(X - μ)²] = "spread" alrededor de la media
+
+### P66: ¿Qué es una cadena de Markov?
+**R:** Proceso estocástico donde el futuro solo depende del estado actual, no del pasado: P(Xₙ₊₁|Xₙ, Xₙ₋₁, ...) = P(Xₙ₊₁|Xₙ). Usado en PageRank, modelos de lenguaje.
+
+### P67: ¿Qué es la distribución estacionaria de una cadena de Markov?
+**R:** Distribución π tal que π = πP. Después de muchos pasos, la cadena converge a esta distribución sin importar el estado inicial.
+
+### P68: ¿Qué es MCMC y para qué se usa?
+**R:** Markov Chain Monte Carlo. Técnica para muestrear de distribuciones complejas construyendo una cadena de Markov cuya distribución estacionaria es la distribución objetivo.
+
+### P69: Explica el algoritmo Metropolis-Hastings.
+**R:**
+1. Proponer nuevo estado x' desde distribución q(x'|x)
+2. Aceptar con probabilidad min(1, P(x')/P(x))
+3. Si acepta, mover a x'; si no, quedarse en x
+4. Repetir
+
+### P70: ¿Qué es un intervalo de confianza?
+**R:** Rango [a,b] tal que si repitiéramos el experimento muchas veces, el parámetro real estaría dentro del intervalo en (1-α)% de las veces (ej: 95%).
+
+### P71: ¿Cuál es la diferencia entre error Tipo I y Tipo II?
+**R:**
+- Tipo I (α): Rechazar H₀ cuando es verdadera (falso positivo)
+- Tipo II (β): No rechazar H₀ cuando es falsa (falso negativo)
+
+### P72: ¿Qué es covarianza y correlación?
+**R:**
+- Cov(X,Y) = E[(X-μₓ)(Y-μᵧ)] - Relación lineal, no normalizada
+- Correlation = Cov(X,Y)/(σₓσᵧ) - Normalizada a [-1, 1]
+
+### P73: ¿Qué es la distribución Bernoulli y Binomial?
+**R:**
+- Bernoulli: Un solo experimento con prob p de éxito
+- Binomial: k éxitos en n experimentos Bernoulli independientes
+
+### P74: ¿Por qué usamos log-likelihood en lugar de likelihood?
+**R:** Producto de probabilidades pequeñas → underflow. Logaritmo convierte productos en sumas, numéricamente más estable.
+
+### P75: ¿Qué es el Teorema del Límite Central?
+**R:** La distribución de la media muestral tiende a una normal cuando n → ∞, sin importar la distribución original. Justifica asumir normalidad en muchos contextos.
+
+### P76: ¿Qué es independencia condicional?
+**R:** P(A,B|C) = P(A|C) × P(B|C). A y B son independientes dado C. Base de Naive Bayes: features son independientes dado la clase.
+
+### P77: ¿Qué es estimador insesgado?
+**R:** Estimador cuyo valor esperado es igual al parámetro real: E[θ̂] = θ. Ejemplo: media muestral es insesgada para la media poblacional.
+
+### P78: ¿Qué es bootstrap?
+**R:** Técnica de remuestreo: crear muchas muestras tomando con reemplazo de los datos originales. Usado para estimar varianza de estimadores.
+
+### P79: ¿Qué es el p-value?
+**R:** Probabilidad de observar resultados tan extremos como los observados, asumiendo que H₀ es verdadera. Si p < α, rechazamos H₀.
+
+---
+
+## Sección 7: Machine Learning ⭐ [PATHWAY LÍNEA 1]
+
+### P80: ¿Cuál es la diferencia entre aprendizaje supervisado y no supervisado?
+**R:**
+- Supervisado: Datos etiquetados (X, y). Objetivo: predecir y dado X.
+- No supervisado: Solo datos X. Objetivo: encontrar estructura (clusters, dimensiones).
+
+### P81: ¿Qué es el bias-variance tradeoff?
+**R:** Error = Bias² + Variance + Ruido irreducible.
+- Bias alto → underfitting (modelo muy simple)
+- Variance alta → overfitting (modelo muy complejo)
+Objetivo: encontrar el balance óptimo.
+
+### P82: ¿Qué es overfitting y cómo detectarlo?
+**R:** Modelo aprende ruido del train set y no generaliza. Se detecta cuando train accuracy >> test accuracy. Soluciones: más datos, regularización, menos complejidad.
+
+### P83: ¿Qué es cross-validation y para qué sirve?
+**R:** Dividir datos en k folds, entrenar en k-1 y validar en 1, rotar. Da estimación más robusta del rendimiento que un solo train/test split.
+
+### P84: Explica gradient descent.
+**R:** Algoritmo de optimización: w = w - lr × ∂L/∂w. Sigue la dirección de máxima pendiente descendente para minimizar la función de pérdida.
+
+### P85: ¿Cuál es la diferencia entre batch, mini-batch y SGD?
+**R:**
+- Batch: Usa todos los datos para cada update
+- Mini-batch: Usa subconjunto (ej: 32 samples)
+- SGD: Usa 1 sample por update
+Mini-batch es el más común: balance entre estabilidad y velocidad.
+
+### P86: ¿Qué es regularización L1 y L2?
+**R:**
+- L1 (Lasso): Suma de |w|. Produce sparsity (pesos = 0).
+- L2 (Ridge): Suma de w². Shrinks pesos pero no a cero.
+Ambas previenen overfitting al penalizar pesos grandes.
+
+### P87: Explica regresión logística.
+**R:** Clasificador lineal: P(y=1|x) = σ(wᵀx + b). Usa sigmoid para mapear a [0,1]. Se entrena minimizando binary cross-entropy con gradient descent.
+
+### P88: ¿Cómo funciona un árbol de decisión?
+**R:** Divide recursivamente los datos según el feature que maximiza ganancia de información (o minimiza Gini). Hojas contienen predicciones. Fácil de interpretar, propenso a overfitting.
+
+### P89: ¿Qué es Random Forest?
+**R:** Ensemble de árboles de decisión. Cada árbol entrena en bootstrap sample con subset de features aleatorio. Predicción final = promedio/voto mayoritario. Reduce variance.
+
+### P90: Explica K-Nearest Neighbors.
+**R:** Predice según el voto de los k vecinos más cercanos. No-paramétrico (no entrena). Complejidad O(n×d) por predicción. Sensible a escala de features.
+
+### P91: ¿Qué es SVM y cuál es la idea del kernel trick?
+**R:** SVM encuentra hiperplano con máximo margen entre clases. Kernel trick: proyectar a dimensión superior donde datos son linealmente separables, sin calcular la proyección explícita.
+
+### P92: ¿Qué métricas usarías para clasificación desbalanceada?
+**R:** Accuracy engaña. Mejor usar:
+- Precision: TP/(TP+FP) - de los predichos +, cuántos son +
+- Recall: TP/(TP+FN) - de los reales +, cuántos encontramos
+- F1: armonic mean de precision y recall
+- AUC-ROC
+
+### P93: Explica K-Means clustering.
+**R:**
+1. Inicializar k centroides aleatorios
+2. Asignar cada punto al centroide más cercano
+3. Actualizar centroides al promedio de sus puntos
+4. Repetir hasta convergencia
+Requiere especificar k. Sensible a inicialización.
+
+### P94: ¿Cómo elegir el número de clusters en K-Means?
+**R:**
+- Elbow method: graficar inertia vs k, buscar "codo"
+- Silhouette score: mide cohesión vs separación
+- Domain knowledge
+
+### P95: ¿Qué es PCA y para qué sirve?
+**R:** Principal Component Analysis. Reduce dimensionalidad proyectando a direcciones de máxima varianza (eigenvectors de la matriz de covarianza). Usado para visualización, compresión, preprocesamiento.
+
+### P96: ¿Qué es una red neuronal?
+**R:** Composición de funciones: y = f(W₃ × f(W₂ × f(W₁x + b₁) + b₂) + b₃). Cada capa es transformación lineal + activación no lineal. Aprende features automáticamente.
+
+### P97: Explica backpropagation.
+**R:** Algoritmo para calcular gradientes en redes neuronales usando la regla de la cadena. Forward pass calcula output, backward pass propaga gradientes desde el loss hacia atrás.
+
+### P98: ¿Qué son funciones de activación y cuáles conoces?
+**R:** Funciones no lineales entre capas.
+- Sigmoid: (0,1), problemas de vanishing gradient
+- ReLU: max(0,x), estándar para capas ocultas
+- Softmax: para output de clasificación multiclase
+
+### P99: ¿Qué es una CNN y para qué se usa?
+**R:** Convolutional Neural Network. Capas de convolución extraen features espaciales. Usadas para imágenes. Ventaja: comparten parámetros, detectan patrones independiente de posición.
+
+### P100: ¿Qué es una RNN y cuál es el problema del vanishing gradient?
+**R:** Recurrent Neural Network. Estado oculto depende del anterior, captura secuencias. Vanishing gradient: gradientes se vuelven muy pequeños en secuencias largas. Solución: LSTM, GRU.
+
+---
+
 ## 🎯 Autoevaluación
 
 | Respuestas Correctas | Nivel |
 |---------------------|-------|
-| 65-80 | 🏆 Listo para Pathway |
-| 50-64 | ✅ Buen nivel, reforzar gaps |
-| 35-49 | ⚠️ Necesita más estudio |
-| <35 | ❌ Revisar módulos |
+| 100-120 | 🏆 Listo para Pathway - Ambas líneas |
+| 80-99 | ✅ Buen nivel, reforzar gaps |
+| 60-79 | ⚠️ Necesita más estudio |
+| <60 | ❌ Revisar módulos |
 
 ---
 
@@ -328,3 +512,5 @@ Complejidad: O(n log n) siempre.
 3. **Pregunta si dudas:** Clarifica requisitos
 4. **Analiza Big O:** Siempre menciona complejidad
 5. **Practica en inglés:** Todo el Pathway es en inglés
+6. **Conecta conceptos:** ML usa probabilidad, DL usa álgebra lineal
+7. **Implementa desde cero:** Demuestra que entiendes, no solo usas sklearn

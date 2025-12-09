@@ -30,7 +30,7 @@ LANG = "es"
 SLOW = False
 
 # Directorio de salida
-OUTPUT_DIR = "audio"
+OUTPUT_DIR_NAME = "audios"
 
 # Archivos a procesar (orden correcto) - v5.0 Senior Edition
 MODULE_FILES = [
@@ -202,7 +202,7 @@ def clean_markdown_for_speech(content: str) -> str:
     text = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", "", text)
 
     # 10. Convertir headers a texto con pausas
-    text = re.sub(r"^#{1,6}\s*(.+)$", r"\n\1.\n", text, flags=re.MULTILINE)
+    text = re.sub(r"^#{1,6}\s*(.+)$", r"\n\1.\n\n", text, flags=re.MULTILINE)
 
     # 11. Eliminar formato bold/italic pero mantener texto
     text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
@@ -395,7 +395,7 @@ def show_install_instructions():
 ║   2. Ejecutar el generador:                                                   ║
 ║      python generate_audio.py                                                 ║
 ║                                                                               ║
-║   3. Los archivos MP3 se guardarán en: ./audio/                               ║
+║   3. Los archivos MP3 se guardarán en: ./audios/                              ║
 ║                                                                               ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
 """
@@ -423,7 +423,8 @@ def main():
 
     # Directorio actual
     script_dir = Path(__file__).parent
-    output_dir = script_dir / OUTPUT_DIR
+    project_root = script_dir.parent
+    output_dir = project_root / OUTPUT_DIR_NAME
     output_dir.mkdir(exist_ok=True)
 
     # Determinar archivos a procesar

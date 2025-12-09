@@ -32,40 +32,48 @@ SLOW = False
 # Directorio de salida
 OUTPUT_DIR_NAME = "audios"
 
-# Archivos a procesar (orden correcto) - v5.0 Senior Edition
+# Archivos a procesar - Mismo orden que el PDF para consistencia
+# Libro completo y autocontenido para el MS in AI Pathway
 MODULE_FILES = [
-    # === ÍNDICE Y NAVEGACIÓN ===
+    # === PARTE 1: INTRODUCCIÓN Y NAVEGACIÓN ===
+    "index.md",
     "00_INDICE.md",
     "SYLLABUS.md",
-    # === FASE 1: FUNDAMENTOS ===
-    "01_PYTHON_MODERNO.md",
-    "02_DISENO_SISTEMAS.md",
-    "03_ESTRUCTURA_PROYECTO.md",
-    "04_ENTORNOS.md",
-    "05_GIT_PROFESIONAL.md",
-    "06_VERSIONADO_DATOS.md",
-    # === FASE 2: ML ENGINEERING ===
-    "07_SKLEARN_PIPELINES.md",
-    "08_INGENIERIA_FEATURES.md",
-    "09_TRAINING_PROFESIONAL.md",
-    "10_EXPERIMENT_TRACKING.md",
-    # === FASE 3: MLOps CORE ===
-    "11_TESTING_ML.md",
-    "12_CI_CD.md",
-    "13_DOCKER.md",
-    "14_FASTAPI.md",
-    "15_STREAMLIT.md",
-    # === FASE 4: PRODUCCIÓN ===
-    "16_OBSERVABILIDAD.md",
-    "17_DESPLIEGUE.md",
-    "18_INFRAESTRUCTURA.md",
-    # === FASE 5: ESPECIALIZACIÓN ===
-    "19_DOCUMENTACION.md",
-    "20_PROYECTO_INTEGRADOR.md",
-    # === REFERENCIAS ===
-    "21_GLOSARIO.md",
-    "22_CHECKLIST.md",
-    "23_RECURSOS.md",
+    "PLAN_ESTUDIOS.md",
+    # === PARTE 2: LOS 10 MÓDULOS OBLIGATORIOS ===
+    # FASE 1: FUNDAMENTOS (Módulos 01-03)
+    "01_PYTHON_PROFESIONAL.md",  # Módulo 01
+    "02_OOP_DESDE_CERO.md",  # Módulo 02
+    "10_ALGEBRA_LINEAL.md",  # Módulo 03 (Álgebra Lineal para ML)
+    # FASE 2: PROBABILIDAD Y ESTADÍSTICA - PATHWAY LÍNEA 2 (Módulos 04-06)
+    "19_PROBABILIDAD_FUNDAMENTOS.md",  # Módulo 04
+    "20_ESTADISTICA_INFERENCIAL.md",  # Módulo 05
+    "21_CADENAS_MARKOV_MONTECARLO.md",  # Módulo 06
+    # FASE 3: MACHINE LEARNING - PATHWAY LÍNEA 1 (Módulos 07-09)
+    "22_ML_SUPERVISADO.md",  # Módulo 07
+    "23_ML_NO_SUPERVISADO.md",  # Módulo 08
+    "24_INTRO_DEEP_LEARNING.md",  # Módulo 09
+    # FASE 4: PROYECTO FINAL (Módulo 10)
+    "12_PROYECTO_INTEGRADOR.md",  # Módulo 10
+    # === PARTE 3: SOPORTE DEL PROGRAMA ===
+    "CHECKLIST.md",
+    "RUBRICA_EVALUACION.md",
+    "EVALUACION_GUIA.md",
+    # === PARTE 4: MATERIAL COMPLEMENTARIO (Recomendado) ===
+    "EJERCICIOS.md",
+    "GLOSARIO.md",
+    "SIMULACRO_ENTREVISTA.md",
+    "RECURSOS.md",
+    # === PARTE 5: ANEXOS DSA (Solo para entrevistas técnicas) ===
+    "04_ARRAYS_STRINGS.md",
+    "05_HASHMAPS_SETS.md",
+    "07_RECURSION.md",
+    "08_SORTING.md",
+    "14_TREES.md",
+    "15_GRAPHS.md",
+    "16_DYNAMIC_PROGRAMMING.md",
+    # === PARTE 6: REFERENCIA AL REPOSITORIO ===
+    "99_MATERIAL_REPO.md",
 ]
 
 
@@ -432,10 +440,12 @@ def main():
         # Archivo específico
         files_to_process = [script_dir / sys.argv[1]]
     else:
-        # Todos los .md actuales en la carpeta (excepto scripts auxiliares)
-        files_to_process = sorted(
-            p for p in script_dir.glob("*.md") if not p.name.startswith("generate")
-        )
+        # Usar la lista MODULE_FILES para mantener el mismo orden que el PDF
+        files_to_process = [
+            script_dir / fname
+            for fname in MODULE_FILES
+            if (script_dir / fname).exists()
+        ]
 
     print(f"📁 Archivos a procesar: {len(files_to_process)}")
     print("🗣️ Motor: Google Text-to-Speech (español)")

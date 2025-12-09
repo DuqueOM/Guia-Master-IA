@@ -26,32 +26,39 @@ FINAL_FILENAME = "GUIA_MS_AI_PATHWAY_v2.pdf"
 # Carpeta donde están los archivos markdown (este script vive en docs/)
 DOCS_DIR = BASE_DIR
 
-# Orden lógico de la guía: 10 MÓDULOS OBLIGATORIOS + Material complementario
-# 100% enfocado en las 6 materias del Pathway
+# Orden lógico de la guía: Libro completo y autocontenido
+# 100% enfocado en las 6 materias del Pathway + material de soporte
 ORDERED_FILES: List[str] = [
-    # === INTRODUCCIÓN ===
+    # === PARTE 1: INTRODUCCIÓN Y NAVEGACIÓN ===
     "index.md",
     "00_INDICE.md",
-    # === FASE 1: FUNDAMENTOS (Módulos 01-03) ===
+    "SYLLABUS.md",
+    "PLAN_ESTUDIOS.md",
+    # === PARTE 2: LOS 10 MÓDULOS OBLIGATORIOS ===
+    # FASE 1: FUNDAMENTOS (Módulos 01-03)
     "01_PYTHON_PROFESIONAL.md",  # Módulo 01
     "02_OOP_DESDE_CERO.md",  # Módulo 02
     "10_ALGEBRA_LINEAL.md",  # Módulo 03 (Álgebra Lineal para ML)
-    # === FASE 2: PROBABILIDAD Y ESTADÍSTICA - PATHWAY LÍNEA 2 (Módulos 04-06) ===
+    # FASE 2: PROBABILIDAD Y ESTADÍSTICA - PATHWAY LÍNEA 2 (Módulos 04-06)
     "19_PROBABILIDAD_FUNDAMENTOS.md",  # Módulo 04
     "20_ESTADISTICA_INFERENCIAL.md",  # Módulo 05
     "21_CADENAS_MARKOV_MONTECARLO.md",  # Módulo 06
-    # === FASE 3: MACHINE LEARNING - PATHWAY LÍNEA 1 (Módulos 07-09) ===
+    # FASE 3: MACHINE LEARNING - PATHWAY LÍNEA 1 (Módulos 07-09)
     "22_ML_SUPERVISADO.md",  # Módulo 07
     "23_ML_NO_SUPERVISADO.md",  # Módulo 08
     "24_INTRO_DEEP_LEARNING.md",  # Módulo 09
-    # === FASE 4: PROYECTO FINAL (Módulo 10) ===
+    # FASE 4: PROYECTO FINAL (Módulo 10)
     "12_PROYECTO_INTEGRADOR.md",  # Módulo 10
-    # === MATERIAL COMPLEMENTARIO (Opcional) ===
+    # === PARTE 3: SOPORTE DEL PROGRAMA ===
+    "CHECKLIST.md",
+    "RUBRICA_EVALUACION.md",
+    "EVALUACION_GUIA.md",
+    # === PARTE 4: MATERIAL COMPLEMENTARIO (Recomendado) ===
     "EJERCICIOS.md",
     "GLOSARIO.md",
     "SIMULACRO_ENTREVISTA.md",
     "RECURSOS.md",
-    # === ANEXOS: DSA (Solo para entrevistas técnicas, NO requerido para Pathway) ===
+    # === PARTE 5: ANEXOS DSA (Solo para entrevistas técnicas) ===
     "04_ARRAYS_STRINGS.md",
     "05_HASHMAPS_SETS.md",
     "07_RECURSION.md",
@@ -59,32 +66,37 @@ ORDERED_FILES: List[str] = [
     "14_TREES.md",
     "15_GRAPHS.md",
     "16_DYNAMIC_PROGRAMMING.md",
+    # === PARTE 6: REFERENCIA AL REPOSITORIO ===
+    "99_MATERIAL_REPO.md",
 ]
 
 FILE_TITLES = {
-    # Introducción
+    # Parte 1: Introducción y navegación
     "index.md": "Guía MS in AI Pathway",
     "00_INDICE.md": "Índice de Módulos",
-    # Fase 1: Fundamentos
+    "SYLLABUS.md": "Syllabus del Programa",
+    "PLAN_ESTUDIOS.md": "Plan de Estudios (26 semanas)",
+    # Parte 2: Los 10 módulos obligatorios
     "01_PYTHON_PROFESIONAL.md": "Módulo 01 - Python Profesional",
     "02_OOP_DESDE_CERO.md": "Módulo 02 - OOP desde Cero",
     "10_ALGEBRA_LINEAL.md": "Módulo 03 - Álgebra Lineal para ML",
-    # Fase 2: Probabilidad (Pathway L2)
     "19_PROBABILIDAD_FUNDAMENTOS.md": "Módulo 04 - Fundamentos de Probabilidad ⭐",
     "20_ESTADISTICA_INFERENCIAL.md": "Módulo 05 - Estadística Inferencial ⭐",
     "21_CADENAS_MARKOV_MONTECARLO.md": "Módulo 06 - Markov y Monte Carlo ⭐",
-    # Fase 3: Machine Learning (Pathway L1)
     "22_ML_SUPERVISADO.md": "Módulo 07 - ML Supervisado ⭐",
     "23_ML_NO_SUPERVISADO.md": "Módulo 08 - ML No Supervisado ⭐",
     "24_INTRO_DEEP_LEARNING.md": "Módulo 09 - Deep Learning ⭐",
-    # Fase 4: Proyecto
     "12_PROYECTO_INTEGRADOR.md": "Módulo 10 - Proyecto Final",
-    # Material Complementario
+    # Parte 3: Soporte del programa
+    "CHECKLIST.md": "Checklist de Finalización",
+    "RUBRICA_EVALUACION.md": "Rúbrica de Evaluación",
+    "EVALUACION_GUIA.md": "Guía de Evaluación",
+    # Parte 4: Material complementario
     "EJERCICIOS.md": "Ejercicios Prácticos",
     "GLOSARIO.md": "Glosario Técnico",
     "SIMULACRO_ENTREVISTA.md": "Simulacro de Entrevista",
     "RECURSOS.md": "Recursos Recomendados",
-    # Anexos DSA (Opcional)
+    # Parte 5: Anexos DSA
     "04_ARRAYS_STRINGS.md": "Anexo DSA - Arrays y Strings",
     "05_HASHMAPS_SETS.md": "Anexo DSA - Hash Maps y Sets",
     "07_RECURSION.md": "Anexo DSA - Recursión",
@@ -92,6 +104,8 @@ FILE_TITLES = {
     "14_TREES.md": "Anexo DSA - Trees y BST",
     "15_GRAPHS.md": "Anexo DSA - Graphs, BFS, DFS",
     "16_DYNAMIC_PROGRAMMING.md": "Anexo DSA - Dynamic Programming",
+    # Parte 6: Referencia al repositorio
+    "99_MATERIAL_REPO.md": "Material Adicional en el Repositorio",
 }
 
 # CSS sencillo pero legible

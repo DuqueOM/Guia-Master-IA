@@ -1,215 +1,256 @@
-# ☑️ Checklist Final
+# ☑️ Checklist Final - ML Specialist v3.3
 
-> Verificación completa antes de considerar el proyecto terminado.
+> Verificación completa del programa de **24 semanas** con validación matemática rigurosa.
 
 ---
 
-## 🏗️ Estructura del Proyecto
+## 📚 Fase 1: Fundamentos (Semanas 1-8)
 
-- [ ] Carpeta `src/` con todos los módulos
-- [ ] Carpeta `tests/` con tests unitarios
-- [ ] Carpeta `docs/` con documentación
-- [ ] Carpeta `data/` con corpus de ejemplo
-- [ ] `README.md` en la raíz
-- [ ] `pyproject.toml` configurado
+### Módulo 01: Python + Pandas + NumPy (Semanas 1-2)
 
-### Archivos Requeridos
+#### Conocimiento
+- [ ] Pandas: cargar CSV con `read_csv()`
+- [ ] Pandas: limpiar datos con `dropna()`, `fillna()`
+- [ ] Pandas: selección con `.loc[]`, `.iloc[]`
+- [ ] Pandas → NumPy: `.to_numpy()`
+- [ ] NumPy: creación de arrays (1D, 2D, 3D)
+- [ ] NumPy: indexing, slicing, broadcasting
+- [ ] NumPy: agregaciones por eje (axis=0, axis=1)
+- [ ] **Conozco los 5 errores comunes de NumPy y sus soluciones**
 
-```
-archimedes-indexer/
-├── src/
-│   ├── __init__.py          ✓
-│   ├── document.py          ✓
-│   ├── tokenizer.py         ✓
-│   ├── inverted_index.py    ✓
-│   ├── sorting.py           ✓
-│   ├── searching.py         ✓
-│   ├── linear_algebra.py    ✓
-│   ├── vectorizer.py        ✓
-│   ├── similarity.py        ✓
-│   └── search_engine.py     ✓
-├── tests/
-│   └── test_*.py            ✓
-├── docs/
-│   └── COMPLEXITY_ANALYSIS.md ✓
-├── README.md                ✓
-└── pyproject.toml           ✓
-```
+#### Estándares Profesionales (v3.2)
+- [ ] `mypy src/` pasa sin errores
+- [ ] `ruff check src/` pasa sin errores
+- [ ] Al menos 3 tests con `pytest` pasando
+
+#### Metodología Feynman
+- [ ] Puedo explicar broadcasting en 5 líneas sin jerga
+
+### Módulo 02: Álgebra Lineal para ML (Semanas 3-5)
+- [ ] Producto punto y significado geométrico
+- [ ] Normas L1, L2, L∞ implementadas
+- [ ] Distancia euclidiana y similitud coseno
+- [ ] Multiplicación de matrices con `@`
+- [ ] Eigenvalues/eigenvectors con `np.linalg.eig()`
+- [ ] SVD con `np.linalg.svd()`
+- [ ] `linear_algebra.py` con tests pasando
+
+### Módulo 03: Cálculo Multivariante (Semanas 6-7)
+- [ ] Derivadas parciales calculadas
+- [ ] Gradiente de funciones multivariables
+- [ ] Gradient Descent implementado desde cero
+- [ ] Efecto del learning rate entendido
+- [ ] Chain Rule aplicada a funciones compuestas
+- [ ] `calculus.py` con Gradient Descent funcional
+
+#### Gradient Checking (v3.3 - Obligatorio)
+- [ ] **`grad_check.py` implementado**
+- [ ] **Validé derivadas de MSE, sigmoid y capa lineal**
+- [ ] Error relativo < 10⁻⁷ en todos los tests
+
+### Módulo 04: Probabilidad para ML (Semana 8)
+- [ ] Teorema de Bayes explicado con ejemplo
+- [ ] Gaussiana univariada: PDF implementada
+- [ ] Gaussiana multivariada: concepto entendido
+- [ ] MLE: conexión con Cross-Entropy explicada
+- [ ] **Softmax con Log-Sum-Exp trick implementado (v3.3)**
+- [ ] `probability.py` con tests pasando
+
+---
+
+## 🤖 Fase 2: Núcleo de ML (Semanas 9-20) ⭐ PATHWAY
+
+### Módulo 05: Supervised Learning (Semanas 9-12)
+
+#### Conocimiento
+- [ ] Regresión lineal (Normal Equation + GD)
+- [ ] MSE y su gradiente derivado
+- [ ] Regresión logística desde cero
+- [ ] Sigmoid y binary cross-entropy
+- [ ] Matriz de confusión (TP, TN, FP, FN)
+- [ ] Accuracy, Precision, Recall, F1 implementados
+- [ ] Train/test split manual
+- [ ] K-fold cross validation
+- [ ] Regularización L2 (Ridge)
+
+#### Derivación Analítica (v3.2 - Obligatorio)
+- [ ] **Derivé el gradiente de Cross-Entropy a mano**
+- [ ] **Documento con derivación completa (Markdown o LaTeX)**
+
+#### Metodología Feynman
+- [ ] Puedo explicar sigmoid vs softmax en 5 líneas
+
+### Módulo 06: Unsupervised Learning (Semanas 13-16)
+- [ ] K-Means con K-Means++ initialization
+- [ ] Algoritmo de Lloyd (asignar-actualizar-repetir)
+- [ ] Inercia y método del codo
+- [ ] PCA usando SVD (`np.linalg.svd()`)
+- [ ] Varianza explicada y elección de n_components
+- [ ] Reconstrucción desde componentes principales
+- [ ] `kmeans.py` y `pca.py` con tests pasando
+
+### Módulo 07: Deep Learning + CNNs (Semanas 17-20)
+
+#### Conocimiento
+- [ ] Neurona artificial y perceptrón
+- [ ] Sigmoid, ReLU, tanh, softmax + derivadas
+- [ ] Problema XOR y su no-linealidad
+- [ ] Forward pass para MLP
+- [ ] Backpropagation con Chain Rule
+- [ ] SGD, Momentum, Adam implementados
+- [ ] Red resuelve problema XOR
+- [ ] **CNNs (teoría):** convolución, stride, padding, pooling
+
+#### Derivación Analítica (v3.2 - Obligatorio)
+- [ ] **Derivé las ecuaciones de backprop para red de 2 capas**
+- [ ] **Diagrama de grafo computacional**
+
+#### Metodología Feynman
+- [ ] Puedo explicar backpropagation en 5 líneas sin jerga
+
+---
+
+## 🎯 Fase 3: Proyecto MNIST Analyst (Semanas 21-24)
+
+### Semana 21: EDA + No Supervisado
+- [ ] MNIST cargado y normalizado
+- [ ] PCA reduce a 2D con visualización
+- [ ] Varianza explicada analizada
+- [ ] K-Means agrupa dígitos sin etiquetas
+- [ ] Centroides visualizados como imágenes 28x28
+
+### Semana 22: Clasificación Supervisada
+- [ ] Logistic Regression One-vs-All implementado
+- [ ] Accuracy > 85% en test set
+- [ ] Precision, Recall, F1 por clase
+- [ ] Matriz de confusión analizada
+- [ ] Errores visualizados (imágenes mal clasificadas)
+
+### Semana 23: Deep Learning
+- [ ] MLP 784→128→64→10 implementado
+- [ ] Forward y backward pass funcionales
+- [ ] Mini-batch SGD funcionando
+- [ ] Accuracy > 90% en test set
+
+### Semana 24: Benchmark + Informe
+- [ ] Comparación MLP vs Logistic Regression
+- [ ] `MODEL_COMPARISON.md` explicando diferencias
+- [ ] `README.md` profesional en inglés
+- [ ] Demo notebook completo
+
+### Requisitos v3.2 (Obligatorios)
+- [ ] **Análisis Bias-Variance** con experimento práctico (3 tamaños de MLP)
+- [ ] **Notebook en formato Paper** (Abstract, Methods, Results, Discussion)
+- [ ] `mypy src/` pasa sin errores en todo el proyecto
+- [ ] `pytest tests/` con cobertura significativa
+
+### Metodología Feynman
+- [ ] Puedo explicar Bias vs Variance en 5 líneas
+- [ ] Puedo explicar por qué MLP supera a Logistic en 5 líneas
 
 ---
 
 ## 💻 Código
 
-### Type Hints
-- [ ] Todos los parámetros de función tienen type hints
-- [ ] Todos los retornos de función tienen type hints
-- [ ] Atributos de clase están tipados
-- [ ] `mypy src/` pasa sin errores
-
-### Estilo
-- [ ] PEP8 cumplido
-- [ ] `ruff check src/` pasa sin errores
-- [ ] Nombres descriptivos (no `x`, `temp`, `data`)
-- [ ] Líneas < 88 caracteres
-
-### Documentación en Código
-- [ ] Todas las clases tienen docstring
-- [ ] Todas las funciones públicas tienen docstring
-- [ ] Docstrings incluyen Args, Returns, Example
-
----
-
-## 🧪 Testing
-
-### Cobertura
-- [ ] `test_document.py` existe
-- [ ] `test_tokenizer.py` existe
-- [ ] `test_inverted_index.py` existe
-- [ ] `test_sorting.py` existe
-- [ ] `test_searching.py` existe
-- [ ] `test_vectorizer.py` existe
-- [ ] `test_similarity.py` existe
-- [ ] `test_search_engine.py` existe
-
-### Calidad
-- [ ] Coverage > 80%
-- [ ] Tests para casos normales
-- [ ] Tests para edge cases (vacío, None, etc.)
-- [ ] Todos los tests pasan
-
-### Comando de Verificación
-```bash
-pytest tests/ -v --cov=src --cov-fail-under=80
+### Estructura del Proyecto MNIST
+```
+mnist-analyst/
+├── src/
+│   ├── __init__.py
+│   ├── data_loader.py
+│   ├── linear_algebra.py
+│   ├── probability.py
+│   ├── pca.py
+│   ├── kmeans.py
+│   ├── logistic_regression.py
+│   ├── neural_network.py
+│   ├── metrics.py
+│   └── pipeline.py
+├── notebooks/
+│   ├── 01_eda_pca_kmeans.ipynb
+│   ├── 02_logistic_classification.ipynb
+│   └── 03_neural_network_benchmark.ipynb
+├── tests/
+│   └── test_*.py
+├── docs/
+│   └── MODEL_COMPARISON.md
+├── README.md
+└── requirements.txt
 ```
 
----
+### Calidad de Código
+- [ ] Type hints en todas las funciones
+- [ ] Docstrings con Args, Returns
+- [ ] `mypy src/` pasa sin errores
+- [ ] Código vectorizado (sin loops innecesarios)
 
-## 📊 Análisis Big O
-
-### Documento COMPLEXITY_ANALYSIS.md
-- [ ] Análisis de `add_document()`
-- [ ] Análisis de `build_index()`
-- [ ] Análisis de `search()`
-- [ ] Análisis de `quicksort()`
-- [ ] Análisis de `binary_search()`
-- [ ] Análisis de `cosine_similarity()`
-- [ ] Justificación para cada análisis
-
-### Correctitud
-- [ ] `quicksort`: O(n log n) promedio, O(n²) peor
-- [ ] `binary_search`: O(log n)
-- [ ] `cosine_similarity`: O(V) donde V = dimensión vector
-- [ ] Hash table operations: O(1) amortizado
+### Tests
+- [ ] Tests unitarios para cada módulo
+- [ ] Tests para edge cases
+- [ ] Todos los tests pasan
 
 ---
 
 ## 📝 Documentación
 
-### README.md
-- [ ] Título y descripción clara
-- [ ] Features principales listados
+### README.md del Proyecto
+- [ ] Descripción del proyecto
 - [ ] Instrucciones de instalación
-- [ ] Ejemplo de uso con código
-- [ ] Link a COMPLEXITY_ANALYSIS.md
-- [ ] Instrucciones para ejecutar tests
+- [ ] Ejemplo de uso
+- [ ] Resultados y métricas
 - [ ] Escrito en inglés
 
-### Ejemplo README Check
-```markdown
-# Archimedes Indexer ✓
-
-A search engine built from scratch... ✓
-
-## Features ✓
-- Inverted index
-- TF-IDF
-- Cosine similarity
-- Pure Python (no numpy)
-
-## Installation ✓
-git clone...
-pip install...
-
-## Usage ✓
-```python
-from src import SearchEngine
-engine = SearchEngine()
-...
-```
-
-## Testing ✓
-pytest tests/
-
-## Complexity ✓
-See docs/COMPLEXITY_ANALYSIS.md
-```
-
----
-
-## 🎯 Funcionalidad
-
-### Motor de Búsqueda
-- [ ] Puede agregar documentos
-- [ ] Puede construir índice
-- [ ] Puede buscar por query
-- [ ] Retorna resultados ordenados por score
-- [ ] Scores están entre 0 y 1
-
-### Demo
-- [ ] Script de demo funciona
-- [ ] Demo usa corpus de ejemplo
-- [ ] Demo muestra resultados formateados
+### MODEL_COMPARISON.md
+- [ ] Tabla comparativa de modelos
+- [ ] Explicación matemática de diferencias
+- [ ] Análisis de PCA
+- [ ] Análisis de K-Means
+- [ ] Conclusiones
 
 ---
 
 ## 🚀 Verificación Final
 
-Ejecuta todos estos comandos y verifica que pasen:
-
 ```bash
-# 1. Type checking
-mypy src/
-# Esperado: Success: no issues found
+# 1. Tests
+python -m pytest tests/ -v
 
-# 2. Linting
-ruff check src/
-# Esperado: All checks passed!
-
-# 3. Tests
-pytest tests/ -v
-# Esperado: X passed
-
-# 4. Coverage
-pytest tests/ --cov=src --cov-report=term-missing
-# Esperado: TOTAL coverage > 80%
-
-# 5. Demo
+# 2. Pipeline completo
 python -c "
-from src.search_engine import SearchEngine
-engine = SearchEngine()
-engine.add_document(1, 'Test', 'python programming tutorial')
-engine.add_document(2, 'Test2', 'java programming guide')
-engine.build_index()
-results = engine.search('python')
-print('Results:', results)
-assert len(results) > 0
-print('✅ Demo passed!')
+from src.pipeline import run_mnist_pipeline
+# Ejecutar pipeline demo
 "
+
+# 3. Verificar accuracy
+# Logistic Regression: > 85%
+# Neural Network: > 90%
 ```
 
 ---
 
 ## ✅ Declaración de Completitud
 
-Marca cuando hayas verificado todo:
+### Por Fase
 
-- [ ] **Estructura:** Todos los archivos en su lugar
-- [ ] **Código:** Type hints, estilo, documentación
-- [ ] **Tests:** Coverage > 80%, todos pasan
-- [ ] **Big O:** Análisis completo y correcto
-- [ ] **Docs:** README profesional en inglés
-- [ ] **Funcionalidad:** Motor funciona correctamente
+- [ ] **Fase 1:** Fundamentos matemáticos dominados
+- [ ] **Fase 2:** Algoritmos ML implementados desde cero
+- [ ] **Fase 3:** Proyecto MNIST completo
+
+### Por Curso del Pathway
+
+- [ ] **Supervised Learning:** Regresión + Clasificación
+- [ ] **Unsupervised Learning:** K-Means + PCA
+- [ ] **Deep Learning:** MLP con Backpropagation
+
+### Métricas Finales
+
+| Métrica | Objetivo | Logrado |
+|---------|----------|---------|
+| Logistic Regression Accuracy | >85% | ___% |
+| Neural Network Accuracy | >90% | ___% |
+| Módulos completados | 8/8 | ___/8 |
+| Tests pasando | 100% | ___% |
 
 **Fecha de completitud:** _______________
 
-**Puntuación autoevaluada:** ___ / 100
+**Listo para el MS in AI Pathway - Línea 1:** ☐ Sí ☐ No

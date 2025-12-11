@@ -426,21 +426,27 @@ def main():
         show_install_instructions()
         return
 
-    # Directorio actual
+    # Directorio actual (raíz del proyecto Guia Master)
     script_dir = Path(__file__).parent
-    # Generar audios en la carpeta raiz del proyecto: Guia_MLOps/audio
-    project_root = script_dir.parent
+    # Raíz del proyecto actual
+    project_root = script_dir
+    # Directorio donde residen los markdown principales
+    docs_dir = project_root / "docs"
+    # Directorio de salida dentro del proyecto: ./audios
     output_dir = project_root / OUTPUT_DIR
     output_dir.mkdir(exist_ok=True)
 
     # Determinar archivos a procesar
     if len(sys.argv) > 1 and not sys.argv[1].startswith("--"):
-        # Archivo específico
-        files_to_process = [script_dir / sys.argv[1]]
+        # Archivo específico (se asume dentro de docs/ salvo que se pase ruta absoluta)
+        candidate = Path(sys.argv[1])
+        if not candidate.is_absolute():
+            candidate = docs_dir / candidate
+        files_to_process = [candidate]
     else:
-        # Todos los .md actuales en la carpeta (excepto scripts auxiliares)
+        # Todos los .md dentro de docs/
         files_to_process = sorted(
-            p for p in script_dir.glob("*.md") if not p.name.startswith("generate")
+            p for p in docs_dir.glob("*.md") if not p.name.startswith("generate")
         )
 
     print(f"📁 Archivos a procesar: {len(files_to_process)}")

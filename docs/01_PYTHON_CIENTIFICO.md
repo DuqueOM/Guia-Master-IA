@@ -1,7 +1,7 @@
 # Módulo 01 - Python Científico + Pandas
 
-> **🎯 Objetivo:** Dominar Pandas para datos + NumPy para matemáticas  
-> **Fase:** 1 - Fundamentos | **Semanas 1-2**  
+> **🎯 Objetivo:** Dominar Pandas para datos + NumPy para matemáticas
+> **Fase:** 1 - Fundamentos | **Semanas 1-2**
 > **Prerrequisitos:** Python básico (variables, funciones, listas, loops)
 
 ---
@@ -102,13 +102,13 @@ print(df.head())
 
 # Información del DataFrame
 print(df.info())
-#  Column         Non-Null Count  Dtype  
-# ---  ------         --------------  -----  
+#  Column         Non-Null Count  Dtype
+# ---  ------         --------------  -----
 #  0   sepal_length   150 non-null    float64
 #  1   sepal_width    150 non-null    float64
 #  2   petal_length   150 non-null    float64
 #  3   petal_width    150 non-null    float64
-#  4   species        150 non-null    object 
+#  4   species        150 non-null    object
 
 # Estadísticas básicas
 print(df.describe())
@@ -491,33 +491,33 @@ from typing import List
 def benchmark_dot_product():
     """Compara rendimiento de lista vs NumPy."""
     size = 1_000_000
-    
+
     # Crear datos
     list_a: List[float] = [float(i) for i in range(size)]
     list_b: List[float] = [float(i) for i in range(size)]
     array_a = np.array(list_a)
     array_b = np.array(list_b)
-    
+
     # Benchmark lista
     start = time.time()
     result_list = sum(a * b for a, b in zip(list_a, list_b))
     time_list = time.time() - start
-    
+
     # Benchmark NumPy
     start = time.time()
     result_numpy = np.dot(array_a, array_b)
     time_numpy = time.time() - start
-    
+
     print(f"Lista:  {time_list:.4f}s")
     print(f"NumPy:  {time_numpy:.4f}s")
     print(f"Speedup: {time_list/time_numpy:.1f}x")
-    
+
     # Verificar resultados iguales
     assert abs(result_list - result_numpy) < 1e-6
 
 if __name__ == "__main__":
     benchmark_dot_product()
-    
+
 # Output típico:
 # Lista:  0.1523s
 # NumPy:  0.0015s
@@ -642,19 +642,19 @@ def benchmark(
     iterations: int = 100
 ) -> BenchmarkResult:
     """Ejecuta benchmark comparativo."""
-    
+
     # Benchmark lista
     start = time.time()
     for _ in range(iterations):
         func_list(*args_list)
     time_list = (time.time() - start) / iterations
-    
+
     # Benchmark NumPy
     start = time.time()
     for _ in range(iterations):
         func_numpy(*args_numpy)
     time_numpy = (time.time() - start) / iterations
-    
+
     return BenchmarkResult(
         operation=operation_name,
         time_list=time_list,
@@ -716,58 +716,58 @@ def matrix_sum_numpy(A: np.ndarray, B: np.ndarray) -> np.ndarray:
 def main():
     """Ejecutar todos los benchmarks."""
     size = 10000
-    
+
     # Crear datos de prueba
     list_a = [float(i) for i in range(size)]
     list_b = [float(i) for i in range(size)]
     array_a = np.array(list_a)
     array_b = np.array(list_b)
-    
+
     matrix_size = 100
-    list_matrix_a = [[float(i*j) for j in range(matrix_size)] 
+    list_matrix_a = [[float(i*j) for j in range(matrix_size)]
                      for i in range(matrix_size)]
-    list_matrix_b = [[float(i+j) for j in range(matrix_size)] 
+    list_matrix_b = [[float(i+j) for j in range(matrix_size)]
                      for i in range(matrix_size)]
     array_matrix_a = np.array(list_matrix_a)
     array_matrix_b = np.array(list_matrix_b)
-    
+
     # Ejecutar benchmarks
     results = []
-    
+
     results.append(benchmark(
         dot_product_list, dot_product_numpy,
         (list_a, list_b), (array_a, array_b),
         "Producto Punto"
     ))
-    
+
     results.append(benchmark(
         normalize_list, normalize_numpy,
         (list_a,), (array_a,),
         "Normalización"
     ))
-    
+
     results.append(benchmark(
         euclidean_distance_list, euclidean_distance_numpy,
         (list_a, list_b), (array_a, array_b),
         "Distancia Euclidiana"
     ))
-    
+
     results.append(benchmark(
         matrix_sum_list, matrix_sum_numpy,
         (list_matrix_a, list_matrix_b), (array_matrix_a, array_matrix_b),
         "Suma de Matrices"
     ))
-    
+
     # Mostrar resultados
     print("\n" + "="*60)
     print("BENCHMARK: Lista vs NumPy")
     print("="*60)
     print(f"{'Operación':<25} {'Lista (ms)':<12} {'NumPy (ms)':<12} {'Speedup':<10}")
     print("-"*60)
-    
+
     for r in results:
         print(f"{r.operation:<25} {r.time_list*1000:<12.4f} {r.time_numpy*1000:<12.4f} {r.speedup:<10.1f}x")
-    
+
     print("="*60)
     print(f"\nSpeedup promedio: {sum(r.speedup for r in results)/len(results):.1f}x")
 
@@ -932,14 +932,14 @@ from numpy.typing import NDArray
 def dot_product(a: NDArray[np.float64], b: NDArray[np.float64]) -> float:
     """
     Calcula el producto punto de dos vectores.
-    
+
     Args:
         a: Primer vector (n,)
         b: Segundo vector (n,)
-    
+
     Returns:
         El producto punto (escalar)
-    
+
     Raises:
         ValueError: Si los vectores tienen shapes diferentes
     """
@@ -965,19 +965,19 @@ from src.linear_algebra import dot_product, norm_l2
 
 class TestDotProduct:
     """Tests para la función dot_product."""
-    
+
     def test_dot_product_basic(self) -> None:
         """Test básico: [1,2,3] · [4,5,6] = 32"""
         a = np.array([1.0, 2.0, 3.0])
         b = np.array([4.0, 5.0, 6.0])
         assert dot_product(a, b) == 32.0
-    
+
     def test_dot_product_orthogonal(self) -> None:
         """Vectores ortogonales tienen producto punto = 0"""
         a = np.array([1.0, 0.0])
         b = np.array([0.0, 1.0])
         assert dot_product(a, b) == 0.0
-    
+
     def test_dot_product_shape_mismatch(self) -> None:
         """Debe lanzar ValueError si shapes no coinciden"""
         a = np.array([1.0, 2.0])
@@ -988,12 +988,12 @@ class TestDotProduct:
 
 class TestNormL2:
     """Tests para la función norm_l2."""
-    
+
     def test_norm_unit_vector(self) -> None:
         """Vector unitario tiene norma 1"""
         v = np.array([1.0, 0.0, 0.0])
         assert norm_l2(v) == 1.0
-    
+
     def test_norm_345(self) -> None:
         """Triángulo 3-4-5: norma de [3,4] = 5"""
         v = np.array([3.0, 4.0])

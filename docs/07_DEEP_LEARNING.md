@@ -1,7 +1,7 @@
 # Módulo 07 - Deep Learning
 
-> **🎯 Objetivo:** Implementar MLP con backprop + entender fundamentos de CNNs  
-> **Fase:** 2 - Núcleo de ML | **Semanas 17-20**  
+> **🎯 Objetivo:** Implementar MLP con backprop + entender fundamentos de CNNs
+> **Fase:** 2 - Núcleo de ML | **Semanas 17-20**
 > **Curso del Pathway:** Introduction to Deep Learning
 
 ---
@@ -65,12 +65,12 @@ Donde:
 def perceptron(x: np.ndarray, w: np.ndarray, b: float) -> float:
     """
     Un perceptrón simple.
-    
+
     Args:
         x: entrada (n_features,)
         w: pesos (n_features,)
         b: bias
-    
+
     Returns:
         salida activada
     """
@@ -85,61 +85,61 @@ import numpy as np
 
 class Activations:
     """Funciones de activación y sus derivadas."""
-    
+
     @staticmethod
     def sigmoid(z: np.ndarray) -> np.ndarray:
         """
         Sigmoid: σ(z) = 1 / (1 + e^(-z))
-        
+
         Rango: (0, 1)
         Uso: Capa de salida para clasificación binaria
         Problema: Vanishing gradient para |z| grande
         """
         z = np.clip(z, -500, 500)
         return 1 / (1 + np.exp(-z))
-    
+
     @staticmethod
     def sigmoid_derivative(a: np.ndarray) -> np.ndarray:
         """σ'(z) = σ(z) · (1 - σ(z)) = a · (1 - a)"""
         return a * (1 - a)
-    
+
     @staticmethod
     def relu(z: np.ndarray) -> np.ndarray:
         """
         ReLU: f(z) = max(0, z)
-        
+
         Rango: [0, ∞)
         Uso: Capas ocultas (default moderno)
         Ventaja: No vanishing gradient para z > 0
         Problema: "Dying ReLU" si z < 0 siempre
         """
         return np.maximum(0, z)
-    
+
     @staticmethod
     def relu_derivative(z: np.ndarray) -> np.ndarray:
         """ReLU'(z) = 1 si z > 0, 0 si z ≤ 0"""
         return (z > 0).astype(float)
-    
+
     @staticmethod
     def tanh(z: np.ndarray) -> np.ndarray:
         """
         Tanh: f(z) = (e^z - e^(-z)) / (e^z + e^(-z))
-        
+
         Rango: (-1, 1)
         Uso: Alternativa a sigmoid (centrado en 0)
         """
         return np.tanh(z)
-    
+
     @staticmethod
     def tanh_derivative(a: np.ndarray) -> np.ndarray:
         """tanh'(z) = 1 - tanh²(z) = 1 - a²"""
         return 1 - a ** 2
-    
+
     @staticmethod
     def softmax(z: np.ndarray) -> np.ndarray:
         """
         Softmax: softmax(z)ᵢ = e^(zᵢ) / Σⱼ e^(zⱼ)
-        
+
         Rango: (0, 1), suma = 1
         Uso: Capa de salida para clasificación multiclase
         Output: probabilidades de cada clase
@@ -232,7 +232,7 @@ from typing import List, Dict
 
 class Layer:
     """Una capa de la red neuronal."""
-    
+
     def __init__(self, input_size: int, output_size: int, activation: str = 'relu'):
         """
         Args:
@@ -243,7 +243,7 @@ class Layer:
         self.input_size = input_size
         self.output_size = output_size
         self.activation = activation
-        
+
         # Inicialización Xavier/He
         if activation == 'relu':
             # He initialization para ReLU
@@ -251,26 +251,26 @@ class Layer:
         else:
             # Xavier initialization
             std = np.sqrt(1.0 / input_size)
-        
+
         self.W = np.random.randn(output_size, input_size) * std
         self.b = np.zeros(output_size)
-        
+
         # Cache para backprop
         self.cache = {}
-    
+
     def forward(self, x: np.ndarray) -> np.ndarray:
         """
         Forward pass de una capa.
-        
+
         z = Wx + b
         a = activation(z)
         """
         self.cache['x'] = x
-        
+
         # Transformación lineal
         z = self.W @ x + self.b
         self.cache['z'] = z
-        
+
         # Activación
         if self.activation == 'relu':
             a = np.maximum(0, z)
@@ -284,14 +284,14 @@ class Layer:
             a = exp_z / np.sum(exp_z)
         else:  # linear
             a = z
-        
+
         self.cache['a'] = a
         return a
 
 
 class NeuralNetwork:
     """Red Neuronal Multicapa."""
-    
+
     def __init__(self, layer_sizes: List[int], activations: List[str]):
         """
         Args:
@@ -299,19 +299,19 @@ class NeuralNetwork:
             activations: ['relu', 'relu', ..., 'sigmoid'] para cada capa
         """
         assert len(activations) == len(layer_sizes) - 1
-        
+
         self.layers = []
         for i in range(len(layer_sizes) - 1):
             layer = Layer(layer_sizes[i], layer_sizes[i+1], activations[i])
             self.layers.append(layer)
-    
+
     def forward(self, x: np.ndarray) -> np.ndarray:
         """Forward pass a través de todas las capas."""
         a = x
         for layer in self.layers:
             a = layer.forward(a)
         return a
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predicción para múltiples muestras."""
         predictions = []
@@ -349,9 +349,9 @@ import numpy as np
 def binary_cross_entropy(y_true: float, y_pred: float, eps: float = 1e-15) -> float:
     """
     Binary Cross-Entropy Loss.
-    
+
     L = -[y·log(ŷ) + (1-y)·log(1-ŷ)]
-    
+
     Args:
         y_true: etiqueta real (0 o 1)
         y_pred: predicción (probabilidad)
@@ -362,7 +362,7 @@ def binary_cross_entropy(y_true: float, y_pred: float, eps: float = 1e-15) -> fl
 def bce_derivative(y_true: float, y_pred: float, eps: float = 1e-15) -> float:
     """
     Derivada de BCE respecto a y_pred.
-    
+
     ∂L/∂ŷ = -y/ŷ + (1-y)/(1-ŷ)
     """
     y_pred = np.clip(y_pred, eps, 1 - eps)
@@ -371,9 +371,9 @@ def bce_derivative(y_true: float, y_pred: float, eps: float = 1e-15) -> float:
 def categorical_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
     """
     Categorical Cross-Entropy para multiclase.
-    
+
     L = -Σᵢ yᵢ·log(ŷᵢ)
-    
+
     Args:
         y_true: one-hot encoded (k,)
         y_pred: probabilidades softmax (k,)
@@ -410,11 +410,11 @@ Patrón:
 def backward_layer(layer, dL_da: np.ndarray) -> tuple:
     """
     Backward pass de una capa.
-    
+
     Args:
         layer: capa con cache del forward pass
         dL_da: gradiente de la loss respecto a la activación
-    
+
     Returns:
         dL_dx: gradiente respecto a la entrada
         dL_dW: gradiente respecto a los pesos
@@ -423,7 +423,7 @@ def backward_layer(layer, dL_da: np.ndarray) -> tuple:
     z = layer.cache['z']
     x = layer.cache['x']
     a = layer.cache['a']
-    
+
     # Derivada de la activación: ∂a/∂z
     if layer.activation == 'sigmoid':
         da_dz = a * (1 - a)
@@ -436,15 +436,15 @@ def backward_layer(layer, dL_da: np.ndarray) -> tuple:
         da_dz = np.ones_like(z)  # se maneja especialmente
     else:  # linear
         da_dz = np.ones_like(z)
-    
+
     # δ = ∂L/∂z = ∂L/∂a · ∂a/∂z
     delta = dL_da * da_dz
-    
+
     # Gradientes
     dL_dW = np.outer(delta, x)
     dL_db = delta
     dL_dx = layer.W.T @ delta
-    
+
     return dL_dx, dL_dW, dL_db
 ```
 
@@ -456,33 +456,33 @@ from typing import List, Tuple
 
 class NeuralNetworkFull:
     """Red Neuronal con Backpropagation completo."""
-    
+
     def __init__(self, layer_sizes: List[int], activations: List[str]):
         self.layers = []
         for i in range(len(layer_sizes) - 1):
             layer = Layer(layer_sizes[i], layer_sizes[i+1], activations[i])
             self.layers.append(layer)
-        
+
         self.loss_history = []
-    
+
     def forward(self, x: np.ndarray) -> np.ndarray:
         a = x
         for layer in self.layers:
             a = layer.forward(a)
         return a
-    
+
     def backward(self, y_true: np.ndarray) -> List[Tuple[np.ndarray, np.ndarray]]:
         """
         Backward pass: calcula gradientes para todas las capas.
-        
+
         Returns:
             Lista de (dW, db) para cada capa
         """
         gradients = []
-        
+
         # Obtener predicción (última activación)
         y_pred = self.layers[-1].cache['a']
-        
+
         # Gradiente inicial: ∂L/∂a_output
         # Para sigmoid + BCE: simplificado a (y_pred - y_true)
         # Para softmax + CCE: también (y_pred - y_true)
@@ -491,21 +491,21 @@ class NeuralNetworkFull:
         else:
             # MSE: 2(y_pred - y_true)
             dL_da = 2 * (y_pred - y_true)
-        
+
         # Propagar hacia atrás
         for layer in reversed(self.layers):
             dL_dx, dL_dW, dL_db = backward_layer(layer, dL_da)
             gradients.insert(0, (dL_dW, dL_db))
             dL_da = dL_dx
-        
+
         return gradients
-    
+
     def update_weights(self, gradients: List[Tuple], learning_rate: float):
         """Actualiza pesos usando gradient descent."""
         for layer, (dW, db) in zip(self.layers, gradients):
             layer.W -= learning_rate * dW
             layer.b -= learning_rate * db
-    
+
     def fit(
         self,
         X: np.ndarray,
@@ -517,11 +517,11 @@ class NeuralNetworkFull:
         """Entrena la red."""
         for epoch in range(epochs):
             total_loss = 0
-            
+
             for xi, yi in zip(X, y):
                 # Forward
                 output = self.forward(xi)
-                
+
                 # Loss
                 if isinstance(yi, (int, float)):
                     yi_arr = np.array([yi])
@@ -529,19 +529,19 @@ class NeuralNetworkFull:
                     yi_arr = yi
                 loss = binary_cross_entropy(yi_arr[0], output[0])
                 total_loss += loss
-                
+
                 # Backward
                 gradients = self.backward(yi_arr)
-                
+
                 # Update
                 self.update_weights(gradients, learning_rate)
-            
+
             avg_loss = total_loss / len(X)
             self.loss_history.append(avg_loss)
-            
+
             if verbose and epoch % 100 == 0:
                 print(f"Epoch {epoch}: Loss = {avg_loss:.4f}")
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         predictions = []
         for x in X:
@@ -577,10 +577,10 @@ for x, y in zip(X_xor, y_xor):
 ```python
 class SGD:
     """Vanilla Stochastic Gradient Descent."""
-    
+
     def __init__(self, learning_rate: float = 0.01):
         self.lr = learning_rate
-    
+
     def update(self, layer, dW: np.ndarray, db: np.ndarray):
         layer.W -= self.lr * dW
         layer.b -= self.lr * db
@@ -592,34 +592,34 @@ class SGD:
 class SGDMomentum:
     """
     SGD con Momentum.
-    
+
     v_t = β·v_{t-1} + (1-β)·∇L
     θ = θ - lr·v_t
-    
+
     Momentum ayuda a:
     - Acelerar convergencia
     - Escapar de mínimos locales
     - Reducir oscilaciones
     """
-    
+
     def __init__(self, learning_rate: float = 0.01, momentum: float = 0.9):
         self.lr = learning_rate
         self.momentum = momentum
         self.velocities = {}
-    
+
     def update(self, layer, dW: np.ndarray, db: np.ndarray, layer_id: int):
         if layer_id not in self.velocities:
             self.velocities[layer_id] = {
                 'W': np.zeros_like(dW),
                 'b': np.zeros_like(db)
             }
-        
+
         v = self.velocities[layer_id]
-        
+
         # Actualizar velocidad
         v['W'] = self.momentum * v['W'] + (1 - self.momentum) * dW
         v['b'] = self.momentum * v['b'] + (1 - self.momentum) * db
-        
+
         # Actualizar parámetros
         layer.W -= self.lr * v['W']
         layer.b -= self.lr * v['b']
@@ -631,18 +631,18 @@ class SGDMomentum:
 class Adam:
     """
     Adam: Adaptive Moment Estimation.
-    
+
     Combina:
     - Momentum (primer momento)
     - RMSprop (segundo momento)
-    
+
     m_t = β₁·m_{t-1} + (1-β₁)·g_t       (momentum)
     v_t = β₂·v_{t-1} + (1-β₂)·g_t²      (velocidad adaptativa)
     m̂_t = m_t / (1 - β₁^t)              (corrección de bias)
     v̂_t = v_t / (1 - β₂^t)
     θ = θ - lr · m̂_t / (√v̂_t + ε)
     """
-    
+
     def __init__(
         self,
         learning_rate: float = 0.001,
@@ -657,27 +657,27 @@ class Adam:
         self.m = {}
         self.v = {}
         self.t = 0
-    
+
     def update(self, layer, dW: np.ndarray, db: np.ndarray, layer_id: int):
         if layer_id not in self.m:
             self.m[layer_id] = {'W': np.zeros_like(dW), 'b': np.zeros_like(db)}
             self.v[layer_id] = {'W': np.zeros_like(dW), 'b': np.zeros_like(db)}
-        
+
         self.t += 1
         m, v = self.m[layer_id], self.v[layer_id]
-        
+
         # Actualizar momentos
         m['W'] = self.beta1 * m['W'] + (1 - self.beta1) * dW
         m['b'] = self.beta1 * m['b'] + (1 - self.beta1) * db
         v['W'] = self.beta2 * v['W'] + (1 - self.beta2) * dW**2
         v['b'] = self.beta2 * v['b'] + (1 - self.beta2) * db**2
-        
+
         # Corrección de bias
         m_hat_W = m['W'] / (1 - self.beta1**self.t)
         m_hat_b = m['b'] / (1 - self.beta1**self.t)
         v_hat_W = v['W'] / (1 - self.beta2**self.t)
         v_hat_b = v['b'] / (1 - self.beta2**self.t)
-        
+
         # Actualizar parámetros
         layer.W -= self.lr * m_hat_W / (np.sqrt(v_hat_W) + self.epsilon)
         layer.b -= self.lr * m_hat_b / (np.sqrt(v_hat_b) + self.epsilon)
@@ -711,19 +711,19 @@ from typing import List, Tuple, Optional
 # ACTIVACIONES
 # ============================================================
 
-def sigmoid(z): 
+def sigmoid(z):
     return 1 / (1 + np.exp(-np.clip(z, -500, 500)))
 
-def sigmoid_deriv(a): 
+def sigmoid_deriv(a):
     return a * (1 - a)
 
-def relu(z): 
+def relu(z):
     return np.maximum(0, z)
 
-def relu_deriv(z): 
+def relu_deriv(z):
     return (z > 0).astype(float)
 
-def tanh_deriv(a): 
+def tanh_deriv(a):
     return 1 - a**2
 
 def softmax(z):
@@ -742,12 +742,12 @@ class Layer:
         self.W = np.random.randn(output_size, input_size) * scale
         self.b = np.zeros(output_size)
         self.cache = {}
-    
+
     def forward(self, x: np.ndarray) -> np.ndarray:
         self.cache['x'] = x
         z = self.W @ x + self.b
         self.cache['z'] = z
-        
+
         if self.activation == 'relu':
             a = relu(z)
         elif self.activation == 'sigmoid':
@@ -758,13 +758,13 @@ class Layer:
             a = softmax(z)
         else:
             a = z
-        
+
         self.cache['a'] = a
         return a
-    
+
     def backward(self, dL_da: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         z, x, a = self.cache['z'], self.cache['x'], self.cache['a']
-        
+
         if self.activation == 'sigmoid':
             da_dz = sigmoid_deriv(a)
         elif self.activation == 'relu':
@@ -773,12 +773,12 @@ class Layer:
             da_dz = tanh_deriv(a)
         else:
             da_dz = np.ones_like(z)
-        
+
         delta = dL_da * da_dz
         dL_dW = np.outer(delta, x)
         dL_db = delta
         dL_dx = self.W.T @ delta
-        
+
         return dL_dx, dL_dW, dL_db
 
 
@@ -789,7 +789,7 @@ class Layer:
 class SGD:
     def __init__(self, lr=0.01):
         self.lr = lr
-    
+
     def step(self, layers, gradients):
         for layer, (dW, db) in zip(layers, gradients):
             layer.W -= self.lr * dW
@@ -800,24 +800,24 @@ class Adam:
     def __init__(self, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
         self.lr, self.beta1, self.beta2, self.eps = lr, beta1, beta2, eps
         self.m, self.v, self.t = {}, {}, 0
-    
+
     def step(self, layers, gradients):
         self.t += 1
         for i, (layer, (dW, db)) in enumerate(zip(layers, gradients)):
             if i not in self.m:
                 self.m[i] = {'W': np.zeros_like(dW), 'b': np.zeros_like(db)}
                 self.v[i] = {'W': np.zeros_like(dW), 'b': np.zeros_like(db)}
-            
+
             self.m[i]['W'] = self.beta1 * self.m[i]['W'] + (1 - self.beta1) * dW
             self.m[i]['b'] = self.beta1 * self.m[i]['b'] + (1 - self.beta1) * db
             self.v[i]['W'] = self.beta2 * self.v[i]['W'] + (1 - self.beta2) * dW**2
             self.v[i]['b'] = self.beta2 * self.v[i]['b'] + (1 - self.beta2) * db**2
-            
+
             m_hat_W = self.m[i]['W'] / (1 - self.beta1**self.t)
             m_hat_b = self.m[i]['b'] / (1 - self.beta1**self.t)
             v_hat_W = self.v[i]['W'] / (1 - self.beta2**self.t)
             v_hat_b = self.v[i]['b'] / (1 - self.beta2**self.t)
-            
+
             layer.W -= self.lr * m_hat_W / (np.sqrt(v_hat_W) + self.eps)
             layer.b -= self.lr * m_hat_b / (np.sqrt(v_hat_b) + self.eps)
 
@@ -828,49 +828,49 @@ class Adam:
 
 class NeuralNetwork:
     def __init__(self, layer_sizes: List[int], activations: List[str]):
-        self.layers = [Layer(layer_sizes[i], layer_sizes[i+1], activations[i]) 
+        self.layers = [Layer(layer_sizes[i], layer_sizes[i+1], activations[i])
                        for i in range(len(layer_sizes)-1)]
         self.loss_history = []
-    
+
     def forward(self, x: np.ndarray) -> np.ndarray:
         for layer in self.layers:
             x = layer.forward(x)
         return x
-    
+
     def backward(self, y_true: np.ndarray) -> List[Tuple]:
         y_pred = self.layers[-1].cache['a']
         dL_da = y_pred - y_true
-        
+
         gradients = []
         for layer in reversed(self.layers):
             dL_da, dW, db = layer.backward(dL_da)
             gradients.insert(0, (dW, db))
         return gradients
-    
+
     def fit(self, X, y, epochs=1000, lr=0.1, optimizer='sgd', verbose=True):
         opt = Adam(lr) if optimizer == 'adam' else SGD(lr)
-        
+
         for epoch in range(epochs):
             total_loss = 0
             for xi, yi in zip(X, y):
                 yi_arr = np.atleast_1d(yi)
                 output = self.forward(xi)
-                
+
                 # BCE loss
                 output_clip = np.clip(output, 1e-15, 1-1e-15)
                 loss = -np.sum(yi_arr * np.log(output_clip) + (1-yi_arr) * np.log(1-output_clip))
                 total_loss += loss
-                
+
                 gradients = self.backward(yi_arr)
                 opt.step(self.layers, gradients)
-            
+
             self.loss_history.append(total_loss / len(X))
             if verbose and epoch % (epochs//10) == 0:
                 print(f"Epoch {epoch}: Loss = {self.loss_history[-1]:.4f}")
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         return np.array([1 if self.forward(x)[0] > 0.5 else 0 for x in X])
-    
+
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         return np.mean(self.predict(X) == y)
 
@@ -883,15 +883,15 @@ if __name__ == "__main__":
     print("=== Test: XOR Problem ===")
     X = np.array([[0,0], [0,1], [1,0], [1,1]])
     y = np.array([0, 1, 1, 0])
-    
+
     net = NeuralNetwork([2, 4, 1], ['tanh', 'sigmoid'])
     net.fit(X, y, epochs=5000, lr=0.5, verbose=True)
-    
+
     print("\nPredicciones:")
     for xi, yi in zip(X, y):
         pred = net.forward(xi)[0]
         print(f"{xi} -> {pred:.4f} (target: {yi})")
-    
+
     print(f"\nAccuracy: {net.score(X, y):.2%}")
     print("\n✓ Test XOR completado!")
 ```
@@ -928,33 +928,33 @@ import numpy as np
 def convolve2d_simple(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     """
     Convolución 2D simplificada (para entender el concepto).
-    
+
     La convolución desliza un kernel (filtro) sobre la imagen
     y calcula el producto punto en cada posición.
-    
+
     Args:
         image: Imagen de entrada (H, W)
         kernel: Filtro (kH, kW), típicamente 3x3 o 5x5
-    
+
     Returns:
         Feature map (H-kH+1, W-kW+1)
     """
     H, W = image.shape
     kH, kW = kernel.shape
-    
+
     # Tamaño del output (sin padding)
     out_H = H - kH + 1
     out_W = W - kW + 1
-    
+
     output = np.zeros((out_H, out_W))
-    
+
     for i in range(out_H):
         for j in range(out_W):
             # Extraer región de la imagen
             region = image[i:i+kH, j:j+kW]
             # Producto punto con el kernel
             output[i, j] = np.sum(region * kernel)
-    
+
     return output
 
 
@@ -1014,11 +1014,11 @@ print(edges)
 ### 5.4 Cálculo de Dimensiones (Importante para Exámenes)
 
 ```python
-def output_size(input_size: int, kernel_size: int, 
+def output_size(input_size: int, kernel_size: int,
                 stride: int = 1, padding: int = 0) -> int:
     """
     Fórmula para calcular tamaño del output de convolución.
-    
+
     output_size = floor((input + 2*padding - kernel) / stride) + 1
     """
     return (input_size + 2 * padding - kernel_size) // stride + 1
@@ -1090,28 +1090,28 @@ print(f"24x24, pooling 2x2 stride 2: output = {out}x{out}")  # 12x12
 def max_pool2d(x: np.ndarray, pool_size: int = 2) -> np.ndarray:
     """
     Max Pooling 2D.
-    
+
     Reduce dimensiones tomando el máximo de cada región.
     Hace la red más robusta a pequeñas traslaciones.
-    
+
     Args:
         x: Feature map (H, W)
         pool_size: Tamaño de la ventana (típicamente 2)
-    
+
     Returns:
         Pooled output (H//pool_size, W//pool_size)
     """
     H, W = x.shape
     out_H, out_W = H // pool_size, W // pool_size
-    
+
     output = np.zeros((out_H, out_W))
-    
+
     for i in range(out_H):
         for j in range(out_W):
-            region = x[i*pool_size:(i+1)*pool_size, 
+            region = x[i*pool_size:(i+1)*pool_size,
                       j*pool_size:(j+1)*pool_size]
             output[i, j] = np.max(region)
-    
+
     return output
 
 
@@ -1141,10 +1141,10 @@ INTUICIÓN:
 
 2. CAPAS MEDIAS: Combinan features simples
    - Esquinas, curvas, patrones
-   
+
 3. CAPAS PROFUNDAS: Features de alto nivel
    - Partes de objetos (ojos, ruedas, letras)
-   
+
 4. CAPAS FINALES: Objetos completos
    - "Esto es un 7", "Esto es un gato"
 
@@ -1286,7 +1286,7 @@ def overfit_test(
 ) -> Tuple[bool, List[float]]:
     """
     Test de overfitting: la red debe memorizar un dataset pequeño.
-    
+
     Args:
         model: Tu red neuronal (debe tener .fit() y .forward())
         X_small: Dataset pequeño (10-20 ejemplos)
@@ -1294,7 +1294,7 @@ def overfit_test(
         epochs: Épocas de entrenamiento
         target_loss: Loss objetivo (default: 0.01)
         verbose: Mostrar progreso
-    
+
     Returns:
         (passed, loss_history)
     """
@@ -1306,7 +1306,7 @@ def overfit_test(
         print(f"Epochs: {epochs}")
         print(f"Target loss: {target_loss}")
         print("-" * 60)
-    
+
     # Entrenar
     loss_history = []
     for epoch in range(epochs):
@@ -1316,20 +1316,20 @@ def overfit_test(
             output = model.forward(X_small[i])
             loss = np.mean((output - y_small[i]) ** 2)  # MSE
             total_loss += loss
-            
+
             # Backward y update (asumiendo que model tiene estos métodos)
             model.backward(y_small[i])
             model.update(learning_rate=0.1)
-        
+
         avg_loss = total_loss / len(y_small)
         loss_history.append(avg_loss)
-        
+
         if verbose and epoch % 500 == 0:
             print(f"Epoch {epoch:4d}: Loss = {avg_loss:.6f}")
-    
+
     final_loss = loss_history[-1]
     passed = final_loss < target_loss
-    
+
     if verbose:
         print("-" * 60)
         print(f"Final Loss: {final_loss:.6f}")
@@ -1344,7 +1344,7 @@ def overfit_test(
             print("  - Learning rate muy bajo")
             print("  - Bug en forward pass")
             print("  - Dimensiones incorrectas")
-    
+
     return passed, loss_history
 
 
@@ -1357,7 +1357,7 @@ def test_xor_overfit():
     print("\n" + "=" * 60)
     print("TEST: Overfit on XOR Problem")
     print("=" * 60)
-    
+
     # XOR dataset (4 ejemplos)
     X = np.array([
         [0, 0],
@@ -1365,14 +1365,14 @@ def test_xor_overfit():
         [1, 0],
         [1, 1]
     ], dtype=np.float64)
-    
+
     y = np.array([
         [0],
         [1],
         [1],
         [0]
     ], dtype=np.float64)
-    
+
     # Crear red simple (2 -> 8 -> 1)
     # NOTA: Reemplaza esto con tu clase NeuralNetwork
     class SimpleNet:
@@ -1382,55 +1382,55 @@ def test_xor_overfit():
             self.b1 = np.zeros((8, 1))
             self.W2 = np.random.randn(1, 8) * 0.5
             self.b2 = np.zeros((1, 1))
-            
+
             # Cache para backprop
             self.cache = {}
-        
+
         def sigmoid(self, z):
             return 1 / (1 + np.exp(-np.clip(z, -500, 500)))
-        
+
         def forward(self, x):
             x = x.reshape(-1, 1)
             z1 = self.W1 @ x + self.b1
             a1 = self.sigmoid(z1)
             z2 = self.W2 @ a1 + self.b2
             a2 = self.sigmoid(z2)
-            
+
             self.cache = {'x': x, 'z1': z1, 'a1': a1, 'z2': z2, 'a2': a2}
             return a2.flatten()
-        
+
         def backward(self, y_true):
             y_true = np.array(y_true).reshape(-1, 1)
             a2 = self.cache['a2']
             a1 = self.cache['a1']
             x = self.cache['x']
-            
+
             # Gradientes
             dz2 = a2 - y_true
             self.dW2 = dz2 @ a1.T
             self.db2 = dz2
-            
+
             da1 = self.W2.T @ dz2
             dz1 = da1 * a1 * (1 - a1)
             self.dW1 = dz1 @ x.T
             self.db1 = dz1
-        
+
         def update(self, learning_rate):
             self.W1 -= learning_rate * self.dW1
             self.b1 -= learning_rate * self.db1
             self.W2 -= learning_rate * self.dW2
             self.b2 -= learning_rate * self.db2
-    
+
     # Ejecutar test
     model = SimpleNet()
     passed, history = overfit_test(model, X, y, epochs=2000, target_loss=0.01)
-    
+
     # Verificar predicciones finales
     print("\nPredicciones finales:")
     for i in range(len(X)):
         pred = model.forward(X[i])
         print(f"  Input: {X[i]} → Pred: {pred[0]:.3f} (Target: {y[i][0]})")
-    
+
     return passed
 
 

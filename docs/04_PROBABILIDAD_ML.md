@@ -1,6 +1,6 @@
 # Módulo 04: Probabilidad Esencial para Machine Learning
 
-> **Semana 8 | Prerequisito para entender Loss Functions y GMM**  
+> **Semana 8 | Prerequisito para entender Loss Functions y GMM**
 > **Filosofía: Solo la probabilidad que necesitas para la Línea 1**
 
 ---
@@ -88,28 +88,28 @@ Ejemplo: Clasificación de spam
 ```python
 import numpy as np
 
-def bayes_classifier(x: np.ndarray, 
+def bayes_classifier(x: np.ndarray,
                      likelihood_spam: float,
                      likelihood_ham: float,
                      prior_spam: float = 0.3) -> str:
     """
     Clasificador Bayesiano simple.
-    
+
     Args:
         x: Características del email (simplificado)
         likelihood_spam: P(x|spam)
         likelihood_ham: P(x|ham)
         prior_spam: P(spam) - conocimiento previo
-    
+
     Returns:
         'spam' o 'ham'
     """
     prior_ham = 1 - prior_spam
-    
+
     # Posterior (sin normalizar, solo comparamos)
     posterior_spam = likelihood_spam * prior_spam
     posterior_ham = likelihood_ham * prior_ham
-    
+
     return 'spam' if posterior_spam > posterior_ham else 'ham'
 
 
@@ -127,26 +127,26 @@ print(f"Clasificación: {result}")  # spam
 #### 2.4 Naive Bayes (Conexión con Supervised Learning)
 
 ```python
-def naive_bayes_predict(X: np.ndarray, 
+def naive_bayes_predict(X: np.ndarray,
                         class_priors: np.ndarray,
                         feature_probs: dict) -> np.ndarray:
     """
     Naive Bayes asume independencia entre features:
     P(x1, x2, ..., xn | clase) = P(x1|clase) · P(x2|clase) · ... · P(xn|clase)
-    
+
     Esta "ingenuidad" simplifica mucho el cálculo.
     """
     n_samples = X.shape[0]
     n_classes = len(class_priors)
-    
+
     log_posteriors = np.zeros((n_samples, n_classes))
-    
+
     for c in range(n_classes):
         # Log para evitar underflow con muchas features
         log_prior = np.log(class_priors[c])
         log_likelihood = np.sum(np.log(feature_probs[c][X]), axis=1)
         log_posteriors[:, c] = log_prior + log_likelihood
-    
+
     return np.argmax(log_posteriors, axis=1)
 ```
 
@@ -182,12 +182,12 @@ import numpy as np
 def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:
     """
     Probability Density Function de la Gaussiana.
-    
+
     Args:
         x: Puntos donde evaluar
         mu: Media
         sigma: Desviación estándar
-    
+
     Returns:
         Densidad de probabilidad en cada punto
     """
@@ -217,39 +217,39 @@ plt.savefig('gaussian_distributions.png')
 #### 3.4 Gaussiana Multivariada (Para GMM)
 
 ```python
-def multivariate_gaussian_pdf(x: np.ndarray, 
-                               mu: np.ndarray, 
+def multivariate_gaussian_pdf(x: np.ndarray,
+                               mu: np.ndarray,
                                cov: np.ndarray) -> float:
     """
     Gaussiana multivariada para vectores.
-    
+
     Args:
         x: Vector de características (d,)
         mu: Vector de medias (d,)
         cov: Matriz de covarianza (d, d)
-    
+
     Returns:
         Densidad de probabilidad
     """
     d = len(mu)
     diff = x - mu
-    
+
     # Determinante e inversa de la covarianza
     det_cov = np.linalg.det(cov)
     inv_cov = np.linalg.inv(cov)
-    
+
     # Coeficiente de normalización
     coefficient = 1 / (np.sqrt((2 * np.pi) ** d * det_cov))
-    
+
     # Exponente (forma cuadrática)
     exponent = -0.5 * diff.T @ inv_cov @ diff
-    
+
     return coefficient * np.exp(exponent)
 
 
 # Ejemplo 2D
 mu = np.array([0, 0])
-cov = np.array([[1, 0.5], 
+cov = np.array([[1, 0.5],
                 [0.5, 1]])  # Correlación positiva
 
 x = np.array([0.5, 0.5])
@@ -264,7 +264,7 @@ print(f"P(x=[0.5, 0.5]) = {prob:.4f}")
 #### 4.1 La Idea Central
 
 ```
-MLE: Encontrar los parámetros θ que maximizan la probabilidad 
+MLE: Encontrar los parámetros θ que maximizan la probabilidad
      de observar los datos que tenemos.
 
 θ_MLE = argmax P(datos | θ)
@@ -283,26 +283,26 @@ MLE: Encontrar los parámetros θ que maximizan la probabilidad
 def mle_gaussian(data: np.ndarray) -> tuple[float, float]:
     """
     Estimar parámetros de Gaussiana con MLE.
-    
+
     Para una Gaussiana, los estimadores MLE son:
     - μ_MLE = media muestral
     - σ²_MLE = varianza muestral (con n, no n-1)
-    
+
     Args:
         data: Muestras observadas
-    
+
     Returns:
         (mu_mle, sigma_mle)
     """
     n = len(data)
-    
+
     # MLE de la media
     mu_mle = np.mean(data)
-    
+
     # MLE de la varianza (dividir por n, no n-1)
     sigma_squared_mle = np.sum((data - mu_mle) ** 2) / n
     sigma_mle = np.sqrt(sigma_squared_mle)
-    
+
     return mu_mle, sigma_mle
 
 
@@ -322,29 +322,29 @@ print(f"MLE estimados:     μ={estimated_mu:.3f}, σ={estimated_sigma:.3f}")
 def cross_entropy_from_mle():
     """
     Demostración de que Cross-Entropy viene de MLE.
-    
+
     Para clasificación binaria con Bernoulli:
     P(y|x, θ) = p^y · (1-p)^(1-y)
-    
+
     Donde p = σ(θᵀx) (predicción del modelo)
-    
+
     Log-likelihood:
     log P(y|x, θ) = y·log(p) + (1-y)·log(1-p)
-    
+
     Maximizar likelihood = Minimizar negative log-likelihood
     = Minimizar Cross-Entropy!
     """
     # Ejemplo numérico
     y_true = np.array([1, 0, 1, 1, 0])
     y_pred = np.array([0.9, 0.1, 0.8, 0.7, 0.2])  # Probabilidades
-    
+
     # Cross-Entropy (negative log-likelihood promedio)
     epsilon = 1e-15  # Para evitar log(0)
     ce = -np.mean(
-        y_true * np.log(y_pred + epsilon) + 
+        y_true * np.log(y_pred + epsilon) +
         (1 - y_true) * np.log(1 - y_pred + epsilon)
     )
-    
+
     print(f"Cross-Entropy Loss: {ce:.4f}")
     return ce
 
@@ -402,19 +402,19 @@ Al restar max(z), todos los exponentes son ≤ 0, evitando overflow.
 def softmax(z: np.ndarray) -> np.ndarray:
     """
     Softmax numéricamente estable usando Log-Sum-Exp trick.
-    
+
     Truco: Restar el máximo para evitar overflow en exp()
     softmax(z) = softmax(z - max(z))
-    
+
     Args:
         z: Logits (scores antes de activación)
-    
+
     Returns:
         Probabilidades que suman 1
     """
     # Log-Sum-Exp trick: restar el máximo
     z_stable = z - np.max(z, axis=-1, keepdims=True)
-    
+
     exp_z = np.exp(z_stable)
     return exp_z / np.sum(exp_z, axis=-1, keepdims=True)
 
@@ -422,7 +422,7 @@ def softmax(z: np.ndarray) -> np.ndarray:
 def log_softmax(z: np.ndarray) -> np.ndarray:
     """
     Log-Softmax estable (útil para Cross-Entropy).
-    
+
     log(softmax(z)) calculado de forma estable.
     Evita calcular softmax primero y luego log (pierde precisión).
     """
@@ -437,24 +437,24 @@ def log_softmax(z: np.ndarray) -> np.ndarray:
 
 def demo_numerical_stability():
     """Muestra por qué necesitamos el Log-Sum-Exp trick."""
-    
+
     # Caso peligroso: logits muy grandes
     z_dangerous = np.array([1000.0, 1001.0, 1002.0])
-    
+
     # Sin el trick (INCORRECTO)
     def softmax_naive(z):
         exp_z = np.exp(z)  # ¡Overflow!
         return exp_z / np.sum(exp_z)
-    
+
     # Con el trick (CORRECTO)
     def softmax_stable(z):
         z_stable = z - np.max(z)
         exp_z = np.exp(z_stable)
         return exp_z / np.sum(exp_z)
-    
+
     print("Logits peligrosos:", z_dangerous)
     print()
-    
+
     # Naive (falla)
     import warnings
     with warnings.catch_warnings():
@@ -462,7 +462,7 @@ def demo_numerical_stability():
         result_naive = softmax_naive(z_dangerous)
         print(f"Softmax NAIVE: {result_naive}")
         print(f"  → Suma: {np.sum(result_naive)} (debería ser 1.0)")
-    
+
     # Estable (funciona)
     result_stable = softmax_stable(z_dangerous)
     print(f"\nSoftmax ESTABLE: {result_stable}")
@@ -485,15 +485,15 @@ print(f"Clase predicha: {np.argmax(probs)}")
 #### 5.3 Categorical Cross-Entropy (Multiclase)
 
 ```python
-def categorical_cross_entropy(y_true: np.ndarray, 
+def categorical_cross_entropy(y_true: np.ndarray,
                                y_pred: np.ndarray) -> float:
     """
     Loss para clasificación multiclase.
-    
+
     Args:
         y_true: One-hot encoded labels (n_samples, n_classes)
         y_pred: Probabilidades softmax (n_samples, n_classes)
-    
+
     Returns:
         Loss promedio
     """
@@ -536,8 +536,8 @@ def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:
     """Densidad de probabilidad Gaussiana univariada."""
     pass
 
-def multivariate_gaussian_pdf(x: np.ndarray, 
-                               mu: np.ndarray, 
+def multivariate_gaussian_pdf(x: np.ndarray,
+                               mu: np.ndarray,
                                cov: np.ndarray) -> float:
     """Densidad de probabilidad Gaussiana multivariada."""
     pass
@@ -554,7 +554,7 @@ def cross_entropy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """Binary cross-entropy loss."""
     pass
 
-def categorical_cross_entropy(y_true: np.ndarray, 
+def categorical_cross_entropy(y_true: np.ndarray,
                                y_pred: np.ndarray) -> float:
     """Categorical cross-entropy loss para multiclase."""
     pass
@@ -567,7 +567,7 @@ def categorical_cross_entropy(y_true: np.ndarray,
 import numpy as np
 import pytest
 from src.probability import (
-    gaussian_pdf, mle_gaussian, softmax, 
+    gaussian_pdf, mle_gaussian, softmax,
     cross_entropy, categorical_cross_entropy
 )
 
@@ -594,9 +594,9 @@ def test_mle_gaussian_accuracy():
     np.random.seed(42)
     true_mu, true_sigma = 10.0, 3.0
     data = np.random.normal(true_mu, true_sigma, size=10000)
-    
+
     est_mu, est_sigma = mle_gaussian(data)
-    
+
     assert np.isclose(est_mu, true_mu, rtol=0.05)
     assert np.isclose(est_sigma, true_sigma, rtol=0.05)
 
@@ -604,7 +604,7 @@ def test_cross_entropy_perfect_prediction():
     """CE debe ser ~0 para predicciones perfectas."""
     y_true = np.array([1, 0, 1])
     y_pred = np.array([0.999, 0.001, 0.999])
-    
+
     loss = cross_entropy(y_true, y_pred)
     assert loss < 0.01
 ```

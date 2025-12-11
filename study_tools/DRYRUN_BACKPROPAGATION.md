@@ -254,27 +254,27 @@ import numpy as np
 
 def verificar_backprop_manual():
     """Verifica los cálculos manuales del Ejercicio 1."""
-    
+
     # Datos
     x = 2.0
     w1, b1 = 0.5, 0.1
     w2, b2 = 0.3, 0.2
     y = 1.0
-    
+
     # Forward
     z1 = x * w1 + b1
     a1 = max(0, z1)  # ReLU
     z2 = a1 * w2 + b2
     y_hat = z2
     L = (y_hat - y) ** 2
-    
+
     print("=== FORWARD PASS ===")
     print(f"z1 = {z1:.4f}")
     print(f"a1 = {a1:.4f}")
     print(f"z2 = {z2:.4f}")
     print(f"ŷ = {y_hat:.4f}")
     print(f"L = {L:.4f}")
-    
+
     # Backward
     dL_dy_hat = 2 * (y_hat - y)
     dL_dz2 = dL_dy_hat * 1
@@ -284,7 +284,7 @@ def verificar_backprop_manual():
     dL_dz1 = dL_da1 * (1 if z1 > 0 else 0)  # ReLU derivative
     dL_dw1 = dL_dz1 * x
     dL_db1 = dL_dz1 * 1
-    
+
     print("\n=== BACKWARD PASS ===")
     print(f"∂L/∂ŷ = {dL_dy_hat:.4f}")
     print(f"∂L/∂z₂ = {dL_dz2:.4f}")
@@ -294,19 +294,19 @@ def verificar_backprop_manual():
     print(f"∂L/∂z₁ = {dL_dz1:.4f}")
     print(f"∂L/∂w₁ = {dL_dw1:.4f}")
     print(f"∂L/∂b₁ = {dL_db1:.4f}")
-    
+
     # Verificación con numerical gradient
     eps = 1e-5
-    
+
     def compute_loss(x, w1, b1, w2, b2, y):
         z1 = x * w1 + b1
         a1 = max(0, z1)
         z2 = a1 * w2 + b2
         return (z2 - y) ** 2
-    
-    numerical_dw1 = (compute_loss(x, w1+eps, b1, w2, b2, y) - 
+
+    numerical_dw1 = (compute_loss(x, w1+eps, b1, w2, b2, y) -
                     compute_loss(x, w1-eps, b1, w2, b2, y)) / (2*eps)
-    
+
     print(f"\n=== VERIFICACIÓN NUMÉRICA ===")
     print(f"∂L/∂w₁ analítico: {dL_dw1:.6f}")
     print(f"∂L/∂w₁ numérico:  {numerical_dw1:.6f}")

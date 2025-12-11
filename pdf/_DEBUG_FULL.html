@@ -3,7 +3,7 @@
     <html>
     <head><meta charset="UTF-8"></head>
     <body>
-        
+
             <div class="cover-page global-cover">
                 <div class="cover-content" style="border-color:rgba(96,165,250,0.3);background:rgba(15,23,42,0.6);">
                     <div style="font-size:60pt;margin-bottom:30px;">🚀</div>
@@ -13,8 +13,8 @@
                 </div>
                 <div style="position:absolute;bottom:30px;font-size:11pt;color:#64748b;">DUQUEOM | 2025</div>
             </div>
-        
-        
+
+
             <!-- MÓDULO: 00_INDICE.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -423,7 +423,8 @@
 </tr>
 </tbody>
 </table>
-<p>| <a href="#mod_PLAN_V4_ESTRATEGICO">PLAN_V4_ESTRATEGICO.md</a> | Plan de Acción Mejorado v4.0 (estrategia de ejecución y estudio diario) | Implementación del plan |</p>
+<p>| <a href="#mod_PLAN_V4_ESTRATEGICO">PLAN_V4_ESTRATEGICO.md</a> | Plan de Acción Mejorado v4.0 (estrategia de ejecución y estudio diario) | Implementación del plan |<br />
+| <a href="#mod_PLAN_V5_ESTRATEGICO">PLAN_V5_ESTRATEGICO.md</a> | Plan de Acción Perfeccionado v5.0 (data rigor, validación externa y examen simulado) | Validación y certificación |</p>
 <h2>🚀 Comenzar</h2>
 <p><strong><a href="#mod_01_PYTHON_CIENTIFICO">→ Módulo 01: Python + Pandas + NumPy</a></strong></p>
 <h2>📌 Restricciones del Proyecto</h2>
@@ -593,7 +594,7 @@
 <p>💡 <strong>Filosofía v3.3:</strong> Esta guía incluye <strong>validación matemática rigurosa</strong> en cada paso. No confíes en que tu código "parece funcionar"—valídalo con gradient checking, shadow mode y overfit tests. Si completas v3.3, tu código es <strong>matemáticamente correcto y profesionalmente validado</strong>.</p>
 </blockquote>
             </div>
-        
+
             <!-- MÓDULO: PLAN_ESTUDIOS.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -830,6 +831,9 @@
 </tbody>
 </table>
 <p><strong>Entregable:</strong> Script que carga CSV con Pandas, limpia datos, y convierte a NumPy para análisis.</p>
+<p><strong>Extensión v5.0 – Dirty Data Check (Módulo 01):</strong><br />
+Además del script, documenta al menos <strong>5 problemas reales</strong> del CSV (nulos, outliers, tipos incorrectos, codificación rara, duplicados) y tus decisiones de limpieza en:<br />
+<code>study_tools/DIRTY_DATA_CHECK.md</code> (Caso 1).</p>
 <p><strong>Recursos:</strong><br />
 - <a href="https://pandas.pydata.org/docs/getting_started/">Pandas Getting Started</a><br />
 - <a href="https://numpy.org/doc/stable/user/quickstart.html">NumPy Quickstart</a></p>
@@ -1349,6 +1353,11 @@
 </tbody>
 </table>
 <p><strong>Entregable:</strong> <code>logistic_regression.py</code> desde cero usando NumPy para clasificar datos simples, con métricas y cross-validation.</p>
+<p><strong>Extensión v5.0 – Dirty Data Check (Módulo 05):</strong><br />
+Para el dataset supervisado usado en regresión logística:<br />
+- Incluir variables categóricas (One-Hot Encoding manual).<br />
+- Incluir variables numéricas que requieran escalado (MinMax/Standard manual).<br />
+- Documentar al menos <strong>5 decisiones clave</strong> de limpieza y preprocesamiento en <code>study_tools/DIRTY_DATA_CHECK.md</code> (Caso 2).</p>
 <h2>🗓️ SEMANA 13-16: Unsupervised Learning (Módulo 06)</h2>
 <p><strong>Materia:</strong> Unsupervised Algorithms in Machine Learning</p>
 <h3>Semana 13: K-Means Clustering</h3>
@@ -1548,6 +1557,8 @@
 </tbody>
 </table>
 <p><strong>Entregable:</strong> <code>kmeans.py</code> y <code>pca.py</code>. Usar PCA para comprimir una imagen y visualizar cuánta varianza se pierde con diferentes números de componentes.</p>
+<p><strong>Extensión v5.0 – Desafío del Tablero Blanco:</strong><br />
+En las semanas 4, 8, 12 y 16, realiza el "Desafío del Tablero Blanco" descrito en <code>study_tools/DESAFIO_TABLERO_BLANCO.md</code>, explicando en 5–7 minutos un concepto clave (Regla de la Cadena, Gradient Descent, K-Means, PCA, Regresión Logística, etc.) y registrando feedback externo.</p>
 <h2>🗓️ SEMANA 17-20: Deep Learning + CNNs (Módulo 07)</h2>
 <p><strong>Materia:</strong> Introduction to Deep Learning</p>
 <h3>Semana 17: Perceptrón y Fundamentos</h3>
@@ -1864,6 +1875,8 @@
 </tbody>
 </table>
 <p><strong>Entregable:</strong> <code>neural_network_mnist.py</code> con backprop manual.</p>
+<p><strong>Extensión v5.0 – Examen de Admisión Simulado:</strong><br />
+En las semanas 22 y 23, realizar los simulacros definidos en <code>study_tools/EXAMEN_ADMISION_SIMULADO.md</code> (2 horas, sin IDE ni internet, 40% pseudocódigo, 60% teoría). El simulacro de la semana 23 debe alcanzar ≥ 80/100 como métrica de "listo para admisión".</p>
 <h2>🗓️ SEMANA 24: Benchmark + Informe Final</h2>
 <p><strong>Objetivo:</strong> Comparar modelos y documentar</p>
 <table>
@@ -1972,7 +1985,7 @@
 <p>💡 <strong>Filosofía v3.1:</strong> Esta guía te lleva de Python básico a candidato competitivo del MS in AI en exactamente 6 meses (24 semanas). Si puedes implementar PCA, K-Means, Logistic Regression y un MLP desde cero sobre MNIST, y entiendes la teoría de CNNs, <strong>dominas la Línea 1 del Pathway</strong>.</p>
 </blockquote>
             </div>
-        
+
             <!-- MÓDULO: 01_PYTHON_CIENTIFICO.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -2062,13 +2075,13 @@ print(df.head())
 
 # Información del DataFrame
 print(df.info())
-#  Column         Non-Null Count  Dtype  
-# ---  ------         --------------  -----  
+#  Column         Non-Null Count  Dtype
+# ---  ------         --------------  -----
 #  0   sepal_length   150 non-null    float64
 #  1   sepal_width    150 non-null    float64
 #  2   petal_length   150 non-null    float64
 #  3   petal_width    150 non-null    float64
-#  4   species        150 non-null    object 
+#  4   species        150 non-null    object
 
 # Estadísticas básicas
 print(df.describe())
@@ -2614,9 +2627,9 @@ def main():
     array_b = np.array(list_b)
 
     matrix_size = 100
-    list_matrix_a = [[float(i*j) for j in range(matrix_size)] 
+    list_matrix_a = [[float(i*j) for j in range(matrix_size)]
                      for i in range(matrix_size)]
-    list_matrix_b = [[float(i+j) for j in range(matrix_size)] 
+    list_matrix_b = [[float(i+j) for j in range(matrix_size)]
                      for i in range(matrix_size)]
     array_matrix_a = np.array(list_matrix_a)
     array_matrix_b = np.array(list_matrix_b)
@@ -2932,7 +2945,7 @@ mypy src/ &amp;&amp; ruff check src/ &amp;&amp; pytest tests/ -v
 </tbody>
 </table>
             </div>
-        
+
             <!-- MÓDULO: 02_ALGEBRA_LINEAL_ML.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -3129,7 +3142,7 @@ def l2_norm(x: np.ndarray) -&gt; float:
 
     ||x||₂ = √(Σᵢ xᵢ²)
 
-    Uso en ML: 
+    Uso en ML:
     - Regularización Ridge
     - Normalización de vectores
     - Distancia euclidiana
@@ -3406,7 +3419,7 @@ Definición: Av = λv
 - v: eigenvector (vector que solo se escala, no cambia dirección)
 - λ: eigenvalue (factor de escala)
 
-Interpretación: 
+Interpretación:
 - Los eigenvectors son las &quot;direcciones principales&quot; de una transformación
 - Los eigenvalues indican cuánto se estira/comprime en cada dirección
 
@@ -3872,7 +3885,7 @@ if __name__ == &quot;__main__&quot;:
 </tbody>
 </table>
             </div>
-        
+
             <!-- MÓDULO: 03_CALCULO_MULTIVARIANTE.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -4054,7 +4067,7 @@ verify_derivative(np.tanh, tanh_derivative, x, &quot;Tanh&quot;)
 <pre><code class="language-python">import numpy as np
 
 &quot;&quot;&quot;
-DERIVADA PARCIAL: Derivada respecto a UNA variable, 
+DERIVADA PARCIAL: Derivada respecto a UNA variable,
 manteniendo las otras constantes.
 
 Para f(x, y):
@@ -4415,7 +4428,7 @@ Esto es FUNDAMENTAL para Backpropagation.
 &quot;&quot;&quot;
 
 # Ejemplo: y = (x² + 1)³
-# 
+#
 # Sea g(x) = x² + 1  y  f(u) = u³
 # Entonces y = f(g(x))
 #
@@ -4545,11 +4558,11 @@ simple_forward_backward()
 RED NEURONAL DE 2 CAPAS
 
 Arquitectura:
-    x (input) 
-    → z₁ = W₁x + b₁ 
-    → a₁ = sigmoid(z₁) 
-    → z₂ = W₂a₁ + b₂ 
-    → a₂ = sigmoid(z₂) 
+    x (input)
+    → z₁ = W₁x + b₁
+    → a₁ = sigmoid(z₁)
+    → z₂ = W₂a₁ + b₂
+    → a₂ = sigmoid(z₂)
     → L = MSE(a₂, y)
 
 Backpropagation usa Chain Rule repetidamente:
@@ -4757,7 +4770,7 @@ def visualize_optimization(
     x = np.linspace(xlim[0], xlim[1], 100)
     y = np.linspace(ylim[0], ylim[1], 100)
     X, Y = np.meshgrid(x, y)
-    Z = np.array([[f(np.array([xi, yi])) for xi, yi in zip(row_x, row_y)] 
+    Z = np.array([[f(np.array([xi, yi])) for xi, yi in zip(row_x, row_y)]
                   for row_x, row_y in zip(X, Y)])
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
@@ -5077,7 +5090,7 @@ def test_linear_layer_gradient():
 
     # Comparar
     passed, error = gradient_check(
-        dL_dW_analytic.flatten(), 
+        dL_dW_analytic.flatten(),
         dL_dW_numerical.flatten()
     )
 
@@ -5207,7 +5220,7 @@ if not passed:
 </tbody>
 </table>
             </div>
-        
+
             <!-- MÓDULO: 04_PROBABILIDAD_ML.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -5282,7 +5295,7 @@ Ejemplo: Clasificación de spam
 <h4>2.3 Implementación en Python</h4>
 <pre><code class="language-python">import numpy as np
 
-def bayes_classifier(x: np.ndarray, 
+def bayes_classifier(x: np.ndarray,
                      likelihood_spam: float,
                      likelihood_ham: float,
                      prior_spam: float = 0.3) -&gt; str:
@@ -5318,7 +5331,7 @@ result = bayes_classifier(
 print(f&quot;Clasificación: {result}&quot;)  # spam
 </code></pre>
 <h4>2.4 Naive Bayes (Conexión con Supervised Learning)</h4>
-<pre><code class="language-python">def naive_bayes_predict(X: np.ndarray, 
+<pre><code class="language-python">def naive_bayes_predict(X: np.ndarray,
                         class_priors: np.ndarray,
                         feature_probs: dict) -&gt; np.ndarray:
     &quot;&quot;&quot;
@@ -5396,8 +5409,8 @@ plt.grid(True)
 plt.savefig('gaussian_distributions.png')
 </code></pre>
 <h4>3.4 Gaussiana Multivariada (Para GMM)</h4>
-<pre><code class="language-python">def multivariate_gaussian_pdf(x: np.ndarray, 
-                               mu: np.ndarray, 
+<pre><code class="language-python">def multivariate_gaussian_pdf(x: np.ndarray,
+                               mu: np.ndarray,
                                cov: np.ndarray) -&gt; float:
     &quot;&quot;&quot;
     Gaussiana multivariada para vectores.
@@ -5428,7 +5441,7 @@ plt.savefig('gaussian_distributions.png')
 
 # Ejemplo 2D
 mu = np.array([0, 0])
-cov = np.array([[1, 0.5], 
+cov = np.array([[1, 0.5],
                 [0.5, 1]])  # Correlación positiva
 
 x = np.array([0.5, 0.5])
@@ -5437,7 +5450,7 @@ print(f&quot;P(x=[0.5, 0.5]) = {prob:.4f}&quot;)
 </code></pre>
 <h3>Día 6: Maximum Likelihood Estimation (MLE)</h3>
 <h4>4.1 La Idea Central</h4>
-<pre><code>MLE: Encontrar los parámetros θ que maximizan la probabilidad 
+<pre><code>MLE: Encontrar los parámetros θ que maximizan la probabilidad
      de observar los datos que tenemos.
 
 θ_MLE = argmax P(datos | θ)
@@ -5508,7 +5521,7 @@ print(f&quot;MLE estimados:     μ={estimated_mu:.3f}, σ={estimated_sigma:.3f}&
     # Cross-Entropy (negative log-likelihood promedio)
     epsilon = 1e-15  # Para evitar log(0)
     ce = -np.mean(
-        y_true * np.log(y_pred + epsilon) + 
+        y_true * np.log(y_pred + epsilon) +
         (1 - y_true) * np.log(1 - y_pred + epsilon)
     )
 
@@ -5634,7 +5647,7 @@ print(f&quot;\nSuma de probabilidades: {np.sum(probs):.6f}&quot;)
 print(f&quot;Clase predicha: {np.argmax(probs)}&quot;)
 </code></pre>
 <h4>5.3 Categorical Cross-Entropy (Multiclase)</h4>
-<pre><code class="language-python">def categorical_cross_entropy(y_true: np.ndarray, 
+<pre><code class="language-python">def categorical_cross_entropy(y_true: np.ndarray,
                                y_pred: np.ndarray) -&gt; float:
     &quot;&quot;&quot;
     Loss para clasificación multiclase.
@@ -5679,8 +5692,8 @@ def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -&gt; np.ndarray:
     &quot;&quot;&quot;Densidad de probabilidad Gaussiana univariada.&quot;&quot;&quot;
     pass
 
-def multivariate_gaussian_pdf(x: np.ndarray, 
-                               mu: np.ndarray, 
+def multivariate_gaussian_pdf(x: np.ndarray,
+                               mu: np.ndarray,
                                cov: np.ndarray) -&gt; float:
     &quot;&quot;&quot;Densidad de probabilidad Gaussiana multivariada.&quot;&quot;&quot;
     pass
@@ -5697,7 +5710,7 @@ def cross_entropy(y_true: np.ndarray, y_pred: np.ndarray) -&gt; float:
     &quot;&quot;&quot;Binary cross-entropy loss.&quot;&quot;&quot;
     pass
 
-def categorical_cross_entropy(y_true: np.ndarray, 
+def categorical_cross_entropy(y_true: np.ndarray,
                                y_pred: np.ndarray) -&gt; float:
     &quot;&quot;&quot;Categorical cross-entropy loss para multiclase.&quot;&quot;&quot;
     pass
@@ -5707,7 +5720,7 @@ def categorical_cross_entropy(y_true: np.ndarray,
 import numpy as np
 import pytest
 from src.probability import (
-    gaussian_pdf, mle_gaussian, softmax, 
+    gaussian_pdf, mle_gaussian, softmax,
     cross_entropy, categorical_cross_entropy
 )
 
@@ -5831,7 +5844,7 @@ def test_cross_entropy_perfect_prediction():
 <p>💡 <strong>Nota Final:</strong> Este módulo es deliberadamente corto (1 semana). No necesitas ser experto en probabilidad para la Línea 1, pero estos conceptos son el "pegamento" que conecta las matemáticas con las funciones de pérdida que usarás en los siguientes módulos.</p>
 </blockquote>
             </div>
-        
+
             <!-- MÓDULO: 05_SUPERVISED_LEARNING.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -6541,7 +6554,7 @@ class LogisticRegressionRegularized:
 
         return grad + reg_grad
 
-    def fit(self, X: np.ndarray, y: np.ndarray, 
+    def fit(self, X: np.ndarray, y: np.ndarray,
             learning_rate: float = 0.1, n_iterations: int = 1000):
         X_b = np.column_stack([np.ones(len(X)), X])
         self.theta = np.zeros(X_b.shape[1])
@@ -6669,7 +6682,7 @@ class LogisticRegression:
 # MÉTRICAS
 # ============================================================
 
-def accuracy(y_true, y_pred): 
+def accuracy(y_true, y_pred):
     return np.mean(y_true == y_pred)
 
 def precision(y_true, y_pred):
@@ -7056,7 +7069,7 @@ if __name__ == &quot;__main__&quot;:
 </tbody>
 </table>
             </div>
-        
+
             <!-- MÓDULO: 06_UNSUPERVISED_LEARNING.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -7428,7 +7441,7 @@ def silhouette_sample(X: np.ndarray, labels: np.ndarray, idx: int) -&gt; float:
     # a(i): distancia promedio intra-cluster
     same_cluster = X[labels == label]
     if len(same_cluster) &gt; 1:
-        a = np.mean([np.sqrt(np.sum((point - p) ** 2)) 
+        a = np.mean([np.sqrt(np.sum((point - p) ** 2))
                      for p in same_cluster if not np.array_equal(p, point)])
     else:
         a = 0
@@ -7440,7 +7453,7 @@ def silhouette_sample(X: np.ndarray, labels: np.ndarray, idx: int) -&gt; float:
         if other_label != label:
             other_cluster = X[labels == other_label]
             if len(other_cluster) &gt; 0:
-                avg_dist = np.mean([np.sqrt(np.sum((point - p) ** 2)) 
+                avg_dist = np.mean([np.sqrt(np.sum((point - p) ** 2))
                                    for p in other_cluster])
                 b = min(b, avg_dist)
 
@@ -7730,7 +7743,7 @@ def visualize_pca_2d(X: np.ndarray, labels: np.ndarray = None, title: str = &quo
     if labels is not None:
         for label in np.unique(labels):
             mask = labels == label
-            plt.scatter(X_2d[mask, 0], X_2d[mask, 1], 
+            plt.scatter(X_2d[mask, 0], X_2d[mask, 1],
                        label=f'Clase {label}', alpha=0.7)
         plt.legend()
     else:
@@ -7809,7 +7822,7 @@ class KMeans:
                 break
 
         self.n_iter_ = i + 1
-        self.inertia_ = sum(np.sum((X[self.labels_ == j] - self.centroids[j])**2) 
+        self.inertia_ = sum(np.sum((X[self.labels_ == j] - self.centroids[j])**2)
                            for j in range(self.n_clusters))
         return self
 
@@ -7862,7 +7875,7 @@ class PCA:
 
 def inertia(X: np.ndarray, labels: np.ndarray, centroids: np.ndarray) -&gt; float:
     &quot;&quot;&quot;Within-cluster sum of squares.&quot;&quot;&quot;
-    return sum(np.sum((X[labels == i] - centroids[i])**2) 
+    return sum(np.sum((X[labels == i] - centroids[i])**2)
                for i in range(len(centroids)))
 
 def silhouette_score(X: np.ndarray, labels: np.ndarray) -&gt; float:
@@ -7950,7 +7963,7 @@ if __name__ == &quot;__main__&quot;:
 </tbody>
 </table>
             </div>
-        
+
             <!-- MÓDULO: 07_DEEP_LEARNING.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -8641,19 +8654,19 @@ from typing import List, Tuple, Optional
 # ACTIVACIONES
 # ============================================================
 
-def sigmoid(z): 
+def sigmoid(z):
     return 1 / (1 + np.exp(-np.clip(z, -500, 500)))
 
-def sigmoid_deriv(a): 
+def sigmoid_deriv(a):
     return a * (1 - a)
 
-def relu(z): 
+def relu(z):
     return np.maximum(0, z)
 
-def relu_deriv(z): 
+def relu_deriv(z):
     return (z &gt; 0).astype(float)
 
-def tanh_deriv(a): 
+def tanh_deriv(a):
     return 1 - a**2
 
 def softmax(z):
@@ -8758,7 +8771,7 @@ class Adam:
 
 class NeuralNetwork:
     def __init__(self, layer_sizes: List[int], activations: List[str]):
-        self.layers = [Layer(layer_sizes[i], layer_sizes[i+1], activations[i]) 
+        self.layers = [Layer(layer_sizes[i], layer_sizes[i+1], activations[i])
                        for i in range(len(layer_sizes)-1)]
         self.loss_history = []
 
@@ -8930,7 +8943,7 @@ print(edges)
 └─────────────────────────────────────────────────────────────────┘
 </code></pre>
 <h3>5.4 Cálculo de Dimensiones (Importante para Exámenes)</h3>
-<pre><code class="language-python">def output_size(input_size: int, kernel_size: int, 
+<pre><code class="language-python">def output_size(input_size: int, kernel_size: int,
                 stride: int = 1, padding: int = 0) -&gt; int:
     &quot;&quot;&quot;
     Fórmula para calcular tamaño del output de convolución.
@@ -9018,7 +9031,7 @@ print(f&quot;24x24, pooling 2x2 stride 2: output = {out}x{out}&quot;)  # 12x12
 
     for i in range(out_H):
         for j in range(out_W):
-            region = x[i*pool_size:(i+1)*pool_size, 
+            region = x[i*pool_size:(i+1)*pool_size,
                       j*pool_size:(j+1)*pool_size]
             output[i, j] = np.max(region)
 
@@ -9455,7 +9468,7 @@ if __name__ == &quot;__main__&quot;:
 </tbody>
 </table>
             </div>
-        
+
             <!-- MÓDULO: 08_PROYECTO_MNIST.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -9756,7 +9769,7 @@ def analyze_pca_mnist(X: np.ndarray, y: np.ndarray):
     plt.figure(figsize=(10, 8))
     for digit in range(10):
         mask = y == digit
-        plt.scatter(X_2d[mask, 0], X_2d[mask, 1], 
+        plt.scatter(X_2d[mask, 0], X_2d[mask, 1],
                    alpha=0.5, label=str(digit), s=10)
     plt.legend()
     plt.xlabel(f'PC1 ({pca_2d.explained_variance_ratio_[0]:.1%})')
@@ -9830,8 +9843,8 @@ class KMeans:
             self.labels_ = np.argmin(distances, axis=1)
 
             # Actualizar
-            new_centroids = np.array([X[self.labels_ == k].mean(axis=0) 
-                                      if np.sum(self.labels_ == k) &gt; 0 
+            new_centroids = np.array([X[self.labels_ == k].mean(axis=0)
+                                      if np.sum(self.labels_ == k) &gt; 0
                                       else self.centroids[k]
                                       for k in range(self.n_clusters)])
 
@@ -9839,7 +9852,7 @@ class KMeans:
                 break
             self.centroids = new_centroids
 
-        self.inertia_ = sum(np.sum((X[self.labels_ == k] - self.centroids[k])**2) 
+        self.inertia_ = sum(np.sum((X[self.labels_ == k] - self.centroids[k])**2)
                            for k in range(self.n_clusters))
         return self
 
@@ -10035,10 +10048,10 @@ import numpy as np
 from typing import List, Tuple
 
 # Funciones de activación
-def relu(z): 
+def relu(z):
     return np.maximum(0, z)
 
-def relu_deriv(z): 
+def relu_deriv(z):
     return (z &gt; 0).astype(float)
 
 def softmax(z):
@@ -10616,7 +10629,7 @@ def analyze_errors(
             idx = error_indices[i]
             img = X_test[idx].reshape(28, 28)
             ax.imshow(img, cmap='gray')
-            ax.set_title(f&quot;True: {y_test[idx]}, Pred: {y_pred[idx]}&quot;, 
+            ax.set_title(f&quot;True: {y_test[idx]}, Pred: {y_pred[idx]}&quot;,
                         color='red', fontsize=10)
             ax.axis('off')
         else:
@@ -10774,7 +10787,7 @@ Esto sugiere que:
 </tbody>
 </table>
             </div>
-        
+
             <!-- MÓDULO: CHECKLIST.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -11061,7 +11074,7 @@ from src.pipeline import run_mnist_pipeline
 <p><strong>Fecha de completitud:</strong> <strong><em>_</em></strong><strong><em>_</em></strong>_</p>
 <p><strong>Listo para el MS in AI Pathway - Línea 1:</strong> ☐ Sí ☐ No</p>
             </div>
-        
+
             <!-- MÓDULO: PLAN_V4_ESTRATEGICO.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -11368,7 +11381,237 @@ source venv/bin/activate
 <li><strong>Herramientas de estudio</strong>: <code>study_tools/README.md</code></li>
 </ul>
             </div>
-        
+
+            <!-- MÓDULO: PLAN_V5_ESTRATEGICO.md -->
+            <div class="cover-page">
+                <div class="cover-content">
+                    <div style="font-size:40pt;margin-bottom:20px;">💎</div>
+                    <div id="mod_PLAN_V5_ESTRATEGICO" class="cover-title">PLAN DE ACCIÓN PERFECCIONADO v5.0</div>
+                    <div class="cover-subtitle">MS in AI Pathway - ML Specialist v3.0</div>
+                    <div class="cover-badge">MATEMÁTICAS APLICADAS A CÓDIGO</div>
+                </div>
+                <div style="position:absolute;bottom:30px;font-size:10pt;opacity:0.6;">DUQUEOM | 2025</div>
+            </div>
+            <div class="content">
+                <h1>📋 Plan de Acción Perfeccionado v5.0 – Validación y Certificación</h1>
+<blockquote>
+<p>Este plan NO cambia el contenido académico de la guía.<br />
+Añade una capa de <strong>validación externa</strong>, <strong>rigor en datos</strong> y <strong>simulacro de examen de admisión</strong> sobre las mismas 24 semanas.</p>
+</blockquote>
+<h2>🎯 Objetivo de v5.0</h2>
+<ul>
+<li>Que <strong>tú</strong> sepas que dominas el contenido (v3.x + v4.0).  </li>
+<li>Que un <strong>tercero</strong> (mentor/IA/entrevistador) pueda confirmar tu nivel.  </li>
+<li>Que tu ejecución esté alineada con el <strong>formato de examen</strong> de la maestría.</li>
+</ul>
+<p>v5.0 introduce 3 protocolos sobre la guía principal:</p>
+<ol>
+<li><strong>Protocolo 1 – Data Rigor (Dirty Data Check)</strong>  </li>
+<li><strong>Protocolo 2 – Validación Externa (Desafío del Tablero Blanco)</strong>  </li>
+<li><strong>Protocolo 3 – Examen de Admisión Simulado</strong></li>
+</ol>
+<h2>📦 Relación con otros documentos</h2>
+<ul>
+<li>Contenido base de 24 semanas: <a href="#mod_PLAN_ESTUDIOS">PLAN_ESTUDIOS.md</a>  </li>
+<li>Estrategia de estudio diario y PyTorch: <a href="#mod_PLAN_V4_ESTRATEGICO">PLAN_V4_ESTRATEGICO.md</a>  </li>
+<li>Simulacros teóricos: <code>study_tools/SIMULACRO_EXAMEN_TEORICO.md</code>  </li>
+<li><strong>Nuevas herramientas v5.0:</strong></li>
+<li><code>study_tools/DIRTY_DATA_CHECK.md</code>  </li>
+<li><code>study_tools/DESAFIO_TABLERO_BLANCO.md</code>  </li>
+<li><code>study_tools/EXAMEN_ADMISION_SIMULADO.md</code></li>
+</ul>
+<h2>1️⃣ Protocolo 1 – Data Rigor (Dirty Data Check)</h2>
+<blockquote>
+<p><em>"El código es inútil si el dato es basura."</em></p>
+</blockquote>
+<h3>1.1. Módulo 01 – Python/Pandas (Semanas 1–2)</h3>
+<p><strong>Cambio en el entregable de Módulo 01:</strong></p>
+<p>Además de cargar un CSV y convertirlo a NumPy, el entregable incluye ahora un <strong>Dirty Data Check</strong>:</p>
+<ul>
+<li>Identificar y documentar <strong>al menos 5 problemas reales</strong> en el dataset:</li>
+<li>Valores nulos / NaN</li>
+<li>Outliers obvios</li>
+<li>Tipos incorrectos (strings donde deberían ser números)</li>
+<li>Codificaciones extrañas ("?", "N/A", "-999" como missing)</li>
+<li>Duplicados</li>
+<li>Para cada problema:</li>
+<li>Describir la <strong>estrategia de limpieza elegida</strong> (drop, imputación, corrección, etc.).</li>
+<li>Justificar la decisión (impacto en el modelo, tamaño de muestra, etc.).</li>
+</ul>
+<p>📄 Usa la plantilla:</p>
+<ul>
+<li><code>study_tools/DIRTY_DATA_CHECK.md</code> (sección <strong>Caso 1: Módulo 01 – CSV Inicial</strong>).</li>
+</ul>
+<h3>1.2. Módulo 05 – Supervised Learning (Semanas 9–12)</h3>
+<p>En el primer proyecto de <strong>Regresión Logística</strong> (Módulo 05):</p>
+<ul>
+<li>Usar un <strong>dataset real</strong> con:</li>
+<li>Variables categóricas (requieren One-Hot Encoding).  </li>
+<li>Variables numéricas que necesitan escalado (MinMax / StandardScaler manual).</li>
+<li>Implementar un <strong>pipeline de preprocesamiento</strong> claro <strong>antes</strong> del modelo:</li>
+<li>Limpieza básica (missing, outliers).  </li>
+<li>Codificación de categóricas (one-hot).  </li>
+<li>Escalado de numéricas.  </li>
+<li>División train/test.</li>
+<li>Documentar este flujo en <code>DIRTY_DATA_CHECK.md</code> (Caso 2: Módulo 05 – Dataset Supervisado).</li>
+</ul>
+<p>🔗 Referencia cruzada en la guía:<br />
+- Ver sección <strong>Supervised Learning (Módulo 05)</strong> en <a href="#mod_PLAN_ESTUDIOS">PLAN_ESTUDIOS.md</a>.</p>
+<h2>2️⃣ Protocolo 2 – Validación Externa (Desafío del Tablero Blanco)</h2>
+<blockquote>
+<p><em>"Si no lo puedes explicar en 5 minutos, no lo entiendes de verdad."</em><br />
+– Método Feynman aplicado a ML</p>
+</blockquote>
+<p>La guía v3.2 ya menciona el "Reto del Tablero Blanco". v5.0 lo <strong>formaliza</strong>:</p>
+<h3>2.1. Frecuencia (Fase 1 y 2)</h3>
+<ul>
+<li><strong>4 sesiones obligatorias</strong>:</li>
+<li>Semana 4  </li>
+<li>Semana 8  </li>
+<li>Semana 12  </li>
+<li>Semana 16</li>
+</ul>
+<h3>2.2. Dinámica de cada sesión</h3>
+<ol>
+<li>Elegir <strong>un concepto central</strong> de las semanas previas, por ejemplo:</li>
+<li>Regla de la Cadena  </li>
+<li>Gradient Descent  </li>
+<li>K-Means  </li>
+<li>PCA  </li>
+<li>Regresión Logística  </li>
+<li>Backpropagation</li>
+<li>Preparar una <strong>explicación de 5 minutos</strong> como si hablaras con un colega.  </li>
+<li>Grabar un <strong>video corto</strong> (pantalla + voz, cámara opcional) explicando el concepto en:</li>
+<li>Un tablero blanco físico,  </li>
+<li>Una tablet, o  </li>
+<li>Una pizarra digital sencilla.</li>
+<li>Pedir <strong>feedback externo</strong>:</li>
+<li>Mentor, colega, comunidad online, o  </li>
+<li>Una IA avanzada (pedir evaluación en claridad, precisión y rigor).</li>
+</ol>
+<p>📄 Usa la plantilla:</p>
+<ul>
+<li><code>study_tools/DESAFIO_TABLERO_BLANCO.md</code> para:</li>
+<li>Registrar tema, fecha, links al video.  </li>
+<li>Autoevaluación + feedback recibido.</li>
+</ul>
+<h3>2.3. Criterio de dominio (Feynman)</h3>
+<blockquote>
+<p>Si en 5 minutos <strong>no puedes</strong> explicar el concepto:<br />
+- sin leer,<br />
+- sin abusar de jerga,<br />
+- y sin cometer errores conceptuales,</p>
+<p>entonces <strong>no lo has dominado</strong> todavía.</p>
+</blockquote>
+<p>En ese caso:<br />
+- Volver al módulo correspondiente en <a href="#mod_PLAN_ESTUDIOS">PLAN_ESTUDIOS.md</a>.<br />
+- Repetir ejercicios clave.<br />
+- Reintentar el desafío en 1 semana.</p>
+<h2>3️⃣ Protocolo 3 – Examen de Admisión Simulado (Semanas 22 y 23)</h2>
+<blockquote>
+<p><em>"Entrena como si mañana fuera el examen real."</em></p>
+</blockquote>
+<p>Este protocolo convierte las semanas 22 y 23 en un <strong>campo de entrenamiento de examen</strong>.</p>
+<h3>3.1. Formato del Examen Simulado</h3>
+<ul>
+<li><strong>Duración:</strong> 2 horas continuas.  </li>
+<li><strong>Condiciones:</strong></li>
+<li>Sin internet.  </li>
+<li>Sin IDE.  </li>
+<li>Solo papel, lápiz y calculadora básica.</li>
+<li><strong>Contenido:</strong></li>
+<li><strong>40% Código (en pseudocódigo / pasos):</strong>  <ul>
+<li>PCA paso a paso,  </li>
+<li>o Backpropagation en una red simple,  </li>
+<li>o K-Means completo.  </li>
+</ul>
+</li>
+<li><strong>60% Teórico:</strong>  <ul>
+<li>Derivación de una función de pérdida (e.g., Cross-Entropy).  </li>
+<li>Explicación gráfica de Bias–Variance.  </li>
+<li>Preguntas conceptuales de ML/DL.</li>
+</ul>
+</li>
+</ul>
+<p>📄 Detalle y plantilla:</p>
+<ul>
+<li><code>study_tools/EXAMEN_ADMISION_SIMULADO.md</code><br />
+  Incluye estructura sugerida, rúbrica de calificación y hojas para registrar resultados.</li>
+</ul>
+<h3>3.2. Calendario</h3>
+<ul>
+<li><strong>Semana 22 – Simulacro 1 (diagnóstico):</strong></li>
+<li>Objetivo: detectar debilidades antes de la última semana.  </li>
+<li><strong>Semana 23 – Simulacro 2 (final):</strong></li>
+<li>Objetivo: confirmar que ya estás en nivel de admisión.</li>
+</ul>
+<h3>3.3. Métrica de "Listo para Admisión"</h3>
+<ul>
+<li>La nota del simulacro final (Semana 23) es tu <strong>Puntaje de Admisión Simulado</strong>.</li>
+<li>Criterio:</li>
+<li><strong>≥ 80%:</strong> nivel adecuado para presentarte con confianza.  </li>
+<li><strong>&lt; 80%:</strong> recomendar extender 2–4 semanas más, reforzar teoría y repetir simulacro.</li>
+</ul>
+<h2>4️⃣ Hoja de Ruta Integrada v5.0</h2>
+<table>
+<thead>
+<tr>
+<th>Fase</th>
+<th>Tarea Principal (Contenido)</th>
+<th>Mejora Estratégica (Ejecución v5.0)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Semanas 1–8</td>
+<td>Fundamentos Matemáticos (Álgebra, Cálculo, Probabilidad).</td>
+<td><strong>Protocolo 1 – Data Rigor:</strong> Dirty Data Check en Módulo 01 (CSV real).</td>
+</tr>
+<tr>
+<td>Semanas 9–20</td>
+<td>Core ML (Supervisado, No Supervisado, Deep Learning).</td>
+<td><strong>Protocolo 1 + 2:</strong> Dirty Data Check en proyecto supervisado + 4 desafíos de Tablero Blanco.</td>
+</tr>
+<tr>
+<td>Semanas 21–24</td>
+<td>Proyecto Integrador (MNIST Analyst).</td>
+<td><strong>Protocolo 3:</strong> 2 simulacros de examen (teoría + pseudocódigo) en Semanas 22 y 23.</td>
+</tr>
+</tbody>
+</table>
+<p>La <strong>transición a PyTorch</strong> sigue estando detallada en <a href="#mod_PLAN_V4_ESTRATEGICO">PLAN_V4_ESTRATEGICO.md</a> y en <code>study_tools/PUENTE_NUMPY_PYTORCH.md</code>.</p>
+<h2>5️⃣ Cómo usar v4.0 y v5.0 juntos</h2>
+<ul>
+<li><strong>v4.0</strong> responde: <em>"¿Cómo estudio cada día para no abandonar?"</em>  </li>
+<li>Protocolo "sandwich".  </li>
+<li>Diario de errores.  </li>
+<li>Dry run de backprop.  </li>
+<li>
+<p>Puente final a PyTorch.</p>
+</li>
+<li>
+<p><strong>v5.0</strong> responde: <em>"¿Cómo demuestro (a otros y a un examen) que sí estoy listo?"</em>  </p>
+</li>
+<li>Dirty Data Check con datasets reales.  </li>
+<li>Validación externa con explicaciones orales.  </li>
+<li>Simulacro de examen de admisión.</li>
+</ul>
+<p>Usa ambos planes como <strong>capas</strong> sobre <a href="#mod_PLAN_ESTUDIOS">PLAN_ESTUDIOS.md</a>:</p>
+<ol>
+<li>Primero aseguras <strong>ejecución diaria y proyectos</strong> (v4.0).  </li>
+<li>Luego aseguras <strong>validación externa y simulacro de examen</strong> (v5.0).</li>
+</ol>
+<h2>6️⃣ Checklist Rápido v5.0</h2>
+<ul>
+<li>[ ] Módulo 01: <code>DIRTY_DATA_CHECK.md</code> completado para un CSV real.  </li>
+<li>[ ] Módulo 05: Dirty Data Check aplicado a dataset supervisado con categóricas + escalado.  </li>
+<li>[ ] 4 videos del <strong>Desafío del Tablero Blanco</strong> (Semanas 4, 8, 12, 16) grabados y evaluados.  </li>
+<li>[ ] Simulacro 1 (Semana 22) completado y analizado.  </li>
+<li>[ ] Simulacro 2 (Semana 23) ≥ 80%.  </li>
+<li>[ ] Diario de Errores actualizado con errores conceptuales detectados en simulacros y desafíos.</li>
+</ul>
+            </div>
+
             <!-- MÓDULO: RECURSOS.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -11825,7 +12068,7 @@ source venv/bin/activate
 <li><a href="https://www.kaggle.com/datasets">Kaggle Datasets</a></li>
 </ul>
             </div>
-        
+
             <!-- MÓDULO: GLOSARIO.md -->
             <div class="cover-page">
                 <div class="cover-content">
@@ -12145,7 +12388,6 @@ source venv/bin/activate
 <strong>Importancia:</strong> Demuestra necesidad de capas ocultas en redes neuronales.<br />
 <strong>Solución:</strong> MLP con al menos una capa oculta.</p>
             </div>
-        
+
     </body>
     </html>
-    

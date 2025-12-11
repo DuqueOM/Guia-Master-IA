@@ -1,7 +1,7 @@
 # Módulo 03 - Cálculo Multivariante para Deep Learning
 
-> **🎯 Objetivo:** Dominar derivadas, gradientes y la Chain Rule para entender Backpropagation  
-> **Fase:** 1 - Fundamentos Matemáticos | **Semanas 6-8**  
+> **🎯 Objetivo:** Dominar derivadas, gradientes y la Chain Rule para entender Backpropagation
+> **Fase:** 1 - Fundamentos Matemáticos | **Semanas 6-8**
 > **Prerrequisitos:** Módulo 02 (Álgebra Lineal para ML)
 
 ---
@@ -63,7 +63,7 @@ Notaciones equivalentes:
 def numerical_derivative(f, x: float, h: float = 1e-7) -> float:
     """
     Calcula la derivada numérica usando diferencias finitas.
-    
+
     Método: diferencia central (más preciso)
     f'(x) ≈ (f(x+h) - f(x-h)) / (2h)
     """
@@ -117,7 +117,7 @@ def sigmoid(x: np.ndarray) -> np.ndarray:
 def sigmoid_derivative(x: np.ndarray) -> np.ndarray:
     """
     d/dx σ(x) = σ(x) · (1 - σ(x))
-    
+
     Derivación:
     σ(x) = (1 + e^(-x))^(-1)
     σ'(x) = -1·(1 + e^(-x))^(-2) · (-e^(-x))
@@ -166,7 +166,7 @@ verify_derivative(np.tanh, tanh_derivative, x, "Tanh")
 import numpy as np
 
 """
-DERIVADA PARCIAL: Derivada respecto a UNA variable, 
+DERIVADA PARCIAL: Derivada respecto a UNA variable,
 manteniendo las otras constantes.
 
 Para f(x, y):
@@ -197,7 +197,7 @@ def df_dy(x: float, y: float) -> float:
 def partial_derivative(f, var_idx: int, point: list, h: float = 1e-7) -> float:
     """
     Calcula ∂f/∂xᵢ en un punto dado.
-    
+
     Args:
         f: función
         var_idx: índice de la variable (0 para x, 1 para y, etc.)
@@ -248,25 +248,25 @@ Propiedades importantes:
 def compute_gradient(f, point: np.ndarray, h: float = 1e-7) -> np.ndarray:
     """
     Calcula el gradiente de f en un punto usando diferencias finitas.
-    
+
     Args:
         f: función f(x) donde x es un array
         point: punto donde calcular el gradiente
         h: paso para diferencias finitas
-    
+
     Returns:
         gradiente como array
     """
     n = len(point)
     gradient = np.zeros(n)
-    
+
     for i in range(n):
         point_plus = point.copy()
         point_minus = point.copy()
         point_plus[i] += h
         point_minus[i] -= h
         gradient[i] = (f(point_plus) - f(point_minus)) / (2 * h)
-    
+
     return gradient
 
 
@@ -299,36 +299,36 @@ import matplotlib.pyplot as plt
 
 def visualize_gradient():
     """Visualiza el gradiente como campo vectorial."""
-    
+
     # Crear grid
     x = np.linspace(-3, 3, 15)
     y = np.linspace(-3, 3, 15)
     X, Y = np.meshgrid(x, y)
-    
+
     # Función: f(x,y) = x² + y²
     Z = X**2 + Y**2
-    
+
     # Gradiente: ∇f = [2x, 2y]
     U = 2 * X  # ∂f/∂x
     V = 2 * Y  # ∂f/∂y
-    
+
     # Normalizar para visualización
     magnitude = np.sqrt(U**2 + V**2)
     U_norm = U / (magnitude + 0.1)
     V_norm = V / (magnitude + 0.1)
-    
+
     plt.figure(figsize=(10, 8))
-    
+
     # Contornos de nivel
     plt.contour(X, Y, Z, levels=20, cmap='viridis', alpha=0.5)
     plt.colorbar(label='f(x,y) = x² + y²')
-    
+
     # Flechas del gradiente
     plt.quiver(X, Y, U_norm, V_norm, magnitude, cmap='Reds', alpha=0.8)
-    
+
     # Punto mínimo
     plt.plot(0, 0, 'g*', markersize=15, label='Mínimo global')
-    
+
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title('Gradiente de f(x,y) = x² + y²\nLas flechas apuntan hacia ARRIBA (máximo ascenso)')
@@ -359,7 +359,7 @@ Algoritmo:
     1. Inicializar x₀
     2. Repetir hasta convergencia:
        x_{t+1} = x_t - α · ∇f(x_t)
-       
+
 Donde α (alpha) es el "learning rate" (tasa de aprendizaje).
 """
 
@@ -373,7 +373,7 @@ def gradient_descent(
 ) -> Tuple[np.ndarray, List[np.ndarray], List[float]]:
     """
     Gradient Descent para minimizar f.
-    
+
     Args:
         f: función a minimizar
         grad_f: gradiente de f
@@ -381,7 +381,7 @@ def gradient_descent(
         learning_rate: tasa de aprendizaje (α)
         max_iterations: máximo de iteraciones
         tolerance: criterio de parada (norma del gradiente)
-    
+
     Returns:
         x_final: solución encontrada
         history_x: trayectoria de x
@@ -390,23 +390,23 @@ def gradient_descent(
     x = x0.copy()
     history_x = [x.copy()]
     history_f = [f(x)]
-    
+
     for i in range(max_iterations):
         # Calcular gradiente
         grad = grad_f(x)
-        
+
         # Verificar convergencia
         if np.linalg.norm(grad) < tolerance:
             print(f"Convergió en iteración {i}")
             break
-        
+
         # Actualizar x
         x = x - learning_rate * grad
-        
+
         # Guardar historia
         history_x.append(x.copy())
         history_f.append(f(x))
-    
+
     return x, history_x, history_f
 
 
@@ -435,24 +435,24 @@ import matplotlib.pyplot as plt
 
 def compare_learning_rates():
     """Compara diferentes learning rates."""
-    
+
     def f(p):
         return p[0]**2 + p[1]**2
-    
+
     def grad_f(p):
         return np.array([2*p[0], 2*p[1]])
-    
+
     x0 = np.array([4.0, 3.0])
-    
+
     learning_rates = [0.01, 0.1, 0.5, 0.9]
-    
+
     plt.figure(figsize=(12, 4))
-    
+
     for i, lr in enumerate(learning_rates):
         x_final, history_x, history_f = gradient_descent(
             f, grad_f, x0, learning_rate=lr, max_iterations=50
         )
-        
+
         plt.subplot(1, 4, i+1)
         plt.plot(history_f, 'b-o', markersize=3)
         plt.xlabel('Iteración')
@@ -460,11 +460,11 @@ def compare_learning_rates():
         plt.title(f'α = {lr}')
         plt.yscale('log')
         plt.grid(True)
-    
+
     plt.tight_layout()
     plt.suptitle('Efecto del Learning Rate en Gradient Descent', y=1.02)
     plt.show()
-    
+
     """
     Observaciones:
     - α muy pequeño (0.01): Convergencia muy lenta
@@ -515,7 +515,7 @@ def binary_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e
 def binary_cross_entropy_gradient(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> np.ndarray:
     """
     ∂BCE/∂y_pred = (1/n) · (y_pred - y_true) / (y_pred · (1 - y_pred))
-    
+
     Simplificación cuando y_pred = σ(z):
     ∂BCE/∂z = (1/n) · (y_pred - y_true)
     """
@@ -546,7 +546,7 @@ REGLA DE LA CADENA (Chain Rule)
 
 Si y = f(g(x)), entonces:
     dy/dx = df/dg · dg/dx
-    
+
 O en notación de composición:
     (f ∘ g)'(x) = f'(g(x)) · g'(x)
 
@@ -554,7 +554,7 @@ Esto es FUNDAMENTAL para Backpropagation.
 """
 
 # Ejemplo: y = (x² + 1)³
-# 
+#
 # Sea g(x) = x² + 1  y  f(u) = u³
 # Entonces y = f(g(x))
 #
@@ -598,7 +598,7 @@ CHAIN RULE PARA REDES NEURONALES
 Una capa de red neuronal:
     z = Wx + b       (transformación lineal)
     a = σ(z)         (activación)
-    
+
 Si L es la pérdida, necesitamos:
     ∂L/∂W, ∂L/∂b     (para actualizar los pesos)
 
@@ -610,45 +610,45 @@ Usando Chain Rule:
 def simple_forward_backward():
     """
     Ejemplo simplificado de forward y backward pass.
-    
+
     Red: x → [z = wx + b] → [a = sigmoid(z)] → [L = (a - y)²]
     """
     # Datos
     x = 2.0          # Input
     y_true = 1.0     # Target
-    
+
     # Parámetros
     w = 0.5
     b = 0.1
-    
+
     # ========== FORWARD PASS ==========
     z = w * x + b                    # z = wx + b
     a = 1 / (1 + np.exp(-z))         # a = sigmoid(z)
     L = (a - y_true) ** 2            # L = MSE
-    
+
     print("=== FORWARD PASS ===")
     print(f"z = w*x + b = {w}*{x} + {b} = {z}")
     print(f"a = sigmoid(z) = {a:.4f}")
     print(f"L = (a - y)² = ({a:.4f} - {y_true})² = {L:.4f}")
-    
+
     # ========== BACKWARD PASS (Chain Rule) ==========
     # Objetivo: calcular ∂L/∂w y ∂L/∂b
-    
+
     # Paso 1: ∂L/∂a
     dL_da = 2 * (a - y_true)
-    
+
     # Paso 2: ∂a/∂z = sigmoid'(z) = a(1-a)
     da_dz = a * (1 - a)
-    
+
     # Paso 3: ∂z/∂w = x,  ∂z/∂b = 1
     dz_dw = x
     dz_db = 1
-    
+
     # Aplicar Chain Rule
     dL_dz = dL_da * da_dz           # ∂L/∂z = ∂L/∂a · ∂a/∂z
     dL_dw = dL_dz * dz_dw           # ∂L/∂w = ∂L/∂z · ∂z/∂w
     dL_db = dL_dz * dz_db           # ∂L/∂b = ∂L/∂z · ∂z/∂b
-    
+
     print("\n=== BACKWARD PASS (Chain Rule) ===")
     print(f"∂L/∂a = 2(a - y) = {dL_da:.4f}")
     print(f"∂a/∂z = a(1-a) = {da_dz:.4f}")
@@ -656,26 +656,26 @@ def simple_forward_backward():
     print(f"∂z/∂b = 1")
     print(f"\n∂L/∂w = ∂L/∂a · ∂a/∂z · ∂z/∂w = {dL_dw:.4f}")
     print(f"∂L/∂b = ∂L/∂a · ∂a/∂z · ∂z/∂b = {dL_db:.4f}")
-    
+
     # ========== VERIFICACIÓN NUMÉRICA ==========
     h = 1e-7
-    
+
     # ∂L/∂w numérica
     z_plus = (w + h) * x + b
     a_plus = 1 / (1 + np.exp(-z_plus))
     L_plus = (a_plus - y_true) ** 2
-    
+
     z_minus = (w - h) * x + b
     a_minus = 1 / (1 + np.exp(-z_minus))
     L_minus = (a_minus - y_true) ** 2
-    
+
     dL_dw_numerical = (L_plus - L_minus) / (2 * h)
-    
+
     print(f"\n=== VERIFICACIÓN ===")
     print(f"∂L/∂w analítica: {dL_dw:.6f}")
     print(f"∂L/∂w numérica:  {dL_dw_numerical:.6f}")
     print(f"Error: {abs(dL_dw - dL_dw_numerical):.2e}")
-    
+
     return dL_dw, dL_db
 
 simple_forward_backward()
@@ -690,11 +690,11 @@ import numpy as np
 RED NEURONAL DE 2 CAPAS
 
 Arquitectura:
-    x (input) 
-    → z₁ = W₁x + b₁ 
-    → a₁ = sigmoid(z₁) 
-    → z₂ = W₂a₁ + b₂ 
-    → a₂ = sigmoid(z₂) 
+    x (input)
+    → z₁ = W₁x + b₁
+    → a₁ = sigmoid(z₁)
+    → z₂ = W₂a₁ + b₂
+    → a₂ = sigmoid(z₂)
     → L = MSE(a₂, y)
 
 Backpropagation usa Chain Rule repetidamente:
@@ -704,82 +704,82 @@ Backpropagation usa Chain Rule repetidamente:
 
 class SimpleNeuralNet:
     """Red neuronal de 2 capas para demostrar backprop."""
-    
+
     def __init__(self, input_size: int, hidden_size: int, output_size: int):
         # Inicializar pesos (Xavier initialization)
         self.W1 = np.random.randn(hidden_size, input_size) * np.sqrt(2 / input_size)
         self.b1 = np.zeros(hidden_size)
         self.W2 = np.random.randn(output_size, hidden_size) * np.sqrt(2 / hidden_size)
         self.b2 = np.zeros(output_size)
-        
+
         # Cache para backprop
         self.cache = {}
-    
+
     def sigmoid(self, z):
         return 1 / (1 + np.exp(-np.clip(z, -500, 500)))
-    
+
     def sigmoid_derivative(self, a):
         return a * (1 - a)
-    
+
     def forward(self, x: np.ndarray) -> np.ndarray:
         """Forward pass guardando valores intermedios."""
         # Capa 1
         z1 = self.W1 @ x + self.b1
         a1 = self.sigmoid(z1)
-        
+
         # Capa 2
         z2 = self.W2 @ a1 + self.b2
         a2 = self.sigmoid(z2)
-        
+
         # Guardar para backprop
         self.cache = {'x': x, 'z1': z1, 'a1': a1, 'z2': z2, 'a2': a2}
-        
+
         return a2
-    
+
     def backward(self, y_true: np.ndarray) -> dict:
         """
         Backward pass usando Chain Rule.
-        
+
         Returns:
             Gradientes de todos los parámetros
         """
         x = self.cache['x']
         a1 = self.cache['a1']
         a2 = self.cache['a2']
-        
+
         # ∂L/∂a₂ (MSE)
         dL_da2 = 2 * (a2 - y_true)
-        
+
         # ∂a₂/∂z₂
         da2_dz2 = self.sigmoid_derivative(a2)
-        
+
         # ∂L/∂z₂ = ∂L/∂a₂ · ∂a₂/∂z₂
         dL_dz2 = dL_da2 * da2_dz2
-        
+
         # Gradientes de capa 2
         # ∂z₂/∂W₂ = a₁, ∂z₂/∂b₂ = 1
         dL_dW2 = np.outer(dL_dz2, a1)
         dL_db2 = dL_dz2
-        
+
         # Propagar hacia atrás a capa 1
         # ∂z₂/∂a₁ = W₂
         dL_da1 = self.W2.T @ dL_dz2
-        
+
         # ∂a₁/∂z₁
         da1_dz1 = self.sigmoid_derivative(a1)
-        
+
         # ∂L/∂z₁
         dL_dz1 = dL_da1 * da1_dz1
-        
+
         # Gradientes de capa 1
         dL_dW1 = np.outer(dL_dz1, x)
         dL_db1 = dL_dz1
-        
+
         return {
             'dW1': dL_dW1, 'db1': dL_db1,
             'dW2': dL_dW2, 'db2': dL_db2
         }
-    
+
     def update(self, gradients: dict, learning_rate: float):
         """Actualiza parámetros usando gradient descent."""
         self.W1 -= learning_rate * gradients['dW1']
@@ -794,10 +794,10 @@ def demo_xor():
     # XOR data
     X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]]).T  # 2x4
     y = np.array([[0], [1], [1], [0]]).T              # 1x4
-    
+
     # Crear red
     net = SimpleNeuralNet(input_size=2, hidden_size=4, output_size=1)
-    
+
     # Entrenar
     losses = []
     for epoch in range(10000):
@@ -807,18 +807,18 @@ def demo_xor():
             output = net.forward(X[:, i])
             loss = (output - y[:, i]) ** 2
             total_loss += loss[0]
-            
+
             # Backward
             gradients = net.backward(y[:, i])
-            
+
             # Update
             net.update(gradients, learning_rate=0.5)
-        
+
         losses.append(total_loss / 4)
-        
+
         if epoch % 2000 == 0:
             print(f"Epoch {epoch}: Loss = {losses[-1]:.4f}")
-    
+
     # Test
     print("\n=== Resultados XOR ===")
     for i in range(4):
@@ -860,7 +860,7 @@ def gradient_descent(
 ) -> Tuple[np.ndarray, List[np.ndarray], List[float]]:
     """
     Implementación de Gradient Descent.
-    
+
     Args:
         f: función objetivo
         grad_f: gradiente de f
@@ -868,24 +868,24 @@ def gradient_descent(
         learning_rate: α
         max_iterations: máximo de iteraciones
         tolerance: criterio de convergencia
-    
+
     Returns:
         x_final, history_x, history_f
     """
     x = x0.copy().astype(float)
     history_x = [x.copy()]
     history_f = [f(x)]
-    
+
     for i in range(max_iterations):
         grad = grad_f(x)
-        
+
         if np.linalg.norm(grad) < tolerance:
             break
-        
+
         x = x - learning_rate * grad
         history_x.append(x.copy())
         history_f.append(f(x))
-    
+
     return x, history_x, history_f
 
 
@@ -899,38 +899,38 @@ def visualize_optimization(
     ylim: Tuple[float, float] = (-5, 5)
 ):
     """Visualiza la trayectoria de optimización."""
-    
+
     x_final, history_x, history_f = gradient_descent(
         f, grad_f, x0, learning_rate, max_iterations=50
     )
-    
+
     # Crear grid para contornos
     x = np.linspace(xlim[0], xlim[1], 100)
     y = np.linspace(ylim[0], ylim[1], 100)
     X, Y = np.meshgrid(x, y)
-    Z = np.array([[f(np.array([xi, yi])) for xi, yi in zip(row_x, row_y)] 
+    Z = np.array([[f(np.array([xi, yi])) for xi, yi in zip(row_x, row_y)]
                   for row_x, row_y in zip(X, Y)])
-    
+
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    
+
     # Plot 1: Contornos y trayectoria
     ax1 = axes[0]
     contour = ax1.contour(X, Y, Z, levels=30, cmap='viridis')
     ax1.clabel(contour, inline=True, fontsize=8)
-    
+
     # Trayectoria
     history_x = np.array(history_x)
     ax1.plot(history_x[:, 0], history_x[:, 1], 'r.-', markersize=8, linewidth=1.5)
     ax1.plot(history_x[0, 0], history_x[0, 1], 'go', markersize=12, label='Inicio')
     ax1.plot(history_x[-1, 0], history_x[-1, 1], 'r*', markersize=15, label='Final')
-    
+
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
     ax1.set_title(f'{title}\nα = {learning_rate}')
     ax1.legend()
     ax1.set_xlim(xlim)
     ax1.set_ylim(ylim)
-    
+
     # Plot 2: Convergencia
     ax2 = axes[1]
     ax2.semilogy(history_f, 'b-o', markersize=4)
@@ -938,11 +938,11 @@ def visualize_optimization(
     ax2.set_ylabel('f(x) (escala log)')
     ax2.set_title('Convergencia')
     ax2.grid(True)
-    
+
     plt.tight_layout()
     plt.savefig(f'gd_{title.lower().replace(" ", "_")}.png', dpi=150)
     plt.show()
-    
+
     print(f"\n{title}")
     print(f"  Punto inicial: {x0}")
     print(f"  Mínimo encontrado: {x_final}")
@@ -952,30 +952,30 @@ def visualize_optimization(
 
 def main():
     """Ejecutar demos."""
-    
+
     # === Función 1: Paraboloide ===
     def paraboloid(p):
         return p[0]**2 + p[1]**2
-    
+
     def grad_paraboloid(p):
         return np.array([2*p[0], 2*p[1]])
-    
+
     visualize_optimization(
         paraboloid, grad_paraboloid,
         x0=np.array([4.0, 3.0]),
         learning_rate=0.1,
         title="Paraboloide f(x,y) = x² + y²"
     )
-    
+
     # === Función 2: Rosenbrock (más difícil) ===
     def rosenbrock(p):
         return (1 - p[0])**2 + 100*(p[1] - p[0]**2)**2
-    
+
     def grad_rosenbrock(p):
         dx = -2*(1 - p[0]) - 400*p[0]*(p[1] - p[0]**2)
         dy = 200*(p[1] - p[0]**2)
         return np.array([dx, dy])
-    
+
     visualize_optimization(
         rosenbrock, grad_rosenbrock,
         x0=np.array([-1.0, 1.0]),
@@ -984,14 +984,14 @@ def main():
         xlim=(-2, 2),
         ylim=(-1, 3)
     )
-    
+
     # === Función 3: Cuadrática elíptica ===
     def elliptic(p):
         return p[0]**2 + 10*p[1]**2
-    
+
     def grad_elliptic(p):
         return np.array([2*p[0], 20*p[1]])
-    
+
     visualize_optimization(
         elliptic, grad_elliptic,
         x0=np.array([4.0, 2.0]),
@@ -1045,38 +1045,38 @@ def numerical_gradient(
 ) -> np.ndarray:
     """
     Calcula el gradiente numérico usando diferencias centrales.
-    
+
     Args:
         f: Función escalar f(x) -> float
         x: Punto donde calcular el gradiente
         epsilon: Tamaño del paso (default: 1e-5)
-    
+
     Returns:
         Gradiente numérico aproximado
     """
     grad = np.zeros_like(x)
-    
+
     # Iterar sobre cada dimensión
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
         idx = it.multi_index
         old_value = x[idx]
-        
+
         # f(x + epsilon)
         x[idx] = old_value + epsilon
         fx_plus = f(x)
-        
+
         # f(x - epsilon)
         x[idx] = old_value - epsilon
         fx_minus = f(x)
-        
+
         # Diferencias centrales: (f(x+ε) - f(x-ε)) / 2ε
         grad[idx] = (fx_plus - fx_minus) / (2 * epsilon)
-        
+
         # Restaurar valor original
         x[idx] = old_value
         it.iternext()
-    
+
     return grad
 
 
@@ -1087,24 +1087,24 @@ def gradient_check(
 ) -> Tuple[bool, float]:
     """
     Compara gradiente analítico vs numérico.
-    
+
     Args:
         analytic_grad: Gradiente calculado con backprop
         numerical_grad: Gradiente calculado numéricamente
         threshold: Umbral de error aceptable
-    
+
     Returns:
         (passed, relative_error)
     """
     # Error relativo: ||a - n|| / (||a|| + ||n||)
     diff = np.linalg.norm(analytic_grad - numerical_grad)
     norm_sum = np.linalg.norm(analytic_grad) + np.linalg.norm(numerical_grad)
-    
+
     if norm_sum == 0:
         relative_error = 0.0
     else:
         relative_error = diff / norm_sum
-    
+
     passed = relative_error < threshold
     return passed, relative_error
 
@@ -1129,28 +1129,28 @@ def test_mse_gradient():
     print("=" * 60)
     print("GRADIENT CHECK: MSE Loss")
     print("=" * 60)
-    
+
     np.random.seed(42)
     y_pred = np.random.randn(10)
     y_true = np.random.randn(10)
-    
+
     # Gradiente analítico
     grad_analytic = mse_gradient_analytic(y_pred, y_true)
-    
+
     # Gradiente numérico
     def loss_fn(pred):
         return mse_loss(pred, y_true)
-    
+
     grad_numerical = numerical_gradient(loss_fn, y_pred.copy())
-    
+
     # Comparar
     passed, error = gradient_check(grad_analytic, grad_numerical)
-    
+
     print(f"Gradiente Analítico: {grad_analytic[:3]}...")
     print(f"Gradiente Numérico:  {grad_numerical[:3]}...")
     print(f"Error Relativo: {error:.2e}")
     print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")
-    
+
     return passed
 
 
@@ -1174,27 +1174,27 @@ def test_sigmoid_gradient():
     print("\n" + "=" * 60)
     print("GRADIENT CHECK: Sigmoid Derivative")
     print("=" * 60)
-    
+
     np.random.seed(42)
     z = np.random.randn(5)
-    
+
     # Derivada analítica
     grad_analytic = sigmoid_derivative_analytic(z)
-    
+
     # Derivada numérica (para cada elemento)
     def sigmoid_element(z_arr):
         return float(np.sum(sigmoid(z_arr)))  # Suma para tener escalar
-    
+
     grad_numerical = numerical_gradient(sigmoid_element, z.copy())
-    
+
     # Comparar
     passed, error = gradient_check(grad_analytic, grad_numerical)
-    
+
     print(f"Derivada Analítica: {grad_analytic}")
     print(f"Derivada Numérica:  {grad_numerical}")
     print(f"Error Relativo: {error:.2e}")
     print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")
-    
+
     return passed
 
 
@@ -1207,42 +1207,42 @@ def test_linear_layer_gradient():
     print("\n" + "=" * 60)
     print("GRADIENT CHECK: Linear Layer (y = Wx + b)")
     print("=" * 60)
-    
+
     np.random.seed(42)
-    
+
     # Dimensiones
     n_in, n_out = 4, 3
-    
+
     # Parámetros
     W = np.random.randn(n_out, n_in)
     b = np.random.randn(n_out)
     x = np.random.randn(n_in)
     y_true = np.random.randn(n_out)
-    
+
     # Forward + Loss
     def forward_and_loss(W_flat):
         W_reshaped = W_flat.reshape(n_out, n_in)
         y_pred = W_reshaped @ x + b
         return mse_loss(y_pred, y_true)
-    
+
     # Gradiente analítico de W
     y_pred = W @ x + b
     dL_dy = 2 * (y_pred - y_true) / n_out  # Gradiente de MSE
     dL_dW_analytic = np.outer(dL_dy, x)    # ∂L/∂W = ∂L/∂y · x^T
-    
+
     # Gradiente numérico de W
     dL_dW_numerical = numerical_gradient(forward_and_loss, W.flatten().copy())
     dL_dW_numerical = dL_dW_numerical.reshape(n_out, n_in)
-    
+
     # Comparar
     passed, error = gradient_check(
-        dL_dW_analytic.flatten(), 
+        dL_dW_analytic.flatten(),
         dL_dW_numerical.flatten()
     )
-    
+
     print(f"Error Relativo: {error:.2e}")
     print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")
-    
+
     return passed
 
 
@@ -1252,22 +1252,22 @@ def main():
     print("       GRADIENT CHECKING SUITE")
     print("       Validación Matemática v3.3")
     print("=" * 60)
-    
+
     results = []
     results.append(("MSE Loss", test_mse_gradient()))
     results.append(("Sigmoid", test_sigmoid_gradient()))
     results.append(("Linear Layer", test_linear_layer_gradient()))
-    
+
     print("\n" + "=" * 60)
     print("RESUMEN")
     print("=" * 60)
-    
+
     all_passed = True
     for name, passed in results:
         status = "✓ PASSED" if passed else "✗ FAILED"
         print(f"  {name}: {status}")
         all_passed = all_passed and passed
-    
+
     print("-" * 60)
     if all_passed:
         print("✓ TODOS LOS GRADIENT CHECKS PASARON")
@@ -1275,7 +1275,7 @@ def main():
     else:
         print("✗ ALGUNOS GRADIENT CHECKS FALLARON")
         print("  Revisa tu implementación de backprop.")
-    
+
     return all_passed
 
 

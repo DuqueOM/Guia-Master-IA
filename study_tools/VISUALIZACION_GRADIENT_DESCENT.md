@@ -42,18 +42,18 @@ from matplotlib import cm
 
 def visualizar_superficie_convexa():
     """Visualiza f(x,y) = x² + y² - un bowl perfecto."""
-    
+
     # Crear grid
     x = np.linspace(-3, 3, 100)
     y = np.linspace(-3, 3, 100)
     X, Y = np.meshgrid(x, y)
-    
+
     # Función objetivo: bowl convexo
     Z = X**2 + Y**2
-    
+
     # Crear figura
     fig = plt.figure(figsize=(14, 5))
-    
+
     # Vista 3D
     ax1 = fig.add_subplot(121, projection='3d')
     ax1.plot_surface(X, Y, Z, cmap=cm.viridis, alpha=0.8)
@@ -61,7 +61,7 @@ def visualizar_superficie_convexa():
     ax1.set_ylabel('y')
     ax1.set_zlabel('f(x,y)')
     ax1.set_title('Superficie Convexa: f(x,y) = x² + y²')
-    
+
     # Curvas de nivel (contour)
     ax2 = fig.add_subplot(122)
     contour = ax2.contour(X, Y, Z, levels=20, cmap=cm.viridis)
@@ -72,7 +72,7 @@ def visualizar_superficie_convexa():
     ax2.set_aspect('equal')
     ax2.plot(0, 0, 'r*', markersize=15, label='Mínimo global')
     ax2.legend()
-    
+
     plt.tight_layout()
     plt.savefig('superficie_convexa.png', dpi=150)
     plt.show()
@@ -97,21 +97,21 @@ from IPython.display import HTML
 
 def gradient_descent_animation():
     """Anima el proceso de Gradient Descent."""
-    
+
     # Función y gradiente
     def f(x, y):
         return x**2 + y**2
-    
+
     def grad_f(x, y):
         return np.array([2*x, 2*y])
-    
+
     # Parámetros
     learning_rate = 0.1
     n_steps = 30
-    
+
     # Punto inicial
     path = [(2.5, 2.5)]
-    
+
     # Ejecutar GD
     x, y = path[0]
     for _ in range(n_steps):
@@ -119,18 +119,18 @@ def gradient_descent_animation():
         x = x - learning_rate * grad[0]
         y = y - learning_rate * grad[1]
         path.append((x, y))
-    
+
     path = np.array(path)
-    
+
     # Crear grid para contour
     x_grid = np.linspace(-3, 3, 100)
     y_grid = np.linspace(-3, 3, 100)
     X, Y = np.meshgrid(x_grid, y_grid)
     Z = f(X, Y)
-    
+
     # Animación
     fig, ax = plt.subplots(figsize=(8, 8))
-    
+
     def init():
         ax.clear()
         ax.contour(X, Y, Z, levels=20, cmap='viridis')
@@ -139,39 +139,39 @@ def gradient_descent_animation():
         ax.set_title('Gradient Descent: f(x,y) = x² + y²')
         ax.set_aspect('equal')
         return []
-    
+
     def animate(i):
         ax.clear()
         ax.contour(X, Y, Z, levels=20, cmap='viridis', alpha=0.5)
-        
+
         # Dibujar camino hasta el paso actual
         ax.plot(path[:i+1, 0], path[:i+1, 1], 'ro-', markersize=4)
         ax.plot(path[i, 0], path[i, 1], 'r*', markersize=15)
-        
+
         # Dibujar gradiente actual (invertido, apunta hacia descenso)
         if i < len(path) - 1:
             grad = grad_f(path[i, 0], path[i, 1])
-            ax.arrow(path[i, 0], path[i, 1], 
+            ax.arrow(path[i, 0], path[i, 1],
                     -0.3*grad[0], -0.3*grad[1],
                     head_width=0.1, head_length=0.05, fc='blue', ec='blue')
-        
+
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.set_title(f'Gradient Descent - Paso {i}, f = {f(path[i,0], path[i,1]):.4f}')
         ax.set_xlim(-3, 3)
         ax.set_ylim(-3, 3)
         ax.set_aspect('equal')
-        
+
         return []
-    
-    anim = FuncAnimation(fig, animate, init_func=init, 
+
+    anim = FuncAnimation(fig, animate, init_func=init,
                         frames=len(path), interval=200, blit=True)
-    
+
     # Para Jupyter: HTML(anim.to_jshtml())
-    # Para script: 
+    # Para script:
     anim.save('gradient_descent.gif', writer='pillow', fps=5)
     plt.show()
-    
+
     return path
 
 path = gradient_descent_animation()
@@ -188,53 +188,53 @@ import matplotlib.pyplot as plt
 
 def comparar_learning_rates():
     """Compara diferentes learning rates."""
-    
+
     def f(x, y):
         return x**2 + y**2
-    
+
     def grad_f(x, y):
         return np.array([2*x, 2*y])
-    
+
     learning_rates = [0.01, 0.1, 0.5, 0.9, 1.1]
     colors = ['blue', 'green', 'orange', 'red', 'purple']
-    
+
     fig, axes = plt.subplots(1, len(learning_rates), figsize=(20, 4))
-    
+
     # Grid para contour
     x_grid = np.linspace(-3, 3, 100)
     y_grid = np.linspace(-3, 3, 100)
     X, Y = np.meshgrid(x_grid, y_grid)
     Z = f(X, Y)
-    
+
     for ax, lr, color in zip(axes, learning_rates, colors):
         # Ejecutar GD
         path = [(2.5, 2.5)]
         x, y = path[0]
-        
+
         for _ in range(30):
             grad = grad_f(x, y)
             x = x - lr * grad[0]
             y = y - lr * grad[1]
-            
+
             # Limitar para evitar explosión
             x = np.clip(x, -10, 10)
             y = np.clip(y, -10, 10)
             path.append((x, y))
-        
+
         path = np.array(path)
-        
+
         # Dibujar
         ax.contour(X, Y, Z, levels=20, cmap='viridis', alpha=0.5)
         ax.plot(path[:, 0], path[:, 1], f'{color[0]}o-', markersize=3)
         ax.plot(path[0, 0], path[0, 1], 'g*', markersize=15, label='Inicio')
         ax.plot(path[-1, 0], path[-1, 1], 'r*', markersize=15, label='Final')
-        
+
         ax.set_xlim(-3, 3)
         ax.set_ylim(-3, 3)
         ax.set_aspect('equal')
         ax.set_title(f'LR = {lr}\nFinal: ({path[-1,0]:.2f}, {path[-1,1]:.2f})')
         ax.legend(fontsize=8)
-    
+
     plt.suptitle('Efecto del Learning Rate en Gradient Descent', fontsize=14)
     plt.tight_layout()
     plt.savefig('learning_rates.png', dpi=150)
@@ -259,18 +259,18 @@ comparar_learning_rates()
 ```python
 def visualizar_superficie_no_convexa():
     """Visualiza una función con múltiples mínimos."""
-    
+
     # Función con múltiples mínimos
     def f(x, y):
         return np.sin(x) * np.cos(y) + 0.1 * (x**2 + y**2)
-    
+
     x = np.linspace(-4, 4, 100)
     y = np.linspace(-4, 4, 100)
     X, Y = np.meshgrid(x, y)
     Z = f(X, Y)
-    
+
     fig = plt.figure(figsize=(14, 5))
-    
+
     # Vista 3D
     ax1 = fig.add_subplot(121, projection='3d')
     ax1.plot_surface(X, Y, Z, cmap=cm.coolwarm, alpha=0.8)
@@ -278,7 +278,7 @@ def visualizar_superficie_no_convexa():
     ax1.set_ylabel('y')
     ax1.set_zlabel('f(x,y)')
     ax1.set_title('Superficie No Convexa\n(Múltiples mínimos locales)')
-    
+
     # Curvas de nivel
     ax2 = fig.add_subplot(122)
     contour = ax2.contourf(X, Y, Z, levels=30, cmap=cm.coolwarm)
@@ -287,7 +287,7 @@ def visualizar_superficie_no_convexa():
     ax2.set_ylabel('y')
     ax2.set_title('Curvas de Nivel')
     ax2.set_aspect('equal')
-    
+
     plt.tight_layout()
     plt.savefig('superficie_no_convexa.png', dpi=150)
     plt.show()
@@ -305,14 +305,14 @@ visualizar_superficie_no_convexa()
 ```python
 def visualizar_punto_silla():
     """Visualiza f(x,y) = x² - y² (saddle point en origen)."""
-    
+
     x = np.linspace(-2, 2, 100)
     y = np.linspace(-2, 2, 100)
     X, Y = np.meshgrid(x, y)
     Z = X**2 - Y**2
-    
+
     fig = plt.figure(figsize=(14, 5))
-    
+
     # Vista 3D
     ax1 = fig.add_subplot(121, projection='3d')
     ax1.plot_surface(X, Y, Z, cmap=cm.RdYlBu, alpha=0.8)
@@ -320,7 +320,7 @@ def visualizar_punto_silla():
     ax1.set_ylabel('y')
     ax1.set_zlabel('f(x,y)')
     ax1.set_title('Punto Silla: f(x,y) = x² - y²\n(Mínimo en x, máximo en y)')
-    
+
     # Curvas de nivel
     ax2 = fig.add_subplot(122)
     contour = ax2.contour(X, Y, Z, levels=20, cmap=cm.RdYlBu)
@@ -331,7 +331,7 @@ def visualizar_punto_silla():
     ax2.set_title('Curvas de Nivel\n(Hipérbolas)')
     ax2.set_aspect('equal')
     ax2.legend()
-    
+
     plt.tight_layout()
     plt.savefig('punto_silla.png', dpi=150)
     plt.show()
@@ -352,28 +352,28 @@ En un punto silla:
 ```python
 def comparar_optimizadores():
     """Compara SGD, Momentum y Adam en una superficie elongada."""
-    
+
     # Función elongada (difícil para SGD vanilla)
     def f(x, y):
         return 10*x**2 + y**2
-    
+
     def grad_f(x, y):
         return np.array([20*x, 2*y])
-    
+
     # Implementaciones
     def sgd_step(x, y, lr):
         grad = grad_f(x, y)
         return x - lr * grad[0], y - lr * grad[1]
-    
+
     def momentum_step(x, y, vx, vy, lr, beta=0.9):
         grad = grad_f(x, y)
         vx = beta * vx + (1 - beta) * grad[0]
         vy = beta * vy + (1 - beta) * grad[1]
         return x - lr * vx, y - lr * vy, vx, vy
-    
+
     # Ejecutar optimizadores
     paths = {}
-    
+
     # SGD
     x, y = 2.0, 2.0
     path = [(x, y)]
@@ -381,7 +381,7 @@ def comparar_optimizadores():
         x, y = sgd_step(x, y, 0.05)
         path.append((x, y))
     paths['SGD'] = np.array(path)
-    
+
     # Momentum
     x, y = 2.0, 2.0
     vx, vy = 0, 0
@@ -390,19 +390,19 @@ def comparar_optimizadores():
         x, y, vx, vy = momentum_step(x, y, vx, vy, 0.05)
         path.append((x, y))
     paths['Momentum'] = np.array(path)
-    
+
     # Visualizar
     x_grid = np.linspace(-3, 3, 100)
     y_grid = np.linspace(-3, 3, 100)
     X, Y = np.meshgrid(x_grid, y_grid)
     Z = f(X, Y)
-    
+
     fig, ax = plt.subplots(figsize=(10, 8))
     ax.contour(X, Y, Z, levels=30, cmap='viridis', alpha=0.5)
-    
+
     for name, path in paths.items():
         ax.plot(path[:, 0], path[:, 1], 'o-', label=name, markersize=3)
-    
+
     ax.plot(2, 2, 'g*', markersize=20, label='Inicio')
     ax.plot(0, 0, 'r*', markersize=20, label='Mínimo')
     ax.set_xlabel('x')

@@ -14,7 +14,7 @@
         /* === LAYOUT & PAGE BREAKS === */
         .page-break { page-break-after: always; }
         .no-break { page-break-inside: avoid; }
-        
+
         /* Contenedor de sección indivisible (Título + Contenido) */
         .section-container {
             page-break-inside: avoid;
@@ -46,7 +46,7 @@
             padding-bottom: 3px;
             margin-top: 1.5em;
         }
-        
+
         /* En la primera página (después de portada), el primer H1 no debe tener margen top exagerado */
         .content-wrapper > h1:first-child { margin-top: 0; }
 
@@ -74,7 +74,7 @@
             white-space: pre-wrap; /* Wrap normal para código */
             page-break-inside: avoid;
         }
-        
+
         /* ASCII ART FIX: Sin wrap, scroll hidden, fuente estricta */
         .ascii-art {
             white-space: pre !important;
@@ -101,7 +101,7 @@
             font-size: 9.5pt;
             page-break-inside: avoid;
         }
-        
+
         th {
             background-color: #1e40af;
             color: white;
@@ -109,13 +109,13 @@
             padding: 8px 12px;
             font-weight: 600;
         }
-        
+
         td {
             border: 1px solid #e5e7eb;
             padding: 8px 12px;
             vertical-align: top;
         }
-        
+
         tr:nth-child(even) { background-color: #f9fafb; }
 
         /* === CALLOUTS / BLOCKQUOTES === */
@@ -144,14 +144,14 @@
             padding: 2in;
             page-break-after: always;
         }
-        
+
         .module-cover h1 {
             font-size: 36pt;
             color: #1e3a8a;
             border: none;
             margin-bottom: 0.5em;
         }
-        
+
         .module-cover h2 {
             font-size: 20pt;
             color: #64748b;
@@ -159,13 +159,12 @@
             border: none;
             margin-top: 0;
         }
-        
+
         .module-cover .icon {
             font-size: 80pt;
             margin-bottom: 40px;
             display: block;
         }
-        
+
         /* === UTILS === */
         .hidden { display: none; }
-        

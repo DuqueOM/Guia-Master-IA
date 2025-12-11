@@ -1,6 +1,6 @@
 # GUÍA MAESTRA: MS AI PATHWAY - ML SPECIALIST (v3.3)
 
-> **De Python Básico a Candidato de Élite para el MS in AI**  
+> **De Python Básico a Candidato de Élite para el MS in AI**
 > **24 semanas | Validación Matemática Rigurosa | Código Profesional**
 
 ---
@@ -27,11 +27,10 @@ Dominio absoluto de las **3 materias de la Línea de Machine Learning** del MS i
 
 ---
 
-## 🧠 Plan Estratégico v4.0
+## 🧠 Planes Estratégicos v4.0 y v5.0
 
-Para la estrategia de ejecución diaria (protocolo "sandwich", simulacros, puente a PyTorch), consulta:
-
-- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md): estrategia de ejecución diaria, diario de errores, dry-run de backprop, puente a PyTorch.
+- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md): data rigor (Dirty Data Check), validación externa (tablero blanco) y examen de admisión simulado.
 
 ---
 

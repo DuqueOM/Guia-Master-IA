@@ -64,85 +64,85 @@ import numpy as np
 
 class NeuralNetworkNumPy:
     """Red neuronal desde cero con NumPy."""
-    
+
     def __init__(self, input_size: int, hidden_size: int, output_size: int):
         # Inicialización Xavier
         self.W1 = np.random.randn(input_size, hidden_size) * np.sqrt(2.0 / input_size)
         self.b1 = np.zeros((1, hidden_size))
         self.W2 = np.random.randn(hidden_size, output_size) * np.sqrt(2.0 / hidden_size)
         self.b2 = np.zeros((1, output_size))
-        
+
         # Cache para backward
         self.cache = {}
-        
+
     def relu(self, z: np.ndarray) -> np.ndarray:
         return np.maximum(0, z)
-    
+
     def relu_derivative(self, z: np.ndarray) -> np.ndarray:
         return (z > 0).astype(float)
-    
+
     def softmax(self, z: np.ndarray) -> np.ndarray:
         exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))  # Numerical stability
         return exp_z / np.sum(exp_z, axis=1, keepdims=True)
-    
+
     def forward(self, X: np.ndarray) -> np.ndarray:
         # Capa 1
         self.cache['X'] = X
         self.cache['Z1'] = X @ self.W1 + self.b1
         self.cache['A1'] = self.relu(self.cache['Z1'])
-        
+
         # Capa 2
         self.cache['Z2'] = self.cache['A1'] @ self.W2 + self.b2
         self.cache['A2'] = self.softmax(self.cache['Z2'])
-        
+
         return self.cache['A2']
-    
+
     def cross_entropy_loss(self, y_pred: np.ndarray, y_true: np.ndarray) -> float:
         m = y_true.shape[0]
         # Evitar log(0)
         log_probs = -np.log(y_pred[range(m), y_true.argmax(axis=1)] + 1e-8)
         return np.mean(log_probs)
-    
+
     def backward(self, y_true: np.ndarray) -> dict:
         m = y_true.shape[0]
         grads = {}
-        
+
         # Gradiente de softmax + cross-entropy (simplificado)
         dZ2 = self.cache['A2'] - y_true  # (m, output_size)
-        
+
         # Gradientes capa 2
         grads['dW2'] = (1/m) * self.cache['A1'].T @ dZ2
         grads['db2'] = (1/m) * np.sum(dZ2, axis=0, keepdims=True)
-        
+
         # Propagar hacia atrás
         dA1 = dZ2 @ self.W2.T
         dZ1 = dA1 * self.relu_derivative(self.cache['Z1'])
-        
+
         # Gradientes capa 1
         grads['dW1'] = (1/m) * self.cache['X'].T @ dZ1
         grads['db1'] = (1/m) * np.sum(dZ1, axis=0, keepdims=True)
-        
+
         return grads
-    
+
     def update_params(self, grads: dict, learning_rate: float):
         self.W1 -= learning_rate * grads['dW1']
         self.b1 -= learning_rate * grads['db1']
         self.W2 -= learning_rate * grads['dW2']
         self.b2 -= learning_rate * grads['db2']
-    
+
     def train_step(self, X: np.ndarray, y: np.ndarray, learning_rate: float) -> float:
         # Forward
         y_pred = self.forward(X)
         loss = self.cross_entropy_loss(y_pred, y)
-        
+
         # Backward
         grads = self.backward(y)
-        
+
         # Update
         self.update_params(grads, learning_rate)
-        
+
         return loss
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         probs = self.forward(X)
         return np.argmax(probs, axis=1)
@@ -159,12 +159,12 @@ import torch.nn.functional as F
 
 class NeuralNetworkPyTorch(nn.Module):
     """La misma red, pero PyTorch hace el trabajo pesado."""
-    
+
     def __init__(self, input_size: int, hidden_size: int, output_size: int):
         super().__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)  # W1, b1 incluidos
         self.fc2 = nn.Linear(hidden_size, output_size)  # W2, b2 incluidos
-        
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = F.relu(self.fc1(x))  # Capa 1 + ReLU
         x = self.fc2(x)          # Capa 2 (sin softmax, lo hace CrossEntropyLoss)
@@ -201,13 +201,13 @@ optimizer = torch.optim.SGD(model_pt.parameters(), lr=0.01)
 # Training loop
 for epoch in range(100):
     optimizer.zero_grad()           # Limpiar gradientes anteriores
-    
+
     outputs = model_pt(X_train_t)   # Forward pass
     loss = criterion(outputs, y_train_t)  # Calcular loss
-    
+
     loss.backward()                 # Backward pass (automático!)
     optimizer.step()                # Actualizar pesos
-    
+
     if epoch % 10 == 0:
         print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
 ```
@@ -238,17 +238,17 @@ import torch.nn as nn
 
 def verificar_equivalencia():
     """Verifica que ambas implementaciones dan el mismo resultado."""
-    
+
     np.random.seed(42)
     torch.manual_seed(42)
-    
+
     # Datos de prueba
     X = np.random.randn(10, 784).astype(np.float32)
     y = np.eye(10)[np.random.randint(0, 10, 10)]  # One-hot
-    
+
     # Modelo NumPy
     model_np = NeuralNetworkNumPy(784, 128, 10)
-    
+
     # Modelo PyTorch (copiar pesos del modelo NumPy)
     model_pt = NeuralNetworkPyTorch(784, 128, 10)
     with torch.no_grad():
@@ -256,15 +256,15 @@ def verificar_equivalencia():
         model_pt.fc1.bias.copy_(torch.from_numpy(model_np.b1.flatten()))
         model_pt.fc2.weight.copy_(torch.from_numpy(model_np.W2.T))
         model_pt.fc2.bias.copy_(torch.from_numpy(model_np.b2.flatten()))
-    
+
     # Forward pass NumPy
     output_np = model_np.forward(X)
-    
+
     # Forward pass PyTorch
     X_t = torch.from_numpy(X)
     with torch.no_grad():
         output_pt = torch.softmax(model_pt(X_t), dim=1).numpy()
-    
+
     # Comparar
     diff = np.abs(output_np - output_pt).max()
     print(f"Diferencia máxima en outputs: {diff:.2e}")
@@ -313,7 +313,7 @@ class MNISTNet(nn.Module):
         self.fc1 = nn.Linear(784, 128)
         self.fc2 = nn.Linear(128, 64)
         self.fc3 = nn.Linear(64, 10)
-        
+
     def forward(self, x):
         x = x.view(-1, 784)  # Flatten
         x = F.relu(self.fc1(x))
@@ -334,7 +334,7 @@ for epoch in range(5):
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-    
+
     print(f"Epoch {epoch+1}, Avg Loss: {total_loss/len(train_loader):.4f}")
 
 # 4. Evaluar

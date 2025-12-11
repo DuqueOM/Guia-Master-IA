@@ -34,6 +34,7 @@ ORDERED_FILES = [
     "08_PROYECTO_MNIST.md",
     "CHECKLIST.md",
     "PLAN_V4_ESTRATEGICO.md",
+    "PLAN_V5_ESTRATEGICO.md",
     "RECURSOS.md",
     "GLOSARIO.md",
 ]
@@ -136,6 +137,7 @@ FILE_TITLES = {
     "08_PROYECTO_MNIST.md": "MÓDULO 08 - PROYECTO MNIST ANALYST",
     "CHECKLIST.md": "CHECKLIST FINAL",
     "PLAN_V4_ESTRATEGICO.md": "PLAN DE ACCIÓN MEJORADO v4.0",
+    "PLAN_V5_ESTRATEGICO.md": "PLAN DE ACCIÓN PERFECCIONADO v5.0",
     "RECURSOS.md": "RECURSOS DE APRENDIZAJE",
     "GLOSARIO.md": "GLOSARIO TÉCNICO",
 }
@@ -192,9 +194,9 @@ body {
 }
 
 /* Headers */
-h1, h2, h3, h4 { 
-    font-family: 'Inter', sans-serif; 
-    line-height: 1.2; 
+h1, h2, h3, h4 {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.2;
     max-width: 100%;
     word-wrap: break-word;
     page-break-after: avoid;
@@ -286,11 +288,11 @@ pre {
     color: #f1f5f9;
     border-radius: 4px;
     padding: 8px;
-    
+
     /* FIX ANCHO */
     width: auto;
     margin: 8px 10px 8px 0;
-    
+
     font-family: 'JetBrains Mono', monospace;
     font-size: 7.5pt;
     line-height: 1.3;

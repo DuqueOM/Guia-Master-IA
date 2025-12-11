@@ -1,7 +1,7 @@
 # Módulo 05 - Supervised Learning
 
-> **🎯 Objetivo:** Dominar regresión lineal, logística y métricas de evaluación  
-> **Fase:** 2 - Núcleo de ML | **Semanas 9-12**  
+> **🎯 Objetivo:** Dominar regresión lineal, logística y métricas de evaluación
+> **Fase:** 2 - Núcleo de ML | **Semanas 9-12**
 > **Curso del Pathway:** Introduction to Machine Learning: Supervised Learning
 
 ---
@@ -81,10 +81,10 @@ import numpy as np
 def mse_cost(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> float:
     """
     Mean Squared Error Cost Function.
-    
+
     J(θ) = (1/2m) Σᵢ (h(xᵢ) - yᵢ)²
          = (1/2m) ||Xθ - y||²
-    
+
     El factor 1/2 es por conveniencia (cancela con la derivada).
     """
     m = len(y)
@@ -95,7 +95,7 @@ def mse_cost(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> float:
 def mse_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
     """
     Gradiente del MSE respecto a θ.
-    
+
     ∂J/∂θ = (1/m) Xᵀ(Xθ - y)
     """
     m = len(y)
@@ -112,13 +112,13 @@ import numpy as np
 def normal_equation(X: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
     Solución cerrada para regresión lineal.
-    
+
     θ = (XᵀX)⁻¹ Xᵀy
-    
+
     Ventajas:
     - No requiere iteraciones
     - No hay hiperparámetros (learning rate)
-    
+
     Desventajas:
     - O(n³) por la inversión de matriz
     - No funciona si XᵀX es singular
@@ -126,7 +126,7 @@ def normal_equation(X: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
     XtX = X.T @ X
     Xty = X.T @ y
-    
+
     # Usar solve en lugar de inv para estabilidad numérica
     theta = np.linalg.solve(XtX, Xty)
     return theta
@@ -140,11 +140,11 @@ from typing import List, Tuple
 
 class LinearRegression:
     """Regresión Lineal implementada desde cero."""
-    
+
     def __init__(self):
         self.theta = None
         self.cost_history = []
-    
+
     def fit(
         self,
         X: np.ndarray,
@@ -155,7 +155,7 @@ class LinearRegression:
     ) -> 'LinearRegression':
         """
         Entrena el modelo.
-        
+
         Args:
             X: features (m, n)
             y: targets (m,)
@@ -166,31 +166,31 @@ class LinearRegression:
         # Añadir bias
         X_b = add_bias_term(X)
         m, n = X_b.shape
-        
+
         if method == 'normal_equation':
             self.theta = normal_equation(X_b, y)
         else:
             # Inicializar theta con ceros o valores pequeños
             self.theta = np.zeros(n)
-            
+
             for i in range(n_iterations):
                 # Calcular gradiente
                 gradient = mse_gradient(X_b, y, self.theta)
-                
+
                 # Actualizar theta
                 self.theta = self.theta - learning_rate * gradient
-                
+
                 # Guardar costo para monitoreo
                 cost = mse_cost(X_b, y, self.theta)
                 self.cost_history.append(cost)
-        
+
         return self
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predice valores."""
         X_b = add_bias_term(X)
         return X_b @ self.theta
-    
+
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         """R² score."""
         y_pred = self.predict(X)
@@ -224,9 +224,9 @@ import numpy as np
 def sigmoid(z: np.ndarray) -> np.ndarray:
     """
     Función sigmoid/logística.
-    
+
     σ(z) = 1 / (1 + e^(-z))
-    
+
     Propiedades:
     - Rango: (0, 1) - perfecto para probabilidades
     - σ(0) = 0.5
@@ -294,11 +294,11 @@ def binary_cross_entropy(
 ) -> float:
     """
     Binary Cross-Entropy (Log Loss).
-    
+
     J(θ) = -(1/m) Σᵢ [yᵢ log(hᵢ) + (1-yᵢ) log(1-hᵢ)]
-    
+
     Donde hᵢ = σ(θᵀxᵢ)
-    
+
     Por qué esta función de costo:
     - Es convexa (tiene un único mínimo global)
     - Penaliza mucho las predicciones muy incorrectas
@@ -306,19 +306,19 @@ def binary_cross_entropy(
     """
     m = len(y)
     h = sigmoid(X @ theta)
-    
+
     # Clip para evitar log(0)
     h = np.clip(h, eps, 1 - eps)
-    
+
     cost = -(1/m) * np.sum(y * np.log(h) + (1 - y) * np.log(1 - h))
     return cost
 
 def bce_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
     """
     Gradiente de Binary Cross-Entropy.
-    
+
     ∂J/∂θ = (1/m) Xᵀ(h - y)
-    
+
     ¡Tiene la misma forma que el gradiente del MSE!
     Esto es porque derivamos σ(z) y la derivada σ'(z) = σ(z)(1-σ(z))
     cancela parte de la expresión.
@@ -336,11 +336,11 @@ from typing import List
 
 class LogisticRegression:
     """Regresión Logística implementada desde cero."""
-    
+
     def __init__(self):
         self.theta = None
         self.cost_history = []
-    
+
     def fit(
         self,
         X: np.ndarray,
@@ -352,32 +352,32 @@ class LogisticRegression:
         # Añadir bias
         X_b = np.column_stack([np.ones(len(X)), X])
         m, n = X_b.shape
-        
+
         # Inicializar
         self.theta = np.zeros(n)
-        
+
         for i in range(n_iterations):
             # Gradiente
             gradient = bce_gradient(X_b, y, self.theta)
-            
+
             # Actualizar
             self.theta = self.theta - learning_rate * gradient
-            
+
             # Guardar costo
             cost = binary_cross_entropy(X_b, y, self.theta)
             self.cost_history.append(cost)
-        
+
         return self
-    
+
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         """Predice probabilidades."""
         X_b = np.column_stack([np.ones(len(X)), X])
         return sigmoid(X_b @ self.theta)
-    
+
     def predict(self, X: np.ndarray, threshold: float = 0.5) -> np.ndarray:
         """Predice clases."""
         return (self.predict_proba(X) >= threshold).astype(int)
-    
+
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         """Accuracy."""
         return np.mean(self.predict(X) == y)
@@ -413,14 +413,14 @@ import numpy as np
 def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
     """
     Calcula la matriz de confusión.
-    
+
     Para clasificación binaria:
-    
+
                     Predicho
                     0       1
     Real    0      TN      FP
             1      FN      TP
-    
+
     - TP (True Positive): Predijo 1, era 1
     - TN (True Negative): Predijo 0, era 0
     - FP (False Positive): Predijo 1, era 0 (Error Tipo I)
@@ -429,11 +429,11 @@ def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
     classes = np.unique(np.concatenate([y_true, y_pred]))
     n_classes = len(classes)
     cm = np.zeros((n_classes, n_classes), dtype=int)
-    
+
     for i, true_class in enumerate(classes):
         for j, pred_class in enumerate(classes):
             cm[i, j] = np.sum((y_true == true_class) & (y_pred == pred_class))
-    
+
     return cm
 
 def extract_tp_tn_fp_fn(y_true: np.ndarray, y_pred: np.ndarray):
@@ -453,9 +453,9 @@ import numpy as np
 def accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Accuracy = (TP + TN) / (TP + TN + FP + FN)
-    
+
     Proporción de predicciones correctas.
-    
+
     Problema: Puede ser engañoso con clases desbalanceadas.
     Si 99% son clase 0, predecir siempre 0 da 99% accuracy.
     """
@@ -464,9 +464,9 @@ def accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 def precision(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Precision = TP / (TP + FP)
-    
+
     De todos los que predije como positivos, ¿cuántos realmente lo son?
-    
+
     Alta precisión = pocos falsos positivos.
     Importante cuando el costo de FP es alto (ej: spam → inbox).
     """
@@ -478,9 +478,9 @@ def precision(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 def recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Recall (Sensitivity, True Positive Rate) = TP / (TP + FN)
-    
+
     De todos los positivos reales, ¿cuántos capturé?
-    
+
     Alto recall = pocos falsos negativos.
     Importante cuando el costo de FN es alto (ej: detección de cáncer).
     """
@@ -492,9 +492,9 @@ def recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 def f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     F1 = 2 * (precision * recall) / (precision + recall)
-    
+
     Media armónica de precision y recall.
-    
+
     Útil cuando quieres un balance entre ambas métricas.
     F1 alto solo si AMBAS precision y recall son altas.
     """
@@ -507,7 +507,7 @@ def f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 def specificity(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Specificity (True Negative Rate) = TN / (TN + FP)
-    
+
     De todos los negativos reales, ¿cuántos identifiqué?
     """
     tp, tn, fp, fn = extract_tp_tn_fp_fn(y_true, y_pred)
@@ -531,7 +531,7 @@ class ClassificationReport:
     f1: float
     specificity: float
     confusion_matrix: np.ndarray
-    
+
     def __str__(self) -> str:
         cm = self.confusion_matrix
         return f"""
@@ -585,7 +585,7 @@ def train_test_split(
 ) -> tuple:
     """
     Divide datos en conjuntos de entrenamiento y prueba.
-    
+
     Args:
         X: features
         y: targets
@@ -594,14 +594,14 @@ def train_test_split(
     """
     if random_state is not None:
         np.random.seed(random_state)
-    
+
     n = len(y)
     indices = np.random.permutation(n)
-    
+
     test_size_n = int(n * test_size)
     test_indices = indices[:test_size_n]
     train_indices = indices[test_size_n:]
-    
+
     return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
 ```
 
@@ -614,25 +614,25 @@ from typing import List, Tuple
 def k_fold_split(n: int, k: int) -> List[Tuple[np.ndarray, np.ndarray]]:
     """
     Genera índices para K-Fold Cross Validation.
-    
+
     Returns:
         Lista de (train_indices, val_indices) para cada fold
     """
     indices = np.arange(n)
     np.random.shuffle(indices)
-    
+
     fold_size = n // k
     folds = []
-    
+
     for i in range(k):
         start = i * fold_size
         end = start + fold_size if i < k - 1 else n
-        
+
         val_indices = indices[start:end]
         train_indices = np.concatenate([indices[:start], indices[end:]])
-        
+
         folds.append((train_indices, val_indices))
-    
+
     return folds
 
 def cross_validate(
@@ -644,26 +644,26 @@ def cross_validate(
 ) -> dict:
     """
     Realiza K-Fold Cross Validation.
-    
+
     Returns:
         Dict con scores de cada fold y promedio
     """
     folds = k_fold_split(len(y), k)
     scores = []
-    
+
     for i, (train_idx, val_idx) in enumerate(folds):
         # Split
         X_train, X_val = X[train_idx], X[val_idx]
         y_train, y_val = y[train_idx], y[val_idx]
-        
+
         # Train
         model = model_class()
         model.fit(X_train, y_train, **model_params)
-        
+
         # Evaluate
         score = model.score(X_val, y_val)
         scores.append(score)
-    
+
     return {
         'scores': scores,
         'mean': np.mean(scores),
@@ -682,7 +682,7 @@ import numpy as np
 
 class LogisticRegressionRegularized:
     """Logistic Regression con regularización L1/L2."""
-    
+
     def __init__(self, regularization: str = 'l2', lambda_: float = 0.01):
         """
         Args:
@@ -693,16 +693,16 @@ class LogisticRegressionRegularized:
         self.lambda_ = lambda_
         self.theta = None
         self.cost_history = []
-    
+
     def _cost(self, X: np.ndarray, y: np.ndarray) -> float:
         """Costo con regularización."""
         m = len(y)
         h = sigmoid(X @ self.theta)
         h = np.clip(h, 1e-15, 1 - 1e-15)
-        
+
         # Cross-entropy base
         bce = -(1/m) * np.sum(y * np.log(h) + (1 - y) * np.log(1 - h))
-        
+
         # Regularización (excluir bias theta[0])
         if self.regularization == 'l2':
             # Ridge: λ/2m * Σθⱼ²
@@ -712,17 +712,17 @@ class LogisticRegressionRegularized:
             reg = (self.lambda_ / m) * np.sum(np.abs(self.theta[1:]))
         else:
             reg = 0
-        
+
         return bce + reg
-    
+
     def _gradient(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Gradiente con regularización."""
         m = len(y)
         h = sigmoid(X @ self.theta)
-        
+
         # Gradiente base
         grad = (1/m) * X.T @ (h - y)
-        
+
         # Regularización (excluir bias)
         if self.regularization == 'l2':
             reg_grad = np.concatenate([[0], (self.lambda_ / m) * self.theta[1:]])
@@ -730,25 +730,25 @@ class LogisticRegressionRegularized:
             reg_grad = np.concatenate([[0], (self.lambda_ / m) * np.sign(self.theta[1:])])
         else:
             reg_grad = 0
-        
+
         return grad + reg_grad
-    
-    def fit(self, X: np.ndarray, y: np.ndarray, 
+
+    def fit(self, X: np.ndarray, y: np.ndarray,
             learning_rate: float = 0.1, n_iterations: int = 1000):
         X_b = np.column_stack([np.ones(len(X)), X])
         self.theta = np.zeros(X_b.shape[1])
-        
+
         for _ in range(n_iterations):
             gradient = self._gradient(X_b, y)
             self.theta -= learning_rate * gradient
             self.cost_history.append(self._cost(X_b, y))
-        
+
         return self
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         X_b = np.column_stack([np.ones(len(X)), X])
         return (sigmoid(X_b @ self.theta) >= 0.5).astype(int)
-    
+
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         return np.mean(self.predict(X) == y)
 ```
@@ -798,11 +798,11 @@ class LinearRegression:
     def __init__(self):
         self.theta = None
         self.cost_history = []
-    
+
     def fit(self, X: np.ndarray, y: np.ndarray,
             method: str = 'normal', lr: float = 0.01, n_iter: int = 1000):
         X_b = add_bias(X)
-        
+
         if method == 'normal':
             self.theta = np.linalg.solve(X_b.T @ X_b, X_b.T @ y)
         else:
@@ -813,10 +813,10 @@ class LinearRegression:
                 self.theta -= lr * grad
                 self.cost_history.append(np.mean((X_b @ self.theta - y)**2))
         return self
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         return add_bias(X) @ self.theta
-    
+
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         y_pred = self.predict(X)
         ss_res = np.sum((y - y_pred)**2)
@@ -834,31 +834,31 @@ class LogisticRegression:
         self.lambda_ = lambda_
         self.theta = None
         self.cost_history = []
-    
+
     def fit(self, X: np.ndarray, y: np.ndarray,
             lr: float = 0.1, n_iter: int = 1000):
         X_b = add_bias(X)
         m, n = X_b.shape
         self.theta = np.zeros(n)
-        
+
         for _ in range(n_iter):
             h = sigmoid(X_b @ self.theta)
             grad = (1/m) * X_b.T @ (h - y)
-            
+
             if self.reg == 'l2':
                 grad[1:] += (self.lambda_/m) * self.theta[1:]
             elif self.reg == 'l1':
                 grad[1:] += (self.lambda_/m) * np.sign(self.theta[1:])
-            
+
             self.theta -= lr * grad
         return self
-    
+
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         return sigmoid(add_bias(X) @ self.theta)
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         return (self.predict_proba(X) >= 0.5).astype(int)
-    
+
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         return np.mean(self.predict(X) == y)
 
@@ -867,7 +867,7 @@ class LogisticRegression:
 # MÉTRICAS
 # ============================================================
 
-def accuracy(y_true, y_pred): 
+def accuracy(y_true, y_pred):
     return np.mean(y_true == y_pred)
 
 def precision(y_true, y_pred):
@@ -909,15 +909,15 @@ def cross_validate(model_class, X, y, k=5, **params):
     idx = np.random.permutation(n)
     fold_size = n // k
     scores = []
-    
+
     for i in range(k):
         val_idx = idx[i*fold_size:(i+1)*fold_size]
         train_idx = np.concatenate([idx[:i*fold_size], idx[(i+1)*fold_size:]])
-        
+
         model = model_class()
         model.fit(X[train_idx], y[train_idx], **params)
         scores.append(model.score(X[val_idx], y[val_idx]))
-    
+
     return {'scores': scores, 'mean': np.mean(scores), 'std': np.std(scores)}
 
 
@@ -927,36 +927,36 @@ def cross_validate(model_class, X, y, k=5, **params):
 
 if __name__ == "__main__":
     np.random.seed(42)
-    
+
     # Test Linear Regression
     X = 2 * np.random.rand(100, 1)
     y = 4 + 3 * X.flatten() + np.random.randn(100) * 0.5
-    
+
     lr = LinearRegression()
     lr.fit(X, y)
     print(f"Linear Regression R²: {lr.score(X, y):.4f}")
-    
+
     # Test Logistic Regression
     X_c0 = np.random.randn(50, 2) + [-2, -2]
     X_c1 = np.random.randn(50, 2) + [2, 2]
     X_clf = np.vstack([X_c0, X_c1])
     y_clf = np.array([0]*50 + [1]*50)
-    
+
     log_reg = LogisticRegression()
     log_reg.fit(X_clf, y_clf)
     print(f"Logistic Regression Accuracy: {log_reg.score(X_clf, y_clf):.4f}")
-    
+
     # Test metrics
     y_true = np.array([0,0,0,1,1,1,1,1])
     y_pred = np.array([0,0,1,1,1,0,1,1])
     print(f"Precision: {precision(y_true, y_pred):.4f}")
     print(f"Recall: {recall(y_true, y_pred):.4f}")
     print(f"F1: {f1_score(y_true, y_pred):.4f}")
-    
+
     # Test CV
     cv = cross_validate(LogisticRegression, X_clf, y_clf, k=5, lr=0.1, n_iter=500)
     print(f"CV Score: {cv['mean']:.4f} ± {cv['std']:.4f}")
-    
+
     print("\n✓ Todos los tests pasaron!")
 ```
 
@@ -1070,43 +1070,43 @@ from sklearn.metrics import accuracy_score, mean_squared_error
 def shadow_mode_logistic_regression(X_train, y_train, X_test, y_test):
     """
     Compara tu Logistic Regression vs sklearn.
-    
+
     Los coeficientes y accuracy deben ser casi idénticos.
     """
     print("=" * 60)
     print("SHADOW MODE: Logistic Regression")
     print("=" * 60)
-    
+
     # ========== TU IMPLEMENTACIÓN ==========
     # my_model = MyLR()
     # my_model.fit(X_train, y_train, lr=0.1, n_iter=1000)
     # my_pred = my_model.predict(X_test)
     # my_acc = accuracy_score(y_test, my_pred)
     # my_weights = my_model.weights
-    
+
     # Placeholder (reemplazar con tu código)
     my_acc = 0.85
     my_weights = np.zeros(X_train.shape[1])
-    
+
     # ========== SKLEARN (GROUND TRUTH) ==========
     sklearn_model = SklearnLR(max_iter=1000, solver='lbfgs')
     sklearn_model.fit(X_train, y_train)
     sklearn_pred = sklearn_model.predict(X_test)
     sklearn_acc = accuracy_score(y_test, sklearn_pred)
     sklearn_weights = sklearn_model.coef_.flatten()
-    
+
     # ========== COMPARACIÓN ==========
     acc_diff = abs(my_acc - sklearn_acc)
     weight_diff = np.linalg.norm(my_weights - sklearn_weights[:len(my_weights)])
-    
+
     print(f"\n📊 RESULTADOS:")
     print(f"  Tu Accuracy:     {my_acc:.4f}")
     print(f"  sklearn Accuracy: {sklearn_acc:.4f}")
     print(f"  Diferencia:       {acc_diff:.4f}")
-    
+
     print(f"\n📐 PESOS:")
     print(f"  Diferencia L2 de pesos: {weight_diff:.4f}")
-    
+
     # Veredicto
     print("\n" + "-" * 60)
     if acc_diff < 0.05:
@@ -1128,30 +1128,30 @@ def shadow_mode_linear_regression(X_train, y_train, X_test, y_test):
     print("=" * 60)
     print("SHADOW MODE: Linear Regression")
     print("=" * 60)
-    
+
     # ========== TU IMPLEMENTACIÓN ==========
     # my_model = MyLinReg()
     # my_model.fit(X_train, y_train)
     # my_pred = my_model.predict(X_test)
     # my_mse = mean_squared_error(y_test, my_pred)
-    
+
     # Placeholder
     my_mse = 0.5
-    
+
     # ========== SKLEARN ==========
     sklearn_model = SklearnLinReg()
     sklearn_model.fit(X_train, y_train)
     sklearn_pred = sklearn_model.predict(X_test)
     sklearn_mse = mean_squared_error(y_test, sklearn_pred)
-    
+
     # ========== COMPARACIÓN ==========
     mse_ratio = my_mse / sklearn_mse if sklearn_mse > 0 else float('inf')
-    
+
     print(f"\n📊 RESULTADOS:")
     print(f"  Tu MSE:     {my_mse:.4f}")
     print(f"  sklearn MSE: {sklearn_mse:.4f}")
     print(f"  Ratio:       {mse_ratio:.2f}x")
-    
+
     print("\n" + "-" * 60)
     if mse_ratio < 1.1:  # Dentro del 10%
         print("✓ PASSED: Tu implementación es correcta")
@@ -1168,7 +1168,7 @@ def shadow_mode_linear_regression(X_train, y_train, X_test, y_test):
 if __name__ == "__main__":
     from sklearn.datasets import make_classification, make_regression
     from sklearn.model_selection import train_test_split
-    
+
     # Dataset de clasificación
     X_clf, y_clf = make_classification(
         n_samples=1000, n_features=10, n_classes=2, random_state=42
@@ -1176,7 +1176,7 @@ if __name__ == "__main__":
     X_train_c, X_test_c, y_train_c, y_test_c = train_test_split(
         X_clf, y_clf, test_size=0.2, random_state=42
     )
-    
+
     # Dataset de regresión
     X_reg, y_reg = make_regression(
         n_samples=1000, n_features=10, noise=10, random_state=42
@@ -1184,7 +1184,7 @@ if __name__ == "__main__":
     X_train_r, X_test_r, y_train_r, y_test_r = train_test_split(
         X_reg, y_reg, test_size=0.2, random_state=42
     )
-    
+
     # Ejecutar Shadow Mode
     shadow_mode_logistic_regression(X_train_c, y_train_c, X_test_c, y_test_c)
     print("\n")

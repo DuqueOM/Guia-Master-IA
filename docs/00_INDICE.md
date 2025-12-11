@@ -1,7 +1,7 @@
 # 📚 GUÍA MAESTRA: MS AI PATHWAY - ML SPECIALIST (v3.1)
 
-> **De Python Básico a Candidato del MS in AI de CU Boulder**  
-> **24 Semanas (6 Meses Exactos) | Enfoque: Línea 1 - Machine Learning**  
+> **De Python Básico a Candidato del MS in AI de CU Boulder**
+> **24 Semanas (6 Meses Exactos) | Enfoque: Línea 1 - Machine Learning**
 > **Filosofía: "Matemáticas Aplicadas a Código"**
 
 ---
@@ -233,6 +233,7 @@ Para que esto quepa en 6 meses y sea efectivo para la **Línea 1 de ML**:
 | [CHECKLIST.md](CHECKLIST.md) | Verificación de entregables | Seguimiento |
 
 | [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md) | Plan de Acción Mejorado v4.0 (estrategia de ejecución y estudio diario) | Implementación del plan |
+| [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md) | Plan de Acción Perfeccionado v5.0 (data rigor, validación externa y examen simulado) | Validación y certificación |
 
 ---
 

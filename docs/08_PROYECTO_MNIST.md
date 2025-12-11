@@ -1,7 +1,7 @@
 # Módulo 08 - Proyecto Final: MNIST Analyst
 
-> **🎯 Objetivo:** Pipeline end-to-end que demuestra competencia en las 3 áreas del Pathway  
-> **Fase:** 3 - Proyecto Integrador | **Semanas 21-24** (4 semanas)  
+> **🎯 Objetivo:** Pipeline end-to-end que demuestra competencia en las 3 áreas del Pathway
+> **Fase:** 3 - Proyecto Integrador | **Semanas 21-24** (4 semanas)
 > **Dataset:** MNIST (dígitos escritos a mano, 28×28 píxeles)
 
 ---
@@ -103,7 +103,7 @@ from typing import Tuple
 def load_mnist_images(filepath: str) -> np.ndarray:
     """
     Carga imágenes MNIST desde archivo IDX.
-    
+
     Formato IDX:
     - 4 bytes: magic number
     - 4 bytes: número de imágenes
@@ -129,7 +129,7 @@ def load_mnist_labels(filepath: str) -> np.ndarray:
 def load_mnist(data_dir: str = 'data/mnist') -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Carga dataset MNIST completo.
-    
+
     Returns:
         X_train: (60000, 784)
         y_train: (60000,)
@@ -137,12 +137,12 @@ def load_mnist(data_dir: str = 'data/mnist') -> Tuple[np.ndarray, np.ndarray, np
         y_test: (10000,)
     """
     data_dir = Path(data_dir)
-    
+
     X_train = load_mnist_images(data_dir / 'train-images-idx3-ubyte.gz')
     y_train = load_mnist_labels(data_dir / 'train-labels-idx1-ubyte.gz')
     X_test = load_mnist_images(data_dir / 't10k-images-idx3-ubyte.gz')
     y_test = load_mnist_labels(data_dir / 't10k-labels-idx1-ubyte.gz')
-    
+
     return X_train, y_train, X_test, y_test
 
 
@@ -164,10 +164,10 @@ def generate_synthetic_mnist(n_samples: int = 1000, seed: int = 42) -> Tuple:
     Genera datos sintéticos similares a MNIST para pruebas.
     """
     np.random.seed(seed)
-    
+
     X = np.random.rand(n_samples, 784)  # Imágenes aleatorias
     y = np.random.randint(0, 10, n_samples)  # Etiquetas aleatorias
-    
+
     # Split 80/20
     split = int(0.8 * n_samples)
     return X[:split], y[:split], X[split:], y[split:]
@@ -183,17 +183,17 @@ def visualize_digits(X: np.ndarray, y: np.ndarray, n_samples: int = 25):
     """Visualiza una cuadrícula de dígitos."""
     n_cols = 5
     n_rows = (n_samples + n_cols - 1) // n_cols
-    
+
     fig, axes = plt.subplots(n_rows, n_cols, figsize=(10, 2*n_rows))
     axes = axes.flatten()
-    
+
     for i, ax in enumerate(axes):
         if i < n_samples:
             img = X[i].reshape(28, 28)
             ax.imshow(img, cmap='gray')
             ax.set_title(f'Label: {y[i]}')
         ax.axis('off')
-    
+
     plt.tight_layout()
     plt.show()
 
@@ -230,73 +230,73 @@ from typing import Tuple
 
 class PCA:
     """PCA implementado desde cero (del Módulo 05)."""
-    
+
     def __init__(self, n_components: int):
         self.n_components = n_components
         self.components_ = None
         self.mean_ = None
         self.explained_variance_ratio_ = None
-    
+
     def fit(self, X: np.ndarray) -> 'PCA':
         self.mean_ = np.mean(X, axis=0)
         X_centered = X - self.mean_
-        
+
         # SVD (más estable que eigendecomposition)
         U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)
-        
+
         self.components_ = Vt[:self.n_components].T
         variance = (S ** 2) / (len(X) - 1)
         self.explained_variance_ratio_ = variance[:self.n_components] / np.sum(variance)
-        
+
         return self
-    
+
     def transform(self, X: np.ndarray) -> np.ndarray:
         return (X - self.mean_) @ self.components_
-    
+
     def fit_transform(self, X: np.ndarray) -> np.ndarray:
         self.fit(X)
         return self.transform(X)
-    
+
     def inverse_transform(self, X_pca: np.ndarray) -> np.ndarray:
         return X_pca @ self.components_.T + self.mean_
 
 
 def analyze_pca_mnist(X: np.ndarray, y: np.ndarray):
     """Análisis PCA completo de MNIST."""
-    
+
     # 1. PCA con diferentes números de componentes
     print("=== Análisis de Varianza Explicada ===")
     pca_full = PCA(n_components=min(50, X.shape[1]))
     pca_full.fit(X)
-    
+
     cumulative_var = np.cumsum(pca_full.explained_variance_ratio_)
-    
+
     for n in [2, 10, 50]:
         if n <= len(cumulative_var):
             print(f"  {n} componentes: {cumulative_var[n-1]:.2%} varianza")
-    
+
     # 2. Visualización 2D
     print("\n=== Proyección 2D ===")
     pca_2d = PCA(n_components=2)
     X_2d = pca_2d.fit_transform(X)
-    
+
     plt.figure(figsize=(10, 8))
     for digit in range(10):
         mask = y == digit
-        plt.scatter(X_2d[mask, 0], X_2d[mask, 1], 
+        plt.scatter(X_2d[mask, 0], X_2d[mask, 1],
                    alpha=0.5, label=str(digit), s=10)
     plt.legend()
     plt.xlabel(f'PC1 ({pca_2d.explained_variance_ratio_[0]:.1%})')
     plt.ylabel(f'PC2 ({pca_2d.explained_variance_ratio_[1]:.1%})')
     plt.title('MNIST en 2D (PCA)')
     plt.show()
-    
+
     # 3. Visualizar componentes principales
     print("\n=== Componentes Principales como Imágenes ===")
     fig, axes = plt.subplots(2, 5, figsize=(12, 5))
     pca_10 = PCA(n_components=10)
     pca_10.fit(X)
-    
+
     for i, ax in enumerate(axes.flatten()):
         component = pca_10.components_[:, i].reshape(28, 28)
         ax.imshow(component, cmap='RdBu')
@@ -305,7 +305,7 @@ def analyze_pca_mnist(X: np.ndarray, y: np.ndarray):
     plt.suptitle('Top 10 Componentes Principales')
     plt.tight_layout()
     plt.show()
-    
+
     return pca_2d, X_2d
 ```
 
@@ -327,7 +327,7 @@ import numpy as np
 
 class KMeans:
     """K-Means implementado desde cero (del Módulo 05)."""
-    
+
     def __init__(self, n_clusters: int = 10, max_iter: int = 100, seed: int = None):
         self.n_clusters = n_clusters
         self.max_iter = max_iter
@@ -335,44 +335,44 @@ class KMeans:
         self.centroids = None
         self.labels_ = None
         self.inertia_ = None
-    
+
     def _init_centroids_plusplus(self, X: np.ndarray) -> np.ndarray:
         """K-Means++ initialization."""
         if self.seed:
             np.random.seed(self.seed)
-        
+
         n_samples = len(X)
         centroids = [X[np.random.randint(n_samples)]]
-        
+
         for _ in range(1, self.n_clusters):
             distances = np.array([min(np.sum((x - c)**2) for c in centroids) for x in X])
             probs = distances / distances.sum()
             centroids.append(X[np.random.choice(n_samples, p=probs)])
-        
+
         return np.array(centroids)
-    
+
     def fit(self, X: np.ndarray) -> 'KMeans':
         self.centroids = self._init_centroids_plusplus(X)
-        
+
         for _ in range(self.max_iter):
             # Asignar
             distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])
             self.labels_ = np.argmin(distances, axis=1)
-            
+
             # Actualizar
-            new_centroids = np.array([X[self.labels_ == k].mean(axis=0) 
-                                      if np.sum(self.labels_ == k) > 0 
+            new_centroids = np.array([X[self.labels_ == k].mean(axis=0)
+                                      if np.sum(self.labels_ == k) > 0
                                       else self.centroids[k]
                                       for k in range(self.n_clusters)])
-            
+
             if np.allclose(self.centroids, new_centroids):
                 break
             self.centroids = new_centroids
-        
-        self.inertia_ = sum(np.sum((X[self.labels_ == k] - self.centroids[k])**2) 
+
+        self.inertia_ = sum(np.sum((X[self.labels_ == k] - self.centroids[k])**2)
                            for k in range(self.n_clusters))
         return self
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])
         return np.argmin(distances, axis=1)
@@ -380,11 +380,11 @@ class KMeans:
 
 def analyze_kmeans_mnist(X: np.ndarray, y: np.ndarray):
     """Análisis K-Means de MNIST."""
-    
+
     print("=== K-Means Clustering ===")
     kmeans = KMeans(n_clusters=10, seed=42)
     kmeans.fit(X)
-    
+
     # 1. Visualizar centroides
     print("\n=== Centroides (promedio de cada cluster) ===")
     fig, axes = plt.subplots(2, 5, figsize=(12, 5))
@@ -396,26 +396,26 @@ def analyze_kmeans_mnist(X: np.ndarray, y: np.ndarray):
     plt.suptitle('Centroides K-Means')
     plt.tight_layout()
     plt.show()
-    
+
     # 2. Analizar pureza de clusters
     print("\n=== Pureza de Clusters ===")
     print("Cluster | Dígito Dominante | Pureza")
     print("-" * 40)
-    
+
     total_correct = 0
     for cluster in range(10):
         cluster_mask = kmeans.labels_ == cluster
         cluster_labels = y[cluster_mask]
-        
+
         if len(cluster_labels) > 0:
             dominant_digit = np.bincount(cluster_labels).argmax()
             purity = np.sum(cluster_labels == dominant_digit) / len(cluster_labels)
             total_correct += np.sum(cluster_labels == dominant_digit)
             print(f"   {cluster}    |        {dominant_digit}         | {purity:.2%}")
-    
+
     overall_purity = total_correct / len(y)
     print(f"\nPureza Global: {overall_purity:.2%}")
-    
+
     return kmeans
 ```
 
@@ -444,42 +444,42 @@ def sigmoid(z):
 
 class LogisticRegressionBinary:
     """Logistic Regression binario."""
-    
+
     def __init__(self, lr: float = 0.1, n_iter: int = 100, reg: float = 0.01):
         self.lr = lr
         self.n_iter = n_iter
         self.reg = reg  # L2 regularization
         self.theta = None
-    
+
     def fit(self, X: np.ndarray, y: np.ndarray) -> 'LogisticRegressionBinary':
         n_samples, n_features = X.shape
         self.theta = np.zeros(n_features)
-        
+
         for _ in range(self.n_iter):
             h = sigmoid(X @ self.theta)
             grad = (1/n_samples) * X.T @ (h - y) + (self.reg/n_samples) * self.theta
             self.theta -= self.lr * grad
-        
+
         return self
-    
+
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         return sigmoid(X @ self.theta)
 
 
 class LogisticRegressionOvA:
     """Logistic Regression One-vs-All para clasificación multiclase."""
-    
+
     def __init__(self, n_classes: int = 10, lr: float = 0.1, n_iter: int = 100):
         self.n_classes = n_classes
         self.lr = lr
         self.n_iter = n_iter
         self.classifiers: List[LogisticRegressionBinary] = []
-    
+
     def fit(self, X: np.ndarray, y: np.ndarray) -> 'LogisticRegressionOvA':
         """Entrena un clasificador por clase."""
         # Añadir bias
         X_b = np.column_stack([np.ones(len(X)), X])
-        
+
         self.classifiers = []
         for c in range(self.n_classes):
             print(f"  Entrenando clasificador para clase {c}...", end='\r')
@@ -487,21 +487,21 @@ class LogisticRegressionOvA:
             clf = LogisticRegressionBinary(self.lr, self.n_iter)
             clf.fit(X_b, y_binary)
             self.classifiers.append(clf)
-        
+
         print("  Entrenamiento completado.                ")
         return self
-    
+
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         """Retorna probabilidades para cada clase."""
         X_b = np.column_stack([np.ones(len(X)), X])
         probs = np.column_stack([clf.predict_proba(X_b) for clf in self.classifiers])
         return probs
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predice la clase con mayor probabilidad."""
         probs = self.predict_proba(X)
         return np.argmax(probs, axis=1)
-    
+
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         """Accuracy."""
         return np.mean(self.predict(X) == y)
@@ -509,48 +509,48 @@ class LogisticRegressionOvA:
 
 def train_logistic_mnist(X_train, y_train, X_test, y_test):
     """Entrena y evalúa Logistic Regression en MNIST."""
-    
+
     print("=== Logistic Regression One-vs-All ===")
-    
+
     # Entrenar
     lr_model = LogisticRegressionOvA(n_classes=10, lr=0.1, n_iter=200)
     lr_model.fit(X_train, y_train)
-    
+
     # Evaluar
     train_acc = lr_model.score(X_train, y_train)
     test_acc = lr_model.score(X_test, y_test)
-    
+
     print(f"\nTrain Accuracy: {train_acc:.2%}")
     print(f"Test Accuracy:  {test_acc:.2%}")
-    
+
     # Métricas detalladas
     y_pred = lr_model.predict(X_test)
-    
+
     print("\n=== Métricas por Clase ===")
     print("Dígito | Precision | Recall | F1-Score")
     print("-" * 45)
-    
+
     for digit in range(10):
         tp = np.sum((y_test == digit) & (y_pred == digit))
         fp = np.sum((y_test != digit) & (y_pred == digit))
         fn = np.sum((y_test == digit) & (y_pred != digit))
-        
+
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0
         f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
-        
+
         print(f"   {digit}   |   {precision:.3f}   |  {recall:.3f}  |   {f1:.3f}")
-    
+
     # Matriz de confusión
     print("\n=== Matriz de Confusión ===")
     cm = np.zeros((10, 10), dtype=int)
     for true, pred in zip(y_test, y_pred):
         cm[true, pred] += 1
-    
+
     print("    " + "  ".join(str(i) for i in range(10)))
     for i in range(10):
         print(f"{i}: " + " ".join(f"{cm[i,j]:3d}" for j in range(10)))
-    
+
     return lr_model
 ```
 
@@ -577,10 +577,10 @@ import numpy as np
 from typing import List, Tuple
 
 # Funciones de activación
-def relu(z): 
+def relu(z):
     return np.maximum(0, z)
 
-def relu_deriv(z): 
+def relu_deriv(z):
     return (z > 0).astype(float)
 
 def softmax(z):
@@ -590,75 +590,75 @@ def softmax(z):
 
 class NeuralNetworkMNIST:
     """Red Neuronal optimizada para MNIST."""
-    
+
     def __init__(self, layer_sizes: List[int] = [784, 128, 64, 10], seed: int = 42):
         """
         Args:
             layer_sizes: [input, hidden1, hidden2, ..., output]
         """
         np.random.seed(seed)
-        
+
         self.layer_sizes = layer_sizes
         self.n_layers = len(layer_sizes)
-        
+
         # Inicializar pesos (He initialization para ReLU)
         self.weights = []
         self.biases = []
-        
+
         for i in range(self.n_layers - 1):
             w = np.random.randn(layer_sizes[i+1], layer_sizes[i]) * np.sqrt(2.0 / layer_sizes[i])
             b = np.zeros(layer_sizes[i+1])
             self.weights.append(w)
             self.biases.append(b)
-        
+
         self.cache = {}
         self.loss_history = []
-    
+
     def forward(self, x: np.ndarray) -> np.ndarray:
         """Forward pass."""
         self.cache['a0'] = x
         a = x
-        
+
         for i in range(self.n_layers - 2):
             z = self.weights[i] @ a + self.biases[i]
             a = relu(z)
             self.cache[f'z{i+1}'] = z
             self.cache[f'a{i+1}'] = a
-        
+
         # Última capa: softmax
         z = self.weights[-1] @ a + self.biases[-1]
         a = softmax(z)
         self.cache[f'z{self.n_layers-1}'] = z
         self.cache[f'a{self.n_layers-1}'] = a
-        
+
         return a
-    
+
     def backward(self, y_true: np.ndarray) -> Tuple[List, List]:
         """Backward pass."""
         y_pred = self.cache[f'a{self.n_layers-1}']
-        
+
         # Gradiente de softmax + cross-entropy
         dz = y_pred - y_true
-        
+
         dW_list = []
         db_list = []
-        
+
         for i in range(self.n_layers - 2, -1, -1):
             a_prev = self.cache[f'a{i}']
-            
+
             dW = np.outer(dz, a_prev)
             db = dz
-            
+
             dW_list.insert(0, dW)
             db_list.insert(0, db)
-            
+
             if i > 0:
                 da_prev = self.weights[i].T @ dz
                 z_prev = self.cache[f'z{i}']
                 dz = da_prev * relu_deriv(z_prev)
-        
+
         return dW_list, db_list
-    
+
     def fit(
         self,
         X: np.ndarray,
@@ -670,59 +670,59 @@ class NeuralNetworkMNIST:
     ):
         """Entrena la red con mini-batch SGD."""
         n_samples = len(X)
-        
+
         for epoch in range(epochs):
             # Shuffle
             indices = np.random.permutation(n_samples)
             X_shuffled = X[indices]
             y_shuffled = y[indices]
-            
+
             total_loss = 0
-            
+
             for i in range(0, n_samples, batch_size):
                 X_batch = X_shuffled[i:i+batch_size]
                 y_batch = y_shuffled[i:i+batch_size]
-                
+
                 # Acumular gradientes del batch
                 dW_accum = [np.zeros_like(w) for w in self.weights]
                 db_accum = [np.zeros_like(b) for b in self.biases]
-                
+
                 for x, y_true_label in zip(X_batch, y_batch):
                     # One-hot encode
                     y_one_hot = np.zeros(10)
                     y_one_hot[y_true_label] = 1
-                    
+
                     # Forward
                     y_pred = self.forward(x)
-                    
+
                     # Loss
                     loss = -np.sum(y_one_hot * np.log(np.clip(y_pred, 1e-15, 1)))
                     total_loss += loss
-                    
+
                     # Backward
                     dW_list, db_list = self.backward(y_one_hot)
-                    
+
                     for j in range(len(self.weights)):
                         dW_accum[j] += dW_list[j]
                         db_accum[j] += db_list[j]
-                
+
                 # Update
                 batch_len = len(X_batch)
                 for j in range(len(self.weights)):
                     self.weights[j] -= learning_rate * dW_accum[j] / batch_len
                     self.biases[j] -= learning_rate * db_accum[j] / batch_len
-            
+
             avg_loss = total_loss / n_samples
             self.loss_history.append(avg_loss)
-            
+
             if verbose:
                 train_acc = self.score(X[:1000], y[:1000])
                 print(f"Epoch {epoch+1}/{epochs} - Loss: {avg_loss:.4f} - Acc: {train_acc:.2%}")
-    
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predice clases."""
         return np.array([np.argmax(self.forward(x)) for x in X])
-    
+
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         """Accuracy."""
         return np.mean(self.predict(X) == y)
@@ -730,19 +730,19 @@ class NeuralNetworkMNIST:
 
 def train_neural_network_mnist(X_train, y_train, X_test, y_test):
     """Entrena y evalúa Neural Network en MNIST."""
-    
+
     print("=== Neural Network (MLP) ===")
     print("Arquitectura: 784 → 128 → 64 → 10")
-    
+
     nn = NeuralNetworkMNIST([784, 128, 64, 10])
     nn.fit(X_train, y_train, epochs=10, batch_size=32, learning_rate=0.01)
-    
+
     train_acc = nn.score(X_train, y_train)
     test_acc = nn.score(X_test, y_test)
-    
+
     print(f"\nTrain Accuracy: {train_acc:.2%}")
     print(f"Test Accuracy:  {test_acc:.2%}")
-    
+
     return nn
 ```
 
@@ -764,7 +764,7 @@ import time
 def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True):
     """
     Ejecuta el pipeline completo de MNIST.
-    
+
     Args:
         use_subset: Si True, usa solo 10k samples para rapidez
     """
@@ -773,11 +773,11 @@ def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True
         y_train = y_train[:10000]
         X_test = X_test[:2000]
         y_test = y_test[:2000]
-    
+
     # Normalizar
     X_train = X_train / 255.0
     X_test = X_test / 255.0
-    
+
     print("=" * 60)
     print("MNIST ANALYST PIPELINE")
     print("=" * 60)
@@ -785,20 +785,20 @@ def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True
     print(f"Test samples: {len(X_test)}")
     print(f"Features: {X_train.shape[1]}")
     print("=" * 60)
-    
+
     results = {}
-    
+
     # === FASE 1: Unsupervised ===
     print("\n" + "=" * 60)
     print("FASE 1: EXPLORACIÓN NO SUPERVISADA")
     print("=" * 60)
-    
+
     # PCA
     print("\n[PCA]")
     pca = PCA(n_components=50)
     pca.fit(X_train)
     print(f"Varianza explicada (50 PCs): {sum(pca.explained_variance_ratio_):.2%}")
-    
+
     # K-Means
     print("\n[K-Means]")
     start = time.time()
@@ -807,12 +807,12 @@ def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True
     kmeans_time = time.time() - start
     print(f"Inercia: {kmeans.inertia_:.2f}")
     print(f"Tiempo: {kmeans_time:.2f}s")
-    
+
     # === FASE 2: Supervised ===
     print("\n" + "=" * 60)
     print("FASE 2: CLASIFICACIÓN SUPERVISADA")
     print("=" * 60)
-    
+
     # Logistic Regression
     print("\n[Logistic Regression One-vs-All]")
     start = time.time()
@@ -823,12 +823,12 @@ def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True
     print(f"Test Accuracy: {lr_acc:.2%}")
     print(f"Tiempo: {lr_time:.2f}s")
     results['Logistic Regression'] = lr_acc
-    
+
     # === FASE 3: Deep Learning ===
     print("\n" + "=" * 60)
     print("FASE 3: DEEP LEARNING")
     print("=" * 60)
-    
+
     # Neural Network
     print("\n[Neural Network MLP]")
     start = time.time()
@@ -839,19 +839,19 @@ def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True
     print(f"Test Accuracy: {nn_acc:.2%}")
     print(f"Tiempo: {nn_time:.2f}s")
     results['Neural Network'] = nn_acc
-    
+
     # === COMPARACIÓN ===
     print("\n" + "=" * 60)
     print("COMPARACIÓN DE MODELOS")
     print("=" * 60)
-    
+
     print("\nModelo               | Accuracy | Mejora vs LR")
     print("-" * 50)
     baseline = results['Logistic Regression']
     for name, acc in results.items():
         improvement = ((acc - baseline) / baseline) * 100 if name != 'Logistic Regression' else 0
         print(f"{name:<20} | {acc:.2%}    | {improvement:+.1f}%")
-    
+
     # === ANÁLISIS ===
     print("\n" + "=" * 60)
     print("ANÁLISIS: ¿Por qué NN es mejor?")
@@ -869,7 +869,7 @@ def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True
 4. COMPOSICIÓN: La red compone funciones simples (lineales + activaciones)
    para aproximar funciones complejas.
 """)
-    
+
     return results
 ```
 
@@ -991,22 +991,22 @@ Añade una sección que responda:
 def train_and_evaluate(hidden_sizes: list, X_train, y_train, X_test, y_test):
     """Entrenar modelos de diferentes tamaños y comparar."""
     results = []
-    
+
     for sizes in hidden_sizes:
         model = NeuralNetwork(layers=[784] + list(sizes) + [10])
         model.fit(X_train, y_train, epochs=100)
-        
+
         train_acc = model.score(X_train, y_train)
         test_acc = model.score(X_test, y_test)
         gap = train_acc - test_acc  # Gap grande = overfitting
-        
+
         results.append({
             'hidden_sizes': sizes,
             'train_acc': train_acc,
             'test_acc': test_acc,
             'gap': gap
         })
-    
+
     return results
 
 # Experimento
@@ -1119,61 +1119,61 @@ def analyze_errors(
 ) -> dict:
     """
     Analiza y visualiza los errores del modelo.
-    
+
     Args:
         model: Modelo entrenado (con .predict())
         X_test: Datos de test
         y_test: Labels de test
         n_errors: Número de errores a visualizar
-    
+
     Returns:
         Diccionario con análisis completo
     """
     # Predicciones
     y_pred = model.predict(X_test)
-    
+
     # Identificar errores
     errors_mask = y_pred != y_test
     error_indices = np.where(errors_mask)[0]
-    
+
     print("=" * 60)
     print("ANÁLISIS DE ERRORES")
     print("=" * 60)
     print(f"Total errores: {len(error_indices)} / {len(y_test)}")
     print(f"Error rate: {100 * len(error_indices) / len(y_test):.2f}%")
-    
+
     # Matriz de confusión de errores
     confusion_pairs = {}
     for idx in error_indices:
         pair = (y_test[idx], y_pred[idx])
         confusion_pairs[pair] = confusion_pairs.get(pair, 0) + 1
-    
+
     # Top confusiones
     sorted_pairs = sorted(confusion_pairs.items(), key=lambda x: -x[1])
-    
+
     print("\n📊 TOP CONFUSIONES:")
     for (true, pred), count in sorted_pairs[:10]:
         print(f"  {true} → {pred}: {count} errores")
-    
+
     # Visualizar errores
     fig, axes = plt.subplots(4, 5, figsize=(12, 10))
     fig.suptitle("Ejemplos de Errores del Modelo", fontsize=14)
-    
+
     for i, ax in enumerate(axes.flat):
         if i < min(n_errors, len(error_indices)):
             idx = error_indices[i]
             img = X_test[idx].reshape(28, 28)
             ax.imshow(img, cmap='gray')
-            ax.set_title(f"True: {y_test[idx]}, Pred: {y_pred[idx]}", 
+            ax.set_title(f"True: {y_test[idx]}, Pred: {y_pred[idx]}",
                         color='red', fontsize=10)
             ax.axis('off')
         else:
             ax.axis('off')
-    
+
     plt.tight_layout()
     plt.savefig('error_analysis.png', dpi=150)
     plt.show()
-    
+
     return {
         'n_errors': len(error_indices),
         'error_rate': len(error_indices) / len(y_test),
@@ -1190,15 +1190,15 @@ def plot_learning_curves(
 ) -> None:
     """
     Visualiza curvas de aprendizaje para diagnóstico Bias-Variance.
-    
+
     - Train alto, Val alto → Underfitting (High Bias)
     - Train bajo, Val alto → Overfitting (High Variance)
     - Train bajo, Val bajo → Buen modelo
     """
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-    
+
     epochs = range(1, len(train_losses) + 1)
-    
+
     # Loss curves
     ax1.plot(epochs, train_losses, 'b-', label='Train Loss')
     ax1.plot(epochs, val_losses, 'r-', label='Validation Loss')
@@ -1207,7 +1207,7 @@ def plot_learning_curves(
     ax1.set_title('Learning Curves: Loss')
     ax1.legend()
     ax1.grid(True, alpha=0.3)
-    
+
     # Accuracy curves
     ax2.plot(epochs, train_accs, 'b-', label='Train Accuracy')
     ax2.plot(epochs, val_accs, 'r-', label='Validation Accuracy')
@@ -1216,23 +1216,23 @@ def plot_learning_curves(
     ax2.set_title('Learning Curves: Accuracy')
     ax2.legend()
     ax2.grid(True, alpha=0.3)
-    
+
     # Diagnóstico
     final_gap = train_accs[-1] - val_accs[-1]
-    
+
     if val_accs[-1] < 0.7:
         diagnosis = "⚠️ UNDERFITTING: Modelo muy simple o poco entrenamiento"
     elif final_gap > 0.1:
         diagnosis = "⚠️ OVERFITTING: Gap train-val > 10%"
     else:
         diagnosis = "✓ BUEN AJUSTE: Modelo generaliza bien"
-    
+
     fig.suptitle(f"Diagnóstico: {diagnosis}", fontsize=12, y=1.02)
-    
+
     plt.tight_layout()
     plt.savefig('learning_curves.png', dpi=150)
     plt.show()
-    
+
     print("\n📈 DIAGNÓSTICO BIAS-VARIANCE:")
     print(f"  Train Accuracy Final: {train_accs[-1]:.4f}")
     print(f"  Val Accuracy Final:   {val_accs[-1]:.4f}")

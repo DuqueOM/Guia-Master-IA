@@ -1,6 +1,6 @@
 # 📅 Plan de Estudios - ML SPECIALIST v3.1
 
-> **24 Semanas | 6 horas/día | Lunes a Sábado**  
+> **24 Semanas | 6 horas/día | Lunes a Sábado**
 > **Preparación para MS in AI Pathway - Línea 1: Machine Learning**
 
 ---
@@ -62,7 +62,7 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 
 ## 🗓️ SEMANA 1-2: Python + Pandas + NumPy (Módulo 01)
 
-**Objetivo:** Dominar Pandas para datos reales + NumPy para matemáticas  
+**Objetivo:** Dominar Pandas para datos reales + NumPy para matemáticas
 **Por qué:** En el mundo real, los datos vienen en CSVs sucios. Pandas es esencial para cargar y limpiar datos antes de aplicar ML.
 
 ### Semana 1: Pandas + NumPy Básico
@@ -89,6 +89,10 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 
 **Entregable:** Script que carga CSV con Pandas, limpia datos, y convierte a NumPy para análisis.
 
+**Extensión v5.0 – Dirty Data Check (Módulo 01):**
+Además del script, documenta al menos **5 problemas reales** del CSV (nulos, outliers, tipos incorrectos, codificación rara, duplicados) y tus decisiones de limpieza en:
+`study_tools/DIRTY_DATA_CHECK.md` (Caso 1).
+
 **Recursos:**
 - [Pandas Getting Started](https://pandas.pydata.org/docs/getting_started/)
 - [NumPy Quickstart](https://numpy.org/doc/stable/user/quickstart.html)
@@ -97,7 +101,7 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 
 ## 🗓️ SEMANA 3-5: Álgebra Lineal para ML (Módulo 02)
 
-**Objetivo:** Vectores, matrices, normas, autovectores  
+**Objetivo:** Vectores, matrices, normas, autovectores
 **Conexión con Pathway:** Vital para Unsupervised Learning (PCA requiere Eigenvalues) y Deep Learning (multiplicaciones de matrices)
 
 ### Semana 3: Vectores y Operaciones Básicas
@@ -143,7 +147,7 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 
 ## 🗓️ SEMANA 6-7: Cálculo Multivariante (Módulo 03) [CRÍTICO]
 
-**Objetivo:** Derivadas, gradiente, Chain Rule  
+**Objetivo:** Derivadas, gradiente, Chain Rule
 **Conexión con Pathway:** Es el lenguaje del Deep Learning. Sin la Regla de la Cadena, no entenderás Backpropagation.
 
 ### Semana 6: Derivadas, Gradiente y GD
@@ -177,7 +181,7 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 
 ## 🗓️ SEMANA 8: Probabilidad para ML (Módulo 04)
 
-**Objetivo:** Bayes, Gaussiana, MLE - lo mínimo para entender loss functions  
+**Objetivo:** Bayes, Gaussiana, MLE - lo mínimo para entender loss functions
 **Conexión con Pathway:** Cross-Entropy viene de MLE. GMM usa Gaussianas.
 
 ### Semana 8: Probabilidad Esencial
@@ -255,6 +259,12 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 
 **Entregable:** `logistic_regression.py` desde cero usando NumPy para clasificar datos simples, con métricas y cross-validation.
 
+**Extensión v5.0 – Dirty Data Check (Módulo 05):**
+Para el dataset supervisado usado en regresión logística:
+- Incluir variables categóricas (One-Hot Encoding manual).
+- Incluir variables numéricas que requieran escalado (MinMax/Standard manual).
+- Documentar al menos **5 decisiones clave** de limpieza y preprocesamiento en `study_tools/DIRTY_DATA_CHECK.md` (Caso 2).
+
 ---
 
 ## 🗓️ SEMANA 13-16: Unsupervised Learning (Módulo 06)
@@ -306,6 +316,9 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 | S | **Checkpoint** | No supervisado completo | Entregable |
 
 **Entregable:** `kmeans.py` y `pca.py`. Usar PCA para comprimir una imagen y visualizar cuánta varianza se pierde con diferentes números de componentes.
+
+**Extensión v5.0 – Desafío del Tablero Blanco:**
+En las semanas 4, 8, 12 y 16, realiza el "Desafío del Tablero Blanco" descrito en `study_tools/DESAFIO_TABLERO_BLANCO.md`, explicando en 5–7 minutos un concepto clave (Regla de la Cadena, Gradient Descent, K-Means, PCA, Regresión Logística, etc.) y registrando feedback externo.
 
 ---
 
@@ -420,6 +433,9 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 
 **Entregable:** `neural_network_mnist.py` con backprop manual.
 
+**Extensión v5.0 – Examen de Admisión Simulado:**
+En las semanas 22 y 23, realizar los simulacros definidos en `study_tools/EXAMEN_ADMISION_SIMULADO.md` (2 horas, sin IDE ni internet, 40% pseudocódigo, 60% teoría). El simulacro de la semana 23 debe alcanzar ≥ 80/100 como métrica de "listo para admisión".
+
 ---
 
 ## 🗓️ SEMANA 24: Benchmark + Informe Final
@@ -435,7 +451,7 @@ Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por s
 | V | Demo final: Jupyter notebook completo |
 | S | **Entrega final + Autoevaluación** |
 
-**Entregable Final:** 
+**Entregable Final:**
 
 ```
 mnist-analyst/

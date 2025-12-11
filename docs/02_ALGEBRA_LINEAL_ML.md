@@ -1,7 +1,7 @@
 # Módulo 02 - Álgebra Lineal para Machine Learning
 
-> **🎯 Objetivo:** Dominar vectores, matrices, normas y eigenvalues para ML  
-> **Fase:** 1 - Fundamentos Matemáticos | **Semanas 3-5**  
+> **🎯 Objetivo:** Dominar vectores, matrices, normas y eigenvalues para ML
+> **Fase:** 1 - Fundamentos Matemáticos | **Semanas 3-5**
 > **Prerrequisitos:** Módulo 01 (Python Científico con NumPy)
 
 ---
@@ -62,7 +62,7 @@ image_vector = np.random.randn(784)
 def plot_vector(v, origin=[0, 0], color='blue', label=None):
     """Dibuja un vector desde el origen."""
     plt.quiver(*origin, *v, angles='xy', scale_units='xy', scale=1, color=color, label=label)
-    
+
 plt.figure(figsize=(8, 8))
 plot_vector(np.array([3, 4]), color='blue', label='v = [3, 4]')
 plot_vector(np.array([2, 1]), color='red', label='w = [2, 1]')
@@ -119,7 +119,7 @@ import numpy as np
 def angle_between_vectors(a: np.ndarray, b: np.ndarray) -> float:
     """
     Calcula el ángulo entre dos vectores.
-    
+
     cos(θ) = (a·b) / (||a|| ||b||)
     """
     cos_theta = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
@@ -153,9 +153,9 @@ import numpy as np
 def project(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     Proyecta el vector a sobre el vector b.
-    
+
     proj_b(a) = (a·b / b·b) · b
-    
+
     Útil para: PCA, regresión, descomposición de señales
     """
     scalar = np.dot(a, b) / np.dot(b, b)
@@ -183,10 +183,10 @@ import numpy as np
 def l2_norm(x: np.ndarray) -> float:
     """
     Norma L2 (Euclidiana): longitud del vector.
-    
+
     ||x||₂ = √(Σᵢ xᵢ²)
-    
-    Uso en ML: 
+
+    Uso en ML:
     - Regularización Ridge
     - Normalización de vectores
     - Distancia euclidiana
@@ -217,9 +217,9 @@ import numpy as np
 def l1_norm(x: np.ndarray) -> float:
     """
     Norma L1 (Manhattan): suma de valores absolutos.
-    
+
     ||x||₁ = Σᵢ |xᵢ|
-    
+
     Uso en ML:
     - Regularización Lasso (promueve sparsity)
     - Robustez a outliers
@@ -243,7 +243,7 @@ import numpy as np
 def linf_norm(x: np.ndarray) -> float:
     """
     Norma L∞: máximo valor absoluto.
-    
+
     ||x||∞ = max(|xᵢ|)
     """
     return np.max(np.abs(x))
@@ -261,9 +261,9 @@ import numpy as np
 def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
     """
     Distancia Euclidiana entre dos puntos.
-    
+
     d(a, b) = ||a - b||₂ = √(Σᵢ (aᵢ - bᵢ)²)
-    
+
     Uso en ML:
     - KNN (k-nearest neighbors)
     - K-Means (asignación a clusters)
@@ -305,14 +305,14 @@ import numpy as np
 def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
     """
     Similitud coseno: mide el ángulo entre vectores.
-    
+
     sim(a, b) = (a·b) / (||a|| ||b||)
-    
+
     Rango: [-1, 1]
     - 1: vectores idénticos (misma dirección)
     - 0: vectores ortogonales
     - -1: vectores opuestos
-    
+
     Uso en ML:
     - NLP (similitud de documentos)
     - Sistemas de recomendación
@@ -321,10 +321,10 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
     dot_product = np.dot(a, b)
     norm_a = np.linalg.norm(a)
     norm_b = np.linalg.norm(b)
-    
+
     if norm_a == 0 or norm_b == 0:
         return 0.0
-    
+
     return dot_product / (norm_a * norm_b)
 
 def cosine_distance(a: np.ndarray, b: np.ndarray) -> float:
@@ -426,7 +426,7 @@ def safe_inverse(A: np.ndarray) -> np.ndarray:
     """
     Calcula la inversa de A si existe.
     A @ A⁻¹ = A⁻¹ @ A = I
-    
+
     Uso en ML:
     - Solución cerrada de regresión lineal: θ = (X^T X)⁻¹ X^T y
     - Whitening en PCA
@@ -496,7 +496,7 @@ Definición: Av = λv
 - v: eigenvector (vector que solo se escala, no cambia dirección)
 - λ: eigenvalue (factor de escala)
 
-Interpretación: 
+Interpretación:
 - Los eigenvectors son las "direcciones principales" de una transformación
 - Los eigenvalues indican cuánto se estira/comprime en cada dirección
 
@@ -539,11 +539,11 @@ import numpy as np
 def pca_via_eigen(X: np.ndarray, n_components: int) -> tuple:
     """
     PCA usando eigendecomposition de la matriz de covarianza.
-    
+
     Args:
         X: datos (n_samples, n_features)
         n_components: número de componentes a retener
-    
+
     Returns:
         X_transformed: datos proyectados
         components: eigenvectors (componentes principales)
@@ -551,30 +551,30 @@ def pca_via_eigen(X: np.ndarray, n_components: int) -> tuple:
     """
     # 1. Centrar datos (restar media)
     X_centered = X - np.mean(X, axis=0)
-    
+
     # 2. Calcular matriz de covarianza
     # Cov = (1/n) X^T X
     n_samples = X.shape[0]
     cov_matrix = (X_centered.T @ X_centered) / (n_samples - 1)
-    
+
     # 3. Calcular eigenvalues y eigenvectors
     eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
-    
+
     # 4. Ordenar por eigenvalue (mayor a menor)
     idx = np.argsort(eigenvalues)[::-1]
     eigenvalues = eigenvalues[idx]
     eigenvectors = eigenvectors[:, idx]
-    
+
     # 5. Seleccionar top n_components
     components = eigenvectors[:, :n_components].real
-    
+
     # 6. Proyectar datos
     X_transformed = X_centered @ components
-    
+
     # 7. Calcular varianza explicada
     total_variance = np.sum(eigenvalues)
     explained_variance = eigenvalues[:n_components].real / total_variance
-    
+
     return X_transformed, components, explained_variance
 
 # Demo
@@ -645,27 +645,27 @@ import numpy as np
 def pca_via_svd(X: np.ndarray, n_components: int) -> tuple:
     """
     PCA usando SVD (más estable que eigendecomposition).
-    
+
     La relación: si X = UΣV^T, entonces:
     - V contiene las componentes principales
     - Σ²/(n-1) son las varianzas (eigenvalues de X^TX)
     """
     # 1. Centrar datos
     X_centered = X - np.mean(X, axis=0)
-    
+
     # 2. SVD
     U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)
-    
+
     # 3. Componentes principales (filas de Vt)
     components = Vt[:n_components]
-    
+
     # 4. Proyectar datos
     X_transformed = X_centered @ components.T
-    
+
     # 5. Varianza explicada
     variance = (S ** 2) / (X.shape[0] - 1)
     explained_variance_ratio = variance[:n_components] / np.sum(variance)
-    
+
     return X_transformed, components, explained_variance_ratio
 
 # Demo
@@ -686,11 +686,11 @@ import numpy as np
 def compress_image_svd(image: np.ndarray, k: int) -> np.ndarray:
     """
     Comprime una imagen usando truncated SVD.
-    
+
     Args:
         image: matriz 2D (grayscale) o 3D (RGB)
         k: número de valores singulares a retener
-    
+
     Returns:
         imagen comprimida
     """
@@ -751,7 +751,7 @@ from typing import Tuple, Optional
 def dot_product(a: np.ndarray, b: np.ndarray) -> float:
     """
     Producto punto de dos vectores.
-    
+
     a·b = Σᵢ aᵢ·bᵢ
     """
     assert a.shape == b.shape, "Vectores deben tener mismo shape"
@@ -761,7 +761,7 @@ def dot_product(a: np.ndarray, b: np.ndarray) -> float:
 def vector_angle(a: np.ndarray, b: np.ndarray) -> float:
     """
     Ángulo entre dos vectores en grados.
-    
+
     cos(θ) = (a·b) / (||a|| ||b||)
     """
     cos_theta = dot_product(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
@@ -772,7 +772,7 @@ def vector_angle(a: np.ndarray, b: np.ndarray) -> float:
 def project_vector(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     """
     Proyección del vector a sobre el vector b.
-    
+
     proj_b(a) = (a·b / b·b) · b
     """
     scalar = dot_product(a, b) / dot_product(b, b)
@@ -840,7 +840,7 @@ def cosine_distance(a: np.ndarray, b: np.ndarray) -> float:
 def pairwise_euclidean(X: np.ndarray) -> np.ndarray:
     """
     Matriz de distancias euclidianas entre todos los pares.
-    
+
     Args:
         X: matriz (n_samples, n_features)
     Returns:
@@ -859,29 +859,29 @@ def pairwise_euclidean(X: np.ndarray) -> np.ndarray:
 def eigendecomposition(A: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
     Calcula eigenvalues y eigenvectors, ordenados por eigenvalue descendente.
-    
+
     Returns:
         eigenvalues: array de eigenvalues (ordenados)
         eigenvectors: matriz donde columna i es el eigenvector i
     """
     eigenvalues, eigenvectors = np.linalg.eig(A)
-    
+
     # Ordenar por eigenvalue descendente
     idx = np.argsort(eigenvalues)[::-1]
     eigenvalues = eigenvalues[idx].real
     eigenvectors = eigenvectors[:, idx].real
-    
+
     return eigenvalues, eigenvectors
 
 
 def pca(X: np.ndarray, n_components: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Principal Component Analysis via SVD.
-    
+
     Args:
         X: datos (n_samples, n_features)
         n_components: número de componentes
-    
+
     Returns:
         X_transformed: datos proyectados (n_samples, n_components)
         components: componentes principales (n_components, n_features)
@@ -889,20 +889,20 @@ def pca(X: np.ndarray, n_components: int) -> Tuple[np.ndarray, np.ndarray, np.nd
     """
     # Centrar datos
     X_centered = X - np.mean(X, axis=0)
-    
+
     # SVD
     U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)
-    
+
     # Componentes principales
     components = Vt[:n_components]
-    
+
     # Proyectar
     X_transformed = X_centered @ components.T
-    
+
     # Varianza explicada
     variance = (S ** 2) / (X.shape[0] - 1)
     explained_variance_ratio = variance[:n_components] / np.sum(variance)
-    
+
     return X_transformed, components, explained_variance_ratio
 
 
@@ -913,25 +913,25 @@ def pca(X: np.ndarray, n_components: int) -> Tuple[np.ndarray, np.ndarray, np.nd
 def run_tests():
     """Ejecuta tests básicos."""
     print("Ejecutando tests...")
-    
+
     # Test producto punto
     a = np.array([1, 2, 3])
     b = np.array([4, 5, 6])
     assert abs(dot_product(a, b) - 32) < 1e-10
     print("✓ dot_product")
-    
+
     # Test normas
     x = np.array([3, 4])
     assert abs(l2_norm(x) - 5) < 1e-10
     assert abs(l1_norm(x) - 7) < 1e-10
     print("✓ normas")
-    
+
     # Test distancias
     p1 = np.array([0, 0])
     p2 = np.array([3, 4])
     assert abs(euclidean_distance(p1, p2) - 5) < 1e-10
     print("✓ distancias")
-    
+
     # Test similitud coseno
     v1 = np.array([1, 0])
     v2 = np.array([1, 0])
@@ -939,7 +939,7 @@ def run_tests():
     assert abs(cosine_similarity(v1, v2) - 1) < 1e-10
     assert abs(cosine_similarity(v1, v3)) < 1e-10
     print("✓ cosine_similarity")
-    
+
     # Test PCA
     np.random.seed(42)
     X = np.random.randn(50, 10)
@@ -947,7 +947,7 @@ def run_tests():
     assert X_pca.shape == (50, 3)
     assert np.sum(var_ratio) <= 1.0
     print("✓ PCA")
-    
+
     print("\n¡Todos los tests pasaron!")
 
 

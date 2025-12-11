@@ -33,6 +33,7 @@ ORDERED_FILES = [
     "07_DEEP_LEARNING.md",
     "08_PROYECTO_MNIST.md",
     "CHECKLIST.md",
+    "PLAN_V4_ESTRATEGICO.md",
     "RECURSOS.md",
     "GLOSARIO.md",
 ]
@@ -134,6 +135,7 @@ FILE_TITLES = {
     "07_DEEP_LEARNING.md": "MÓDULO 07 - DEEP LEARNING + CNNs",
     "08_PROYECTO_MNIST.md": "MÓDULO 08 - PROYECTO MNIST ANALYST",
     "CHECKLIST.md": "CHECKLIST FINAL",
+    "PLAN_V4_ESTRATEGICO.md": "PLAN DE ACCIÓN MEJORADO v4.0",
     "RECURSOS.md": "RECURSOS DE APRENDIZAJE",
     "GLOSARIO.md": "GLOSARIO TÉCNICO",
 }
@@ -724,7 +726,7 @@ def main():
 
     # Generar PDF único
     print("\n[4] Generando PDF final...")
-    final_path = OUTPUT_DIR / "GUIA_MS_AI_ML_SPECIALIST_v3.pdf"
+    final_path = OUTPUT_DIR / "GUIA_MS_AI_ML_SPECIALIST_v4.pdf"
 
     HTML(string=full_html, base_url=str(DOCS_DIR)).write_pdf(
         target=final_path, stylesheets=[gen.css]

@@ -48,6 +48,10 @@
 | 🌇 Mediodía | 11:00 - 13:30 | Implementación en NumPy | 2.5 h |
 | 🌙 Tarde | 15:00 - 16:00 | Ejercicios + visualización | 1 h |
 
+Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por semana (versión estratégica v4.0), consulta también:
+
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+
 ---
 
 # 🔷 FASE 1: FUNDAMENTOS MATEMÁTICOS (Semanas 1-8)

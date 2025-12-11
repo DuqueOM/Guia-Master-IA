@@ -27,6 +27,14 @@ Dominio absoluto de las **3 materias de la Línea de Machine Learning** del MS i
 
 ---
 
+## 🧠 Plan Estratégico v4.0
+
+Para la estrategia de ejecución diaria (protocolo "sandwich", simulacros, puente a PyTorch), consulta:
+
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+
+---
+
 ## 📋 Los 8 Módulos (24 Semanas)
 
 ### Fase 1: Fundamentos (Semanas 1-8)

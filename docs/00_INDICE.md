@@ -232,6 +232,8 @@ Para que esto quepa en 6 meses y sea efectivo para la **Línea 1 de ML**:
 | [RECURSOS.md](RECURSOS.md) | Cursos y libros externos | Profundizar |
 | [CHECKLIST.md](CHECKLIST.md) | Verificación de entregables | Seguimiento |
 
+| [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md) | Plan de Acción Mejorado v4.0 (estrategia de ejecución y estudio diario) | Implementación del plan |
+
 ---
 
 ## 🚀 Comenzar

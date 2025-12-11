@@ -423,6 +423,7 @@
 </tr>
 </tbody>
 </table>
+<p>| <a href="#mod_PLAN_V4_ESTRATEGICO">PLAN_V4_ESTRATEGICO.md</a> | Plan de Acción Mejorado v4.0 (estrategia de ejecución y estudio diario) | Implementación del plan |</p>
 <h2>🚀 Comenzar</h2>
 <p><strong><a href="#mod_01_PYTHON_CIENTIFICO">→ Módulo 01: Python + Pandas + NumPy</a></strong></p>
 <h2>📌 Restricciones del Proyecto</h2>
@@ -721,6 +722,10 @@
 </tr>
 </tbody>
 </table>
+<p>Para ver el <strong>protocolo diario detallado</strong>, simulacros de examen y ajustes por semana (versión estratégica v4.0), consulta también:</p>
+<ul>
+<li><a href="#mod_PLAN_V4_ESTRATEGICO">PLAN_V4_ESTRATEGICO.md</a></li>
+</ul>
 <h1>🔷 FASE 1: FUNDAMENTOS MATEMÁTICOS (Semanas 1-8)</h1>
 <p><em>Objetivo: Leer notación matemática y traducirla a Python/NumPy</em></p>
 <h2>🗓️ SEMANA 1-2: Python + Pandas + NumPy (Módulo 01)</h2>
@@ -11055,6 +11060,313 @@ from src.pipeline import run_mnist_pipeline
 </table>
 <p><strong>Fecha de completitud:</strong> <strong><em>_</em></strong><strong><em>_</em></strong>_</p>
 <p><strong>Listo para el MS in AI Pathway - Línea 1:</strong> ☐ Sí ☐ No</p>
+            </div>
+        
+            <!-- MÓDULO: PLAN_V4_ESTRATEGICO.md -->
+            <div class="cover-page">
+                <div class="cover-content">
+                    <div style="font-size:40pt;margin-bottom:20px;">💎</div>
+                    <div id="mod_PLAN_V4_ESTRATEGICO" class="cover-title">PLAN DE ACCIÓN MEJORADO v4.0</div>
+                    <div class="cover-subtitle">MS in AI Pathway - ML Specialist v3.0</div>
+                    <div class="cover-badge">MATEMÁTICAS APLICADAS A CÓDIGO</div>
+                </div>
+                <div style="position:absolute;bottom:30px;font-size:10pt;opacity:0.6;">DUQUEOM | 2025</div>
+            </div>
+            <div class="content">
+                <h1>📋 Plan de Acción Mejorado v4.0 - Guía de Integración</h1>
+<blockquote>
+<p>Este documento explica cómo integrar las mejoras estratégicas con el plan de estudios existente.</p>
+</blockquote>
+<h2>🎯 Resumen de Mejoras</h2>
+<p>Este plan no cambia <strong>qué</strong> estudias (el PDF ya es excelente), sino <strong>cómo</strong> ejecutas el estudio para garantizar que no abandones y superes el nivel requerido.</p>
+<h2>📁 Nuevos Recursos Creados</h2>
+<h3>Configuración del Entorno</h3>
+<table>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pyproject.toml</code></td>
+<td>Configuración de proyecto Python con dependencias</td>
+</tr>
+<tr>
+<td><code>.pre-commit-config.yaml</code></td>
+<td>Hooks automáticos para código limpio</td>
+</tr>
+<tr>
+<td><code>setup_env.sh</code></td>
+<td>Script de instalación rápida</td>
+</tr>
+</tbody>
+</table>
+<h3>Herramientas de Estudio (<code>study_tools/</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Propósito</th>
+<th>Cuándo Usar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DIARIO_ERRORES.md</code></td>
+<td>Registro de errores</td>
+<td>Diariamente</td>
+</tr>
+<tr>
+<td><code>DRILL_DIMENSIONES_NUMPY.md</code></td>
+<td>Ejercicios de shapes</td>
+<td>Semanas 1-2</td>
+</tr>
+<tr>
+<td><code>SIMULACRO_EXAMEN_TEORICO.md</code></td>
+<td>Preguntas tipo examen</td>
+<td>Sábados</td>
+</tr>
+<tr>
+<td><code>VISUALIZACION_GRADIENT_DESCENT.md</code></td>
+<td>Código de visualización</td>
+<td>Semanas 6-7</td>
+</tr>
+<tr>
+<td><code>DRYRUN_BACKPROPAGATION.md</code></td>
+<td>Backprop en papel</td>
+<td>Semana 18</td>
+</tr>
+<tr>
+<td><code>PUENTE_NUMPY_PYTORCH.md</code></td>
+<td>Traducción a PyTorch</td>
+<td>Semana 24</td>
+</tr>
+</tbody>
+</table>
+<h3>AI Code Reviewer (<code>prompts/</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AI_CODE_REVIEWER.md</code></td>
+<td>Prompt para ChatGPT/Claude como revisor de código</td>
+</tr>
+</tbody>
+</table>
+<h3>Tests (<code>tests/</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_dimension_assertions.py</code></td>
+<td>Tests de dimensiones para validar código ML</td>
+</tr>
+</tbody>
+</table>
+<h2>📅 Integración con el Cronograma Existente</h2>
+<h3>Semana 0: Preparación del Laboratorio</h3>
+<pre><code class="language-bash"># 1. Ejecutar setup
+cd &quot;/home/duque_om/projects/Guia Master&quot;
+bash setup_env.sh
+
+# 2. Activar entorno
+source venv/bin/activate
+
+# 3. Configurar AI Code Reviewer
+# Copiar contenido de prompts/AI_CODE_REVIEWER.md a ChatGPT/Claude
+</code></pre>
+<h3>Semanas 1-2: Añadir Drill de Dimensiones</h3>
+<p><strong>Ajuste al estudio diario:</strong></p>
+<pre><code>Antes de codificar (5 min):
+  → Abrir study_tools/DRILL_DIMENSIONES_NUMPY.md
+  → Completar 5 ejercicios de predicción de shape
+  → Verificar en Python
+</code></pre>
+<h3>Semanas 6-7: Añadir Visualización 3D</h3>
+<p><strong>Ajuste semanal:</strong></p>
+<pre><code>Durante estudio de Gradient Descent:
+  → Ejecutar código de study_tools/VISUALIZACION_GRADIENT_DESCENT.md
+  → Experimentar con diferentes learning rates
+  → Usar GeoGebra para exploración interactiva
+</code></pre>
+<h3>Semana 18: Dry Run Obligatorio</h3>
+<p><strong>Antes de codificar Backpropagation:</strong></p>
+<pre><code>1. Abrir study_tools/DRYRUN_BACKPROPAGATION.md
+2. Completar ejercicio en papel (30 min)
+3. Verificar con código de verificación
+4. SOLO ENTONCES empezar tu implementación
+</code></pre>
+<h3>Semana 24: Traducción a PyTorch</h3>
+<p><strong>Día extra al final del proyecto MNIST:</strong></p>
+<pre><code>1. Abrir study_tools/PUENTE_NUMPY_PYTORCH.md
+2. Tomar tu clase NeuralNetwork de NumPy
+3. Reescribir en PyTorch (15 líneas)
+4. Comparar resultados
+5. Responder checklist de &quot;iluminación&quot;
+</code></pre>
+<h3>Cada Sábado: Simulacro de Examen</h3>
+<p><strong>Protocolo de 1 hora:</strong></p>
+<pre><code>1. Sin IDE, sin internet
+2. Solo lápiz, papel, calculadora básica
+3. Abrir study_tools/SIMULACRO_EXAMEN_TEORICO.md
+4. Completar simulacro correspondiente a la fase
+5. Auto-evaluar con criterios de puntuación
+6. Registrar temas débiles
+</code></pre>
+<h2>🔄 Protocolo Diario "Sandwich"</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ MAÑANA (Teoría - Input)                                     │
+│ • Ver videos / leer documentación                           │
+│ • NO tomar notas lineales (ineficiente)                     │
+│ • Enfocarse en ENTENDER, no memorizar                       │
+├─────────────────────────────────────────────────────────────┤
+│ MEDIODÍA (Implementación - Output)                          │
+│ • Escribir código                                           │
+│ • Usar pre-commit para validación automática                │
+│ • Consultar AI Code Reviewer para estilo/vectorización      │
+├─────────────────────────────────────────────────────────────┤
+│ CIERRE (Validación Feynman)                                 │
+│ • Explicar el concepto como si enseñaras a alguien          │
+│ • Registrar TODOS los errores en DIARIO_ERRORES.md          │
+│ • Identificar: ¿Qué no entendí completamente hoy?           │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<h2>✅ Checklist de Configuración Inicial</h2>
+<ul>
+<li>[ ] Ejecutar <code>bash setup_env.sh</code></li>
+<li>[ ] Verificar que <code>pre-commit run --all-files</code> funciona</li>
+<li>[ ] Configurar AI Code Reviewer en ChatGPT/Claude</li>
+<li>[ ] Leer <code>study_tools/README.md</code> completo</li>
+<li>[ ] Crear primera entrada en <code>DIARIO_ERRORES.md</code></li>
+<li>[ ] Completar Nivel 1 de <code>DRILL_DIMENSIONES_NUMPY.md</code></li>
+</ul>
+<h2>📊 Tabla de Ajustes por Fase</h2>
+<table>
+<thead>
+<tr>
+<th>Fase</th>
+<th>Semanas</th>
+<th>Ajuste Estratégico</th>
+<th>Recurso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fundamentos</td>
+<td>1-2</td>
+<td>Drill de Dimensiones</td>
+<td><code>DRILL_DIMENSIONES_NUMPY.md</code></td>
+</tr>
+<tr>
+<td>Fundamentos</td>
+<td>4</td>
+<td>Simulacro Álgebra Lineal</td>
+<td><code>SIMULACRO_EXAMEN_TEORICO.md</code></td>
+</tr>
+<tr>
+<td>Fundamentos</td>
+<td>6-7</td>
+<td>Visualización 3D</td>
+<td><code>VISUALIZACION_GRADIENT_DESCENT.md</code></td>
+</tr>
+<tr>
+<td>Fundamentos</td>
+<td>8</td>
+<td>Simulacro Cálculo</td>
+<td><code>SIMULACRO_EXAMEN_TEORICO.md</code></td>
+</tr>
+<tr>
+<td>Probabilidad</td>
+<td>12</td>
+<td>Simulacro Probabilidad</td>
+<td><code>SIMULACRO_EXAMEN_TEORICO.md</code></td>
+</tr>
+<tr>
+<td>ML</td>
+<td>16</td>
+<td>Simulacro Supervised Learning</td>
+<td><code>SIMULACRO_EXAMEN_TEORICO.md</code></td>
+</tr>
+<tr>
+<td>DL</td>
+<td>18</td>
+<td>Dry Run Backprop</td>
+<td><code>DRYRUN_BACKPROPAGATION.md</code></td>
+</tr>
+<tr>
+<td>DL</td>
+<td>22</td>
+<td>Simulacro Deep Learning</td>
+<td><code>SIMULACRO_EXAMEN_TEORICO.md</code></td>
+</tr>
+<tr>
+<td>Proyecto</td>
+<td>24</td>
+<td>Traducción PyTorch</td>
+<td><code>PUENTE_NUMPY_PYTORCH.md</code></td>
+</tr>
+</tbody>
+</table>
+<h2>🎯 Criterios de Éxito</h2>
+<h3>Por Checkpoint</h3>
+<ul>
+<li>Simulacro correspondiente ≥ 75 puntos</li>
+<li>Diario de Errores actualizado</li>
+<li>Código pasa pre-commit</li>
+</ul>
+<h3>Señales de Progreso</h3>
+<ul>
+<li>Predices <code>.shape</code> sin ejecutar código</li>
+<li>Errores del Diario no se repiten</li>
+<li>Simulacros &lt; 60 minutos</li>
+<li>Puedes explicar conceptos sin notas</li>
+</ul>
+<h2>🚨 Señales de Alarma</h2>
+<table>
+<thead>
+<tr>
+<th>Señal</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mismo error 3+ veces</td>
+<td>Revisar tema desde cero</td>
+</tr>
+<tr>
+<td>Simulacro &lt; 60 pts</td>
+<td>Repetir fase antes de avanzar</td>
+</tr>
+<tr>
+<td>No puedes explicar sin código</td>
+<td>Más teoría, menos implementación</td>
+</tr>
+<tr>
+<td>Pre-commit falla siempre</td>
+<td>Revisar estilo en <code>AI_CODE_REVIEWER.md</code></td>
+</tr>
+</tbody>
+</table>
+<h2>🔗 Referencias Rápidas</h2>
+<ul>
+<li><strong>Guía principal</strong>: <a href="#mod_PLAN_ESTUDIOS">PLAN_ESTUDIOS.md</a></li>
+<li><strong>Índice de contenidos</strong>: <a href="#mod_00_INDICE">00_INDICE.md</a></li>
+<li><strong>Checklist de progreso</strong>: <a href="#mod_CHECKLIST">CHECKLIST.md</a></li>
+<li><strong>Herramientas de estudio</strong>: <code>study_tools/README.md</code></li>
+</ul>
             </div>
         
             <!-- MÓDULO: RECURSOS.md -->

@@ -213,3 +213,49 @@ Usa ambos planes como **capas** sobre [PLAN_ESTUDIOS.md](PLAN_ESTUDIOS.md):
 - [ ] Simulacro 1 (Semana 22) completado y analizado.
 - [ ] Simulacro 2 (Semana 23) ≥ 80%.
 - [ ] Diario de Errores actualizado con errores conceptuales detectados en simulacros y desafíos.
+
+## 7️⃣ Plan de Acción Definitivo v5.0 – Protocolo A/B/C
+
+> Esta sección resume cómo combinar los módulos y herramientas existentes en **tres protocolos operativos** durante las 24 semanas.
+
+### Protocolo A – Verificación Triple del Código (Precisión Matemática)
+
+| Módulo/Semana | Acción de Validación | Objetivo de Seguridad |
+|---------------|----------------------|------------------------|
+| **Módulo 03 – Cálculo** | **Gradient Checking Obligatorio**: antes de confiar en cualquier `backward()` manual, ejecutar un chequeo de gradiente por diferencias finitas (método de diferencia central) sobre tus derivadas clave. | Detectar errores sutiles de signo o de álgebra en la implementación de tus gradientes. |
+| **Módulo 05 – Supervised Learning** | **Modo Sombra (Shadow Mode)**: los viernes, después de entrenar tu propia Regresión Lineal/Logística, entrenar el mismo modelo con `sklearn` y comparar accuracy y coeficientes (W, b). | Validar que tu implementación desde cero coincide con la librería estándar de la industria; si hay discrepancias grandes, el bug es tuyo. |
+| **Módulo 07 – Deep Learning** | **Test de Overfitting**: entrenar tu red MLP manual para que memorice un minibatch pequeño (5–10 ejemplos) hasta pérdida casi cero. | Comprobar que la lógica de forward/backward es correcta; si no puede memorizar el minibatch, hay un fallo estructural en backprop. |
+
+- Referencias:
+  - Gradient checking: sección **"Gradient Checking: Validación Matemática (v3.3)"** en `03_CALCULO_MULTIVARIANTE.md`.
+  - Shadow Mode: sección **"Shadow Mode: Validación con sklearn (v3.3)"** en `05_SUPERVISED_LEARNING.md`.
+  - Overfitting: implementación y entrenamiento de MLP en `07_DEEP_LEARNING.md`.
+
+### Protocolo B – Rigor Académico y Validación Externa (Examen)
+
+| Frecuencia | Acción | Objetivo |
+|-----------|--------|----------|
+| **Diario (15 minutos)** | **Diario de Errores Críticos**: registrar a mano los 5 errores conceptuales más grandes del día (confusiones de definiciones, notación, dimensiones, interpretación de resultados, etc.). | Evitar repetir los mismos errores y construir un "resumen de examen" personalizado. |
+| **Mensual (Sábado)** | **Desafío del Tablero Blanco (Feynman Challenge)**: explicar en 5–7 minutos, sin leer notas, un concepto complejo (PCA, K-Means, Gradient Descent, Regla de la Cadena, Backpropagation, etc.) y registrar feedback externo. | Probar dominio conceptual en lenguaje sencillo, similar a una entrevista técnica u oral de examen. |
+| **Semanas 22–23** | **Simulacro de Examen de Admisión**: 2 horas, sin IDE ni internet, 40% pseudocódigo y dimensiones, 60% teoría y derivaciones. | Simular el Pathway real y obtener una métrica objetiva de "listo / no listo". |
+
+- Herramientas asociadas:
+  - Diario: `study_tools/DIARIO_ERRORES.md`.
+  - Tablero Blanco: `study_tools/DESAFIO_TABLERO_BLANCO.md` (y sección 2 de este documento).
+  - Examen: `study_tools/EXAMEN_ADMISION_SIMULADO.md` (y sección 3 de este documento).
+
+### Protocolo C – Puente a la Realidad (Transición a Industria)
+
+1. **Traducción del Core ML a PyTorch (Módulo 08)**
+   - Después de completar el proyecto **MNIST Analyst** con tu propio código NumPy, reescribir tu red neuronal más avanzada usando PyTorch (`torch.nn.Linear`, `optim`, etc.).
+   - Apoyarte en `study_tools/PUENTE_NUMPY_PYTORCH.md` y en las secciones de Deep Learning para mapear capas y operaciones.
+   - Objetivo: ver cómo docenas de líneas de inicialización y backprop se condensan en unas pocas capas de alto nivel.
+
+2. **Análisis de Errores con Datos Reales (Módulo 08)**
+   - En el informe final del proyecto MNIST incluir una sección titulada **"Las 5 imágenes peor clasificadas"**.
+   - Para cada imagen:
+     - Mostrar la imagen y la predicción errónea del modelo.
+     - Describir brevemente el tipo de error.
+     - Argumentar si el fallo se debe principalmente a **Bias** (modelo demasiado simple) o **Variance** (modelo demasiado complejo / datos ruidosos o insuficientes), conectando con el análisis de Bias–Variance del proyecto.
+
+Con estos tres protocolos, v5.0 pasa de ser solo una capa extra de herramientas a un **sistema completo de verificación, validación externa y transición a herramientas de producción** aplicado sobre las mismas 24 semanas del plan base.

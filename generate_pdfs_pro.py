@@ -8,8 +8,14 @@ GENERADOR PDF PRO v9.0 - WeasyPrint Edition
 """
 
 import re
+import runpy
 from pathlib import Path
 from typing import List, Optional
+
+_NEW_GENERATOR = Path(__file__).resolve().parent / "pdf" / "generate_pdfs_pro.py"
+if _NEW_GENERATOR.exists() and _NEW_GENERATOR.resolve() != Path(__file__).resolve():
+    runpy.run_path(str(_NEW_GENERATOR), run_name="__main__")
+    raise SystemExit(0)
 
 import markdown
 from PyPDF2 import PdfMerger

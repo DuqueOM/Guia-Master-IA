@@ -584,6 +584,27 @@ class PDFGenerator:
         self.font_config = FontConfiguration()
         self.css = CSS(string=CONTENT_CSS, font_config=self.font_config)
 
+    def _demote_headings(self, md: str, level_offset: int = 1) -> str:
+        parts = self._split_by_fenced_codeblocks(md)
+        out: List[str] = []
+
+        def demote_line(line: str) -> str:
+            m = re.match(r"^(#{1,6})\s+(.*)$", line)
+            if not m:
+                return line
+            hashes = m.group(1)
+            title = m.group(2)
+            new_level = min(6, len(hashes) + level_offset)
+            return ("#" * new_level) + " " + title
+
+        for is_code, seg in parts:
+            if is_code:
+                out.append(seg)
+                continue
+            out.append("\n".join(demote_line(ln) for ln in seg.splitlines()))
+
+        return "\n".join(out)
+
     def _split_by_fenced_codeblocks(self, text: str) -> List[tuple[bool, str]]:
         parts: List[tuple[bool, str]] = []
         fence_re = re.compile(r"(^```[\s\S]*?^```\s*$)", flags=re.MULTILINE)
@@ -649,6 +670,10 @@ class PDFGenerator:
             (PROJECT_DIR / "pyproject.toml", "toml"),
             (PROJECT_DIR / "setup_env.sh", "bash"),
             (PROJECT_DIR / ".gitignore", "text"),
+            (PROJECT_DIR / "pdf" / "_style.css", "css"),
+            (PROJECT_DIR / "pdf" / "_style_pro.css", "css"),
+            (PROJECT_DIR / "pdf" / "_content.css", "css"),
+            (PROJECT_DIR / "pdf" / "generate_pdfs_pro.py", "python"),
         ]:
             if p.exists():
                 items.append(AppendixItem(p.name, p, lang))
@@ -657,7 +682,10 @@ class PDFGenerator:
             raw = item.path.read_text(encoding="utf-8", errors="ignore")
             lines.append(f"## {html_escape(item.title)}")
             lines.append("")
-            lines.append(self._fence_code_block(raw, item.language))
+            if item.language == "markdown":
+                lines.append(self._demote_headings(raw, level_offset=1))
+            else:
+                lines.append(self._fence_code_block(raw, item.language))
             lines.append("")
 
         return "\n".join(lines)

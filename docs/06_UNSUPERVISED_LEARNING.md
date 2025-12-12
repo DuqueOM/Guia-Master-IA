@@ -6,9 +6,48 @@
 
 ---
 
+<a id="m06-0"></a>
+
+## 🧭 Cómo usar este módulo (modo 0→100)
+
+**Propósito:** que puedas:
+
+- encontrar estructura sin etiquetas (clustering)
+- reducir dimensionalidad con rigor (PCA)
+- decidir cuándo NO usar estos métodos
+
+### Objetivos de aprendizaje (medibles)
+
+Al terminar este módulo podrás:
+
+- **Implementar** K-Means (Lloyd + K-Means++).
+- **Evaluar** clustering con inercia/codo y silhouette (entendiendo limitaciones).
+- **Implementar** PCA con SVD y usar varianza explicada para elegir `n_components`.
+- **Diagnosticar** cuándo K-Means/PCA fallan y proponer alternativas.
+
+Enlaces rápidos:
+
+- [GLOSARIO.md](GLOSARIO.md)
+- [RECURSOS.md](RECURSOS.md)
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Recursos (cuándo usarlos)
+
+| Prioridad | Recurso | Cuándo usarlo en este módulo | Para qué |
+|----------|---------|------------------------------|----------|
+| **Obligatorio** | `study_tools/DRILL_DIMENSIONES_NUMPY.md` | Semana 13–16, cada vez que implementes distancias/proyecciones y se rompan shapes | Evitar errores silenciosos en broadcasting/`axis` |
+| **Obligatorio** | `study_tools/DIARIO_ERRORES.md` | Cuando K-Means produzca clusters vacíos, `NaN` o PCA devuelva resultados inestables | Registrar el caso y dejarlo “debuggeable” |
+| **Complementario** | [3Blue1Brown: Linear Algebra](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab) | Semana 15 (PCA), al ver varianza/proyecciones/autovectores | Intuición visual para PCA |
+| **Complementario** | [VisuAlgo](https://visualgo.net/en) | Semana 13–14, al estudiar el comportamiento iterativo de K-Means y su sensibilidad a inicialización | Visualizar algoritmos paso a paso para construir intuición |
+| **Complementario** | [Mathematics for ML (book)](https://mml-book.github.io/) | Semana 15–16, al formalizar covarianza, eigen/SVD | Notación y derivaciones más rigurosas |
+| **Opcional** | [RECURSOS.md](RECURSOS.md) | Al terminar el módulo (para profundizar en clustering/reducción dimensional) | Elegir material extra sin dispersarte |
+
+---
+
 ## 🧠 ¿Qué es Unsupervised Learning?
 
-```
+```text
 APRENDIZAJE NO SUPERVISADO
 
 Tenemos:
@@ -39,7 +78,161 @@ Tipos principales:
 
 ---
 
+## 🧩 Micro-Capítulo Maestro: PCA (Principal Component Analysis) — Nivel: Avanzado
+
+### 1) Intuición: la mejor foto
+
+Imagina que tienes un objeto 3D (tus datos en alta dimensión) y solo puedes tomar una “foto” en 2D.
+
+- Si tomas la foto desde un ángulo malo, la sombra se ve “aplastada” y pierdes estructura.
+- Si tomas la foto desde el ángulo correcto, la sombra conserva la mayor cantidad de información posible.
+
+PCA busca matemáticamente ese ángulo: la proyección donde la **varianza proyectada** es máxima.
+
+### 2) Derivación lógica (covarianza → eigen)
+
+1) **Centrar**
+
+Mueves el origen para que el promedio sea 0:
+
+`X_c = X - μ`
+
+2) **Covarianza**
+
+La matriz de covarianza captura cómo “se estiran” los datos:
+
+`Σ = (1/(n-1)) X_c^T X_c`
+
+Si (en 2D) `Σ = [[10, 0],[0, 1]]`, significa: hay mucha más varianza en X que en Y.
+
+3) **Eigenvectors y eigenvalues**
+
+- Los **eigenvectors** de `Σ` apuntan en direcciones principales de estiramiento.
+- Los **eigenvalues** dicen cuánta varianza hay en esas direcciones.
+
+PCA elige los eigenvectors con eigenvalues más grandes y proyecta ahí.
+
+### 3) Por qué SVD suele ser mejor que eigen en código
+
+Si calculas `X_c^T X_c` puedes amplificar problemas numéricos (estás “cuadrando” escalas).
+
+En cambio, con SVD:
+
+`X_c = U S V^T`
+
+se obtienen las componentes principales directamente desde `V` sin formar explícitamente `Σ`.
+
+Regla práctica:
+
+- **En teoría:** PCA = eigen de la covarianza.
+- **En práctica:** PCA = SVD de `X_c` (más estable; es lo que usan implementaciones modernas).
+
+---
+
 ## 💻 Parte 1: K-Means Clustering
+
+### 1.0 K-Means — Nivel: intermedio (core del Pathway)
+
+**Propósito:** pasar de “sé que K-Means agrupa puntos” a **poder implementarlo desde cero, elegir `k` con criterio y detectar cuándo NO usarlo**.
+
+#### Objetivos de aprendizaje (medibles)
+
+Al terminar esta parte podrás:
+
+- **Explicar** la función objetivo de K-Means (inercia) y por qué usa distancia euclidiana.
+- **Aplicar** el algoritmo de Lloyd (asignar → actualizar → repetir) y reconocer convergencia.
+- **Implementar** K-Means++ y justificar por qué mejora la inicialización.
+- **Analizar** fallas típicas: clusters vacíos, sensibilidad a escala, mínimos locales.
+- **Evaluar** resultados usando inercia y silhouette (y entender limitaciones de ambas).
+
+#### Prerrequisitos
+
+- De `Módulo 01`: NumPy (broadcasting, `axis`, shapes).
+- De `Módulo 02`: norma L2 / distancia euclidiana.
+
+Enlaces rápidos:
+
+- [GLOSARIO: K-Means](GLOSARIO.md#k-means)
+- [GLOSARIO: K-Means++](GLOSARIO.md#k-means-1)
+- [GLOSARIO: Inertia](GLOSARIO.md#inertia)
+- [GLOSARIO: Clustering](GLOSARIO.md#clustering)
+
+#### Resumen ejecutivo (big idea)
+
+K-Means alterna dos pasos que **siempre reducen (o no aumentan)** la inercia:
+
+- **Asignación:** cada punto va al centroide más cercano.
+- **Actualización:** cada centroide se mueve al promedio de sus puntos.
+
+Esto garantiza que el algoritmo converge (en iteraciones finitas), pero **no garantiza el mínimo global**: por eso la inicialización (K-Means++) importa.
+
+#### Intuición → formalización
+
+##### a) Intuición
+
+K-Means intenta poner `k` “imanes” (centroides) y moverlos hasta que cada imán represente bien a los puntos que atrajo.
+
+##### a.1 Intuición geométrica: Voronoi tessellation (territorios)
+
+Una forma visual de entender K-Means:
+
+- pones `k` centroides como “semillas” en el plano
+- cada semilla **reclama el territorio** de los puntos más cercanos
+
+Eso induce un particionado del espacio en **celdas de Voronoi**: regiones poligonales donde todos los puntos están más cerca de un centroide que de cualquier otro.
+
+En cada iteración de Lloyd:
+
+- **Asignación:** recalculas las celdas (quién pertenece a quién)
+- **Actualización:** cada semilla se mueve al centro de masa de su celda
+
+##### b) Formalización
+
+Función objetivo:
+
+`J = Σᵢ Σ_{x∈Cᵢ} ||x - μᵢ||²`
+
+Donde:
+
+- `μᵢ` es el centroide del cluster `i`.
+- `Cᵢ` es el conjunto de puntos asignados al cluster `i`.
+
+##### c) Condiciones donde K-Means funciona bien
+
+- clusters “redondos” / aproximadamente esféricos
+- tamaños similares
+- distancia euclidiana tiene sentido (features en la misma escala)
+
+##### d) Casos donde falla (y cómo detectarlo)
+
+- clusters alargados/no convexos (ej.: “dos lunas”)
+- escalas distintas sin normalizar (una feature domina)
+- outliers fuertes arrastran centroides
+
+#### Actividades activas (aprendizaje activo)
+
+- **Retrieval practice (3–5 min):** escribe sin mirar:
+  - los dos pasos del algoritmo de Lloyd
+  - la función objetivo `J`
+- **Ejercicio de diagnóstico:** crea 2 features con escalas distintas y observa cómo cambia el clustering si normalizas.
+
+#### Debugging / validación (v5)
+
+- Si obtienes resultados raros, revisa primero:
+  - shapes (`X: (n_samples, n_features)`, `centroids: (k, n_features)`, `labels: (n_samples,)`)
+  - `NaN` por clusters vacíos (centroide sin puntos)
+- Registra hallazgos en `study_tools/DIARIO_ERRORES.md`.
+- Antes de usar un dataset real “sucio”, aplica `study_tools/DIRTY_DATA_CHECK.md`.
+- Para integrar el protocolo completo:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+#### Cheat sheet (repaso rápido)
+
+- **Paso 1:** `labels = argmin(||x - μᵢ||²)`
+- **Paso 2:** `μᵢ = mean(points_in_cluster_i)`
+- **Convergencia:** `||μ_new - μ_old||² < tol`
+- **Riesgo:** mínimos locales → usar K-Means++ y/o múltiples inicializaciones
 
 ### 1.1 Algoritmo de Lloyd
 
@@ -283,6 +476,33 @@ print(f"Centroides:\n{kmeans.centroids}")
 
 ## 💻 Parte 2: Evaluación de Clusters
 
+### 2.0 Evaluación — cómo decidir si el clustering “tiene sentido”
+
+**Propósito:** evitar el error común de “K-Means siempre devuelve clusters, entonces siempre sirve”. Aquí aprendes a **medir calidad** y a entender por qué esas métricas pueden engañar.
+
+#### Objetivos de aprendizaje (medibles)
+
+- **Explicar** qué mide la inercia y por qué siempre baja al subir `k`.
+- **Aplicar** el método del codo como heurística (no como regla matemática).
+- **Interpretar** silhouette score (qué significa cerca de 1, 0 y valores negativos).
+- **Analizar** cuándo no puedes validar bien (porque no hay ground truth).
+
+Enlaces rápidos:
+
+- [GLOSARIO: Inertia](GLOSARIO.md#inertia)
+- [GLOSARIO: Silhouette Score](GLOSARIO.md#silhouette-score)
+
+#### Resumen ejecutivo
+
+- **Inercia:** mide compactación interna; útil para comparar `k`, pero sesgada (siempre favorece `k` grande).
+- **Silhouette:** mezcla cohesión y separación; útil para comparar modelos, pero costosa de calcular de forma exacta.
+
+#### Actividades activas
+
+- Ejecuta elbow + silhouette sobre el mismo dataset y escribe una conclusión:
+  - ¿coinciden en el `k`?
+  - si no coinciden, ¿por qué podría pasar?
+
 ### 2.1 Inercia (Within-Cluster Sum of Squares)
 
 ```python
@@ -404,6 +624,235 @@ def silhouette_score(X: np.ndarray, labels: np.ndarray) -> float:
 ---
 
 ## 💻 Parte 3: PCA (Principal Component Analysis)
+
+### 3.0 PCA — Nivel: intermedio (reducción dimensional con rigor)
+
+**Propósito:** pasar de “PCA reduce dimensiones” a **poder derivar su lógica, implementarlo con SVD y usar varianza explicada para tomar decisiones**.
+
+#### Objetivos de aprendizaje (medibles)
+
+Al terminar esta parte podrás:
+
+- **Explicar** por qué PCA encuentra direcciones de máxima varianza (y qué NO significa eso).
+- **Aplicar** el pipeline correcto: centrar → descomponer (SVD) → proyectar → reconstruir.
+- **Implementar** PCA con SVD y calcular `explained_variance_ratio_`.
+- **Elegir** `n_components` por varianza acumulada y justificar el trade-off.
+- **Diagnosticar** errores típicos: no centrar datos, confundir componentes con scores, reconstrucción incorrecta.
+
+#### Motivación / por qué importa
+
+En la mayoría de los problemas reales, la intuición visual se pierde en espacios de alta dimensión (ej.: cientos o miles de features). PCA te permite:
+
+- **Visualizar** en 2D/3D sin tirar información “a ojo”.
+- **Eliminar ruido** (quedándote con las direcciones dominantes de variación).
+- **Comprimir** (reconstruir aproximaciones controlando el error).
+
+Regla práctica: PCA no “encuentra lo que separa clases”; encuentra lo que **más varía**.
+
+#### Prerrequisitos
+
+- De `Módulo 02`: SVD (intuición) y producto matricial.
+- De `Módulo 02`: matriz de covarianza, eigenvalues y eigenvectors.
+- De `Módulo 02`: proyección (producto punto) y norma.
+- De `Módulo 01`: manipulación de shapes y `axis`.
+
+Enlaces rápidos:
+
+- [GLOSARIO: PCA](GLOSARIO.md#pca-principal-component-analysis)
+- [GLOSARIO: SVD](GLOSARIO.md#svd-singular-value-decomposition)
+- [RECURSOS.md](RECURSOS.md)
+
+#### Resumen ejecutivo (big idea)
+
+PCA crea un nuevo sistema de coordenadas donde:
+
+- el eje 1 (PC1) captura la mayor varianza,
+- el eje 2 (PC2) captura la mayor varianza restante, y así sucesivamente,
+
+y luego te permite quedarte con los primeros `k` ejes para comprimir.
+
+#### Intuición → formalización
+
+##### a) Intuición
+
+Si tus datos viven cerca de un plano dentro de un espacio 100D, PCA intenta encontrar ese plano (o subespacio) para representar los datos con menos números.
+
+Analogía: “buscar el mejor ángulo para tomar una foto”
+
+- Tienes un objeto 3D (tus datos en alta dimensión).
+- Una foto 2D pierde información.
+- PCA elige el **ángulo de cámara** que preserva la mayor “información” medible como **varianza**.
+
+Metáfora complementaria (baguette): imagina una nube de puntos alargada como una baguette flotando en 3D. Si tomas la foto desde la punta, parece un círculo (pierdes estructura). Si la tomas de lado, ves su longitud real. PCA busca ese “lado” matemáticamente.
+
+Ojo: “más varianza” no significa “más útil para clasificar”; solo significa “más dispersión”.
+
+##### b) Conceptos clave (glosario mínimo)
+
+- **Varianza:** dispersión de los datos; PCA busca maximizarla *después* de proyectar.
+- **Matriz de covarianza (`Σ`):** matriz simétrica que describe cómo varían las variables y cómo co-varían entre sí.
+- **Eigenvector (vector propio):** dirección que no cambia (salvo escala) al aplicar `Σ`; en PCA, son los ejes principales.
+- **Eigenvalue (valor propio):** varianza capturada en la dirección de su eigenvector.
+- **Componente principal:** eje (eigenvector) ordenado por eigenvalue descendente.
+
+##### c) Formalización mínima
+
+- Centrar: `X_c = X - mean(X)`
+- SVD: `X_c = U S Vᵀ`
+- Componentes principales: columnas de `V` (o filas de `Vᵀ`)
+- Proyección a `k` componentes: `Z = X_c @ V_k`
+- Reconstrucción: `X_hat = Z @ V_kᵀ + mean`
+
+##### c.1 Maximizando la varianza (derivación lógica → ecuación de eigenvalores)
+
+Idea: buscas un vector unitario `u` (dirección) tal que la varianza de la proyección `uᵀx` sea máxima.
+
+Si `x` está centrado, la varianza proyectada es:
+
+`Var(uᵀx) = uᵀ Σ u`
+
+Planteas el problema:
+
+`max_u  uᵀ Σ u   s.a.  ||u||₂ = 1`
+
+Con multiplicadores de Lagrange, la condición de óptimo lleva a:
+
+`Σu = λu`
+
+Interpretación directa:
+
+- `u` es un componente principal.
+- `λ` es la varianza capturada por ese componente.
+
+##### c.2 Relación SVD ↔ eigenvalues (por qué SVD es el método preferido)
+
+Si `X_c` son los datos centrados y haces:
+
+```
+X_c = U S Vᵀ
+```
+
+Entonces la covarianza muestral es:
+
+```
+Σ = (1/(n-1)) X_cᵀ X_c
+  = (1/(n-1)) (V S Uᵀ)(U S Vᵀ)
+  = V (S²/(n-1)) Vᵀ
+```
+
+Conclusión:
+
+- **Los eigenvectors de `Σ`** son las columnas de `V`.
+- **Los eigenvalues de `Σ`** son `S²/(n-1)`.
+
+Esto conecta directamente con `Módulo 02` (eigenvalues/eigenvectors) y explica por qué PCA “vía SVD” suele ser más estable.
+
+##### c.3 Worked example: PCA manual en 2D (rotación de ejes)
+
+Supón datos 2D que “viven” casi sobre la diagonal `y = x`.
+
+1) Centrar los datos:
+
+```
+X_c = X - mean(X)
+```
+
+2) Imagina que la covarianza queda (caso idealizado):
+
+```
+Σ = [[1, 1],
+     [1, 1]]
+```
+
+3) Sus eigenvectors (direcciones principales) son:
+
+- `v1 = (1, 1)/√2`  (dirección diagonal)
+- `v2 = (1, -1)/√2` (dirección anti-diagonal)
+
+Y sus eigenvalues:
+
+- `λ1 = 2` (mucha varianza en la diagonal)
+- `λ2 = 0` (casi nada en la anti-diagonal)
+
+4) Proyección a 1D:
+
+```
+z = X_c @ v1
+```
+
+Interpretación: rotaste ejes y te quedaste solo con el eje donde “vive” casi toda la variación.
+
+##### c.4 Worked example (numérico): covarianza y primer componente a mano
+
+Datos centrados (6 puntos):
+
+```text
+X = [(-1,-1), (-2,-1), (-3,-2), (1,1), (2,1), (3,2)]
+```
+
+1) Construye `X` como matriz `(n_samples, 2)` y calcula:
+
+`Σ = (1/(n-1)) Xᵀ X`
+
+Aquí:
+
+```text
+XᵀX = [[28, 18],
+       [18, 12]]
+n-1 = 5
+```
+
+Por tanto:
+
+```text
+Σ = [[5.6, 3.6],
+     [3.6, 2.4]]
+```
+
+2) Eigenvalues/eigenvectors (aprox.)
+
+- `λ1 ≈ 7.94`, `λ2 ≈ 0.06`
+- primer eigenvector (normalizado) `u1 ≈ (0.84, 0.55)`
+
+3) Varianza explicada del primer componente:
+
+`λ1/(λ1+λ2) ≈ 7.94/8.00 ≈ 99.3%`
+
+Lectura: la nube está casi en una línea; proyectar a 1D conserva casi toda la estructura.
+
+#### Algoritmo (paso a paso)
+
+1) Centrar (y típicamente escalar si tus features tienen unidades distintas).
+2) SVD de `X_c` (recomendado) o eigen de `Σ`.
+3) Elegir `k` por varianza acumulada (y/o error de reconstrucción).
+4) Proyectar `Z = X_c @ V_k`.
+5) (Opcional) Reconstruir `X_hat = Z @ V_kᵀ + mean` para medir pérdida.
+
+#### Implementación práctica (código)
+
+En esta guía ya tienes:
+
+- `pca_eigen(...)` en **3.2** (útil para entender la teoría).
+- `pca_svd(...)` y la clase `PCA` en **3.3–3.4** (recomendado para práctica).
+
+#### Evaluación formativa (rápida)
+
+Pregunta: si `λ1 = 9` y `λ2 = 1`, ¿qué proporción de varianza captura PC1?
+
+Respuesta: `9/(9+1) = 90%`.
+
+#### Actividades activas
+
+- **Retrieval practice:** escribe las 4 ecuaciones (centrar, SVD, proyectar, reconstruir).
+- **Experimento mínimo:** genera datos 3D correlacionados, reduce a 1D y reporta:
+  - varianza explicada
+  - error de reconstrucción
+
+#### Errores comunes
+
+- **No centrar**: PCA se sesga hacia la media (resultado incorrecto).
+- **Confundir `components` vs `X_pca`**: componentes son ejes; `X_pca` son coordenadas en esos ejes.
+- **Elegir `n_components` “a ojo”**: usar varianza acumulada.
 
 ### 3.1 Concepto
 
@@ -642,6 +1091,184 @@ def choose_n_components(X: np.ndarray, variance_threshold: float = 0.95) -> int:
 
 ---
 
+## 🧩 Consolidación (PCA)
+
+### Errores comunes
+
+- **No centrar:** si no restas la media, el primer componente puede capturar “offset” en vez de estructura.
+- **Confundir `components` con `X_pca`:**
+  - `components` = ejes
+  - `X_pca` = coordenadas en esos ejes
+- **Elegir `n_components` sin criterio:** usa varianza acumulada + error de reconstrucción.
+
+### Debugging / validación (v5)
+
+- Verifica:
+  - `X_centered.mean(axis=0)` cerca de 0
+  - shapes: `components: (n_features, k)`, `X_pca: (n_samples, k)`
+- Si tu reconstrucción explota, revisa `X_hat = Z @ V_kᵀ + mean`.
+- Registra hallazgos en `study_tools/DIARIO_ERRORES.md`.
+- Protocolos completos:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Reto Feynman (tablero blanco)
+
+Explica en 5 líneas o menos:
+
+1) ¿Por qué PCA “elige un ángulo” y qué significa “máxima varianza”?
+2) ¿Por qué `S²/(n-1)` son eigenvalues de la covarianza?
+3) ¿Qué pierde la reconstrucción cuando `k < n_features`?
+
+---
+
+## 💻 Parte 5: Gaussian Mixture Models (GMM)
+
+### 5.0 GMM — Nivel: intermedio/avanzado (clustering probabilístico)
+
+**Propósito:** pasar de “K-Means agrupa” a **entender cuándo K-Means es geométricamente incorrecto** y usar un modelo que capture **clusters elípticos** y asignación “suave” (*soft clustering*).
+
+#### Objetivos de aprendizaje (medibles)
+
+Al terminar este bloque podrás:
+
+- **Explicar** por qué K-Means asume clusters aproximadamente esféricos (misma varianza en todas direcciones).
+- **Describir** un GMM como “mezcla de Gaussianas” con una variable latente de componente.
+- **Derivar** la idea operacional del algoritmo EM (E-step y M-step) a nivel implementable.
+- **Interpretar** *responsibilities* `γ(z_k)` como probabilidad de pertenencia.
+- **Diagnosticar** fallas típicas: colapso de covarianzas, sensibilidad a inicialización, singularidad.
+
+#### Intuición geométrica: clusters elípticos y pertenencia suave
+
+Imagina que tus datos forman “nubes” alargadas:
+
+- K-Means solo puede poner centroides y partir el espacio por regiones de Voronoi con distancia euclidiana.
+- GMM asume que cada cluster es una **Gaussiana** con su propia forma:
+  - media `μ_k` (centro)
+  - covarianza `Σ_k` (orientación y elongación)
+
+La diferencia clave es que GMM no dice “este punto es del cluster 2”. Dice:
+
+> “Este punto es 70% del componente 2 y 30% del componente 1”.
+
+Eso es extremadamente útil cuando los clusters se solapan.
+
+#### Conceptos clave (glosario mínimo)
+
+- **Mezcla:** combinación ponderada de distribuciones.
+- **Pesos `π_k`:** probabilidades a priori de cada componente (suman 1).
+- **Variable latente `z`:** indica qué componente “generó” el punto.
+- **Responsibilities `γ_{ik}`:** `P(z=k | x_i)`.
+- **EM (Expectation-Maximization):** alterna “asignar probabilidades” y “re-estimar parámetros”.
+
+#### Formalización mínima
+
+Modelo:
+
+`p(x) = Σ_{k=1..K} π_k  N(x | μ_k, Σ_k)`
+
+Log-likelihood de datos `X = {x_i}`:
+
+`ℓ = Σ_i log( Σ_k π_k N(x_i | μ_k, Σ_k) )`
+
+No puedes maximizar esto de forma cerrada por el `log(Σ ...)`. EM lo hace iterativamente.
+
+#### EM (idea implementable)
+
+**E-step:** calcula responsibilities
+
+`γ_{ik} = P(z=k | x_i) = (π_k N(x_i|μ_k,Σ_k)) / (Σ_j π_j N(x_i|μ_j,Σ_j))`
+
+**M-step:** actualiza parámetros usando promedios ponderados
+
+- `N_k = Σ_i γ_{ik}`
+- `π_k = N_k / n`
+- `μ_k = (1/N_k) Σ_i γ_{ik} x_i`
+- `Σ_k = (1/N_k) Σ_i γ_{ik} (x_i-μ_k)(x_i-μ_k)ᵀ`
+
+#### Worked example (mínimo, 1D para ver EM sin álgebra pesada)
+
+Supón puntos 1D `x = [-2, -1, 0, 2, 3]` y `K=2`.
+
+Idea:
+
+1) Inicializas dos Gaussianas (medias distintas).
+2) En E-step, los puntos negativos tienen `γ` alto para el componente “izquierdo” y bajo para el derecho.
+3) En M-step, la media izquierda se va hacia el promedio ponderado de los negativos, la derecha hacia los positivos.
+4) Repites hasta que el log-likelihood deja de mejorar.
+
+La intuición: es como K-Means, pero en vez de asignar “duro”, asignas *responsabilities* y actualizas con pesos.
+
+#### Cuándo usar GMM vs K-Means (regla práctica)
+
+- **Usa K-Means** si esperas clusters aproximadamente esféricos, bien separados y quieres simplicidad/velocidad.
+- **Usa GMM** si:
+  - esperas **clusters elípticos** o con varianzas distintas por dirección
+  - hay **solapamiento** y necesitas pertenencia probabilística
+  - quieres un modelo generativo simple para densidad
+
+#### Errores comunes / debugging
+
+- **No estandarizar features:** si una dimensión domina, la covarianza se distorsiona.
+- **Singularidad/collapse:** una `Σ_k` puede volverse casi singular si un componente “se queda” con muy pocos puntos.
+- **Inicialización pobre:** EM converge a óptimos locales; iniciar con K-Means suele ayudar.
+
+---
+
+## 🚫 Cuándo NO usar K-Means / PCA (y qué hacer en su lugar)
+
+### Diagnóstico rápido (regla práctica)
+
+Si no puedes justificar “por qué este método tiene sentido para este dataset”, asume que estás en zona de riesgo.
+
+#### K-Means: señales de que NO es buena idea
+
+- **Geometría incorrecta:** clusters no convexos (formas tipo “dos lunas”) o estructuras alargadas.
+- **Densidades muy distintas:** un cluster muy denso y otro muy disperso.
+- **Outliers fuertes:** centroides se mueven para “perseguir” outliers.
+- **Escalas distintas:** una feature domina la distancia euclidiana.
+
+**Síntomas medibles típicos:**
+
+- El **método del codo** no muestra un “codo” claro.
+- **Silhouette score** bajo (cerca de 0) o negativo.
+- Resultados muy distintos entre distintas inicializaciones.
+
+**Qué hacer en su lugar (según el problema):**
+
+- **Clusters elípticos (varianza diferente por dirección):** GMM (Gaussian Mixture Models).
+- **Clusters con formas arbitrarias y ruido:** DBSCAN / HDBSCAN (no implementados aquí, pero recomendados).
+- **Estructura jerárquica:** Hierarchical clustering.
+
+#### PCA: señales de que NO es buena idea
+
+- **Señal no alineada con varianza:** la dirección con mayor varianza no es la que separa clases (común en tareas supervisadas).
+- **Relación no lineal:** datos sobre un manifold curvo (PCA lineal pierde estructura).
+- **Interpretación equivocada:** usar PCA como “selector de features importantes” sin analizar varianza explicada y reconstrucción.
+
+**Síntomas medibles típicos:**
+
+- Necesitas muchos componentes para llegar a 95% de varianza (PCA no está comprimiendo bien).
+- La visualización en 2D parece “mezclar” todo sin estructura (ojo: esto no prueba que no haya estructura, pero es una señal).
+
+**Qué hacer en su lugar (según el objetivo):**
+
+- **Visualización no lineal:** t-SNE / UMAP (útiles para explorar, no para entrenar modelos lineales directamente).
+- **Compresión aprendida:** autoencoders (Módulo 07, enfoque DL).
+- **Si solo quieres acelerar:** reducir features por ingeniería o seleccionar por dominio.
+
+### Checklist de decisión (antes de usar el método)
+
+- **Datos escalados:** ¿features comparables? (si no, normaliza).
+- **Outliers:** ¿hay outliers? (si sí, documenta su impacto).
+- **Objetivo real:** ¿quieres compresión, visualización, o clustering interpretable?
+
+Integración con ejecución y validación:
+
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+- Diario: `study_tools/DIARIO_ERRORES.md`
+
 ## 💻 Parte 4: Aplicaciones de PCA
 
 ### 4.1 Compresión de Imágenes
@@ -723,7 +1350,7 @@ Implementación desde cero de:
 - Métricas de evaluación de clusters
 
 Autor: [Tu nombre]
-Módulo: 05 - Unsupervised Learning
+Módulo: 06 - Unsupervised Learning
 """
 
 import numpy as np
@@ -893,6 +1520,81 @@ if __name__ == "__main__":
 
 ---
 
+## 🔍 Shadow Mode: Validación con sklearn (v3.3)
+
+> ⚠️ **Regla:** sklearn está **prohibido para aprender**, pero es **útil para validar**. Si tus resultados difieren de forma grande y consistente, primero asume bug.
+
+### Protocolo mínimo
+
+- **K-Means:** comparar inercia y silhouette para el mismo `k`.
+- **PCA:** comparar `explained_variance_ratio_` y reconstrucción aproximada.
+
+```python
+"""
+Shadow Mode - Unsupervised Learning
+Comparación: implementaciones desde cero vs sklearn.
+"""
+
+import numpy as np
+from sklearn.cluster import KMeans as SklearnKMeans
+from sklearn.decomposition import PCA as SklearnPCA
+
+
+def shadow_mode_kmeans(X: np.ndarray, k: int = 3, seed: int = 42) -> None:
+    """Compara inercia de tu K-Means vs sklearn."""
+    # Tu implementación
+    # my = KMeans(n_clusters=k, random_state=seed)
+    # my_labels = my.fit_predict(X)
+    # my_inertia = my.inertia_
+
+    # Placeholder (reemplazar con tu código)
+    my_inertia = 0.0
+
+    # sklearn
+    sk = SklearnKMeans(n_clusters=k, init="k-means++", n_init=10, random_state=seed)
+    sk.fit(X)
+
+    print("=" * 60)
+    print("SHADOW MODE: K-Means")
+    print("=" * 60)
+    print(f"Tu inercia:      {my_inertia:.4f}")
+    print(f"sklearn inertia: {sk.inertia_:.4f}")
+
+
+def shadow_mode_pca(X: np.ndarray, n_components: int = 2) -> None:
+    """Compara varianza explicada de tu PCA vs sklearn."""
+    # Tu implementación
+    # my = PCA(n_components=n_components)
+    # X_my = my.fit_transform(X)
+
+    # sklearn
+    sk = SklearnPCA(n_components=n_components)
+    sk.fit(X)
+
+    print("=" * 60)
+    print("SHADOW MODE: PCA")
+    print("=" * 60)
+    print(f"sklearn explained_variance_ratio_: {sk.explained_variance_ratio_}")
+```
+
+---
+
+## 🧭 Puente al Módulo 08 (MNIST Analyst)
+
+En la Semana 21 del proyecto:
+
+- **PCA:** lo usas para reducir MNIST y visualizar estructura en 2D (y para acelerar métodos posteriores).
+- **K-Means:** lo usas para agrupar dígitos sin etiquetas y visualizar centroides como “prototipos”.
+
+Checklist de integración:
+
+- **Entrada:** MNIST normalizado a `[0, 1]`.
+- **PCA 2D:** gráfico con clusters/colores.
+- **K-Means:** elegir `k=10` y analizar si los clusters se alinean con dígitos.
+- **Salida:** guarda figuras y conclusiones para el informe.
+
+---
+
 ## ✅ Checklist de Finalización
 
 - [ ] Implementé K-Means con inicialización K-Means++
@@ -911,4 +1613,4 @@ if __name__ == "__main__":
 
 | Anterior | Índice | Siguiente |
 |----------|--------|-----------|
-| [04_SUPERVISED_LEARNING](04_SUPERVISED_LEARNING.md) | [00_INDICE](00_INDICE.md) | [06_DEEP_LEARNING](06_DEEP_LEARNING.md) |
+| [05_SUPERVISED_LEARNING](05_SUPERVISED_LEARNING.md) | [00_INDICE](00_INDICE.md) | [07_DEEP_LEARNING](07_DEEP_LEARNING.md) |

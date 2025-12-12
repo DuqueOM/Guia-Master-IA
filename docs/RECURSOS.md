@@ -1,4 +1,4 @@
-# 📚 Recursos de Aprendizaje - ML Specialist v3.0
+# 📚 Recursos de Aprendizaje - ML Specialist v3.3
 
 > Recursos organizados para dominar la **Línea 1: Machine Learning** del MS in AI Pathway.
 
@@ -10,9 +10,9 @@ Estos son los **3 cursos** de la Línea de Machine Learning:
 
 | Curso | Enlace | Módulo de Preparación |
 |-------|--------|----------------------|
-| **Introduction to ML: Supervised Learning** | [Coursera](https://www.coursera.org/learn/introduction-to-machine-learning-supervised-learning) | Módulo 04 |
-| **Unsupervised Algorithms in ML** | [Coursera](https://www.coursera.org/learn/unsupervised-algorithms-in-machine-learning) | Módulo 05 |
-| **Introduction to Deep Learning** | [Coursera](https://www.coursera.org/learn/introduction-to-deep-learning-boulder) | Módulo 06 |
+| **Introduction to ML: Supervised Learning** | [Coursera](https://www.coursera.org/learn/introduction-to-machine-learning-supervised-learning) | Módulo 05 |
+| **Unsupervised Algorithms in ML** | [Coursera](https://www.coursera.org/learn/unsupervised-algorithms-in-machine-learning) | Módulo 06 |
+| **Introduction to Deep Learning** | [Coursera](https://www.coursera.org/learn/introduction-to-deep-learning-boulder) | Módulo 07 |
 
 > 💡 Puedes auditar estos cursos GRATIS en Coursera para ver el contenido.
 
@@ -127,7 +127,7 @@ Estos son los **3 cursos** de la Línea de Machine Learning:
 
 ---
 
-## 📅 Ruta de Aprendizaje (26 Semanas)
+## 📅 Ruta de Aprendizaje (24 Semanas)
 
 ### Semanas 1-8: Fundamentos Matemáticos
 
@@ -135,23 +135,25 @@ Estos son los **3 cursos** de la Línea de Machine Learning:
 |--------|------|----------|
 | 1-2 | Python Científico + NumPy | Módulo 01 + NumPy docs |
 | 3-5 | Álgebra Lineal | Módulo 02 + 3B1B Linear Algebra |
-| 6-8 | Cálculo Multivariante | Módulo 03 + 3B1B Calculus |
+| 6-7 | Cálculo Multivariante | Módulo 03 + 3B1B Calculus |
+| 8 | Probabilidad para ML | Módulo 04 + StatQuest |
 
 ### Semanas 9-20: Núcleo ML
 
 | Semana | Tema | Recursos |
 |--------|------|----------|
-| 9-12 | Supervised Learning | Módulo 04 + StatQuest ML |
-| 13-16 | Unsupervised Learning | Módulo 05 + Andrew Ng videos |
-| 17-20 | Deep Learning | Módulo 06 + 3B1B Neural Networks |
+| 9-12 | Supervised Learning | Módulo 05 + StatQuest ML |
+| 13-16 | Unsupervised Learning | Módulo 06 + Andrew Ng videos |
+| 17-20 | Deep Learning | Módulo 07 + 3B1B Neural Networks |
 
-### Semanas 21-26: Proyecto MNIST
+### Semanas 21-24: Proyecto MNIST
 
 | Semana | Fase | Entregable |
 |--------|------|------------|
-| 21-22 | PCA + K-Means | Exploración no supervisada |
-| 23-24 | Logistic Regression | Clasificación supervisada |
-| 25-26 | MLP + Benchmark | Comparación de modelos |
+| 21 | PCA + K-Means | Exploración no supervisada |
+| 22 | Logistic Regression | Clasificación supervisada |
+| 23 | MLP (Backprop) | Deep Learning aplicado |
+| 24 | Benchmark + Informe | Comparación y comunicación |
 
 ---
 

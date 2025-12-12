@@ -6,9 +6,51 @@
 
 ---
 
+<a id="m05-0"></a>
+
+## 🧭 Cómo usar este módulo (modo 0→100)
+
+**Propósito:** que puedas construir un pipeline supervisado “de examen”:
+
+- entrenar (regresión lineal/logística)
+- evaluar (métricas)
+- validar (train/test, K-fold)
+- controlar overfitting (regularización)
+
+### Objetivos de aprendizaje (medibles)
+
+Al terminar este módulo podrás:
+
+- **Implementar** regresión lineal y regresión logística desde cero.
+- **Derivar** el gradiente de MSE y de cross-entropy (con la forma `Xᵀ(ŷ - y)`).
+- **Elegir** métricas correctas según el costo de FP/FN.
+- **Aplicar** validación (split y K-fold) evitando leakage.
+- **Validar** tu implementación con Shadow Mode (sklearn) como ground truth.
+
+Enlaces rápidos:
+
+- [04_PROBABILIDAD_ML.md](04_PROBABILIDAD_ML.md) (MLE → cross-entropy)
+- [GLOSARIO.md](GLOSARIO.md)
+- [RECURSOS.md](RECURSOS.md)
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Recursos (cuándo usarlos)
+
+| Prioridad | Recurso | Cuándo usarlo en este módulo | Para qué |
+|----------|---------|------------------------------|----------|
+| **Obligatorio** | [04_PROBABILIDAD_ML.md](04_PROBABILIDAD_ML.md) | Antes de implementar `log-loss`/cross-entropy y el gradiente de logística | Conectar MLE → cross-entropy y evitar derivaciones “de memoria” |
+| **Obligatorio** | `study_tools/DIRTY_DATA_CHECK.md` | Antes del primer entrenamiento real (Semana 9–10), al preparar datasets | Evitar que el modelo “aprenda basura” por fallas de datos |
+| **Obligatorio** | `study_tools/DIARIO_ERRORES.md` | Cada vez que veas métricas incoherentes, accuracy “mágico” o divergencia | Registrar bugs, causas y fixes reproducibles |
+| **Complementario** | [StatQuest ML (playlist)](https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF) | Semana 10–12 (logística, métricas, regularización) | Refuerzo conceptual rápido + ejemplos |
+| **Complementario** | [Stanford CS229](https://www.youtube.com/playlist?list=PLoROMvodv4rMiGQp3WXShtMGgzqpfVfbU) | Después de implementar regresión lineal/logística (para profundizar) | Profundizar en teoría y derivaciones estándar |
+| **Opcional** | [RECURSOS.md](RECURSOS.md) | Al finalizar el módulo (para escoger práctica extra) | Expandir sin perder el foco del Pathway |
+
+---
+
 ## 🧠 ¿Qué es Supervised Learning?
 
-```
+```text
 APRENDIZAJE SUPERVISADO
 
 Tenemos:
@@ -216,6 +258,258 @@ print(f"R² score: {model.score(X, y):.4f}")
 
 ## 💻 Parte 2: Regresión Logística
 
+### 2.0 Regresión Logística — Nivel: intermedio (core del Pathway)
+
+**Propósito:** pasar de “sé aplicar sigmoid” a **poder entrenar, derivar y validar** un clasificador binario (y extenderlo a multiclase con One-vs-All).
+
+#### Objetivos de aprendizaje (medibles)
+
+Al terminar esta parte podrás:
+
+- **Explicar** por qué regresión logística es un modelo lineal *sobre el log-odds* (aunque la salida sea una probabilidad).
+- **Derivar** (a mano) el gradiente de la pérdida *Binary Cross-Entropy* y reconocer la forma `Xᵀ(ŷ - y)`.
+- **Implementar** `fit()` con gradient descent estable (con `clip`/`eps`) y verificar convergencia.
+- **Diagnosticar** errores típicos: shapes, overflow en `exp`, signos invertidos, saturación de sigmoid.
+- **Validar** tu implementación con **Shadow Mode** (comparación con sklearn) y con un *overfit test* en dataset pequeño.
+
+#### Prerrequisitos
+
+- De `Módulo 03`: Chain Rule y gradiente.
+- De `Módulo 04`: interpretación de MLE (conexión con cross-entropy).
+
+Enlaces rápidos:
+
+- [GLOSARIO: Logistic Regression](GLOSARIO.md#logistic-regression)
+- [GLOSARIO: Sigmoid](GLOSARIO.md#sigmoid)
+- [GLOSARIO: Binary Cross-Entropy](GLOSARIO.md#binary-cross-entropy)
+- [GLOSARIO: Gradient Descent](GLOSARIO.md#gradient-descent)
+- [RECURSOS.md](RECURSOS.md)
+
+#### Explicación progresiva (intuición → formalización → implementación)
+
+##### a) Intuición
+
+Quieres un modelo que devuelva:
+
+- un **score lineal** `z = θᵀx` (como en regresión lineal), y
+- lo convierta en una **probabilidad** en `(0, 1)`.
+
+Eso lo hace `σ(z)`.
+
+##### a.1 Odds, log-odds y por qué esto “sigue siendo lineal”
+
+Si el modelo produce `p = P(y=1|x)`, define:
+
+```
+odds = p / (1 - p)
+logit(p) = log(odds)
+```
+
+La regresión logística asume que **el log-odds es lineal**:
+
+```
+logit(p) = θᵀx
+```
+
+Y la sigmoide es simplemente la función que vuelve de logit a probabilidad:
+
+```
+p = σ(θᵀx) = 1 / (1 + exp(-θᵀx))
+```
+
+Esto importa porque te permite interpretar el modelo:
+
+- subir `θᵀx` en +1 incrementa el **log-odds** en +1 (cambio multiplicativo en odds).
+
+##### a.2 Por qué NO usar MSE para clasificación
+
+Podrías intentar usar MSE con `ŷ = σ(z)`, pero en práctica es mala idea:
+
+- **La geometría del entrenamiento empeora:** el gradiente se vuelve poco informativo cuando `σ(z)` se satura (cerca de 0 o 1).
+- **La función objetivo deja de ser convexa** (puede tener mínimos locales / mesetas), haciendo el descenso de gradiente menos confiable.
+- **No penaliza bien el caso “seguro y equivocado”:** si `y=1` pero `ŷ≈0`, quieres un castigo enorme; eso lo da `-log(ŷ)`.
+
+Por eso usamos **Log-Loss / Binary Cross-Entropy**, que viene de MLE y es convexa para este modelo.
+
+##### a.3 Visual: frontera de decisión
+
+La frontera de decisión es el conjunto de puntos donde `p = 0.5`:
+
+```
+σ(θᵀx) = 0.5  ⇔  θᵀx = 0
+```
+
+##### a.3.1 Intuición geométrica: el “plano de corte”
+
+Piensa en tus datos como puntos en un espacio.
+
+- En 2D, `θᵀx + b = 0` es una **línea**.
+- En 3D, es un **plano**.
+- En `n` dimensiones, es un **hiperplano**.
+
+La cantidad `z = θᵀx + b` es un **score con signo**:
+
+- `z > 0` → estás del lado “positivo” del plano
+- `z < 0` → estás del lado “negativo”
+
+La sigmoide `σ(z)` convierte ese score (relacionado con la distancia al plano) en probabilidad:
+
+- puntos muy lejos del plano (|z| grande) → probabilidad cerca de 0 o 1
+- puntos cerca del plano (`z ≈ 0`) → probabilidad cerca de 0.5
+
+Visualización sugerida (dibújalo): una nube roja/azul y una línea que la corta; marca puntos a distinta distancia y escribe su `z` y `σ(z)`.
+
+##### a.3.2 Conexión conceptual: SVM y la idea de “margen” (sin implementar)
+
+Aunque no implementes SVM aquí, su intuición te mejora la comprensión de regularización.
+
+Idea:
+
+- En clasificación lineal, hay muchas líneas/planos que separan (si los datos lo permiten).
+- SVM busca el separador que deja la “carretera” más ancha entre clases: **máximo margen**.
+
+Conexión con lo que sí implementas:
+
+- La **regularización** (L2/L1) controla complejidad efectiva.
+- En problemas separables o casi separables, regularizar suele empujar a soluciones más estables, con fronteras menos extremas.
+
+Visualización sugerida: dos líneas separadoras posibles y dibujar cuál deja más espacio mínimo a los puntos más cercanos (support vectors).
+
+En 2D, `θᵀx = 0` es una **línea**.
+
+```
+clase 1:   o o o o o
+           o o o o o
+
+frontera:  ---------
+
+clase 0:   x x x x x
+           x x x x x
+```
+
+##### a.4 Worked example (numérico) de BCE
+
+Datos: `x=2`, `y=1`.
+
+- `w=0.5`, `b=0`
+- `z = wx + b = 1`
+- `ŷ = σ(1) ≈ 0.731`
+
+Como `y=1`, la loss por muestra es:
+
+```
+L = -log(ŷ) ≈ -log(0.731) ≈ 0.313
+```
+
+Interpretación: la predicción es “bastante” correcta, por eso la loss es pequeña. Si `ŷ` fuera 0.01, la loss sería enorme.
+
+##### a.5 Código generador de intuición (Protocolo D): frontera de decisión en 2D
+
+Objetivo: ver que la **frontera de decisión** (`p=0.5`) es lineal, aunque la salida `σ(z)` sea curva (curva en *probabilidad*, no en geometría de la frontera).
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def make_blobs_2d(n=200, seed=42):
+    rng = np.random.default_rng(seed)
+    c0 = rng.normal(loc=(-2.0, -1.5), scale=0.8, size=(n // 2, 2))
+    c1 = rng.normal(loc=(2.0, 1.5), scale=0.8, size=(n // 2, 2))
+    X = np.vstack([c0, c1])
+    y = np.array([0] * (n // 2) + [1] * (n // 2))
+    return X, y
+
+
+def sigmoid(z):
+    z = np.clip(z, -500, 500)
+    return 1 / (1 + np.exp(-z))
+
+
+def add_bias(X):
+    return np.column_stack([np.ones(len(X)), X])
+
+
+def plot_decision_boundary(model, X, y, title="Decision boundary"):
+    x_min, x_max = X[:, 0].min() - 1.0, X[:, 0].max() + 1.0
+    y_min, y_max = X[:, 1].min() - 1.0, X[:, 1].max() + 1.0
+
+    xx, yy = np.meshgrid(
+        np.linspace(x_min, x_max, 250),
+        np.linspace(y_min, y_max, 250),
+    )
+
+    grid = np.column_stack([xx.ravel(), yy.ravel()])
+    proba = model.predict_proba(grid).reshape(xx.shape)
+
+    plt.figure(figsize=(7, 6))
+    plt.contourf(xx, yy, proba, levels=20, cmap="RdBu", alpha=0.35)
+    plt.contour(xx, yy, proba, levels=[0.5], colors="black", linewidths=2)
+
+    plt.scatter(X[y == 0, 0], X[y == 0, 1], s=18, label="Clase 0")
+    plt.scatter(X[y == 1, 0], X[y == 1, 1], s=18, label="Clase 1")
+
+    plt.title(title)
+    plt.legend()
+    plt.grid(True, alpha=0.2)
+    plt.show()
+
+
+# Usa TU LogisticRegression del módulo (la clase ya existe más abajo)
+# X, y = make_blobs_2d(n=300)
+# model = LogisticRegression()
+# model.fit(X, y, learning_rate=0.1, n_iterations=2000)
+# plot_decision_boundary(model, X, y)
+```
+
+Reto visual (opcional, si usas sklearn solo para generar datos):
+
+- genera `make_moons` y grafica la frontera
+- verás por qué logística falla (frontera lineal)
+- luego entrena tu MLP (M07) y observa cómo la frontera se curva
+
+##### b) Formalización mínima
+
+- **Modelo:** `ŷ = σ(Xθ)`
+- **Decisión:** `ŷ ≥ 0.5 → clase 1` (umbral configurable)
+- **Loss (BCE):** penaliza fuerte cuando estás “seguro y equivocado” (ej. `ŷ≈0` pero `y=1`).
+
+##### c) Regla de oro de shapes
+
+Evita bugs silenciosos usando una convención consistente:
+
+- `X`: `(m, n)`
+- `θ`: `(n,)` (o `(n, 1)` si prefieres columnas)
+- `y`: `(m,)`
+
+Y verifica que `X @ θ` te da `(m,)`.
+
+#### Actividades activas (para convertir teoría en habilidad)
+
+- **Retrieval practice (5 min):** escribe sin mirar:
+  - la ecuación de BCE,
+  - el gradiente `∇θ`.
+- **Ejercicio de calibración:** cambia el `threshold` de 0.5 a 0.3 y explica qué pasa con precision/recall.
+- **Sanity check obligatorio:** entrena con 20 ejemplos hasta obtener accuracy ~100% (si no, hay bug).
+
+#### Evaluación (criterios de “dominio”)
+
+- **Dominio matemático:** puedes explicar por qué aparece `(ŷ - y)` en el gradiente.
+- **Dominio de implementación:** tu `fit()` reduce BCE de forma monotónica (o casi) en un dataset simple.
+- **Dominio de validación:** tu accuracy difiere <5% de sklearn en Shadow Mode.
+
+#### Errores comunes (los que más queman tiempo)
+
+- **Overflow/NaN:** `exp(500)` revienta. Solución: `clip(z)` y `eps` en logs.
+- **Saturación:** si `|z|` crece, `σ(z)` se pega a 0/1 y el gradiente se hace pequeño.
+- **Signo invertido:** si actualizas en la dirección equivocada, la loss sube.
+- **Sin normalización:** features en escalas muy distintas hacen que GD sea inestable.
+
+#### Integración con Plan v4/v5
+
+- **v4.0:** usa `study_tools/SIMULACRO_EXAMEN_TEORICO.md` para preguntas tipo examen (sigmoid vs softmax, BCE vs MSE).
+- **v5.0:** ejecuta **Shadow Mode** como verificación externa antes de dar por terminado el módulo.
+
 ### 2.1 Función Sigmoid
 
 ```python
@@ -403,7 +697,87 @@ print(f"Parámetros: {model.theta}")
 
 ---
 
+## 🧩 Consolidación (Regresión Logística)
+
+### Errores comunes
+
+- **Etiquetas incorrectas:** BCE asume `y ∈ {0,1}` (no `{-1,1}`) si usas la fórmula estándar.
+- **Olvidar el bias:** si no agregas columna de 1s, la frontera se forza a pasar por el origen.
+- **`exp` overflow:** si `z` crece, `exp(-z)` puede overflow/underflow → usa `clip`.
+- **`log(0)`:** si `h` llega a 0 o 1 exactos, `log` revienta → usa `eps`.
+- **Sin escalado:** features con escalas distintas hacen el GD inestable.
+
+### Debugging / validación (v5)
+
+- **Overfit test:** entrena con 20 ejemplos hasta casi 100% accuracy. Si no, asume bug.
+- **Shadow Mode:** compara con sklearn para la misma semilla/dataset.
+- Registra hallazgos en `study_tools/DIARIO_ERRORES.md`.
+- Protocolos completos:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Reto Feynman (tablero blanco)
+
+Explica en 5 líneas o menos:
+
+1) ¿Qué es el logit y por qué logística es lineal “en el espacio de log-odds”?
+2) ¿Por qué `-log(ŷ)` explota cuando estás seguro y equivocado?
+3) ¿Qué significa `Xᵀ(ŷ - y)` y por qué aparece en el gradiente?
+
+---
+
 ## 💻 Parte 3: Métricas de Evaluación
+
+### 3.0 Métricas — Nivel: intermedio (de “calcular” a “tomar decisiones”)
+
+**Propósito:** que no te quedes en “sé calcular accuracy”, sino que puedas **elegir la métrica correcta según el riesgo** (FP vs FN), detectar desbalance de clases y justificar tus decisiones como en un informe.
+
+#### Objetivos de aprendizaje (medibles)
+
+Al terminar esta parte podrás:
+
+- **Explicar** la matriz de confusión y derivar TP/TN/FP/FN sin mirar apuntes.
+- **Aplicar** accuracy/precision/recall/F1/specificity y explicar cuándo cada una es adecuada.
+- **Analizar** el impacto del umbral (`threshold`) en precision/recall.
+- **Diagnosticar** trampas comunes: accuracy alta con clases desbalanceadas, leakage, evaluar sobre train.
+
+#### Prerrequisitos y conexiones
+
+- Conexión directa con probabilidad/loss:
+  - [04_PROBABILIDAD_ML.md](04_PROBABILIDAD_ML.md) (MLE → cross-entropy)
+- Glosario:
+  - [GLOSARIO: Confusion Matrix](GLOSARIO.md#confusion-matrix)
+  - [GLOSARIO: Accuracy](GLOSARIO.md#accuracy)
+  - [GLOSARIO: Precision](GLOSARIO.md#precision)
+  - [GLOSARIO: Recall](GLOSARIO.md#recall)
+  - [GLOSARIO: F1 Score](GLOSARIO.md#f1-score)
+
+#### Resumen ejecutivo (big idea)
+
+La métrica es una traducción explícita de “qué error es más caro”:
+
+- Si te preocupa **no perder positivos reales** → prioriza **recall**.
+- Si te preocupa **no disparar falsas alarmas** → prioriza **precision**.
+- Si necesitas balance → **F1**.
+- Si tu dataset está balanceado y el costo es simétrico → **accuracy** puede servir.
+
+#### Actividades activas (obligatorias)
+
+- **Retrieval practice (5 min):** escribe la matriz 2x2 y define TP/TN/FP/FN.
+- **Experimento de umbral:** evalúa con `threshold = 0.3, 0.5, 0.7` y anota cómo cambian precision/recall.
+- **Caso desbalanceado:** crea un dataset donde 95% sea clase 0 y muestra por qué accuracy engaña.
+
+#### Errores comunes (los que más dañan resultados)
+
+- **Evaluar en training:** te da una “métrica falsa” por overfitting.
+- **Leakage:** normalizar/seleccionar features usando todo el dataset antes del split.
+- **No fijar semilla:** resultados no reproducibles.
+
+Integración con Plan v4/v5:
+
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md) (rutina + simulacros)
+- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md) (validación externa / rigor)
+- Diario: `study_tools/DIARIO_ERRORES.md`
 
 ### 3.1 Matriz de Confusión
 
@@ -571,6 +945,49 @@ print(report)
 ---
 
 ## 💻 Parte 4: Validación y Regularización
+
+### 4.0 Validación y regularización — Nivel: intermedio/avanzado
+
+**Propósito:** aprender el “workflow real” que evita autoengaño:
+
+- dividir datos correctamente
+- validar de forma robusta
+- controlar overfitting (regularización)
+
+#### Objetivos de aprendizaje (medibles)
+
+Al terminar esta parte podrás:
+
+- **Explicar** la diferencia entre train/val/test y por qué el test no se toca.
+- **Aplicar** K-fold cross validation y reportar media ± desviación.
+- **Diagnosticar** sesgo-varianza en términos prácticos (qué cambia si aumentas `λ` o si cambias el tamaño del modelo).
+- **Implementar** regularización L2 y justificar por qué se excluye el bias.
+
+#### Resumen ejecutivo (big idea)
+
+- **Validación** te dice si generalizas.
+- **Regularización** controla complejidad efectiva.
+
+Conectar esto con el Pathway:
+
+- En el curso, se evalúa tanto la *matemática* como tu capacidad de **evitar leakage** y reportar resultados correctamente.
+
+#### Actividades activas (obligatorias)
+
+- Ejecuta `train_test_split` con al menos 2 semillas distintas y compara varianza en accuracy.
+- Haz K-fold (k=5) y reporta `mean ± std`.
+- Prueba `lambda_` en `{0, 0.01, 0.1, 1.0}` y describe el efecto.
+
+#### Errores comunes
+
+- **Data leakage** por normalizar antes del split.
+- **Elegir hiperparámetros mirando el test** (invalidas el test).
+- **Regularizar el bias** sin querer.
+
+#### Integración con Plan v4/v5
+
+- v4.0: usa simulacros para preguntas tipo examen (`study_tools/SIMULACRO_EXAMEN_TEORICO.md`).
+- v5.0: valida tu implementación con Shadow Mode (sklearn) antes de cerrar el módulo.
 
 ### 4.1 Train/Test Split
 
@@ -770,7 +1187,7 @@ Implementación desde cero de:
 - Cross Validation
 
 Autor: [Tu nombre]
-Módulo: 04 - Supervised Learning
+Módulo: 05 - Supervised Learning
 """
 
 import numpy as np
@@ -962,58 +1379,76 @@ if __name__ == "__main__":
 
 ---
 
-## 📝 Derivación Analítica: El Entregable de Lápiz y Papel (v3.2)
+## 📝 Derivación Analítica: El Entregable de Lápiz y Papel (v3.3)
 
 > 🎓 **Simulación de Examen:** En la maestría te pedirán: *"Derive la regla de actualización de pesos para Logistic Regression"*. Debes poder hacerlo a mano.
 
 ### Derivación del Gradiente de Logistic Regression
 
-**Objetivo:** Derivar $\frac{\partial L}{\partial w}$ para la función de costo Cross-Entropy.
+**Objetivo:** Derivar `∂L/∂w` para la función de costo Cross-Entropy.
 
 #### Paso 1: Definir la Función de Costo
 
-$$L(w) = -\frac{1}{n} \sum_{i=1}^{n} \left[ y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i) \right]$$
+```
+L(w) = -(1/n) Σ_{i=1..n} [ y_i log(ŷ_i) + (1 - y_i) log(1 - ŷ_i) ]
+```
 
 Donde:
-- $\hat{y}_i = \sigma(w^T x_i) = \frac{1}{1 + e^{-w^T x_i}}$
-- $\sigma(z)$ es la función sigmoid
+- `ŷ_i = σ(wᵀ x_i) = 1 / (1 + e^{-wᵀ x_i})`
+- `σ(z)` es la función sigmoid
 
 #### Paso 2: Derivar la Sigmoid
 
-$$\frac{d\sigma}{dz} = \sigma(z)(1 - \sigma(z))$$
+```
+dσ/dz = σ(z)(1 - σ(z))
+```
 
 **Demostración:**
-$$\sigma(z) = \frac{1}{1 + e^{-z}}$$
-$$\frac{d\sigma}{dz} = \frac{e^{-z}}{(1 + e^{-z})^2} = \frac{1}{1 + e^{-z}} \cdot \frac{e^{-z}}{1 + e^{-z}} = \sigma(z)(1 - \sigma(z))$$
+```
+σ(z) = 1 / (1 + e^{-z})
+
+dσ/dz = e^{-z} / (1 + e^{-z})^2
+      = (1 / (1 + e^{-z})) · (e^{-z} / (1 + e^{-z}))
+      = σ(z)(1 - σ(z))
+```
 
 #### Paso 3: Aplicar la Regla de la Cadena
 
-Para un solo ejemplo $(x_i, y_i)$:
+Para un solo ejemplo `(x_i, y_i)`:
 
-$$\frac{\partial L_i}{\partial w} = \frac{\partial L_i}{\partial \hat{y}_i} \cdot \frac{\partial \hat{y}_i}{\partial z_i} \cdot \frac{\partial z_i}{\partial w}$$
+```
+∂L_i/∂w = (∂L_i/∂ŷ_i) · (∂ŷ_i/∂z_i) · (∂z_i/∂w)
+```
 
-Donde $z_i = w^T x_i$
+Donde `z_i = wᵀ x_i`
 
 **Calcular cada término:**
 
-1. $\frac{\partial L_i}{\partial \hat{y}_i} = -\frac{y_i}{\hat{y}_i} + \frac{1 - y_i}{1 - \hat{y}_i}$
+1. `∂L_i/∂ŷ_i = -y_i/ŷ_i + (1 - y_i)/(1 - ŷ_i)`
 
-2. $\frac{\partial \hat{y}_i}{\partial z_i} = \hat{y}_i(1 - \hat{y}_i)$
+2. `∂ŷ_i/∂z_i = ŷ_i(1 - ŷ_i)`
 
-3. $\frac{\partial z_i}{\partial w} = x_i$
+3. `∂z_i/∂w = x_i`
 
 #### Paso 4: Simplificar
 
-$$\frac{\partial L_i}{\partial w} = \left( -\frac{y_i}{\hat{y}_i} + \frac{1 - y_i}{1 - \hat{y}_i} \right) \cdot \hat{y}_i(1 - \hat{y}_i) \cdot x_i$$
+```
+∂L_i/∂w = ( -y_i/ŷ_i + (1 - y_i)/(1 - ŷ_i) ) · ŷ_i(1 - ŷ_i) · x_i
+```
 
 Simplificando el término entre paréntesis:
-$$= \frac{-y_i(1 - \hat{y}_i) + (1-y_i)\hat{y}_i}{\hat{y}_i(1 - \hat{y}_i)} \cdot \hat{y}_i(1 - \hat{y}_i) \cdot x_i$$
-$$= (-y_i + y_i\hat{y}_i + \hat{y}_i - y_i\hat{y}_i) \cdot x_i$$
-$$= (\hat{y}_i - y_i) \cdot x_i$$
+```
+= ( (-y_i(1 - ŷ_i) + (1 - y_i)ŷ_i) / (ŷ_i(1 - ŷ_i)) ) · ŷ_i(1 - ŷ_i) · x_i
+= (-y_i + y_iŷ_i + ŷ_i - y_iŷ_i) · x_i
+= (ŷ_i - y_i) · x_i
+```
 
 #### Resultado Final
 
-$$\boxed{\frac{\partial L}{\partial w} = \frac{1}{n} \sum_{i=1}^{n} (\hat{y}_i - y_i) x_i = \frac{1}{n} X^T (\hat{y} - y)}$$
+```
+∂L/∂w = (1/n) Σ_{i=1..n} (ŷ_i - y_i) x_i
+      = (1/n) Xᵀ (ŷ - y)
+```
 
 **Forma vectorizada (para código):**
 ```python
@@ -1024,8 +1459,8 @@ gradient = (1/n) * X.T @ (y_pred - y_true)
 
 Escribe en un documento (Markdown o LaTeX):
 1. La derivación completa del gradiente de Cross-Entropy
-2. La derivación de la regla de actualización: $w \leftarrow w - \alpha \nabla L$
-3. Por qué el gradiente tiene la forma $(\hat{y} - y)$ (interpretación geométrica)
+2. La derivación de la regla de actualización: `w <- w - α ∇L`
+3. Por qué el gradiente tiene la forma `(ŷ - y)` (interpretación geométrica)
 
 ---
 
@@ -1037,7 +1472,7 @@ Explica en **máximo 5 líneas** sin jerga técnica:
    > Pista: Piensa en probabilidades entre 0 y 1.
 
 2. **¿Por qué Cross-Entropy y no MSE para clasificación?**
-   > Pista: Piensa en qué pasa cuando $\hat{y} \approx 0$ pero $y = 1$.
+   > Pista: Piensa en qué pasa cuando `ŷ ≈ 0` pero `y = 1`.
 
 3. **¿Qué significa "One-vs-All"?**
    > Pista: Piensa en cómo clasificar 10 dígitos con clasificadores binarios.
@@ -1226,7 +1661,7 @@ if __name__ == "__main__":
 ### Derivación Analítica (Obligatorio)
 - [ ] Derivé el gradiente de Cross-Entropy a mano
 - [ ] Documento con derivación completa (Markdown o LaTeX)
-- [ ] Puedo explicar por qué $\nabla L = X^T(\hat{y} - y)$
+- [ ] Puedo explicar por qué `∇L = Xᵀ(ŷ - y)`
 
 ### Metodología Feynman
 - [ ] Puedo explicar sigmoid en 5 líneas sin jerga

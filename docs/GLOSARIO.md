@@ -1,4 +1,4 @@
-# 📖 Glosario Técnico - ML Specialist v3.0
+# 📖 Glosario Técnico - ML Specialist v3.3
 
 > Definiciones A-Z de términos de Machine Learning usados en la guía.
 

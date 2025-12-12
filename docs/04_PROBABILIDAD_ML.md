@@ -18,13 +18,70 @@ Dominar los **conceptos mínimos de probabilidad** necesarios para:
 
 ---
 
+<a id="m04-0"></a>
+
+## 🧭 Cómo usar este módulo (modo 0→100)
+
+**Propósito:** conectar probabilidad con lo que realmente usarás en el Pathway:
+
+- pérdidas (cross-entropy) como *negative log-likelihood*
+- clasificación probabilística (logistic/softmax)
+- gaussianas como base de modelos generativos (GMM)
+- estabilidad numérica (evitar `NaN`)
+
+### Objetivos de aprendizaje (medibles)
+
+Al terminar el módulo podrás:
+
+- **Explicar** `P(A|B)` y el teorema de Bayes con un ejemplo de clasificación.
+- **Aplicar** el punto de vista de MLE: “elegir parámetros que hacen los datos más probables”.
+- **Derivar** por qué minimizar cross-entropy equivale a maximizar log-likelihood (binaria y multiclase).
+- **Implementar** softmax y log-softmax de forma numéricamente estable (log-sum-exp).
+- **Diagnosticar** fallos típicos: `log(0)`, overflow/underflow, probabilidades que no suman 1.
+
+### Prerrequisitos
+
+- De `Módulo 01`: NumPy (vectorización, `axis`, broadcasting).
+- De `Módulo 03`: Chain Rule y gradiente (para entender el salto a `Módulo 05/07`).
+
+Enlaces rápidos:
+
+- [RECURSOS.md](RECURSOS.md)
+- [GLOSARIO: Binary Cross-Entropy](GLOSARIO.md#binary-cross-entropy)
+- [GLOSARIO: Softmax](GLOSARIO.md#softmax)
+- [GLOSARIO: Chain Rule](GLOSARIO.md#chain-rule)
+
+### Integración con Plan v4/v5
+
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+- Registro de errores: `study_tools/DIARIO_ERRORES.md`
+
+### Recursos (cuándo usarlos)
+
+| Prioridad | Recurso | Cuándo usarlo en este módulo | Para qué |
+|----------|---------|------------------------------|----------|
+| **Obligatorio** | `study_tools/DIARIO_ERRORES.md` | Cada vez que aparezca `NaN`, `inf`, `log(0)` u overflow/underflow | Registrar el caso y crear un “fix” reproducible |
+| **Obligatorio** | [StatQuest - Maximum Likelihood](https://www.youtube.com/watch?v=XepXtl9YKwc) | Antes (o durante) la sección de MLE y cross-entropy | Alinear intuición de “maximizar verosimilitud” |
+| **Complementario** | [3Blue1Brown - Bayes Theorem](https://www.youtube.com/watch?v=HZGCoVF3YvM) | Cuando Bayes se sienta “fórmula sin sentido” (día 3-4) | Visualizar prior/likelihood/posterior |
+| **Complementario** | [Mathematics for ML (book)](https://mml-book.github.io/) | Al implementar Gaussiana multivariada y covarianza | Refuerzo de notación y derivaciones |
+| **Opcional** | [RECURSOS.md](RECURSOS.md) | Al terminar el módulo (para planificar Línea 2 o profundizar) | Elegir rutas de estudio sin romper el foco de Línea 1 |
+
+### Mapa conceptual (qué conecta con qué)
+
+- **MLE → Cross-Entropy:** sustenta Logistic Regression (Módulo 05) y BCE/CCE en Deep Learning (Módulo 07).
+- **Gaussiana multivariada:** es el “átomo” de GMM (Módulo 06).
+- **Softmax + Log-Sum-Exp:** evita inestabilidad numérica en clasificación multiclase (Módulo 05/07).
+
+---
+
 ## 📚 Contenido
 
 ### Día 1-2: Fundamentos de Probabilidad
 
 #### 1.1 Probabilidad Básica
 
-```
+```text
 P(A) = casos favorables / casos totales
 
 Propiedades:
@@ -35,7 +92,7 @@ Propiedades:
 
 #### 1.2 Probabilidad Condicional
 
-```
+```text
 P(A|B) = P(A ∩ B) / P(B)
 
 "Probabilidad de A dado que B ocurrió"
@@ -46,7 +103,7 @@ P(A|B) = P(A ∩ B) / P(B)
 
 #### 1.3 Independencia
 
-```
+```text
 A y B son independientes si:
 P(A ∩ B) = P(A) · P(B)
 
@@ -60,7 +117,7 @@ P(A|B) = P(A)
 
 #### 2.1 La Fórmula
 
-```
+```text
             P(B|A) · P(A)
 P(A|B) = ─────────────────
                P(B)
@@ -74,7 +131,7 @@ Donde:
 
 #### 2.2 Interpretación para ML
 
-```
+```text
               P(datos|clase) · P(clase)
 P(clase|datos) = ─────────────────────────
                       P(datos)
@@ -152,11 +209,162 @@ def naive_bayes_predict(X: np.ndarray,
 
 ---
 
+## 🧩 Micro-Capítulo Maestro: Maximum Likelihood Estimation (MLE) — Nivel: Avanzado
+
+### 1) Intuición (la metáfora del detective)
+
+Imagina que eres un detective que llega a una escena del crimen (tus **datos** `X`).
+
+- Tienes una lista de sospechosos (tus **modelos**).
+- Cada sospechoso tiene un comportamiento ajustable por perillas (tus **parámetros** `θ`).
+
+MLE pregunta:
+
+> **¿Qué valores de `θ` hacen MÁS PROBABLE que estos datos específicos hayan ocurrido?**
+
+Importante:
+
+- No estamos diciendo “qué parámetro es más probable” (eso sería un enfoque Bayesiano).
+- Estamos diciendo “qué parámetro le da la mayor probabilidad a los datos que YA vimos”.
+
+### 2) Formalización (likelihood y log-likelihood)
+
+Sea `X = {x1, x2, ..., xn}` un conjunto de datos i.i.d.
+
+La **likelihood** es:
+
+`L(θ | X) = P(X | θ) = Π_{i=1}^{n} P(x_i | θ)`
+
+Como multiplicar muchos números pequeños causa underflow, usamos log:
+
+`ℓ(θ) = log L(θ|X) = Σ_{i=1}^{n} log P(x_i | θ)`
+
+Como `log` es monótona creciente, maximizar `L` y maximizar `ℓ` es equivalente:
+
+`θ_MLE = argmax_θ ℓ(θ)`
+
+### 3) Derivación clave: de MLE a MSE (Regresión Lineal)
+
+La idea conceptual: cuando usas **MSE**, estás asumiendo implícitamente un modelo de ruido.
+
+Supón que tu regresión lineal es:
+
+`y = Xβ + ε` con `ε ~ N(0, σ² I)`
+
+Entonces la probabilidad de observar `y` dado `β` es Gaussiana:
+
+`P(y | X, β) ∝ exp( - (1/(2σ²)) ||y - Xβ||² )`
+
+Tomando log-likelihood y tirando constantes que no dependen de `β`:
+
+`ℓ(β) = const - (1/(2σ²)) ||y - Xβ||²`
+
+Maximizar `ℓ(β)` equivale a minimizar `||y - Xβ||²`.
+
+Conclusión:
+
+- Minimizar **SSE/MSE** es exactamente hacer **MLE** bajo ruido Gaussiano.
+- Esta conexión es el puente directo hacia **Statistical Estimation** (Línea 2).
+
+### 4) Conexión Línea 2: estimadores, sesgo y varianza (intuición)
+
+En Línea 2, la palabra clave es **estimador**: una regla que convierte datos en un parámetro.
+
+- Un **estimador** es una función: `\hat{θ} = g(X)`.
+- **Sesgo (bias):** si `E[\hat{θ}]` no coincide con el valor real `θ`.
+- **Varianza:** cuánto cambia `\hat{θ}` si repites el muestreo.
+
+Regla mental:
+
+- **Más bias** suele dar **menos varianza**.
+- **Menos bias** suele dar **más varianza**.
+
+Esto reaparece en ML como *bias-variance tradeoff*.
+
+### 5) Teoría de Estimadores (lo que te evalúan en proyectos/examen)
+
+Aquí pasamos de la intuición a una formalización que aparece mucho en evaluación.
+
+#### 5.1 Sesgo, varianza y MSE (descomposición clave)
+
+Si quieres estimar un parámetro real `θ` con un estimador `\hat{θ}`, el error cuadrático medio es:
+
+`MSE(\hat{θ}) = E[(\hat{θ} - θ)^2]`
+
+La identidad importante es:
+
+`MSE(\hat{θ}) = Var(\hat{θ}) + Bias(\hat{θ})^2`
+
+Donde:
+
+- `Bias(\hat{θ}) = E[\hat{θ}] - θ`
+- `Var(\hat{θ}) = E[(\hat{θ} - E[\hat{θ}])^2]`
+
+Lectura mental:
+
+- Puedes reducir MSE bajando varianza, aunque suba un poco el sesgo.
+- O puedes “perseguir cero sesgo” y pagar con alta varianza.
+
+Esto es exactamente el *bias-variance trade-off* en ML (por ejemplo, regularizar o simplificar modelos).
+
+#### 5.2 Unbiased vs consistente (2 propiedades distintas)
+
+- **Unbiased (insesgado):** `E[\hat{θ}] = θ`.
+- **Consistente:** cuando `n → ∞`, `\hat{θ} → θ` (en un sentido probabilístico).
+
+Un estimador puede ser sesgado y aun así consistente (y a veces es preferible si reduce varianza para `n` finito).
+
+#### 5.3 Conexión directa con regularización (puente a ML)
+
+Ejemplo mental:
+
+- **Ridge / L2** introduce sesgo (empuja coeficientes hacia 0).
+- A cambio suele reducir varianza (solución más estable ante ruido y colinealidad).
+
+En términos de la descomposición:
+
+- sube `Bias^2`
+- baja `Var`
+
+Si el total baja, mejora el `MSE` esperado fuera de muestra.
+
+## 🧩 Micro-Capítulo Maestro: Introducción a Markov Chains — Nivel: Intermedio
+
+### 1) Concepto
+
+Una cadena de Markov es un sistema que salta entre estados.
+
+Propiedad de Markov (“falta de memoria”):
+
+`P(S_{t+1} | S_t, S_{t-1}, ...) = P(S_{t+1} | S_t)`
+
+### 2) Representación matricial (puente con Álgebra Lineal)
+
+Si tienes 3 estados (Sol, Nube, Lluvia), defines una matriz de transición `P` (3×3) donde cada fila suma 1.
+
+Si `π_t` es un vector fila (1×3) con la distribución “hoy”, entonces:
+
+`π_{t+1} = π_t P`
+
+Y en `k` pasos:
+
+`π_{t+k} = π_t P^k`
+
+### 3) Reto mental: estacionariedad = eigenvector
+
+Si repites multiplicaciones, muchas cadenas convergen a una distribución estacionaria `π*` tal que:
+
+`π* = π* P`
+
+Eso significa (en la perspectiva correcta) que `π*` es un **eigenvector** asociado al **eigenvalue 1**.
+
+---
+
 ### Día 5: Distribución Gaussiana (Normal)
 
 #### 3.1 La Distribución Más Importante en ML
 
-```
+```text
                     1              (x - μ)²
 f(x) = ───────────────── · exp(- ─────────)
        σ · √(2π)                   2σ²
@@ -261,9 +469,96 @@ print(f"P(x=[0.5, 0.5]) = {prob:.4f}")
 
 ### Día 6: Maximum Likelihood Estimation (MLE)
 
+#### 4.0 MLE → Cross-Entropy (la conexión que te piden en exámenes)
+
+**Idea:** si un modelo produce probabilidades `P(y|x, θ)`, entrenar por MLE significa:
+
+- maximizar `Πᵢ P(yᵢ|xᵢ, θ)`
+
+Por estabilidad numérica y conveniencia, trabajamos con log:
+
+- maximizar `Σᵢ log P(yᵢ|xᵢ, θ)`
+
+Y como optimizadores minimizan, entrenamos minimizando:
+
+- `-Σᵢ log P(yᵢ|xᵢ, θ)`  (negative log-likelihood)
+
+Ese término es exactamente la **cross-entropy** que usas en:
+
+- Logistic Regression (BCE) en `Módulo 05`
+- clasificación multiclase (CCE) en `Módulo 07`
+
+**Cheat sheet:**
+
+- **MLE:** maximizar likelihood
+- **Entrenamiento:** minimizar negative log-likelihood
+- **En clasificación:** eso se llama cross-entropy
+
+---
+
+### Extensión Estratégica (Línea 2): Statistical Estimation
+
+#### MLE como filosofía: “ajustar perillas”
+
+MLE no es solo una fórmula: es una forma de pensar.
+
+- Tienes un modelo con parámetros `θ` (las “perillas”).
+- Ya viste datos `D`.
+- Pregunta: ¿qué valores de `θ` hacen que `D` sea lo más probable posible?
+
+Formalmente:
+
+```text
+θ_MLE = argmax_θ P(D | θ)
+```
+
+Como `P(D|θ)` suele ser un producto grande, usamos log:
+
+```text
+θ_MLE = argmax_θ log P(D | θ)
+```
+
+Esto es el puente directo a **Statistical Estimation** (Línea 2): estimadores, sesgo, varianza, y por qué “promedio” aparece en tantos lados.
+
+#### Worked example: Moneda (Bernoulli) → estimador MLE
+
+Modelo:
+
+- `X_i ~ Bernoulli(p)` donde `p = P(cara)`.
+
+Datos:
+
+- `D = {x_1, ..., x_n}` con `x_i ∈ {0,1}`.
+
+Likelihood:
+
+```text
+P(D | p) = Π_i p^{x_i} (1-p)^{(1-x_i)}
+```
+
+Log-likelihood:
+
+```text
+ℓ(p) = Σ_i [x_i log p + (1-x_i) log(1-p)]
+```
+
+Derivar y hacer 0 (intuición: el máximo ocurre cuando la “probabilidad del modelo” coincide con la frecuencia observada):
+
+```text
+dℓ/dp = Σ_i [x_i/p - (1-x_i)/(1-p)] = 0
+```
+
+Solución:
+
+```text
+p_MLE = (1/n) Σ_i x_i
+```
+
+Interpretación: el MLE de `p` es simplemente la **proporción de caras**. Este patrón (media muestral) reaparece en gaussianas y en muchos estimadores.
+
 #### 4.1 La Idea Central
 
-```
+```text
 MLE: Encontrar los parámetros θ que maximizan la probabilidad
      de observar los datos que tenemos.
 
@@ -318,6 +613,26 @@ print(f"MLE estimados:     μ={estimated_mu:.3f}, σ={estimated_sigma:.3f}")
 
 #### 4.4 Conexión con Cross-Entropy Loss
 
+#### 4.5 MLE para multiclase (Softmax + Categorical Cross-Entropy)
+
+Para `K` clases, `y` es one-hot y el modelo produce probabilidades con softmax:
+
+- `p = softmax(z)` donde `z = XW` son logits
+
+Likelihood (por muestra):
+
+- `P(y|x) = Π_k p_k^{y_k}`
+
+Log-likelihood:
+
+- `log P(y|x) = Σ_k y_k log(p_k)`
+
+Negative log-likelihood promedio:
+
+- `L = -(1/m) Σᵢ Σ_k y_{ik} log(p_{ik})`
+
+Eso es exactamente **Categorical Cross-Entropy**.
+
 ```python
 def cross_entropy_from_mle():
     """
@@ -353,11 +668,64 @@ cross_entropy_from_mle()
 
 ---
 
+## 🌱 Extensión Estratégica (Línea 2): Markov Chains (intro conceptual)
+
+> Esta sección es conceptual: no vas a implementar Markov Chains en Línea 1, pero sí necesitas que la idea te resulte familiar cuando entres al curso de **Discrete-Time Markov Chains and Monte Carlo Methods**.
+
+### Idea central: estados y transiciones
+
+Una cadena de Markov modela un sistema que “salta” entre **estados**.
+
+- Hoy estás en un estado `S_t`.
+- Mañana estás en `S_{t+1}`.
+- Lo importante: `P(S_{t+1} | S_t)` depende solo del estado actual (memoria de 1 paso).
+
+### Matriz de transición (conexión con Álgebra Lineal)
+
+Definimos una matriz `P` donde:
+
+- `P[i, j] = P(estado j | estado i)`
+- Cada fila suma 1 (matriz estocástica por filas)
+
+Si `π_t` es un vector fila con la distribución de probabilidad sobre estados en el tiempo `t`, entonces:
+
+```text
+π_{t+1} = π_t P
+```
+
+Esto conecta directamente con `Módulo 02`: es **multiplicación de matrices** aplicada a probabilidades.
+
+### Ejemplo mínimo (2 estados)
+
+Estados: `A` y `B`.
+
+```text
+P = [[0.9, 0.1],
+     [0.2, 0.8]]
+```
+
+Interpretación:
+
+- Si estás en `A`, te quedas en `A` con 0.9, pasas a `B` con 0.1.
+- Si estás en `B`, pasas a `A` con 0.2, te quedas en `B` con 0.8.
+
+### Estacionariedad (semilla para Línea 2)
+
+Una distribución estacionaria `π*` satisface:
+
+```text
+π* = π* P
+```
+
+En otras palabras: es un **autovector** (eigenvector) asociado al eigenvalue `1` (visto desde la perspectiva correcta). Esto vuelve a conectar Markov Chains con eigenvalues/eigenvectors.
+
+---
+
 ### Día 7: Softmax como Distribución de Probabilidad
 
 #### 5.1 De Logits a Probabilidades
 
-```
+```text
                     exp(zᵢ)
 softmax(z)ᵢ = ─────────────────
               Σⱼ exp(zⱼ)
@@ -370,7 +738,7 @@ Propiedades:
 
 #### 5.2 El Problema de Estabilidad Numérica (v3.3)
 
-```
+```text
 ⚠️ PROBLEMA: exp() puede causar overflow/underflow
 
 Ejemplo peligroso:
@@ -384,7 +752,7 @@ Ejemplo underflow:
 
 #### 5.3 Log-Sum-Exp Trick (Estabilidad Numérica)
 
-```
+```text
 TRUCO: softmax(z) = softmax(z - max(z))
 
 Demostración:
@@ -397,6 +765,8 @@ Al restar max(z), todos los exponentes son ≤ 0, evitando overflow.
 ```
 
 #### 5.4 Implementación Numéricamente Estable
+
+> Regla práctica: si vas a calcular cross-entropy, prefiere **log-softmax** estable en vez de `np.log(softmax(z))`.
 
 ```python
 def softmax(z: np.ndarray) -> np.ndarray:
@@ -429,6 +799,17 @@ def log_softmax(z: np.ndarray) -> np.ndarray:
     z_stable = z - np.max(z, axis=-1, keepdims=True)
     log_sum_exp = np.log(np.sum(np.exp(z_stable), axis=-1, keepdims=True))
     return z_stable - log_sum_exp
+
+
+def categorical_cross_entropy_from_logits(y_true: np.ndarray, logits: np.ndarray) -> float:
+    """
+    Cross-entropy estable usando logits directamente.
+
+    Evita calcular softmax explícito.
+    Útil cuando entrenas modelos y quieres estabilidad.
+    """
+    log_probs = log_softmax(logits)
+    return -np.mean(np.sum(y_true * log_probs, axis=1))
 
 
 # ============================================================
@@ -613,7 +994,7 @@ def test_cross_entropy_perfect_prediction():
 
 ## 📊 Resumen Visual
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │  PROBABILIDAD PARA ML - MAPA CONCEPTUAL                         │
 ├─────────────────────────────────────────────────────────────────┤
@@ -656,12 +1037,42 @@ def test_cross_entropy_perfect_prediction():
 
 ---
 
+## 🧩 Consolidación (errores comunes + debugging v5 + reto Feynman)
+
+### Errores comunes
+
+- **Confundir PDF con probabilidad:** en continuas, `f(x)` es densidad; la probabilidad requiere integrar en un intervalo.
+- **`log(0)` en cross-entropy:** siempre usa `epsilon` o `np.clip`.
+- **Overflow/underflow en `exp`:** aplica log-sum-exp / log-softmax.
+- **MLE “mágico”:** si no puedes explicar por qué aparece la media, repite el worked example Bernoulli.
+
+### Debugging / validación (v5)
+
+- Cuando algo explote con `nan/inf`, revisa:
+  - `np.log` sobre valores 0
+  - `np.exp` sobre logits grandes
+  - normalización incorrecta en probabilidades (que no suman 1)
+- Registra hallazgos en `study_tools/DIARIO_ERRORES.md`.
+- Protocolos completos:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Reto Feynman (tablero blanco)
+
+Explica en 5 líneas o menos:
+
+1) ¿Por qué maximizar likelihood es equivalente a minimizar negative log-likelihood?
+2) ¿Por qué el MLE de una moneda es “proporción de caras”?
+3) ¿Qué significa `π_{t+1} = π_t P` y por qué es álgebra lineal?
+
 ## ✅ Checklist del Módulo
 
 - [ ] Puedo explicar el Teorema de Bayes con un ejemplo
 - [ ] Sé calcular la PDF de una Gaussiana a mano
 - [ ] Entiendo por qué MLE da Cross-Entropy como loss
 - [ ] Implementé softmax numéricamente estable
+- [ ] Puedo derivar el MLE de una Bernoulli (moneda) y explicarlo
+- [ ] Puedo explicar qué es una Markov Chain y qué representa una matriz de transición
 - [ ] Los tests de `probability.py` pasan
 
 ---
@@ -679,7 +1090,7 @@ def test_cross_entropy_perfect_prediction():
 
 ---
 
-> 💡 **Nota Final:** Este módulo es deliberadamente corto (1 semana). No necesitas ser experto en probabilidad para la Línea 1, pero estos conceptos son el "pegamento" que conecta las matemáticas con las funciones de pérdida que usarás en los siguientes módulos.
+> 💡 **Nota Final:** Este módulo sigue siendo compacto comparado con un curso completo de probabilidad/estadística, pero aquí ya tienes el núcleo de Línea 1 y una “semilla” intencional para Línea 2 (estimación y Markov Chains).
 
 ---
 

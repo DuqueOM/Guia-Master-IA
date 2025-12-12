@@ -30,7 +30,7 @@ Dominio absoluto de las **3 materias de la Línea de Machine Learning** del MS i
 ## 🧠 Planes Estratégicos v4.0 y v5.0
 
 - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md): estrategia de ejecución diaria, diario de errores, dry-run de backprop, puente a PyTorch.
-- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md): data rigor (Dirty Data Check), validación externa (tablero blanco) y examen de admisión simulado.
+- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md): data rigor (Dirty Data Check), validación externa (tablero blanco), examen de admisión simulado, **visualización generativa** (Protocolo D) y **rescate cognitivo/ejecución** (Protocolo E: metacognición, puente teoría↔código, simulacros PB y badges).
 
 ---
 

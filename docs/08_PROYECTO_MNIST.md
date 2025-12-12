@@ -27,7 +27,7 @@
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-> 💡 **Nota v3.1:** MNIST es un dataset simple. 4 semanas son suficientes para un proyecto bien estructurado.
+> 💡 **Nota v3.3:** MNIST es un dataset simple. 4 semanas son suficientes para un proyecto bien estructurado.
 
 ---
 
@@ -1256,7 +1256,7 @@ def plot_learning_curves(
 
 ### Visualización de Errores
 
-![Errores del modelo](error_analysis.png)
+Incluye una visualización (por ejemplo una cuadrícula con las imágenes mal clasificadas) en tu reporte final.
 
 ### Interpretación
 

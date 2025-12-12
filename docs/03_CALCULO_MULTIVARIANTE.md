@@ -6,6 +6,63 @@
 
 ---
 
+<a id="m03-0"></a>
+
+## 🧭 Cómo usar este módulo (modo 0→100)
+
+**Propósito:** que puedas hacer 3 cosas sin depender de “fe”:
+
+- derivar gradientes de pérdidas comunes (MSE, BCE)
+- implementar y depurar optimización (gradient descent)
+- entender por qué backprop es chain rule aplicada a un grafo
+
+### Objetivos de aprendizaje (medibles)
+
+Al terminar este módulo podrás:
+
+- **Calcular** derivadas y derivadas parciales (a mano y con verificación numérica).
+- **Aplicar** gradiente y dirección de máximo descenso para optimizar funciones.
+- **Implementar** gradient descent con criterios de convergencia razonables.
+- **Explicar** la Chain Rule y usarla para derivar gradientes compuestos.
+- **Validar** derivadas con gradient checking (error relativo pequeño).
+
+### Prerrequisitos
+
+- `Módulo 02` (producto matricial, normas, intuición geométrica).
+
+Enlaces rápidos:
+
+- [GLOSARIO: Derivative](GLOSARIO.md#derivative)
+- [GLOSARIO: Gradient](GLOSARIO.md#gradient)
+- [GLOSARIO: Gradient Descent](GLOSARIO.md#gradient-descent)
+- [GLOSARIO: Chain Rule](GLOSARIO.md#chain-rule)
+- [RECURSOS.md](RECURSOS.md)
+
+### Integración con Plan v4/v5
+
+- Visualización de optimización: `study_tools/VISUALIZACION_GRADIENT_DESCENT.md`
+- Simulacros: `study_tools/SIMULACRO_EXAMEN_TEORICO.md`
+- Protocolo completo:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Recursos (cuándo usarlos)
+
+| Prioridad | Recurso | Cuándo usarlo en este módulo | Para qué |
+|----------|---------|------------------------------|----------|
+| **Obligatorio** | `study_tools/VISUALIZACION_GRADIENT_DESCENT.md` | Al implementar Gradient Descent (cuando ajustes `learning_rate` y criterios de parada) | Ver si “baja” o diverge y por qué |
+| **Complementario** | [`visualizations/viz_gradient_3d.ipynb`](../visualizations/viz_gradient_3d.ipynb) | Semana 7, cuando ya entiendas `∇J` pero el `learning_rate` se sienta “mágico” | Ver en 3D la superficie + la trayectoria y entender divergencia por overshooting |
+| **Complementario** | [3Blue1Brown: Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr) | Antes de Chain Rule (o si derivar se siente mecánico) | Intuición visual de derivadas y composición |
+| **Complementario** | [Mathematics for ML: Multivariate Calculus](https://www.coursera.org/learn/multivariate-calculus-machine-learning) | Cuando pases de derivadas 1D a gradiente/derivadas parciales | Práctica estructurada con ejercicios |
+| **Obligatorio** | `study_tools/SIMULACRO_EXAMEN_TEORICO.md` | Tras terminar Chain Rule (antes de saltar a M05/M07) | Verificar que puedes derivar sin mirar apuntes |
+| **Opcional** | [RECURSOS.md](RECURSOS.md) | Al cerrar el módulo (para refuerzo) | Elegir material extra sin perder foco |
+
+### Criterio de salida (cuándo puedes avanzar)
+
+- Puedes derivar y verificar (numérico vs analítico) gradientes de MSE y BCE.
+- Puedes explicar chain rule en 5 líneas y aplicarla a una composición.
+- Puedes ejecutar gradient checking y entender qué significa el error relativo.
+
 ## 🧠 ¿Por Qué Cálculo para ML?
 
 ### ⚠️ CRÍTICO: Sin Chain Rule No Hay Deep Learning
@@ -31,6 +88,42 @@ probablemente REPROBARÁS el curso de Deep Learning.
 | **Chain Rule** | Backpropagation | Deep Learning |
 
 ---
+
+## 🧭 Intuición geométrica (para que no sea mecánico)
+
+### 1) El gradiente como brújula en una montaña
+
+Piensa en la función de pérdida `J(θ)` como un terreno (montaña/valle) y tú como alguien parado en un punto.
+
+- `J` te dice la altura.
+- El **gradiente** `∇J` apunta hacia donde el terreno sube más rápido.
+- Si quieres bajar (minimizar), te mueves en la dirección opuesta:
+
+`θ_{t+1} = θ_t - α ∇J(θ_t)`
+
+Visualización sugerida (hazlo en papel):
+
+- curvas de nivel (contornos) alrededor de un valle
+- un vector `∇J` perpendicular a las curvas de nivel
+
+### 2) La regla de la cadena como engranajes (ratios de cambio)
+
+Imagina tres engranajes conectados:
+
+`x  →  g(x)  →  f(g(x))`
+
+Si giras un poquito el primer engranaje (`x`), el último (`f`) gira según dos “ratios”:
+
+- cuánto cambia `f` si cambia `g` (`df/dg`)
+- cuánto cambia `g` si cambia `x` (`dg/dx`)
+
+Y la regla es:
+
+`df/dx = (df/dg) · (dg/dx)`
+
+Backprop es esto mismo, pero aplicado a un grafo con muchas piezas: multiplicas ratios locales y propagas desde el final al inicio.
+
+Diagrama sugerido (dibújalo): un grafo pequeño con nodos `z = Wx + b`, `a = φ(z)`, `L(a)` y flechas con gradientes “río arriba”.
 
 ## 📚 Contenido del Módulo
 
@@ -338,17 +431,43 @@ def visualize_gradient():
     plt.show()
 
 # visualize_gradient()  # Descomentar para ejecutar
-```
+
 
 ---
+
+### Intuición: Gradient Descent como “bajar una montaña en la niebla”
+
+Imagina que estás en una montaña con niebla: no ves el valle (mínimo), pero puedes **sentir la pendiente local**.
+
+- **El gradiente** `∇f(x)` apunta hacia el “subir más rápido”.
+- Para bajar, te mueves en la dirección opuesta: `-∇f(x)`.
+- El `learning_rate (α)` es el tamaño del paso: demasiado grande → te pasas/oscillas; demasiado pequeño → avanzas lento.
+
+Checklist de diagnóstico rápido:
+
+- **Si diverge:** `α` es demasiado grande o tu gradiente está mal.
+- **Si converge muy lento:** `α` demasiado pequeño.
+- **Si el loss baja y luego sube:** posible oscilación (reduce `α`).
+- **Si no baja nunca:** gradiente incorrecto (haz gradient checking).
 
 ## 💻 Parte 3: Gradient Descent
 
 ### 3.1 Algoritmo Básico
 
-```python
-import numpy as np
-from typing import Callable, List, Tuple
+#### Código generador de intuición (Protocolo D): superficie 3D + slider de `learning_rate`
+
+Ejecuta el notebook:
+
+- [`visualizations/viz_gradient_3d.ipynb`](../visualizations/viz_gradient_3d.ipynb)
+
+Checklist de uso:
+
+- cambia `lr` a valores pequeños (ej. `0.01`) y observa convergencia suave
+- sube `lr` (ej. `0.5` o `1.0`) y observa oscilación/divergencia
+
+Objetivo: que puedas explicar la frase:
+
+> “El learning rate no es un número mágico: controla cuánto avanzas en la dirección del gradiente, y si te pasas, rebotas.”
 
 """
 GRADIENT DESCENT: Algoritmo de optimización iterativo.
@@ -425,11 +544,18 @@ print(f"\nPunto inicial: {x0}")
 print(f"Mínimo encontrado: {x_final}")
 print(f"f(mínimo) = {f(x_final):.6f}")
 print(f"Iteraciones: {len(history_f)}")
-```
+
 
 ### 3.2 Efecto del Learning Rate
 
-```python
+"""
+El learning rate (α) controla la velocidad de convergencia.
+
+- α muy pequeño: Convergencia lenta
+- α óptimo: Convergencia rápida y estable
+- α muy grande: Oscilaciones, puede diverger
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -474,12 +600,9 @@ def compare_learning_rates():
     """
 
 # compare_learning_rates()  # Descomentar para ejecutar
-```
+
 
 ### 3.3 Funciones de Pérdida en ML
-
-```python
-import numpy as np
 
 """
 FUNCIONES DE PÉRDIDA COMUNES Y SUS GRADIENTES
@@ -490,35 +613,23 @@ que mide qué tan mal están nuestras predicciones.
 
 # 1. MSE (Mean Squared Error) - Regresión
 def mse_loss(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    """
-    MSE = (1/n) Σ (y_true - y_pred)²
-    """
+    """Mean Squared Error."""
     return np.mean((y_true - y_pred) ** 2)
 
 def mse_gradient(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
-    """
-    ∂MSE/∂y_pred = (2/n) Σ (y_pred - y_true)
-                 = (2/n) (y_pred - y_true)
-    """
+    """Gradiente de MSE respecto a y_pred."""
     n = len(y_true)
-    return (2 / n) * (y_pred - y_true)
+    return 2 * (y_pred - y_true) / n
 
 
 # 2. Binary Cross-Entropy - Clasificación binaria
 def binary_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
-    """
-    BCE = -(1/n) Σ [y·log(ŷ) + (1-y)·log(1-ŷ)]
-    """
+    """Binary Cross-Entropy."""
     y_pred = np.clip(y_pred, eps, 1 - eps)  # Evitar log(0)
     return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
 
 def binary_cross_entropy_gradient(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> np.ndarray:
-    """
-    ∂BCE/∂y_pred = (1/n) · (y_pred - y_true) / (y_pred · (1 - y_pred))
-
-    Simplificación cuando y_pred = σ(z):
-    ∂BCE/∂z = (1/n) · (y_pred - y_true)
-    """
+    """Gradiente de BCE respecto a y_pred."""
     y_pred = np.clip(y_pred, eps, 1 - eps)
     return (y_pred - y_true) / (y_pred * (1 - y_pred)) / len(y_true)
 
@@ -530,16 +641,59 @@ y_pred = np.array([0.1, 0.2, 0.8, 0.9])
 
 print("MSE Loss:", mse_loss(y_true, y_pred))
 print("BCE Loss:", binary_cross_entropy(y_true, y_pred))
-```
+
 
 ---
 
 ## 💻 Parte 4: Regla de la Cadena (Chain Rule)
 
-### 4.1 Chain Rule en 1D
+### 4.0 Visualización: Grafo computacional (computational graph)
 
-```python
-import numpy as np
+En Deep Learning, casi todo es una composición de funciones. El truco mental es pensar en un **grafo**:
+
+```
+x ──► z = w·x + b ──► a = σ(z) ──► L(a, y)
+
+(forward)  verde: x→z→a→L
+(backward) rojo:  dL/da → da/dz → dz/dw, dz/db
+```
+
+Regla de oro (chain rule):
+
+```
+dL/dw = dL/da · da/dz · dz/dw
+dL/db = dL/da · da/dz · dz/db
+```
+
+### 4.0.1 Derivación paso a paso: `f(x) = x²`
+
+Si `f(x) = x²`, entonces:
+
+```
+f'(x) = lim_{h→0} [(x+h)² - x²] / h
+      = lim_{h→0} [x² + 2xh + h² - x²] / h
+      = lim_{h→0} [2xh + h²] / h
+      = lim_{h→0} [2x + h]
+      = 2x
+```
+
+### 4.0.2 Derivación paso a paso: sigmoide `σ(z)`
+
+Definición:
+
+```
+σ(z) = 1 / (1 + e^{-z})
+```
+
+Resultado clave:
+
+```
+σ'(z) = σ(z)(1 - σ(z))
+```
+
+Consejo práctico: cuando ya tienes `a = σ(z)`, usa `a(1-a)` para derivar, en vez de re-calcular `exp`.
+
+### 4.1 Chain Rule en 1D
 
 """
 REGLA DE LA CADENA (Chain Rule)
@@ -585,12 +739,9 @@ x = 2.0
 print(f"y({x}) = {y(x)}")
 print(f"dy/dx analítica:  {dy_dx_analytical(x)}")
 print(f"dy/dx numérica:   {dy_dx_numerical(x):.6f}")
-```
+
 
 ### 4.2 Chain Rule para Funciones Compuestas (Backprop Preview)
-
-```python
-import numpy as np
 
 """
 CHAIN RULE PARA REDES NEURONALES
@@ -679,12 +830,9 @@ def simple_forward_backward():
     return dL_dw, dL_db
 
 simple_forward_backward()
-```
+
 
 ### 4.3 Backpropagation en una Red de 2 Capas
-
-```python
-import numpy as np
 
 """
 RED NEURONAL DE 2 CAPAS
@@ -826,15 +974,13 @@ def demo_xor():
         print(f"Input: {X[:, i]} → Pred: {pred[0]:.3f} (Target: {y[0, i]})")
 
 demo_xor()
-```
+
 
 ---
-
-## 📦 Entregable del Módulo
+## Entregable del Módulo
 
 ### Script: `gradient_descent_demo.py`
 
-```python
 """
 Gradient Descent Demo - Visualización de Optimización
 
@@ -1002,31 +1148,13 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
+
 
 ---
+## Entregable Obligatorio v3.3
 
-## 🔬 Gradient Checking: Validación Matemática (v3.3)
+### Script: `grad_check.py`
 
-> ⚠️ **CRÍTICO:** El mayor riesgo en ML es implementar backpropagation incorrectamente. El código puede correr, el loss puede bajar, pero el gradiente estar mal. **Esta técnica es estándar en CS231n de Stanford.**
-
-### Concepto: Derivada Numérica vs Analítica
-
-```
-GRADIENT CHECKING
-
-Tu gradiente analítico (backprop):
-    ∂L/∂w = [valor calculado con Chain Rule]
-
-Gradiente numérico (aproximación):
-    ∂L/∂w ≈ [L(w + ε) - L(w - ε)] / (2ε)
-
-Si |analítico - numérico| > 10⁻⁷ → TU IMPLEMENTACIÓN TIENE UN BUG
-```
-
-### Script: `grad_check.py` (Entregable Obligatorio v3.3)
-
-```python
 """
 Gradient Checking - Validación de Derivadas
 Técnica estándar de CS231n Stanford para debugging de backprop.
@@ -1117,7 +1245,6 @@ def mse_loss(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """Mean Squared Error."""
     return float(np.mean((y_pred - y_true) ** 2))
 
-
 def mse_gradient_analytic(y_pred: np.ndarray, y_true: np.ndarray) -> np.ndarray:
     """Gradiente analítico de MSE respecto a y_pred."""
     n = len(y_true)
@@ -1161,7 +1288,6 @@ def test_mse_gradient():
 def sigmoid(z: np.ndarray) -> np.ndarray:
     """Sigmoid activation."""
     return 1 / (1 + np.exp(-z))
-
 
 def sigmoid_derivative_analytic(z: np.ndarray) -> np.ndarray:
     """Derivada analítica: σ'(z) = σ(z)(1 - σ(z))"""
@@ -1281,37 +1407,34 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
 
-### Cómo Usar Gradient Checking
 
-```python
-# En tu código de backprop:
+---
 
-# 1. Calcula el gradiente analítico (tu implementación)
-grad_analytic = my_backward_pass(...)
+## 🧩 Consolidación (errores comunes + debugging v5 + reto Feynman)
 
-# 2. Calcula el gradiente numérico
-def loss_wrapper(params):
-    return forward_pass(params, ...)
+### Errores comunes
 
-grad_numerical = numerical_gradient(loss_wrapper, params)
+- **Confundir derivada local con “dirección global”:** el gradiente solo te da información local.
+- **`learning_rate` demasiado grande:** puede oscilar o divergir aunque el gradiente sea correcto.
+- **Estabilidad numérica:** `exp(z)` puede overflow; usa `np.clip` cuando aplique.
+- **Gradient checking mal aplicado:** `ε` demasiado pequeño puede amplificar ruido numérico.
 
-# 3. Compara
-passed, error = gradient_check(grad_analytic, grad_numerical)
-if not passed:
-    raise ValueError(f"Gradient check failed! Error: {error:.2e}")
-```
+### Debugging / validación (v5)
 
-### Reglas del Gradient Checking
+- Si tu entrenamiento es inestable o no baja el loss, valida derivadas con `grad_check.py`.
+- Registra hallazgos en `study_tools/DIARIO_ERRORES.md`.
+- Protocolos completos:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
 
-| Error Relativo | Interpretación |
-|----------------|----------------|
-| < 10⁻⁷ | ✓ Excelente - tu gradiente es correcto |
-| 10⁻⁷ a 10⁻⁵ | ⚠️ Sospechoso - revisa tu código |
-| > 10⁻⁵ | ✗ Bug - tu backprop está mal |
+### Reto Feynman (tablero blanco)
 
-> ⚠️ **Nota:** Desactiva gradient checking durante el entrenamiento real (es lento). Solo úsalo para validar tu implementación.
+Explica en 5 líneas o menos:
+
+1) ¿Qué significa “seguir `-∇f`” y por qué eso baja la función?
+2) Dibuja el grafo `x→z→a→L` y explica por qué multiplicas derivadas.
+3) ¿Por qué gradient checking detecta bugs de backprop?
 
 ---
 

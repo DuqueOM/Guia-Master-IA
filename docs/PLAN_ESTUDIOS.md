@@ -1,4 +1,4 @@
-# 📅 Plan de Estudios - ML SPECIALIST v3.1
+# 📅 Plan de Estudios - ML SPECIALIST v3.3
 
 > **24 Semanas | 6 horas/día | Lunes a Sábado**
 > **Preparación para MS in AI Pathway - Línea 1: Machine Learning**
@@ -22,6 +22,20 @@
 
 ### Los 8 Módulos Obligatorios
 
+### ⚡ Enlaces rápidos (bloques 0→100)
+
+Estos atajos te llevan directo a la sección **"Cómo usar este módulo (modo 0→100)"** dentro de cada módulo:
+
+| Módulo | Atajo |
+|--------|-------|
+| 01 | [M01 → Cómo usar](01_PYTHON_CIENTIFICO.md#m01-0) |
+| 02 | [M02 → Cómo usar](02_ALGEBRA_LINEAL_ML.md#m02-0) |
+| 03 | [M03 → Cómo usar](03_CALCULO_MULTIVARIANTE.md#m03-0) |
+| 04 | [M04 → Cómo usar](04_PROBABILIDAD_ML.md#m04-0) |
+| 05 | [M05 → Cómo usar](05_SUPERVISED_LEARNING.md#m05-0) |
+| 06 | [M06 → Cómo usar](06_UNSUPERVISED_LEARNING.md#m06-0) |
+| 07 | [M07 → Cómo usar](07_DEEP_LEARNING.md#m07-0) |
+
 | Semanas | Módulo | Tema | Curso del Pathway |
 |---------|--------|------|-------------------|
 | 1-2 | 01 | Python + Pandas + NumPy | - (Fundamento) |
@@ -35,7 +49,7 @@
 
 ---
 
-> **Filosofía v3.1:** "Matemáticas Aplicadas a Código". Pandas para datos, NumPy para matemáticas, probabilidad para loss functions.
+> **Filosofía v3.3:** "Matemáticas Aplicadas a Código". Pandas para datos, NumPy para matemáticas, probabilidad para loss functions.
 
 ---
 
@@ -51,6 +65,18 @@
 Para ver el **protocolo diario detallado**, simulacros de examen y ajustes por semana (versión estratégica v4.0), consulta también:
 
 - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+
+---
+
+## 🧠 Protocolo E (v5.1): Rescate Cognitivo + Metacognición + Puente Teoría↔Código
+
+Bloques fijos (para reducir fatiga y mejorar retención):
+
+- **Diario (5 min):** `study_tools/DIARIO_METACOGNITIVO.md`
+- **Semanal (20–30 min):** `study_tools/TEORIA_CODIGO_BRIDGE.md`
+- **Sábado (1 hora):** `study_tools/CIERRE_SEMANAL.md`
+- **Badges por módulo:** `study_tools/BADGES_CHECKPOINTS.md`
+- **Simulacros performance-based (PB):** `study_tools/SIMULACRO_PERFORMANCE_BASED.md` (Semanas **8, 16, 23**)
 
 ---
 
@@ -137,6 +163,10 @@ Además del script, documenta al menos **5 problemas reales** del CSV (nulos, ou
 | V | Aplicación: PCA preview | Reducción dimensional | Demo visual |
 | S | **Checkpoint** | `linear_algebra.py` completo | Entregable |
 
+Extensión Protocolo D (visualización generativa):
+
+- ejecutar `visualizations/viz_transformations.py` y experimentar con matrices (estiramiento/rotación/shear)
+
 **Entregable:** Librería `linear_algebra.py` que implementa:
 - Producto punto, normas L1/L2
 - Distancia euclidiana y coseno
@@ -160,6 +190,10 @@ Además del script, documenta al menos **5 problemas reales** del CSV (nulos, ou
 | J | Gradient Descent (concepto) | Algoritmo básico | Pseudocódigo |
 | V | Gradient Descent (código) | Minimizar $f(x,y) = x^2 + y^2$ | Implementar |
 | S | **Repaso** | Learning rate y convergencia | Visualización |
+
+Extensión Protocolo D (visualización generativa):
+
+- ejecutar `visualizations/viz_gradient_3d.ipynb` y variar `learning_rate` con el slider
 
 ### Semana 7: Chain Rule
 
@@ -197,6 +231,11 @@ Además del script, documenta al menos **5 problemas reales** del CSV (nulos, ou
 
 **Entregable:** Librería `probability.py` con Gaussiana, MLE y softmax.
 
+Extensión Protocolo E:
+
+- **Simulacro PB-8 (90 min):** `study_tools/SIMULACRO_PERFORMANCE_BASED.md`
+- **Cierre semanal (1 hora):** `study_tools/CIERRE_SEMANAL.md`
+
 **Recursos:**
 - [3Blue1Brown: Bayes Theorem](https://www.youtube.com/watch?v=HZGCoVF3YvM)
 - [StatQuest: Maximum Likelihood](https://www.youtube.com/watch?v=XepXtl9YKwc)
@@ -215,6 +254,8 @@ Además del script, documenta al menos **5 problemas reales** del CSV (nulos, ou
 
 ### Semana 9: Regresión Lineal
 
+Teorema de la semana (concepto-guía): mínimos cuadrados.
+
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
 |-----|-----------------|-------------------|------------------|
 | L | Regresión: concepto | Línea de mejor ajuste | Visualizar datos |
@@ -225,6 +266,8 @@ Además del script, documenta al menos **5 problemas reales** del CSV (nulos, ou
 | S | **Repaso** | `linear_regression.py` v1 | Test |
 
 ### Semana 10: Regresión Logística
+
+Teorema de la semana (concepto-guía): MLE → cross-entropy.
 
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
 |-----|-----------------|-------------------|------------------|
@@ -295,6 +338,8 @@ Para el dataset supervisado usado en regresión logística:
 
 ### Semana 15: PCA (Principal Component Analysis)
 
+Teorema de la semana (concepto-guía): PCA como maximización de varianza.
+
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
 |-----|-----------------|-------------------|------------------|
 | L | Reducción dimensional | Por qué reducir | Visualizar |
@@ -316,6 +361,11 @@ Para el dataset supervisado usado en regresión logística:
 | S | **Checkpoint** | No supervisado completo | Entregable |
 
 **Entregable:** `kmeans.py` y `pca.py`. Usar PCA para comprimir una imagen y visualizar cuánta varianza se pierde con diferentes números de componentes.
+
+Extensión Protocolo E:
+
+- **Simulacro PB-16 (90 min):** `study_tools/SIMULACRO_PERFORMANCE_BASED.md`
+- **Cierre semanal (1 hora):** `study_tools/CIERRE_SEMANAL.md`
 
 **Extensión v5.0 – Desafío del Tablero Blanco:**
 En las semanas 4, 8, 12 y 16, realiza el "Desafío del Tablero Blanco" descrito en `study_tools/DESAFIO_TABLERO_BLANCO.md`, explicando en 5–7 minutos un concepto clave (Regla de la Cadena, Gradient Descent, K-Means, PCA, Regresión Logística, etc.) y registrando feedback externo.
@@ -359,6 +409,10 @@ En las semanas 4, 8, 12 y 16, realiza el "Desafío del Tablero Blanco" descrito 
 | V | Max pooling implementación | Concepto simple | Código básico |
 | S | **Repaso** | Quiz de dimensiones CNN | Test teórico |
 
+Extensión Protocolo D (visualización generativa):
+
+- ejecutar `visualizations/viz_convolution.py` sobre una imagen propia y observar el feature map (Sobel)
+
 ### Semana 20: Optimizadores y Entrenamiento
 
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
@@ -380,7 +434,7 @@ En las semanas 4, 8, 12 y 16, realiza el "Desafío del Tablero Blanco" descrito 
 
 **Dataset:** MNIST (imágenes de 28x28 píxeles de dígitos escritos a mano)
 
-> 💡 **v3.1:** MNIST es un dataset simple (solo 10 clases, imágenes pequeñas). 4 semanas son suficientes.
+> 💡 **v3.3:** MNIST es un dataset simple (solo 10 clases, imágenes pequeñas). 4 semanas son suficientes.
 
 ---
 
@@ -436,6 +490,10 @@ En las semanas 4, 8, 12 y 16, realiza el "Desafío del Tablero Blanco" descrito 
 **Extensión v5.0 – Examen de Admisión Simulado:**
 En las semanas 22 y 23, realizar los simulacros definidos en `study_tools/EXAMEN_ADMISION_SIMULADO.md` (2 horas, sin IDE ni internet, 40% pseudocódigo, 60% teoría). El simulacro de la semana 23 debe alcanzar ≥ 80/100 como métrica de "listo para admisión".
 
+Extensión Protocolo E:
+
+- **Simulacro PB-23:** se considera cubierto por el examen final de `study_tools/EXAMEN_ADMISION_SIMULADO.md`.
+
 ---
 
 ## 🗓️ SEMANA 24: Benchmark + Informe Final
@@ -477,7 +535,7 @@ mnist-analyst/
 
 ---
 
-## ✅ Checklist de Finalización - ML SPECIALIST v3.1
+## ✅ Checklist de Finalización - ML SPECIALIST v3.3
 
 ### Fase 1: Fundamentos (Módulos 01-04)
 - [ ] Python + Pandas + NumPy dominado
@@ -523,4 +581,4 @@ mnist-analyst/
 
 ---
 
-> 💡 **Filosofía v3.1:** Esta guía te lleva de Python básico a candidato competitivo del MS in AI en exactamente 6 meses (24 semanas). Si puedes implementar PCA, K-Means, Logistic Regression y un MLP desde cero sobre MNIST, y entiendes la teoría de CNNs, **dominas la Línea 1 del Pathway**.
+> 💡 **Filosofía v3.3:** Esta guía te lleva de Python básico a candidato competitivo del MS in AI en exactamente 6 meses (24 semanas). Si puedes implementar PCA, K-Means, Logistic Regression y un MLP desde cero sobre MNIST, y entiendes la teoría de CNNs, **dominas la Línea 1 del Pathway**.

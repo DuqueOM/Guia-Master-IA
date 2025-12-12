@@ -6,6 +6,56 @@
 
 ---
 
+<a id="m01-0"></a>
+
+## 🧭 Cómo usar este módulo (modo 0→100)
+
+**Propósito:** que pases de “sé Python básico” a **poder trabajar con datos reales y producir arrays listos para modelos** (lo que usarás en TODO el Pathway).
+
+### Objetivos de aprendizaje (medibles)
+
+Al terminar este módulo podrás:
+
+- **Aplicar** Pandas para cargar, explorar y limpiar datasets reales.
+- **Convertir** datasets a `np.ndarray` con shapes correctos para ML (`X` y `y`).
+- **Explicar** qué es vectorización y por qué NumPy elimina loops.
+- **Diagnosticar** los errores de shapes más comunes (`(n,)` vs `(n,1)`, broadcasting silencioso, vistas vs copias).
+
+### Prerrequisitos
+
+- Python básico (loops, funciones, listas, diccionarios).
+
+Enlaces rápidos:
+
+- [GLOSARIO: NumPy](GLOSARIO.md#numpy)
+- [GLOSARIO: Broadcasting](GLOSARIO.md#broadcasting)
+- [GLOSARIO: Vectorization](GLOSARIO.md#vectorization)
+- [RECURSOS.md](RECURSOS.md)
+
+### Integración con Plan v4/v5
+
+- Drill diario de shapes: `study_tools/DRILL_DIMENSIONES_NUMPY.md`
+- Registro de errores: `study_tools/DIARIO_ERRORES.md`
+- Protocolo completo:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Recursos (cuándo usarlos)
+
+| Prioridad | Recurso | Cuándo usarlo en este módulo | Para qué |
+|----------|---------|------------------------------|----------|
+| **Obligatorio** | [Pandas Getting Started](https://pandas.pydata.org/docs/getting_started/) | Semana 1, antes de empezar con `DataFrame/Series` y limpieza | Referencia oficial para flujo típico de carga/EDA/limpieza |
+| **Obligatorio** | [NumPy Documentation (absolute beginners)](https://numpy.org/doc/stable/user/absolute_beginners.html) | Semana 2, cuando aparezcan `ndarray`, `dtype`, `reshape`, `axis`, broadcasting | Fuente oficial para resolver dudas de shapes/axis |
+| **Obligatorio** | `study_tools/DRILL_DIMENSIONES_NUMPY.md` | Cada vez que te equivoques en un shape / antes del checklist de salida | Automatizar intuición de shapes |
+| **Complementario** | [Real Python - NumPy](https://realpython.com/numpy-tutorial/) | Después de completar broadcasting + vectorización (Semana 2) | Consolidar patrones idiomáticos con ejemplos prácticos |
+| **Opcional** | [RECURSOS.md](RECURSOS.md) | Al terminar el módulo (para planificar refuerzo) | Elegir rutas de profundización sin dispersarte |
+
+### Criterio de salida (cuándo puedes avanzar)
+
+- Puedes preparar un `X` y `y` desde un CSV sin errores de dtype/shape.
+- Puedes explicar `axis=0` vs `axis=1` y predecir shapes sin ejecutar.
+- Puedes demostrar speedup vectorizado (benchmark) y justificarlo.
+
 ## 🧠 ¿Por Qué Este Módulo?
 
 ### El Problema con Python Puro para ML
@@ -203,6 +253,24 @@ print(f"Tipo y: {type(y)}")  # <class 'numpy.ndarray'>
 
 ### 1. Arrays vs Listas
 
+#### Intuición: “memoria contigua” (NumPy) vs “cajas dispersas” (listas)
+
+Piensa en una **lista de Python** como una fila de cajitas que guardan **referencias** a objetos; esos objetos pueden estar **dispersos** por la memoria. NumPy, en cambio, busca representar un `ndarray` como un **bloque contiguo** de números del mismo tipo (homogéneos). Esa decisión habilita:
+
+- **Vectorización real:** bucles internos en C (muy optimizados).
+- **Mejor uso de caché CPU:** leer datos contiguos es más rápido.
+- **Menos overhead:** no hay “un objeto por número”.
+
+Mini-diagrama mental:
+
+```
+Lista (referencias):  [ * ] -> obj1   [ * ] -> obj2   [ * ] -> obj3   ...
+                       |              |              |
+                      mem@A          mem@Z          mem@K
+
+NumPy (contiguo):     [ 1.0 ][ 2.0 ][ 3.0 ][ 4.0 ] ...  (mismo dtype)
+```
+
 ```python
 import numpy as np
 
@@ -268,6 +336,35 @@ print(matrix[matrix > 5])  # [6, 7, 8, 9]
 
 ### 4. Broadcasting
 
+#### Worked Example: `(3, 1) + (1, 3)` paso a paso
+
+Objetivo: entender **por qué** funciona sin loops.
+
+1) Define dos arrays con una dimensión “de tamaño 1”:
+
+- `A.shape = (3, 1)` (columna)
+- `B.shape = (1, 3)` (fila)
+
+2) Regla clave: si en una dimensión uno de los tamaños es `1`, NumPy puede **“estirar”** esa dimensión para igualar al otro.
+
+3) Resultado final: ambos se ven como `(3, 3)` y se suman elemento a elemento.
+
+```python
+import numpy as np
+
+A = np.array([[1], [2], [3]])        # shape: (3, 1)
+B = np.array([[10, 20, 30]])         # shape: (1, 3)
+
+# Broadcasting:
+# A se repite horizontalmente 3 veces
+# B se repite verticalmente 3 veces
+C = A + B                             # shape: (3, 3)
+
+print("A:\n", A)
+print("B:\n", B)
+print("C = A + B:\n", C)
+```
+
 ```python
 import numpy as np
 
@@ -294,6 +391,23 @@ print(matrix + vector)
 ```
 
 ### 5. Agregaciones y Ejes
+
+#### Visualización: ¿qué “colapsa” cada eje?
+
+Regla práctica:
+
+- `axis=0` **colapsa filas** → te queda “una salida por columna”
+- `axis=1` **colapsa columnas** → te queda “una salida por fila”
+
+Ejemplo con una matriz `2x3`:
+
+```
+X = [[1, 2, 3],
+     [4, 5, 6]]
+
+sum(axis=0) = [1+4, 2+5, 3+6] = [5, 7, 9]
+sum(axis=1) = [1+2+3, 4+5+6] = [6, 15]
+```
 
 ```python
 import numpy as np

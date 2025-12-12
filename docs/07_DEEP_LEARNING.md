@@ -6,6 +6,48 @@
 
 ---
 
+<a id="m07-0"></a>
+
+## 🧭 Cómo usar este módulo (modo 0→100)
+
+**Propósito:** que puedas construir y depurar una red neuronal desde cero:
+
+- forward pass
+- backpropagation
+- optimización (SGD/Momentum/Adam)
+- sanity checks (overfit test)
+
+### Objetivos de aprendizaje (medibles)
+
+Al terminar este módulo podrás:
+
+- **Implementar** un MLP que resuelva XOR.
+- **Explicar** backprop como chain rule aplicada a un grafo computacional.
+- **Depurar** entrenamiento con overfit test (si no memoriza, hay bug).
+- **Entender** teoría de CNNs (convolución, stride, padding, pooling).
+
+Enlaces rápidos:
+
+- [03_CALCULO_MULTIVARIANTE.md](03_CALCULO_MULTIVARIANTE.md) (Chain Rule)
+- [GLOSARIO.md](GLOSARIO.md)
+- [RECURSOS.md](RECURSOS.md)
+- [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+- [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Recursos (cuándo usarlos)
+
+| Prioridad | Recurso | Cuándo usarlo en este módulo | Para qué |
+|----------|---------|------------------------------|----------|
+| **Obligatorio** | [03_CALCULO_MULTIVARIANTE.md](03_CALCULO_MULTIVARIANTE.md) | Antes de implementar `backward()` (Semana 18) | Asegurar Chain Rule y gradientes básicos |
+| **Obligatorio** | `study_tools/DRYRUN_BACKPROPAGATION.md` | Justo antes de tu primera implementación completa de Backprop | Hacer “dry-run” y detectar errores de gradiente antes del código |
+| **Obligatorio** | `study_tools/EXAMEN_ADMISION_SIMULADO.md` | Después de que tu MLP resuelva XOR y antes de cerrar el módulo | Validación tipo examen (sin IDE/internet) |
+| **Complementario** | [3Blue1Brown: Neural Networks](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) | Semana 17–18, cuando necesites intuición de backprop | Visualizar forward/backward y por qué aprende |
+| **Complementario** | [TensorFlow Playground](https://playground.tensorflow.org/) | Semana 17–18, cuando estudies por qué una capa lineal no resuelve XOR y cómo las activaciones cambian la geometría | Ver en tiempo real cómo la red “dobla” el espacio para separar clases |
+| **Complementario** | [Deep Learning Book](https://www.deeplearningbook.org/) | Semana 19–20 (CNNs/entrenamiento), si quieres rigor | Referencia profunda (gratis) |
+| **Opcional** | [RECURSOS.md](RECURSOS.md) | Al terminar el módulo (para profundizar en DL/CNNs) | Seleccionar refuerzos sin romper el plan |
+
+---
+
 ## 🧠 ¿Por Qué Deep Learning?
 
 ```
@@ -22,6 +64,21 @@ Desventajas:
 ├── "Caja negra" - menos interpretable
 └── Costoso computacionalmente
 ```
+
+### Intuición geométrica: Deep Learning como “doblar el espacio” (origami)
+
+Una capa lineal `z = Wx + b` solo puede **rotar, estirar o inclinar** el espacio: siempre produce una frontera de decisión lineal (un hiperplano). Por eso un modelo lineal no puede separar XOR.
+
+La no linealidad (ReLU/sigmoid/tanh) es lo que permite “doblar” el espacio:
+
+- después del primer doblez, puntos que antes estaban mezclados pueden quedar en regiones separables
+- con varias capas, encadenas dobleces hasta que en la última capa los datos son separables con un hiperplano
+
+Visualización sugerida:
+
+- dibuja XOR en 2D
+- intenta separarlo con una sola línea (imposible)
+- luego imagina un doblez que junta los puntos de la misma clase
 
 ---
 
@@ -341,232 +398,378 @@ print(f"Output: {output}")
 
 ## 💻 Parte 3: Backpropagation
 
-### 3.1 Funciones de Pérdida
+### 3.0 Backpropagation — Nivel: intermedio/avanzado
 
-```python
-import numpy as np
+**Propósito:** este bloque te lleva de “sé que backprop existe” a **poder derivarlo, implementarlo y depurarlo** bajo condiciones tipo examen.
 
-def binary_cross_entropy(y_true: float, y_pred: float, eps: float = 1e-15) -> float:
-    """
-    Binary Cross-Entropy Loss.
+#### Objetivos de aprendizaje (medibles)
 
-    L = -[y·log(ŷ) + (1-y)·log(1-ŷ)]
+Al terminar este bloque podrás:
 
-    Args:
-        y_true: etiqueta real (0 o 1)
-        y_pred: predicción (probabilidad)
-    """
-    y_pred = np.clip(y_pred, eps, 1 - eps)
-    return -(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+- **Recordar** la notación estándar de una capa (`z = Wx + b`, `a = φ(z)`) y el rol de cada variable.
+- **Explicar** por qué backprop es simplemente *regla de la cadena aplicada a un grafo computacional*.
+- **Aplicar** backprop para calcular `∂L/∂W` y `∂L/∂b` en una red MLP de 2 capas.
+- **Analizar** fallas típicas (signos, shapes, overflow) usando pruebas de sanidad.
+- **Evaluar** si tu implementación es correcta con un *overfit test* y (cuando aplique) *gradient checking*.
+- **Crear** una implementación mínima (NumPy) de forward + backward y entrenarla en un toy dataset.
 
-def bce_derivative(y_true: float, y_pred: float, eps: float = 1e-15) -> float:
-    """
-    Derivada de BCE respecto a y_pred.
+#### Motivación / por qué importa
 
-    ∂L/∂ŷ = -y/ŷ + (1-y)/(1-ŷ)
-    """
-    y_pred = np.clip(y_pred, eps, 1 - eps)
-    return -y_true / y_pred + (1 - y_true) / (1 - y_pred)
+Backpropagation es el mecanismo que hace posible que redes con millones de parámetros se ajusten a datos. En práctica:
 
-def categorical_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
-    """
-    Categorical Cross-Entropy para multiclase.
+- **Visión (CV):** CNNs y modelos de clasificación/segmentación se entrenan con backprop.
+- **NLP:** aunque los Transformers no se implementan aquí, el entrenamiento sigue siendo backprop sobre un grafo computacional.
+- **Industria:** cuando un entrenamiento “no aprende”, casi siempre el diagnóstico comienza revisando gradientes, estabilidad numérica y shapes.
 
-    L = -Σᵢ yᵢ·log(ŷᵢ)
+#### Prerrequisitos y nivel de entrada
 
-    Args:
-        y_true: one-hot encoded (k,)
-        y_pred: probabilidades softmax (k,)
-    """
-    y_pred = np.clip(y_pred, eps, 1 - eps)
-    return -np.sum(y_true * np.log(y_pred))
+- **Cálculo:** derivadas, derivadas parciales, regla de la cadena.
+- **Álgebra lineal:** multiplicación matriz-vector, transpuesta.
+- **Probabilidad / pérdidas:** cross-entropy como pérdida para clasificación.
 
-def mse_loss(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    """Mean Squared Error."""
-    return np.mean((y_true - y_pred) ** 2)
+Mini-recordatorio (enlaces directos):
+
+- [GLOSARIO: Chain Rule](GLOSARIO.md#chain-rule)
+- [GLOSARIO: Gradient](GLOSARIO.md#gradient)
+- [GLOSARIO: Backpropagation](GLOSARIO.md#backpropagation)
+- [GLOSARIO: Binary Cross-Entropy](GLOSARIO.md#binary-cross-entropy)
+
+#### Resumen ejecutivo (big idea)
+
+Backpropagation calcula gradientes **de manera eficiente** reutilizando resultados intermedios del forward pass. En vez de derivar a mano una expresión enorme, modelas el cálculo como un **grafo** de operaciones simples (sumas, productos, activaciones). Luego aplicas la regla de la cadena localmente y propagas “responsabilidad del error” desde la salida hasta los parámetros.
+
+La idea operacional es:
+
+- Haces un **forward pass** guardando `x`, `z`, `a` de cada capa.
+- Calculas la pérdida `L`.
+- Empiezas en la salida con un gradiente inicial y haces un **backward pass** capa por capa:
+  - `δ = ∂L/∂z` (el “error” local)
+  - `∂L/∂W = δ ⊗ x` y `∂L/∂b = δ`
+  - propagas hacia atrás: `∂L/∂x = Wᵀ δ`
+
+#### Visualización crítica: el grafo computacional de Backprop (hacer clic mental)
+
+Para entender backprop, no mires fórmulas planas: mira el grafo.
+
+Una neurona simple:
+
+`L(a)  ←  a = σ(z)  ←  z = w·x + b`
+
+El gradiente fluye río arriba (de derecha a izquierda):
+
+1) **Llegada del error:** recibes `∂L/∂a`.
+2) **Compuerta sigmoide:** multiplicas por la derivada local `σ'(z)`.
+3) **Señal en z:**
+
+`δ = ∂L/∂z = (∂L/∂a) · σ'(z)`
+
+4) **Bifurcación lineal (`z = w·x + b`):**
+
+- Hacia `w`: `∂L/∂w = δ · x`
+- Hacia `b`: `∂L/∂b = δ`
+- Hacia `x`: `∂L/∂x = δ · w`
+
+Regla mnemotécnica:
+
+- Gradiente del **peso** = **error local (`δ`) × entrada (`x`)**
+- Gradiente hacia atrás = **error local (`δ`) × peso (`w`)**
+
+#### Mapa del contenido y tiempo estimado
+
+- **Intuición + vocabulario:** 20–35 min
+- **Formalización (notación + shapes):** 30–45 min
+- **Derivación guiada (2 capas):** 45–75 min
+- **Worked example numérico (paso a paso):** 45–60 min
+- **Implementación práctica (NumPy) + pruebas de sanidad:** 2–4 h
+
+#### Núcleo: explicación progresiva por capas
+
+##### a) Intuición / metáfora
+
+Piensa en una red como una fábrica con varias estaciones. La salida está mal (pérdida alta) y quieres saber **cuánto contribuyó cada perilla** (peso) al error. Backprop es un procedimiento para *repartir la culpa* desde el error final hacia atrás, estación por estación.
+
+##### b) Conceptos clave (glosario mínimo)
+
+- **Forward pass:** computar `z` y `a` desde la entrada hasta la salida.
+- **Loss `L`:** número que mide “qué tan mal” predice el modelo.
+- **Gradiente:** vector de derivadas que indica cómo cambia `L` si mueves parámetros.
+- **Delta `δ`:** gradiente local `∂L/∂z` en una capa (la señal que se propaga hacia atrás).
+
+##### c) Formalización (fórmulas + shapes)
+
+Para una capa totalmente conectada:
+
+- `z = Wx + b`
+- `a = φ(z)`
+
+Shapes recomendados (para evitar errores silenciosos):
+
+- `x`: `(n_in,)` o `(n_in, 1)`
+- `W`: `(n_out, n_in)`
+- `b`: `(n_out,)` o `(n_out, 1)`
+- `z, a`: `(n_out,)` o `(n_out, 1)`
+
+##### d) Demostración / derivación (idea central)
+
+En cada capa usas regla de la cadena:
+
+- `∂L/∂W = ∂L/∂z · ∂z/∂W`
+- `∂L/∂b = ∂L/∂z · ∂z/∂b`
+- `∂L/∂x = ∂L/∂z · ∂z/∂x`
+
+Y como `z = Wx + b`:
+
+- `∂z/∂W` depende de `x`
+- `∂z/∂b = 1`
+- `∂z/∂x = W`
+
+Esto produce el patrón computacional:
+
+```
+dL_da  →  (multiplicar por φ'(z))  →  δ = dL_dz
+                       │
+                       ├── dL_dW = δ ⊗ x
+                       ├── dL_db = δ
+                       └── dL_dx = Wᵀ δ
 ```
 
-### 3.2 Backpropagation: La Chain Rule en Acción
+##### e) Ejemplo resuelto (worked example) paso a paso
 
-```python
-"""
-BACKPROPAGATION
+Objetivo del ejemplo: una red **2-2-1** (2 entradas, 2 ocultas, 1 salida) con sigmoid en salida para clasificación binaria. El entregable es poder escribir:
 
-Objetivo: Calcular ∂L/∂W y ∂L/∂b para cada capa.
+- forward: `z1, a1, z2, a2`
+- backward: `δ2, dW2, db2, δ1, dW1, db1`
 
-Usando Chain Rule:
-    ∂L/∂W₂ = ∂L/∂a₂ · ∂a₂/∂z₂ · ∂z₂/∂W₂
-    ∂L/∂W₁ = ∂L/∂a₂ · ∂a₂/∂z₂ · ∂z₂/∂a₁ · ∂a₁/∂z₁ · ∂z₁/∂W₁
+Guía de trabajo (sin números para que puedas rellenar tú):
 
-Patrón:
-1. Calcular ∂L/∂a_output (derivada de la loss)
-2. Para cada capa, de atrás hacia adelante:
-   a. δ = ∂L/∂z = ∂L/∂a · ∂a/∂z (error de la capa)
-   b. ∂L/∂W = δ · x^T
-   c. ∂L/∂b = δ
-   d. Propagar: ∂L/∂a_prev = W^T · δ
-"""
+1. **Forward**
+   - `z1 = W1 x + b1`
+   - `a1 = φ(z1)`
+   - `z2 = W2 a1 + b2`
+   - `a2 = σ(z2)`
+2. **Loss**
+   - `L = BCE(y, a2)`
+3. **Backward**
+   - Para sigmoid + BCE (caso típico): `δ2 = a2 - y`
+   - `dW2 = δ2 ⊗ a1`
+   - `db2 = δ2`
+   - `δ1 = (W2ᵀ δ2) ⊙ φ'(z1)`
+   - `dW1 = δ1 ⊗ x`
+   - `db1 = δ1`
 
-def backward_layer(layer, dL_da: np.ndarray) -> tuple:
-    """
-    Backward pass de una capa.
+Ejemplo numérico completo (forward y backward, con números):
 
-    Args:
-        layer: capa con cache del forward pass
-        dL_da: gradiente de la loss respecto a la activación
+Definimos:
 
-    Returns:
-        dL_dx: gradiente respecto a la entrada
-        dL_dW: gradiente respecto a los pesos
-        dL_db: gradiente respecto al bias
-    """
-    z = layer.cache['z']
-    x = layer.cache['x']
-    a = layer.cache['a']
+- Entrada: `x = [1.0, -2.0]`
+- Etiqueta: `y = 1`
+- Activación oculta: `φ = ReLU`
+- Activación salida: `σ` (sigmoid)
 
-    # Derivada de la activación: ∂a/∂z
-    if layer.activation == 'sigmoid':
-        da_dz = a * (1 - a)
-    elif layer.activation == 'relu':
-        da_dz = (z > 0).astype(float)
-    elif layer.activation == 'tanh':
-        da_dz = 1 - a ** 2
-    elif layer.activation == 'softmax':
-        # Para softmax + cross-entropy, usamos el gradiente simplificado
-        da_dz = np.ones_like(z)  # se maneja especialmente
-    else:  # linear
-        da_dz = np.ones_like(z)
+Parámetros:
 
-    # δ = ∂L/∂z = ∂L/∂a · ∂a/∂z
-    delta = dL_da * da_dz
+- `W1 = [[0.1, -0.2], [0.4, 0.3]]`, `b1 = [0.0, 0.1]`
+- `W2 = [[-0.3, 0.2]]`, `b2 = [0.05]`
 
-    # Gradientes
-    dL_dW = np.outer(delta, x)
-    dL_db = delta
-    dL_dx = layer.W.T @ delta
+1) Forward
 
-    return dL_dx, dL_dW, dL_db
+- `z1 = W1x + b1`
+  - `z1_1 = 0.1·1 + (-0.2)·(-2) + 0.0 = 0.5`
+  - `z1_2 = 0.4·1 + 0.3·(-2) + 0.1 = -0.1`
+  - `z1 = [0.5, -0.1]`
+- `a1 = ReLU(z1) = [0.5, 0.0]`
+
+- `z2 = W2a1 + b2 = (-0.3)·0.5 + 0.2·0.0 + 0.05 = -0.10`
+- `a2 = σ(z2) ≈ 0.4750`
+
+2) Loss (Binary Cross-Entropy)
+
+- `L = -log(a2) ≈ -log(0.4750) ≈ 0.744`
+
+3) Backward
+
+- Para sigmoid + BCE: `δ2 = a2 - y ≈ 0.4750 - 1 = -0.5250`
+
+- Gradientes en salida:
+  - `dW2 = δ2 ⊗ a1 = [-0.5250·0.5, -0.5250·0.0] ≈ [-0.2625, 0.0]`
+  - `db2 = δ2 ≈ -0.5250`
+
+- Propagación a la capa oculta:
+  - `dL/da1 = W2ᵀ δ2 = [-0.3, 0.2]ᵀ · (-0.5250) ≈ [0.1575, -0.1050]`
+  - `ReLU'(z1) = [1, 0]` (porque `z1_1>0` y `z1_2<0`)
+  - `δ1 = dL/da1 ⊙ ReLU'(z1) ≈ [0.1575, 0.0]`
+
+- Gradientes en primera capa:
+  - `dW1 = δ1 ⊗ x`
+    - para neurona 1: `[0.1575·1.0, 0.1575·(-2.0)] ≈ [0.1575, -0.3150]`
+    - para neurona 2: `[0, 0]`
+  - `db1 = δ1 ≈ [0.1575, 0.0]`
+
+Chequeo mental:
+
+- Los gradientes “se apagan” donde `ReLU'(z)=0`.
+- `dW` siempre tiene la misma shape que `W`.
+
+##### f) Implementación práctica (laboratorio)
+
+Checklist mínimo de implementación (sin “magia”):
+
+- una clase/capa que guarde `x`, `z`, `a` en cache
+- un `backward()` que devuelva `dL_dx`, `dL_dW`, `dL_db`
+- un training loop que muestre una curva de pérdida descendente
+
+Protocolos de ejecución (integración v4/v5):
+
+- **v4.0 (Semana 18):** antes de programar, completar `study_tools/DRYRUN_BACKPROPAGATION.md`.
+- **v5.0 (validación):** si el entrenamiento no converge, hacer:
+  - *Overfit on small batch* (este módulo ya lo incluye más abajo).
+  - si el error persiste, revisar *gradient checking* (ver checklist general en `CHECKLIST.md`).
+
+##### g) Variantes, limitaciones y casos frontera
+
+- **Softmax + Cross-Entropy:** el gradiente de salida también se simplifica a `y_pred - y_true` (cuando `y_true` es one-hot).
+- **Sigmoid en capas ocultas:** riesgo de *vanishing gradients* si `|z|` crece.
+- **ReLU:** riesgo de *dying ReLU* (neurona que queda en 0 siempre).
+- **Estabilidad numérica:** usar `clip`, restar `max(z)` en softmax, y `eps` en logs.
+
+#### Visuales (para estudiar y recordar)
+
+Grafo computacional mínimo (una capa):
+
+```
+x ──► (Wx + b) ──► z ──► φ(z) ──► a ──► L
+         ▲                    ▲
+         │                    │
+         W,b                  φ'
 ```
 
-### 3.3 Red Neuronal Completa con Backprop
+#### Diagrama de flujo: forward (verde) / backward (rojo)
 
-```python
-import numpy as np
-from typing import List, Tuple
-
-class NeuralNetworkFull:
-    """Red Neuronal con Backpropagation completo."""
-
-    def __init__(self, layer_sizes: List[int], activations: List[str]):
-        self.layers = []
-        for i in range(len(layer_sizes) - 1):
-            layer = Layer(layer_sizes[i], layer_sizes[i+1], activations[i])
-            self.layers.append(layer)
-
-        self.loss_history = []
-
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        a = x
-        for layer in self.layers:
-            a = layer.forward(a)
-        return a
-
-    def backward(self, y_true: np.ndarray) -> List[Tuple[np.ndarray, np.ndarray]]:
-        """
-        Backward pass: calcula gradientes para todas las capas.
-
-        Returns:
-            Lista de (dW, db) para cada capa
-        """
-        gradients = []
-
-        # Obtener predicción (última activación)
-        y_pred = self.layers[-1].cache['a']
-
-        # Gradiente inicial: ∂L/∂a_output
-        # Para sigmoid + BCE: simplificado a (y_pred - y_true)
-        # Para softmax + CCE: también (y_pred - y_true)
-        if self.layers[-1].activation in ['sigmoid', 'softmax']:
-            dL_da = y_pred - y_true
-        else:
-            # MSE: 2(y_pred - y_true)
-            dL_da = 2 * (y_pred - y_true)
-
-        # Propagar hacia atrás
-        for layer in reversed(self.layers):
-            dL_dx, dL_dW, dL_db = backward_layer(layer, dL_da)
-            gradients.insert(0, (dL_dW, dL_db))
-            dL_da = dL_dx
-
-        return gradients
-
-    def update_weights(self, gradients: List[Tuple], learning_rate: float):
-        """Actualiza pesos usando gradient descent."""
-        for layer, (dW, db) in zip(self.layers, gradients):
-            layer.W -= learning_rate * dW
-            layer.b -= learning_rate * db
-
-    def fit(
-        self,
-        X: np.ndarray,
-        y: np.ndarray,
-        epochs: int = 1000,
-        learning_rate: float = 0.1,
-        verbose: bool = True
-    ):
-        """Entrena la red."""
-        for epoch in range(epochs):
-            total_loss = 0
-
-            for xi, yi in zip(X, y):
-                # Forward
-                output = self.forward(xi)
-
-                # Loss
-                if isinstance(yi, (int, float)):
-                    yi_arr = np.array([yi])
-                else:
-                    yi_arr = yi
-                loss = binary_cross_entropy(yi_arr[0], output[0])
-                total_loss += loss
-
-                # Backward
-                gradients = self.backward(yi_arr)
-
-                # Update
-                self.update_weights(gradients, learning_rate)
-
-            avg_loss = total_loss / len(X)
-            self.loss_history.append(avg_loss)
-
-            if verbose and epoch % 100 == 0:
-                print(f"Epoch {epoch}: Loss = {avg_loss:.4f}")
-
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        predictions = []
-        for x in X:
-            output = self.forward(x)
-            predictions.append(1 if output[0] > 0.5 else 0)
-        return np.array(predictions)
-
-
-# Demo: Resolver XOR
-print("=== Entrenando para XOR ===")
-X_xor = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_xor = np.array([0, 1, 1, 0])
-
-net = NeuralNetworkFull(
-    layer_sizes=[2, 4, 1],
-    activations=['tanh', 'sigmoid']
-)
-
-net.fit(X_xor, y_xor, epochs=5000, learning_rate=0.5, verbose=True)
-
-print("\n=== Predicciones XOR ===")
-for x, y in zip(X_xor, y_xor):
-    pred = net.forward(x)[0]
-    print(f"{x} -> {pred:.4f} (target: {y})")
 ```
+FORWARD (verde)
+x → z1=W1x+b1 → a1=φ(z1) → z2=W2a1+b2 → a2 → L
+
+BACKWARD (rojo)
+L → dL/da2 → δ2=dL/dz2 → dW2,db2 → δ1 → dW1,db1
+```
+
+Regla práctica para implementarlo:
+
+- **Forward:** guarda en cache `x, z, a` por capa.
+- **Backward:** empieza por el último `δ` y propaga hacia atrás con `Wᵀ`.
+
+#### Fallas típicas (con visual): Vanishing Gradient vs Dying ReLU
+
+**1) Vanishing gradient (sigmoid/tanh en capas ocultas)**
+
+Si `|z|` es grande, `σ(z)` se satura y `σ'(z) ≈ 0`.
+En backprop, multiplicas muchas derivadas pequeñas:
+
+```
+δ1 = (W2ᵀ δ2) ⊙ φ'(z1)
+δ0 = (W1ᵀ δ1) ⊙ φ'(z0)
+...
+
+si φ'(z) ≈ 0 en varias capas → δ se vuelve ~0
+```
+
+Síntomas:
+
+- loss baja muy lento
+- pesos de capas tempranas casi no cambian
+
+Mitigación (en este nivel):
+
+- usa ReLU en ocultas (o inicializaciones cuidadosas)
+- normaliza features
+
+**2) Dying ReLU**
+
+ReLU: `φ(z)=max(0,z)` y `φ'(z)=0` si `z<0`.
+
+Si una neurona queda siempre con `z<0`, su gradiente se vuelve 0 y “muere”:
+
+```
+z < 0  →  a = 0
+φ'(z)=0  →  δ = δ_next ⊙ 0 = 0
+```
+
+Síntomas:
+
+- muchas activaciones exactamente 0
+- algunas neuronas nunca “reviven”
+
+Mitigación (en este nivel):
+
+- baja learning rate
+- inicializa pesos con escalas razonables
+- considera LeakyReLU (conceptual)
+
+#### Actividades activas (aprendizaje activo)
+
+- **Retrieval practice (5–10 min):** sin mirar notas, escribe las 6 ecuaciones: `δ2`, `dW2`, `db2`, `δ1`, `dW1`, `db1`.
+- **Interleaving:** alterna ejercicios de backprop con ejercicios de shapes (recomendado: `study_tools/DRILL_DIMENSIONES_NUMPY.md`).
+- **Generación:** crea tu propio mini-ejemplo con una red 3-3-1 y verifica a mano una iteración.
+
+#### Evaluación (formativa y sumativa)
+
+- **Quiz conceptual:**
+  - ¿Qué representa `δ` y por qué es útil?
+  - ¿Por qué `δ2 = a2 - y` en sigmoid+BCE?
+- **Prueba práctica:** tu red debe:
+  - resolver XOR, y
+  - pasar el *overfit test* sobre un minibatch.
+
+#### Cheat sheet (repaso rápido)
+
+- `z = Wx + b`
+- `a = φ(z)`
+- `δ = ∂L/∂z = (∂L/∂a) ⊙ φ'(z)`
+- `∂L/∂W = δ ⊗ x`
+- `∂L/∂b = δ`
+- `∂L/∂x = Wᵀ δ`
+
+#### Errores comunes y FAQs
+
+- **(Shapes)** confundir `(n,)` con `(n,1)` y obtener gradientes transpuestos.
+- **(Signos)** usar `y - y_pred` en lugar de `y_pred - y` y “subir” la loss.
+- **(Softmax)** implementar softmax sin restar el máximo → overflow.
+- **(Debug)** si la red no puede memorizar 4 puntos de XOR, *no* es “falta de datos”; es un bug.
+
+#### Recursos complementarios (orientados a práctica)
+
+- [RECURSOS.md](RECURSOS.md)
+- `study_tools/DRYRUN_BACKPROPAGATION.md`
+- `study_tools/EXAMEN_ADMISION_SIMULADO.md`
+- [3Blue1Brown: Neural Networks](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)
+
+### Consolidación (Backpropagation)
+
+#### Errores comunes
+
+- **Shapes mal:** confundir `(n,)` con `(n,1)` y obtener transpuestas inesperadas.
+- **Signo del gradiente:** si actualizas con `+ lr * grad`, subes la loss.
+- **No cachear:** si no guardas `x, z, a`, terminas recomputando o usando valores incorrectos.
+- **Explosión numérica:** logits grandes → `exp` overflow → `nan`.
+
+#### Debugging / validación (v5)
+
+- **Overfit on small batch:** si no puede memorizar 4 puntos (XOR), asume bug.
+- Revisa `nan/inf`:
+  - `np.exp` sin `clip`
+  - `np.log` sin `eps`
+- Registra hallazgos en `study_tools/DIARIO_ERRORES.md`.
+- Protocolos completos:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+#### Reto Feynman (tablero blanco)
+
+Explica en 5 líneas o menos:
+
+1) ¿Qué es `δ` y por qué es la señal que “viaja hacia atrás”?
+2) ¿Por qué `dW = δ ⊗ x` tiene sentido dimensionalmente?
+3) ¿Cómo distinguirías vanishing gradient vs dying ReLU en logs/activaciones?
 
 ---
 
@@ -901,6 +1104,25 @@ if __name__ == "__main__":
 ## 💻 Parte 5: CNNs - Redes Convolucionales (Semana 19)
 
 > ⚠️ **Nota:** En este módulo NO implementamos CNNs desde cero (es complejo). El objetivo es **entender la teoría** para el curso de Deep Learning de CU Boulder.
+
+### Protocolo D (visualización generativa): convolución sobre una imagen real
+
+Para que “convolución” no sea solo una fórmula, ejecuta el script:
+
+- [`visualizations/viz_convolution.py`](../visualizations/viz_convolution.py)
+
+Uso recomendado (con una imagen propia):
+
+```bash
+python3 visualizations/viz_convolution.py /ruta/a/tu_imagen.png
+```
+
+Qué debes observar:
+
+- el **Sobel X** responde fuerte a bordes verticales
+- la **magnitud** combina bordes en varias direcciones
+
+Entregable sugerido: captura de *input vs feature map* + explicación en 5 líneas de qué patrón detecta el filtro.
 
 ### 5.1 ¿Por Qué CNNs para Imágenes?
 

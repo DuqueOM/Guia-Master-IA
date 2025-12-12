@@ -9,11 +9,16 @@ Este directorio contiene los materiales del **Plan de Acción Mejorado v4.0** pa
 | Archivo | Propósito | Cuándo usar |
 |---------|-----------|-------------|
 | `DIARIO_ERRORES.md` | Registro de errores matemáticos y de código | Diariamente, al final del estudio |
+| `DIARIO_METACOGNITIVO.md` | Metacognición (qué entendí / qué no / patrón de error) | 5 min diarios |
 | `DRILL_DIMENSIONES_NUMPY.md` | Ejercicios de predicción de `.shape` | Semanas 1-2, 5 min diarios |
+| `TEORIA_CODIGO_BRIDGE.md` | Traducción matemática ↔ implementación (shapes + sanity checks) | 1 vez por semana (20–30 min) |
 | `SIMULACRO_EXAMEN_TEORICO.md` | Banco de preguntas tipo examen | Sábados, 1 hora |
+| `SIMULACRO_PERFORMANCE_BASED.md` | Simulacros 50% teoría / 50% pseudocódigo-código (PB) | Semanas 8, 16 y 23 |
+| `CIERRE_SEMANAL.md` | Consolidación + rescate cognitivo (mapa mental, Feynman, autoevaluación) | Sábados, 1 hora |
 | `VISUALIZACION_GRADIENT_DESCENT.md` | Código para visualizar optimización | Semanas 6-7 |
 | `DRYRUN_BACKPROPAGATION.md` | Plantilla para backprop en papel | Semana 18, antes de codificar |
 | `PUENTE_NUMPY_PYTORCH.md` | Traducción NumPy → PyTorch | Semana 24 |
+| `BADGES_CHECKPOINTS.md` | Badges (mini-victorias verificables por módulo) | Al cerrar cada módulo |
 
 ---
 
@@ -43,6 +48,13 @@ Este directorio contiene los materiales del **Plan de Acción Mejorado v4.0** pa
 ### Cada Sábado
 - [ ] Simulacro de 1 hora usando `SIMULACRO_EXAMEN_TEORICO.md`
 - [ ] Sin IDE, sin internet, solo lápiz y papel
+- [ ] Cierre semanal usando `CIERRE_SEMANAL.md`
+
+### Cada día (5 min)
+- [ ] Diario metacognitivo en `DIARIO_METACOGNITIVO.md`
+
+### Una vez por semana (20–30 min)
+- [ ] Puente Teoría ↔ Código en `TEORIA_CODIGO_BRIDGE.md`
 
 ---
 
@@ -56,11 +68,11 @@ Este directorio contiene los materiales del **Plan de Acción Mejorado v4.0** pa
 ├─────────────────────────────────────────────────┤
 │  MEDIODÍA (Output)                              │
 │  • Implementar en código                        │
-│  • Usar AI Code Reviewer para validar estilo   │
+│  • Usar AI Code Reviewer para validar estilo    │
 ├─────────────────────────────────────────────────┤
 │  CIERRE (Validación Feynman)                    │
-│  • Explicar el concepto como si enseñaras      │
-│  • Registrar errores en DIARIO_ERRORES.md      │
+│  • Explicar el concepto como si enseñaras       │
+│  • Registrar errores en DIARIO_ERRORES.md       │
 └─────────────────────────────────────────────────┘
 ```
 

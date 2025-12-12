@@ -6,7 +6,109 @@
 
 ---
 
+<a id="m02-0"></a>
+
+## 🧭 Cómo usar este módulo (modo 0→100)
+
+**Propósito:** que puedas leer y escribir la “gramática” matemática de ML:
+
+- `ŷ = Xθ` (supervised)
+- proyecciones y bases (PCA)
+- descomposiciones (SVD)
+
+### Objetivos de aprendizaje (medibles)
+
+Al terminar este módulo podrás:
+
+- **Aplicar** producto punto y similitud coseno para medir “parecido” entre vectores.
+- **Implementar** normas y distancias (L1/L2/L∞) y explicar su rol en regularización.
+- **Razonar** shapes en operaciones matriciales (evitar bugs silenciosos).
+- **Explicar** eigenvalues/eigenvectors como “direcciones principales” y conectarlo con PCA.
+- **Explicar** SVD y por qué es el método preferido para PCA numéricamente estable.
+
+### Prerrequisitos
+
+- `Módulo 01` (NumPy, vectorización, shapes).
+
+Enlaces rápidos:
+
+- [GLOSARIO: Dot Product](GLOSARIO.md#dot-product)
+- [GLOSARIO: Matrix Multiplication](GLOSARIO.md#matrix-multiplication)
+- [GLOSARIO: L1 Norm](GLOSARIO.md#l1-norm-manhattan)
+- [GLOSARIO: L2 Norm](GLOSARIO.md#l2-norm-euclidean)
+- [GLOSARIO: SVD](GLOSARIO.md#svd-singular-value-decomposition)
+- [RECURSOS.md](RECURSOS.md)
+
+### Integración con Plan v4/v5
+
+- Refuerzo diario de shapes: `study_tools/DRILL_DIMENSIONES_NUMPY.md`
+- Simulacros: `study_tools/SIMULACRO_EXAMEN_TEORICO.md`
+- Protocolos completos:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Recursos (cuándo usarlos)
+
+| Prioridad | Recurso | Cuándo usarlo en este módulo | Para qué |
+|----------|---------|------------------------------|----------|
+| **Obligatorio** | `study_tools/DRILL_DIMENSIONES_NUMPY.md` | Cada vez que una multiplicación/proyección te cambie el shape de forma inesperada | Evitar bugs silenciosos por shapes |
+| **Obligatorio** | [3Blue1Brown: Linear Algebra](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab) | Semana 3–4, antes de entrar a matrices/eigen/SVD (y si te sientes “mecánico” con `@`/`eig`) | Construir intuición geométrica sólida |
+| **Complementario** | Plot interactivo en Jupyter (`matplotlib` + `plotly` + `ipywidgets`) | Semana 3–5, cuando estudies transformaciones lineales / eigenvectors | Ver “rejillas deformándose” y construir intuición geométrica por experimentación |
+| **Complementario** | [Mathematics for ML: Linear Algebra](https://www.coursera.org/learn/linear-algebra-machine-learning) | Semana 5, al entrar a eigenvalues/SVD | Formalizar con ejercicios guiados |
+| **Opcional** | [Mathematics for ML (book)](https://mml-book.github.io/) | Después de terminar eigen/SVD (para profundizar) | Profundizar en notación y demostraciones |
+| **Opcional** | [RECURSOS.md](RECURSOS.md) | Al planificar refuerzo para PCA (M06) | Elegir materiales de práctica adicionales |
+
 ## 🧠 ¿Por Qué Álgebra Lineal para ML?
+
+### Intuición del espacio vectorial (el eslabón perdido)
+
+Si solo piensas en matrices como “tablas de números”, vas a poder escribir `np.linalg.eig(A)` pero no vas a entender qué estás calculando. La idea central es:
+
+> Una matriz es una **función** que transforma el espacio: lo estira, lo rota, lo inclina o lo aplasta.
+
+#### 1) Vectores como movimiento (no como puntos)
+
+Un vector `v = [x, y]` puede verse como un **desplazamiento**:
+
+- empezar en el origen
+- caminar `x` en X
+- caminar `y` en Y
+
+Visualización sugerida (dibújalo): suma de vectores como “caminar dos movimientos seguidos”.
+
+#### 2) Matrices como deformación de una rejilla (grid)
+
+Imagina una rejilla cuadrada en el plano. Multiplicar por una matriz `A` deforma toda la rejilla:
+
+- líneas paralelas siguen paralelas
+- el origen no se mueve
+- los cuadrados se vuelven paralelogramos
+
+Ejemplos mentales:
+
+- `[[2, 0], [0, 1]]` estira el espacio en X al doble.
+- Si `det(A) = 0`, aplastas el plano 2D en una línea (o un punto): pierdes dimensión.
+
+Esto explica por qué una matriz con determinante 0 no es invertible: no puedes “des-aplastar” una línea para volver a hacer un plano.
+
+#### 3) Producto punto como “sombra” (proyección)
+
+Lectura geométrica: `a·b = ||a|| ||b|| cos(θ)` mide cuánto de `a` apunta en la dirección de `b`.
+
+Aplicación directa en ML:
+
+- `w·x` mide qué tan alineado está tu input `x` con el patrón `w`.
+
+#### 4) Eigenvectors: los ejes que no se mueven
+
+Cuando una matriz rota/estira el espacio, casi todos los vectores cambian de dirección. Pero algunos vectores son “tercos”: solo se escalan.
+
+- **Eigenvector:** dirección que no gira bajo `A`.
+- **Eigenvalue:** cuánto se estiró/encogió esa dirección.
+
+Visualización sugerida (para PCA): imagina que quieres alinear una “cámara” con esos ejes naturales.
+
+En PCA (M06), esos ejes (eigenvectors de la covarianza) son los ejes donde hay más varianza.
 
 ### Conexiones Directas con el Pathway
 
@@ -77,6 +179,26 @@ plt.show()
 ```
 
 ### 1.2 Operaciones con Vectores
+
+#### Formalización: Producto punto como “sombra/proyección”
+
+**Intuición:** el producto punto te dice cuánto del vector `a` está “apuntando” en la dirección de `b`. Si imaginas una linterna proyectando `a` sobre la línea de `b`, el producto punto está relacionado con el tamaño de esa **sombra**.
+
+Dos fórmulas que debes dominar:
+
+```
+a·b = ||a|| · ||b|| · cos(θ)
+
+proj_b(a) = (a·b / b·b) · b
+```
+
+Interpretación rápida:
+
+- si `a·b` es grande y positivo → apuntan parecido
+- si `a·b ≈ 0` → son casi ortogonales (poca “sombra”)
+- si `a·b` es negativo → apuntan en sentidos opuestos
+
+**Por qué importa en ML:** muchas predicciones son de la forma `ŷ = Xθ` (sumas de productos punto). Entenderlo geométricamente evita que el modelo sea “caja negra”.
 
 ```python
 import numpy as np
@@ -486,6 +608,70 @@ print(f"A @ x = {A @ x_solve}")    # [9, 8] ✓
 
 ### 4.1 Concepto
 
+#### Intuición física: el globo terráqueo (eigenvector como eje)
+
+Imagina que tomas un globo terráqueo y lo haces girar.
+
+- Casi todos los puntos de la superficie se mueven.
+- Pero hay una línea “especial” que no cambia de dirección: el eje que conecta los polos.
+
+Ese eje es la metáfora del **eigenvector**: una dirección que la transformación “respeta” (no la gira, solo la escala).
+
+El **eigenvalue** te dice cuánto se estira/encoge esa dirección.
+
+#### Código generador de intuición (obligatorio): rejilla deformada por una matriz
+
+Para dejar de ver matrices como tablas y empezar a verlas como “máquinas que deforman el espacio”, usa el script:
+
+- [`visualizations/viz_transformations.py`](../visualizations/viz_transformations.py)
+
+Ejecución:
+
+```bash
+python3 visualizations/viz_transformations.py
+```
+
+Ejercicio:
+
+- prueba matrices como `[[2, 0], [0, 1]]`, `[[0, -1], [1, 0]]`, `[[1, 1], [0, 1]]`
+- observa cómo se deforma la rejilla y cómo se comporta un eigenvector (si existe en R²)
+
+#### Worked example: Eigenvalues de una matriz 2×2 (a mano)
+
+Antes de usar `np.linalg.eig`, hazlo una vez “a mano” para fijar la idea.
+
+Para:
+
+```
+A = [[2, 1],
+     [1, 2]]
+```
+
+1) Buscamos `λ` tal que exista un `v ≠ 0` cumpliendo `Av = λv`. Eso equivale a:
+
+```
+(A - λI)v = 0
+```
+
+2) Para que haya solución no trivial, el determinante debe ser 0:
+
+```
+det(A - λI) = 0
+
+det([[2-λ, 1],
+     [1, 2-λ]]) = (2-λ)^2 - 1
+```
+
+3) Resolver:
+
+```
+(2-λ)^2 - 1 = 0
+2-λ = ±1
+λ ∈ {3, 1}
+```
+
+Esto coincide con lo que imprime el código (eigenvalues `[3, 1]`).
+
 ```python
 import numpy as np
 
@@ -532,6 +718,22 @@ print(f"¿Iguales? {np.allclose(Av, lambda_v)}")
 ```
 
 ### 4.2 Eigenvalues para PCA
+
+#### Conexión Línea 2: Covarianza como esperanza (estadística)
+
+En estadística, la matriz de covarianza se define conceptualmente como:
+
+```
+Cov(X) = E[(X - μ)(X - μ)^T]
+```
+
+En la práctica, como no conocemos la distribución real, usamos la versión muestral:
+
+```
+Σ ≈ (1/(n-1)) X_centered^T X_centered
+```
+
+Este puente es clave para el curso de **Statistical Estimation** (Línea 2): la misma idea de “esperanza” aparece en MLE, varianza, estimadores y pruebas.
 
 ```python
 import numpy as np
@@ -954,6 +1156,35 @@ def run_tests():
 if __name__ == "__main__":
     run_tests()
 ```
+
+---
+
+## 🧩 Consolidación (errores comunes + debugging v5 + reto Feynman)
+
+### Errores comunes
+
+- **Confundir dot product con multiplicación elemento-a-elemento:** `a*b` no es `a·b`.
+- **Shapes silenciosos:** `a` con shape `(n,)` vs `(n,1)` cambia resultados al multiplicar.
+- **Invertir matrices innecesariamente:** evita `inv(A) @ b` y prefiere `solve(A, b)`.
+- **PCA sin centrar:** si no haces `X_centered = X - mean`, PCA sale mal.
+- **Signo de eigenvectors:** el signo de un eigenvector puede cambiar (`v` o `-v`); no es un bug.
+
+### Debugging / validación (v5)
+
+- Verifica `shapes` en cada operación matricial.
+- Si aparece `nan/inf`, revisa escalas y operaciones sensibles.
+- Registra hallazgos en `study_tools/DIARIO_ERRORES.md`.
+- Protocolos completos:
+  - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
+  - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+
+### Reto Feynman (tablero blanco)
+
+Explica en 5 líneas o menos:
+
+1) ¿Por qué `a·b` es una “sombra” y qué significa que sea negativo?
+2) ¿Por qué PCA usa eigenvectors de la covarianza?
+3) ¿Qué te da SVD que sea más estable que eigendecomposition?
 
 ---
 

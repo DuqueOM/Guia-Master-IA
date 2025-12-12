@@ -16,6 +16,28 @@ from PyPDF2 import PdfMerger
 from weasyprint import CSS, HTML
 from weasyprint.text.fonts import FontConfiguration
 
+try:
+    from pygments.formatters import HtmlFormatter
+
+    PYGMENTS_CSS = HtmlFormatter(style="monokai").get_style_defs(".codehilite")
+    HAS_PYGMENTS = True
+except Exception:
+    PYGMENTS_CSS = ""
+    HAS_PYGMENTS = False
+
+
+def get_markdown_extensions():
+    extensions = ["tables", "fenced_code", "admonition", "nl2br"]
+    extension_configs = {}
+    if HAS_PYGMENTS:
+        extensions.insert(2, "codehilite")
+        extension_configs["codehilite"] = {
+            "guess_lang": False,
+            "noclasses": False,
+        }
+    return extensions, extension_configs
+
+
 BASE_DIR = Path(__file__).parent
 DOCS_DIR = BASE_DIR / "docs"
 OUTPUT_DIR = BASE_DIR / "pdf"
@@ -143,7 +165,8 @@ FILE_TITLES = {
 }
 
 # CSS Optimizado para WeasyPrint (Estilo Compacto y Profesional)
-CONTENT_CSS = """
+CONTENT_CSS = (
+    """
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 /* Intentar cargar fuente de emojis si está disponible localmente */
@@ -235,7 +258,7 @@ h4 {
 }
 
 /* Evitar partir tablas, imágenes y CÓDIGO */
-table, img, figure, .admonition, pre {
+img, figure, .admonition {
     page-break-inside: avoid;
     break-inside: avoid; /* Refuerzo para navegadores modernos/WeasyPrint */
 }
@@ -253,8 +276,31 @@ p, li {
 
 ul, ol { margin: 0 0 8px 0; padding-left: 16px; max-width: 100%; }
 li { margin-bottom: 2px; text-align: left; }
-}
 blockquote p { margin: 0; text-align: left; } /* Forzar izquierda dentro del blockquote */
+
+blockquote {
+    margin: 8px 0;
+    padding: 8px 10px;
+    border-left: 4px solid #3b82f6;
+    background: #eff6ff;
+    color: #0f172a;
+    border-radius: 6px;
+}
+
+/* Admonitions (Python-Markdown extension) */
+.admonition {
+    margin: 8px 0;
+    padding: 8px 10px;
+    border-left: 4px solid #0ea5e9;
+    background: #ecfeff;
+    color: #0f172a;
+    border-radius: 6px;
+}
+.admonition > .admonition-title {
+    margin: 0 0 6px 0;
+    font-weight: 700;
+    color: #075985;
+}
 
 /* Links - IMPORTANTE para PDF */
 a {
@@ -280,7 +326,7 @@ code {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.9em;
     overflow-wrap: break-word;
-    word-break: break-all; /* Romper links largos */
+    word-break: break-word; /* Evitar romper tokens en exceso */
 }
 
 pre {
@@ -297,14 +343,22 @@ pre {
     font-size: 7.5pt;
     line-height: 1.3;
     white-space: pre-wrap;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     word-wrap: break-word;
-    word-break: break-all;
+    word-break: normal;
     text-align: left;
     break-inside: auto;
     border: 1px solid #1e293b;
 }
-pre code { background: none; color: inherit; padding: 0; word-break: break-all; }
+pre code { background: none; color: inherit; padding: 0; word-break: normal; }
+
+/* Pygments wrapper */
+.codehilite {
+    margin: 8px 0;
+}
+.codehilite pre {
+    margin: 0;
+}
 
 /* Imágenes */
 img {
@@ -318,36 +372,47 @@ img {
 table {
     width: 100%;
     max-width: 100%;
-    table-layout: auto; /* Auto para optimizar ancho de columnas según contenido */
+    table-layout: fixed; /* Evita columnas que se “rompen” distinto por página */
     border-collapse: collapse;
+    border-spacing: 0;
     margin: 10px 0;
-    font-size: 8pt;
+    font-size: 7.3pt;
     break-inside: auto;
     border: 1px solid #e2e8f0;
 }
+
+thead { display: table-header-group; }
+tfoot { display: table-footer-group; }
+tr { break-inside: avoid; page-break-inside: avoid; }
 
 th {
     background: #f1f5f9;
     color: #1e293b;
     font-weight: 600;
     text-align: left;
-    padding: 8px 8px;
+    padding: 6px 6px;
     border-bottom: 2px solid #e2e8f0;
-    overflow-wrap: break-word;
-    word-break: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
 }
 
 td {
     border-bottom: 1px solid #e2e8f0;
-    padding: 6px 8px;
+    border-left: 1px solid #e2e8f0;
+    padding: 5px 6px;
     vertical-align: top;
     text-align: left; /* Texto en tablas siempre a la izquierda */
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     word-wrap: break-word;
-    word-break: break-word;
+    word-break: normal;
+    hyphens: auto;
 }
 
 tr:nth-child(even) { background: #f8fafc; }
+
+th { border-left: 1px solid #e2e8f0; }
+th:first-child, td:first-child { border-left: none; }
 
 /* Portadas - FULL PAGE sin márgenes */
 .cover-page {
@@ -428,6 +493,10 @@ h2 + *, h3 + *, h4 + * {
     break-before: avoid-page;
 }
 """
+    + "\n"
+    + PYGMENTS_CSS
+    + "\n"
+)
 
 
 class PDFGenerator:
@@ -540,8 +609,11 @@ class PDFGenerator:
         # 2. Transformar enlaces a internos (con debug)
         linked_md = self.transform_internal_links(clean_md, debug=True)
 
+        md_extensions, md_extension_configs = get_markdown_extensions()
         content_html = markdown.markdown(
-            linked_md, extensions=["tables", "fenced_code", "nl2br"]
+            linked_md,
+            extensions=md_extensions,
+            extension_configs=md_extension_configs,
         )
 
         # ID para el ancla: mod_FILENAME (mismo formato que transform_internal_links)
@@ -671,8 +743,11 @@ def main():
         linked_md = gen.transform_internal_links(clean, debug=True)
 
         # Convertir a HTML
+        md_extensions, md_extension_configs = get_markdown_extensions()
         content_html = markdown.markdown(
-            linked_md, extensions=["tables", "fenced_code", "nl2br"]
+            linked_md,
+            extensions=md_extensions,
+            extension_configs=md_extension_configs,
         )
 
         # ID para el ancla
@@ -728,7 +803,7 @@ def main():
 
     # Generar PDF único
     print("\n[4] Generando PDF final...")
-    final_path = OUTPUT_DIR / "GUIA_MS_AI_ML_SPECIALIST_v4.pdf"
+    final_path = OUTPUT_DIR / "GUIA_MS_AI_ML_SPECIALIST_v10.10.pdf"
 
     HTML(string=full_html, base_url=str(DOCS_DIR)).write_pdf(
         target=final_path, stylesheets=[gen.css]

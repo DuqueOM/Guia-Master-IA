@@ -11,11 +11,13 @@
 - Que un **tercero** (mentor/IA/entrevistador) pueda confirmar tu nivel.
 - Que tu ejecución esté alineada con el **formato de examen** de la maestría.
 
-v5.0 introduce 3 protocolos sobre la guía principal:
+v5.0 introduce 5 protocolos sobre la guía principal:
 
 1. **Protocolo 1 – Data Rigor (Dirty Data Check)**
 2. **Protocolo 2 – Validación Externa (Desafío del Tablero Blanco)**
 3. **Protocolo 3 – Examen de Admisión Simulado**
+4. **Protocolo D – Visualización Generativa (Intuición Geométrica por Código)**
+5. **Protocolo E – Rescate Cognitivo y Ejecución (Metacognición + Puentes + Simulacros PB + Badges)**
 
 ---
 
@@ -28,6 +30,11 @@ v5.0 introduce 3 protocolos sobre la guía principal:
   - `study_tools/DIRTY_DATA_CHECK.md`
   - `study_tools/DESAFIO_TABLERO_BLANCO.md`
   - `study_tools/EXAMEN_ADMISION_SIMULADO.md`
+  - `study_tools/CIERRE_SEMANAL.md`
+  - `study_tools/DIARIO_METACOGNITIVO.md`
+  - `study_tools/TEORIA_CODIGO_BRIDGE.md`
+  - `study_tools/BADGES_CHECKPOINTS.md`
+  - `study_tools/SIMULACRO_PERFORMANCE_BASED.md`
 
 ---
 
@@ -259,3 +266,77 @@ Usa ambos planes como **capas** sobre [PLAN_ESTUDIOS.md](PLAN_ESTUDIOS.md):
      - Argumentar si el fallo se debe principalmente a **Bias** (modelo demasiado simple) o **Variance** (modelo demasiado complejo / datos ruidosos o insuficientes), conectando con el análisis de Bias–Variance del proyecto.
 
 Con estos tres protocolos, v5.0 pasa de ser solo una capa extra de herramientas a un **sistema completo de verificación, validación externa y transición a herramientas de producción** aplicado sobre las mismas 24 semanas del plan base.
+
+---
+
+### Protocolo E – Rescate Cognitivo y Ejecución (Metacognición + Puentes + Simulacros PB + Badges)
+
+Objetivo: reducir **fatiga cognitiva**, aumentar **retención** y mantener **motivación visible** durante 24 semanas sin bajar el rigor.
+
+Regla práctica:
+
+- esto no es contenido extra: es **consolidación** y **transferencia** (teoría → código) que evita deserción.
+
+Componentes:
+
+1) **Cierre Cognitivo Semanal (Sábado, 1 hora)**
+   - Herramienta: `study_tools/CIERRE_SEMANAL.md`
+   - Incluye mapa mental, Feynman, 3 errores comunes, checklist y mini autoevaluación.
+
+2) **Metacognición diaria (5 min)**
+   - Herramienta: `study_tools/DIARIO_METACOGNITIVO.md`
+   - Preguntas guía: qué entendí, qué no, patrón de error, acción correctiva.
+
+3) **Puente Teoría ↔ Código (semanal, 20–30 min)**
+   - Herramienta: `study_tools/TEORIA_CODIGO_BRIDGE.md`
+   - Ejemplos: covarianza → NumPy, gradiente MSE → implementación, log-sum-exp → estabilidad.
+
+4) **Badges y mini-victorias (por módulo)**
+   - Herramienta: `study_tools/BADGES_CHECKPOINTS.md`
+   - Criterio: cada badge requiere evidencia verificable (script/notebook/test/explicación breve).
+
+5) **Simulacros performance-based (Semanas 8, 16, 23)**
+   - Herramienta: `study_tools/SIMULACRO_PERFORMANCE_BASED.md`
+   - Formato: 50% teoría + 50% pseudocódigo/código.
+
+
+### Protocolo D – Visualización Generativa (Intuición Geométrica por Código)
+
+Objetivo: construir intuición geométrica **mediante visualizaciones reproducibles** (sin depender de imágenes estáticas). El estudiante aprende a “ver”:
+
+- matrices como deformación del espacio
+- gradiente descent como trayectoria en un valle
+- convolución como detector local de patrones
+
+Regla práctica:
+
+- no es “decoración”: cada visualización debe responder una pregunta conceptual
+
+#### Semana 3 (Álgebra) – Transformaciones lineales y eigenvectors
+
+- **Tarea:** ejecutar y modificar [`visualizations/viz_transformations.py`](../visualizations/viz_transformations.py)
+- **Entregable:**
+  - un plot que muestre una rejilla antes/después de `A`
+  - y una breve nota: “¿cuál es el eigenvector (si existe) y qué le pasa?”
+
+#### Semana 7 (Cálculo) – Descenso de gradiente 3D interactivo
+
+- **Tarea:** ejecutar [`visualizations/viz_gradient_3d.ipynb`](../visualizations/viz_gradient_3d.ipynb) (Plotly + ipywidgets)
+- **Entregable:**
+  - captura o export de la trayectoria con `lr` pequeño (convergencia)
+  - captura o export con `lr` grande (divergencia)
+  - explicación en 5 líneas del fenómeno
+
+#### Semana 19 (CNNs) – Convolución y feature maps (Sobel)
+
+- **Tarea:** ejecutar [`visualizations/viz_convolution.py`](../visualizations/viz_convolution.py)
+- **Entregable:**
+  - cargar una imagen propia (foto) y aplicar Sobel
+  - mostrar input vs feature map
+  - explicar qué patrón detecta el filtro
+
+Herramientas requeridas:
+
+- `matplotlib`
+- `plotly`
+- `ipywidgets`

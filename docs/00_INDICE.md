@@ -1,4 +1,4 @@
-# 📚 GUÍA MAESTRA: MS AI PATHWAY - ML SPECIALIST (v3.1)
+# 📚 GUÍA MAESTRA: MS AI PATHWAY - ML SPECIALIST (v3.3)
 
 > **De Python Básico a Candidato del MS in AI de CU Boulder**
 > **24 Semanas (6 Meses Exactos) | Enfoque: Línea 1 - Machine Learning**
@@ -86,6 +86,20 @@
 
 ## 📖 Módulos Obligatorios
 
+### ⚡ Enlaces rápidos (bloques 0→100)
+
+Estos atajos te llevan directo a la sección **"Cómo usar este módulo (modo 0→100)"** dentro de cada módulo:
+
+| Módulo | Atajo |
+|--------|-------|
+| 01 | [M01 → Cómo usar](01_PYTHON_CIENTIFICO.md#m01-0) |
+| 02 | [M02 → Cómo usar](02_ALGEBRA_LINEAL_ML.md#m02-0) |
+| 03 | [M03 → Cómo usar](03_CALCULO_MULTIVARIANTE.md#m03-0) |
+| 04 | [M04 → Cómo usar](04_PROBABILIDAD_ML.md#m04-0) |
+| 05 | [M05 → Cómo usar](05_SUPERVISED_LEARNING.md#m05-0) |
+| 06 | [M06 → Cómo usar](06_UNSUPERVISED_LEARNING.md#m06-0) |
+| 07 | [M07 → Cómo usar](07_DEEP_LEARNING.md#m07-0) |
+
 ### FASE 1: Fundamentos (Semanas 1-8)
 
 *Python científico con Pandas, matemáticas esenciales y probabilidad básica para ML.*
@@ -102,6 +116,8 @@
 - Librería `linear_algebra.py` con proyecciones y distancias
 - Gradient Descent manual para minimizar funciones
 - Implementación de MLE para estimar parámetros de Gaussiana
+- Visualizaciones generativas (Protocolo D): transformaciones lineales y gradient descent interactivo
+- Rescate cognitivo y transferencia (Protocolo E): cierre semanal, diario metacognitivo, puente teoría↔código y simulacro PB-8
 
 ---
 
@@ -120,6 +136,7 @@
 - `kmeans.py` y `pca.py` funcionales
 - `neural_network.py` con backprop manual (MLP)
 - Teoría de CNNs (convolución, pooling, stride)
+- Rescate cognitivo y transferencia (Protocolo E): puente teoría↔código semanal, badges por módulo y simulacro PB-16
 
 ---
 
@@ -139,6 +156,11 @@
 | 22 | Regresión Logística One-vs-All | Supervised Learning |
 | 23 | MLP con Backprop desde cero | Deep Learning |
 | 24 | Informe + Comparación de Modelos | Integración |
+
+Extensión Protocolo E (motivación + simulacro):
+
+- Badges por módulo: `study_tools/BADGES_CHECKPOINTS.md`
+- Simulacros performance-based: `study_tools/SIMULACRO_PERFORMANCE_BASED.md` (PB-8, PB-16, PB-23)
 
 ---
 
@@ -190,7 +212,7 @@ mnist-analyst/
 │
 ├── README.md                  # Documentación (inglés)
 ├── pyproject.toml
-└── requirements.txt           # numpy, pandas, matplotlib, pytest
+└── requirements.txt           # stack de trabajo (numpy/pandas/matplotlib/plotly/ipywidgets/jupyterlab + tooling)
 ```
 
 ---
@@ -241,6 +263,16 @@ Para que esto quepa en 6 meses y sea efectivo para la **Línea 1 de ML**:
 
 **[→ Módulo 01: Python + Pandas + NumPy](01_PYTHON_CIENTIFICO.md)**
 
+### ⚡ Links rápidos (0→100)
+
+- **M01 (Python Científico) — 0→100:** [Cómo usar este módulo](01_PYTHON_CIENTIFICO.md#m01-0)
+- **M02 (Álgebra Lineal) — 0→100:** [Cómo usar este módulo](02_ALGEBRA_LINEAL_ML.md#m02-0)
+- **M03 (Cálculo Multivariante) — 0→100:** [Cómo usar este módulo](03_CALCULO_MULTIVARIANTE.md#m03-0)
+- **M04 (Probabilidad para ML) — 0→100:** [Cómo usar este módulo](04_PROBABILIDAD_ML.md#m04-0)
+- **M05 (Supervised Learning) — 0→100:** [Cómo usar este módulo](05_SUPERVISED_LEARNING.md#m05-0)
+- **M06 (Unsupervised Learning) — 0→100:** [Cómo usar este módulo](06_UNSUPERVISED_LEARNING.md#m06-0)
+- **M07 (Deep Learning) — 0→100:** [Cómo usar este módulo](07_DEEP_LEARNING.md#m07-0)
+
 ---
 
 ## 📌 Restricciones del Proyecto
@@ -262,52 +294,3 @@ Para que esto quepa en 6 meses y sea efectivo para la **Línea 1 de ML**:
 | **ML: Deep Learning** | ✅ | MLP con Backprop + teoría CNNs |
 
 ---
-
-## ✨ Cambios en v3.1 (vs v3.0)
-
-| Cambio | Razón |
-|--------|-------|
-| **24 semanas** (antes 26) | Proyecto MNIST reducido a 4 sem (es dataset simple) |
-| **Pandas en Módulo 01** | Necesario para cargar y limpiar datos reales |
-| **Probabilidad para ML (Módulo 04)** | Bayes y MLE son esenciales para entender loss functions |
-| **CNNs en Módulo 07** | El curso de Deep Learning de CU Boulder las cubre |
-
----
-
-## ✨ Cambios en v3.2 (vs v3.1)
-
-| Cambio | Razón |
-|--------|-------|
-| **Debugging NumPy (M01)** | 5 errores comunes que causan horas de frustración |
-| **Estándares Profesionales** | `mypy`, `ruff`, `pytest` obligatorios desde Semana 2 |
-| **Metodología Feynman** | "Reto del Tablero Blanco" en cada módulo |
-| **Derivación Analítica (M05, M07)** | Simula exámenes de posgrado: derivar gradientes a mano |
-| **Análisis Bias-Variance (M08)** | Concepto central de ML para diseño de modelos |
-| **Formato Paper (M08)** | Notebook final con estructura académica |
-
----
-
-## ✨ Cambios en v3.3 (vs v3.2)
-
-| Cambio | Razón |
-|--------|-------|
-| **Gradient Checking (M03)** | Validación matemática de derivadas (técnica CS231n Stanford) |
-| **Log-Sum-Exp Trick (M04)** | Softmax numéricamente estable (evita NaN) |
-| **Shadow Mode (M05)** | Validar implementaciones vs sklearn |
-| **Overfit Test (M07)** | Si no hace overfit en 10 ejemplos, tiene bug |
-| **Análisis de Errores (M08)** | Visualizar y explicar fallos (nivel senior) |
-| **Curvas de Aprendizaje (M08)** | Diagnóstico gráfico de Bias-Variance |
-
-### Nuevos Entregables v3.3
-
-| Módulo | Nuevo Entregable |
-|--------|------------------|
-| 03 | `grad_check.py` - validación numérica de derivadas |
-| 04 | `softmax` con log-sum-exp trick |
-| 05 | Comparativa Shadow Mode vs sklearn |
-| 07 | `overfit_test.py` - debugging de redes |
-| 08 | Sección "Error Analysis" + Learning Curves |
-
----
-
-> 💡 **Filosofía v3.3:** Esta guía incluye **validación matemática rigurosa** en cada paso. No confíes en que tu código "parece funcionar"—valídalo con gradient checking, shadow mode y overfit tests. Si completas v3.3, tu código es **matemáticamente correcto y profesionalmente validado**.

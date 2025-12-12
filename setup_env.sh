@@ -23,7 +23,7 @@ pip install --upgrade pip
 pip install numpy matplotlib scipy scikit-learn pandas seaborn jupyter jupyterlab ipython plotly ipywidgets
 
 echo "📄 Instalando dependencias para generación de PDF (markdown, PyPDF2, weasyprint)..."
-pip install markdown PyPDF2 weasyprint pygments
+pip install markdown markdown-katex PyPDF2 weasyprint pygments
 
 # Instalar herramientas de desarrollo
 echo "🔧 Instalando herramientas de desarrollo..."

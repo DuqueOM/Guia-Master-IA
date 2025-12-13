@@ -87,6 +87,22 @@ Bloques fijos (para reducir fatiga y mejorar retención):
 
 **Objetivo:** dejar el repo listo para ejecución + calibrar evaluación.
 
+### 🧱 HARD GATE (no negociable): Entorno virtual + reproducibilidad
+
+Si no tienes un entorno aislado, **no avances** a Semana 1.
+
+- Crear y activar entorno virtual (elige uno):
+  - `venv` (recomendado): ejecutar desde el root del repo: `bash setup_env.sh`
+  - `conda`: crear env equivalente e instalar dependencias
+- Instalar dependencias del repo (reproducibilidad):
+  - `pip install -r requirements.txt`
+- Criterio de éxito (5 checks):
+  - `which python` apunta al entorno (no al sistema)
+  - `python --version` cumple `pyproject.toml` (`>=3.10`)
+  - `python -c "import numpy, pandas, matplotlib"` no falla
+  - `pre-commit install` ejecutado (hooks activos)
+  - cualquier instalación de PyTorch ocurre **dentro** del entorno (Semana 20)
+
 - Crear plantilla y pesos de rúbrica: `study_tools/RUBRICA_v1.md` + `rubrica.csv`.
 - Definir roles de evaluación: auto (estudiante), IA/pareja (AI Code Reviewer), mentor externo (si existe).
 - Test rápido: aplicar la rúbrica a 1 entregable pequeño (p.ej. drill NumPy) y ajustar descriptores/pesos.
@@ -103,6 +119,8 @@ Bloques fijos (para reducir fatiga y mejorar retención):
 
 **Objetivo:** Dominar Pandas para datos reales + NumPy para matemáticas
 **Por qué:** En el mundo real, los datos vienen en CSVs sucios. Pandas es esencial para cargar y limpiar datos antes de aplicar ML.
+
+**Hard Gate:** confirma que tu entorno virtual está activo antes de correr cualquier script.
 
 ### Semana 1: Pandas + NumPy Básico
 
@@ -302,6 +320,17 @@ Teorema de la semana (concepto-guía): MLE → cross-entropy.
 | J | F1-Score | Media armónica | Implementar |
 | V | Matriz de confusión | Visualización | matplotlib |
 | S | **Repaso** | `metrics.py` completo | Test |
+
+### ⚠️ Nota crítica (Semana 11 → prepara Semana 12): Recursividad
+
+La implementación de un Árbol de Decisión desde cero se construye **recursivamente**. Si no controlas condiciones de parada, vas a terminar en loops infinitos o árboles “sin fin”.
+
+- Aprende/repasa: base cases, depth limit, y “no split improves”.
+- Recurso corto recomendado: https://realpython.com/python-recursion/
+- Checklist mínimo antes de Semana 12:
+  - puedes explicar en 5 líneas cuándo se detiene la recursión
+  - agregas `max_depth` y lo pruebas en un dataset toy
+  - logueas profundidad/número de nodos al depurar
 
 ### Semana 12: Validación Cruzada y Regularización
 

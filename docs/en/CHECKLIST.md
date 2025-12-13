@@ -19,6 +19,15 @@ Recommended cadence:
 
 ---
 
+## Hard gate (setup + reproducibility)
+
+- [ ] You work inside a virtual environment (venv/conda), not system Python.
+- [ ] Dependencies installed reproducibly:
+  - `bash setup_env.sh` **or** `pip install -r requirements.txt`
+- [ ] `python --version` satisfies `pyproject.toml` (`>=3.10`).
+- [ ] `python -c "import numpy, pandas, matplotlib"` works.
+- [ ] `pre-commit install` done.
+
 ## Phase 1 (Weeks 1–8)
 
 - Python + NumPy basics (arrays, broadcasting, axis ops)
@@ -38,7 +47,9 @@ Recommended cadence:
 Supervised:
 
 - Logistic Regression from scratch + metrics + CV
+- **Weights interpretation (LogReg):** reshape weights into a 28×28 image (MNIST-like) and write a short interpretation.
 - **Tree-Based Models:** you can explain impurity + information gain
+- **Recursion hard gate (trees):** stopping conditions tested (`max_depth`, purity, `min_samples_split`, “no split improves”).
 - Decision Tree deliverable runnable: `scripts/decision_tree_from_scratch.py`
 
 Unsupervised:

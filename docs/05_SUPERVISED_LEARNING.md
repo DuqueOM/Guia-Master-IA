@@ -701,6 +701,19 @@ print(f"Parámetros: {model.theta}")
 
 ## 🧩 Consolidación (Regresión Logística)
 
+### Entregable conceptual (v3.3): Interpretación de pesos (LogReg)
+
+Objetivo: conectar el vector de pesos con “qué está mirando” el modelo.
+
+- Dataset recomendado: MNIST (28x28) en binario (p. ej. 0 vs 1) usando `sklearn.datasets.fetch_openml("mnist_784", as_frame=False)`.
+- Entrena tu regresión logística sobre imágenes aplanadas (`784` features).
+- Visualiza:
+  - toma `theta[1:]` (sin bias), reshapea a `(28, 28)` y grafica con `imshow`.
+  - usa un mapa de color divergente (p. ej. centrado en 0) y guarda una imagen.
+- Interpreta en 5–10 líneas:
+  - ¿qué regiones tienen peso positivo/negativo?
+  - ¿por qué eso tiene sentido para el dígito?
+
 ### Errores comunes
 
 - **Etiquetas incorrectas:** BCE asume `y ∈ {0,1}` (no `{-1,1}`) si usas la fórmula estándar.
@@ -1173,6 +1186,14 @@ class LogisticRegressionRegularized:
 ```
 
 ---
+
+### ⚠️ Aviso crítico antes de Árboles: Recursividad (Semana 12)
+
+La implementación de árboles se basa en **recursión**. Si no defines y pruebas condiciones de parada, vas a generar árboles infinitos o muy profundos.
+
+- Condiciones de parada mínimas: `max_depth`, pureza (todas las etiquetas iguales), `min_samples_split`, “no split improves”.
+- Recurso recomendado: https://realpython.com/python-recursion/
+- Debug mínimo: imprime `depth`, `n_samples` y el criterio elegido por nodo durante desarrollo.
 
 ## 🌳 Parte 5: Tree-Based Models (Semana 12)
 
@@ -1710,6 +1731,7 @@ if __name__ == "__main__":
 
 ### Entregables de Código
 - [ ] `logistic_regression.py` con tests pasando
+- [ ] `artifacts/m05_logreg_weights.png` + 5–10 líneas de interpretación (pesos 28x28)
 - [ ] `mypy src/` pasa sin errores
 - [ ] `pytest tests/` pasa sin errores
 

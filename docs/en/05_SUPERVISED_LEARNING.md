@@ -57,6 +57,17 @@ Quick references (Spanish source):
 - Gradient (must be derived and understood):
   - `∇L = (1/m) Xᵀ(ŷ - y)`
 
+### Weights interpretation (deliverable)
+
+Goal: connect the learned weight vector to “what the model is looking at”.
+
+- Recommended dataset: MNIST (28×28) binary (e.g., 0 vs 1) via `sklearn.datasets.fetch_openml("mnist_784", as_frame=False)`.
+- Train your logistic regression on flattened images (`784` features).
+- Visualize:
+  - take `theta[1:]` (no bias), reshape to `(28, 28)`, plot with `imshow`.
+  - use a diverging colormap centered at 0 and save the figure.
+- Write 5–10 lines interpreting positive vs negative regions.
+
 ### Metrics
 
 - Confusion matrix: TP/TN/FP/FN.
@@ -70,6 +81,13 @@ Quick references (Spanish source):
 - Use K-fold to estimate performance more reliably.
 
 ---
+
+## Recursion warning (before trees)
+
+Decision trees are built **recursively**. If you don’t define and test stopping conditions, you’ll hit infinite recursion or unbounded depth.
+
+- Minimum stopping conditions: `max_depth`, purity, `min_samples_split`, “no split improves”.
+- Recommended resource: https://realpython.com/python-recursion/
 
 ## Tree-Based Models (Week 12 add-on)
 
@@ -100,6 +118,9 @@ Deliverable in this repo:
   - logistic regression (+ optional L1/L2)
   - core metrics
   - validation helpers (split, K-fold)
+
+- `artifacts/m05_logreg_weights.png`:
+  - 28×28 visualization of learned logistic regression weights + short interpretation
 
 - `scripts/decision_tree_from_scratch.py`:
   - simple decision tree from scratch
@@ -139,6 +160,7 @@ Minimum acceptance criteria:
 - [ ] `mypy` passes.
 - [ ] `pytest` passes.
 - [ ] `scripts/decision_tree_from_scratch.py` runs and reports train/test accuracy.
+- [ ] `artifacts/m05_logreg_weights.png` saved and interpreted (5–10 lines).
 
 ### Analytical derivation (required)
 

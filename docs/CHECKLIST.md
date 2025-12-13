@@ -6,6 +6,15 @@
 
 ---
 
+## 🧱 Hard Gates (Setup + reproducibilidad)
+
+- [ ] Trabajo dentro de un entorno virtual (venv/conda), no en el Python del sistema.
+- [ ] Instalé dependencias de forma reproducible:
+  - `bash setup_env.sh` **o** `pip install -r requirements.txt`
+- [ ] `python --version` cumple `pyproject.toml` (`>=3.10`).
+- [ ] `python -c "import numpy, pandas, matplotlib"` no falla.
+- [ ] `pre-commit install` ejecutado (hooks activos).
+
 ## 📏 Rúbrica (evaluación formal)
 
 - `study_tools/RUBRICA_v1.md`
@@ -89,6 +98,8 @@ Uso recomendado:
 - [ ] Train/test split manual
 - [ ] K-fold cross validation
 - [ ] Regularización L2 (Ridge)
+- [ ] Árboles: entiendo recursividad y condiciones de parada (p. ej. `max_depth`, `min_samples_split`, “no split improves”).
+- [ ] LogReg: interpreté pesos como imagen (28x28) y puedo explicar qué aprende (signo/magnitud).
 
 #### Derivación Analítica (v3.2 - Obligatorio)
 - [ ] **Derivé el gradiente de Cross-Entropy a mano**

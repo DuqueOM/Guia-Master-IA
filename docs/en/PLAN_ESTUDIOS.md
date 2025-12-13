@@ -6,6 +6,20 @@
 
 ---
 
+## Hard gate (non-negotiable): virtual environment + reproducibility
+
+If your environment is not isolated, **do not start Week 1**.
+
+- From the repo root:
+  - create/activate venv + install deps: `bash setup_env.sh`
+  - or install reproducibly: `pip install -r requirements.txt`
+- Success criteria:
+  - `which python` points to the env (not system Python)
+  - `python --version` satisfies `pyproject.toml` (`>=3.10`)
+  - `python -c "import numpy, pandas, matplotlib"` works
+  - `pre-commit install` done
+  - PyTorch (Week 20) is installed **inside** the env only
+
 ## Weekly overview
 
 - **Weeks 1–8 (Foundations)**: Python, Linear Algebra, Calculus, Probability
@@ -41,6 +55,10 @@ Practical visualization (run, don’t build from scratch):
   - Cross-validation
   - **Decision Tree from scratch** (Tree-Based Models)
 
+Week 11 → prep for Week 12:
+
+- **Recursion hard gate:** you must be able to define and test stopping conditions (`max_depth`, purity, `min_samples_split`, “no split improves”) before implementing a decision tree.
+
 - Unsupervised:
   - K-Means
   - PCA
@@ -67,4 +85,4 @@ Practical visualization (run, don’t build from scratch):
 ## How to use this English plan
 
 - Use this file as your **weekly compass**.
-- For full detail and exercises, follow the linked Spanish modules until each module gets an English adaptation.
+- For module-level details, use the English modules in `docs/en/` (and the Spanish originals only if you want extra depth).

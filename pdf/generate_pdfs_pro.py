@@ -128,9 +128,9 @@ APPENDIX_ITEMS: List[AppendixItem] = [
         "python",
     ),
     AppendixItem(
-        "visualizations/viz_gradient_3d.ipynb",
-        PROJECT_DIR / "visualizations" / "viz_gradient_3d.ipynb",
-        "json",
+        "visualizations/viz_gradient_3d.py",
+        PROJECT_DIR / "visualizations" / "viz_gradient_3d.py",
+        "python",
     ),
     AppendixItem("requirements.txt", PROJECT_DIR / "requirements.txt", "text"),
     AppendixItem("pyproject.toml", PROJECT_DIR / "pyproject.toml", "toml"),

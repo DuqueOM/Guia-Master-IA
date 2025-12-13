@@ -26,6 +26,7 @@ Al terminar este módulo podrás:
 - **Elegir** métricas correctas según el costo de FP/FN.
 - **Aplicar** validación (split y K-fold) evitando leakage.
 - **Validar** tu implementación con Shadow Mode (sklearn) como ground truth.
+- **Explicar** Entropía/Gini, Information Gain y el contraste **Bagging vs Boosting** (Random Forest vs Gradient Boosting) a nivel conceptual.
 
 Enlaces rápidos:
 
@@ -76,7 +77,7 @@ Tipos principales:
 | 9 | Regresión Lineal | `linear_regression.py` |
 | 10 | Regresión Logística | `logistic_regression.py` |
 | 11 | Métricas de Evaluación | `metrics.py` |
-| 12 | Validación y Regularización | Cross-validation, L1/L2 |
+| 12 | Validación + Regularización + Árboles | Cross-validation, L1/L2 + Tree-Based Models |
 
 ---
 
@@ -1173,7 +1174,60 @@ class LogisticRegressionRegularized:
 
 ---
 
+## 🌳 Parte 5: Tree-Based Models (Semana 12)
+
+Esta semana cubre modelos supervisados **no diferenciables** (no entrenan con Gradient Descent). La lógica de entrenamiento es:
+
+- elegir un *split* (feature + threshold)
+- medir qué tan “puro” queda cada lado (Entropía o Gini)
+- repetir recursivamente
+
+### 5.1 Entropía, Gini e Information Gain
+
+Definiciones base (para clasificación):
+
+- **Entropía:** `H(y) = - Σ p(c) log2 p(c)`
+- **Gini:** `G(y) = 1 - Σ p(c)^2`
+
+Un split `(j, t)` divide el dataset en:
+
+- izquierda: `x_j ≤ t`
+- derecha: `x_j > t`
+
+La idea es maximizar la mejora en pureza:
+
+- **Information Gain:** `IG = impurity(parent) - weighted_impurity(children)`
+
+### 5.2 Entrenable desde cero (entregable)
+
+Entregable runnable:
+
+- `scripts/decision_tree_from_scratch.py`
+
+Ejecuta:
+
+```bash
+python3 scripts/decision_tree_from_scratch.py --criterion gini --max-depth 5
+```
+
+Objetivo mínimo:
+
+- que el script entrene un árbol y reporte accuracy train/test en un dataset toy
+- que puedas explicar (en 5 líneas) cómo el árbol decide el mejor split
+
+### 5.3 Ensembles (intro): Bagging vs Boosting
+
+Conceptos clave:
+
+- **Bagging (Random Forest):** muchos árboles entrenados en *bootstrap samples*; reduce varianza.
+- **Boosting (Gradient Boosting/XGBoost):** árboles entrenados secuencialmente corrigiendo errores; reduce bias (pero puede sobreajustar).
+
+---
+
 ## 📦 Entregable del Módulo
+
+- `supervised_learning.py` (regresión lineal + logística + métricas + validación).
+- `scripts/decision_tree_from_scratch.py` (árbol de decisión simple desde cero, sin gradientes).
 
 ### `supervised_learning.py`
 

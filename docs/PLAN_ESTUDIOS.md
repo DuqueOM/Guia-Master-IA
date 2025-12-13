@@ -307,12 +307,12 @@ Teorema de la semana (concepto-guía): MLE → cross-entropy.
 |-----|-----------------|-------------------|------------------|
 | L | Overfitting vs Underfitting | Bias-Variance tradeoff | Diagrama |
 | M | K-Fold Cross Validation | Validación robusta | Implementar |
-| X | Regularización L2 (Ridge) | $\lambda\|\theta\|^2$ | Añadir a regresión |
-| J | Regularización L1 (Lasso) | $\lambda\|\theta\|_1$ | Comparar |
-| V | Selección de hiperparámetros | Grid search simple | Implementar |
+| X | **Tree-Based Models** | Entropía/Gini + Information Gain | Ejercicios |
+| J | Árbol de Decisión (CART/ID3) | Implementación recursiva (sin gradientes) | Código |
+| V | Ensembles (intro) | Bagging vs Boosting (Random Forest vs Gradient Boosting) | Comparar fronteras |
 | S | **Checkpoint** | Supervisado completo | Entregable |
 
-**Entregable:** `logistic_regression.py` desde cero usando NumPy para clasificar datos simples, con métricas y cross-validation.
+**Entregable:** `logistic_regression.py` desde cero usando NumPy para clasificar datos simples, con métricas y cross-validation **+** `scripts/decision_tree_from_scratch.py` (Árbol de Decisión simple desde cero).
 
 **Extensión v5.0 – Dirty Data Check (Módulo 05):**
 Para el dataset supervisado usado en regresión logística:
@@ -413,15 +413,15 @@ Teorema de la semana (concepto-guía): PCA como maximización de varianza.
 | V | Inicialización de pesos | Xavier, He | Implementar |
 | S | **Repaso** | Forward funcional | Test |
 
-### Semana 19: CNNs - Teoría (NO implementación)
+### Semana 19: CNNs - Teoría + Forward Pass (NumPy)
 
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
 |-----|-----------------|-------------------|------------------|
 | L | Por qué CNNs para imágenes | Problema de MLP con imágenes | Diagrama |
 | M | Operación de convolución | Kernel, filtro, feature map | Demo visual |
 | X | Stride, padding, pooling | Cálculo de dimensiones output | Ejercicios |
-| J | Arquitectura LeNet-5 | Capas CONV + POOL + FC | Diagrama |
-| V | Max pooling implementación | Concepto simple | Código básico |
+| J | **CNN Forward Pass (NumPy)** | Convolución + pooling (forward) | Código |
+| V | Arquitectura tipo LeNet | Dimensiones end-to-end | Quiz de shapes |
 | S | **Repaso** | Quiz de dimensiones CNN | Test teórico |
 
 ### Semana 20: Optimizadores y Entrenamiento
@@ -429,13 +429,13 @@ Teorema de la semana (concepto-guía): PCA como maximización de varianza.
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
 |-----|-----------------|-------------------|------------------|
 | L | SGD (Stochastic GD) | Mini-batches | Implementar |
-| M | Momentum | Acelerar convergencia | Implementar |
-| X | Adam optimizer | Adaptive learning rate | Implementar |
-| J | Regularización DL | Dropout (concepto), L2 | Implementar L2 |
-| V | Training loop completo | Epochs, batches, logging | Implementar |
+| M | Momentum / Adam | Acelerar convergencia | Implementar |
+| X | **Intro a PyTorch** | Tensores, `nn.Module`, `DataLoader` | Primer forward |
+| J | **CNN Training con PyTorch** | Entrenar una CNN (sin backward manual) | Código |
+| V | Comparación | CNN NumPy (forward) vs CNN PyTorch (training) | Notas |
 | S | **Checkpoint** | MLP resuelve XOR | Entregable |
 
-**Entregable:** `neural_net.py` - Una red neuronal que resuelve el problema XOR y clasifica dígitos simples, implementando `backward()` manualmente.
+**Entregable:** `neural_net.py` - Una red neuronal que resuelve el problema XOR implementando `backward()` manualmente **+** `scripts/train_cnn_pytorch.py` (entrenamiento CNN con PyTorch).
 
 **Evaluación (rúbrica):**
 
@@ -447,7 +447,7 @@ Teorema de la semana (concepto-guía): PCA como maximización de varianza.
 
 *Objetivo: Un proyecto intensivo de 4 semanas que demuestra competencia en las 3 áreas*
 
-**Dataset:** MNIST (imágenes de 28x28 píxeles de dígitos escritos a mano)
+**Dataset:** MNIST (dígitos, 28×28) / **Fashion-MNIST** (alternativo, mismo formato)
 
 > 💡 **v3.3:** MNIST es un dataset simple (solo 10 clases, imágenes pequeñas). 4 semanas son suficientes.
 
@@ -519,10 +519,10 @@ En las semanas 22 y 23, realizar los simulacros definidos en `study_tools/EXAMEN
 | Día | Actividad |
 |-----|-----------|
 | L | Comparar rendimiento: Logistic vs MLP |
-| M | Análisis: ¿por qué MLP es mejor? (no linealidad) |
-| X | Escribir MODEL_COMPARISON.md |
-| J | Crear README.md profesional (inglés) |
-| V | Demo final: Jupyter notebook completo |
+| M | Benchmark alternativo (recomendado): **Fashion-MNIST** |
+| X | Dirty Data Check: generar dataset corrupto (`scripts/corrupt_mnist.py`) + limpieza |
+| J | Deployment mínimo: guardar checkpoint + `scripts/predict.py` |
+| V | Escribir MODEL_COMPARISON.md + crear README.md profesional (inglés) |
 | S | **Entrega final + Autoevaluación** |
 
 **Entregable Final:**

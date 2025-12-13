@@ -19,7 +19,7 @@ Regla: un badge se gana con criterios verificables.
 ## Módulo 03 – Badge: Maestro del Gradiente
 
 - Puedo explicar `learning_rate` como estabilidad vs oscilación.
-- Corrí `visualizations/viz_gradient_3d.ipynb` con `lr` pequeño y grande + explicación.
+- Corrí `visualizations/viz_gradient_3d.py` con `lr` pequeño y grande + explicación.
 
 ## Módulo 04 – Badge: Probabilidad en Acción
 

@@ -321,7 +321,7 @@ Regla práctica:
 
 #### Semana 7 (Cálculo) – Descenso de gradiente 3D interactivo
 
-- **Tarea:** ejecutar [`visualizations/viz_gradient_3d.ipynb`](../visualizations/viz_gradient_3d.ipynb) (Plotly + ipywidgets)
+- **Tarea:** ejecutar [`visualizations/viz_gradient_3d.py`](../visualizations/viz_gradient_3d.py) (Plotly, export a HTML)
 - **Entregable:**
   - captura o export de la trayectoria con `lr` pequeño (convergencia)
   - captura o export con `lr` grande (divergencia)

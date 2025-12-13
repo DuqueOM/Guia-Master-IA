@@ -2,7 +2,7 @@
 
 > **🎯 Objetivo:** Pipeline end-to-end que demuestra competencia en las 3 áreas del Pathway
 > **Fase:** 3 - Proyecto Integrador | **Semanas 21-24** (4 semanas)
-> **Dataset:** MNIST (dígitos escritos a mano, 28×28 píxeles)
+> **Dataset:** MNIST (dígitos escritos a mano, 28×28 píxeles) / **Fashion-MNIST** (alternativo, mismo formato)
 
 ---
 
@@ -29,6 +29,8 @@
 
 > 💡 **Nota v3.3:** MNIST es un dataset simple. 4 semanas son suficientes para un proyecto bien estructurado.
 
+> 💡 **Nota (upgrade):** si quieres un benchmark más realista, usa **Fashion-MNIST**. Mantiene 28×28 y 10 clases, pero es más difícil y diferencia mejor LR vs MLP/CNN.
+
 ---
 
 ## 📚 Estructura del Proyecto
@@ -40,12 +42,18 @@
 | 21 | EDA + No Supervisado | Unsupervised Algorithms | PCA + K-Means funcionando |
 | 22 | Clasificación Clásica | Supervised Learning | Logistic Regression OvA |
 | 23 | Deep Learning | Introduction to Deep Learning | MLP con backprop |
-| 24 | Benchmark + Informe | Integración | MODEL_COMPARISON.md |
+| 24 | Benchmark + Informe | Integración | MODEL_COMPARISON.md + deployment mínimo |
 
 Evaluación (rúbrica):
 
 - [study_tools/RUBRICA_v1.md](../study_tools/RUBRICA_v1.md) (scope `M08` en `rubrica.csv`)
 - Condición dura de admisión: **PB-23 ≥ 80/100** (si PB-23 < 80 ⇒ estado “Aún no listo” aunque el total global sea alto)
+
+Notas prácticas (Week 24):
+
+- **Fashion-MNIST (alternativo):** en vez de MNIST dígitos, corre el benchmark en Fashion-MNIST para ver degradación realista.
+- **Dirty Data Check:** genera un dataset corrupto (ruido/NaNs/inversión) con `scripts/corrupt_mnist.py` y documenta cómo lo limpiaste.
+- **Deployment mínimo:** entrena y guarda una CNN con `scripts/train_cnn_pytorch.py` y luego predice una imagen 28×28 con `scripts/predict.py`.
 
 ### Estructura de Archivos
 
@@ -1297,6 +1305,10 @@ Esto sugiere que:
 ### Semana 24: Benchmark + Informe
 - [ ] MODEL_COMPARISON.md completo
 - [ ] README.md profesional en inglés
+ - [ ] Benchmark alternativo: probé **Fashion-MNIST** (o justifiqué por qué no)
+ - [ ] Dirty Data Check: generé un dataset corrupto con `scripts/corrupt_mnist.py` y documenté limpieza
+ - [ ] Deployment mínimo: entrené una CNN con `scripts/train_cnn_pytorch.py` y guardé el checkpoint
+ - [ ] Deployment mínimo: ejecuté `scripts/predict.py` sobre una imagen 28×28 y reporté predicción
 
 ### Requisitos v3.3
 - [ ] **Análisis Bias-Variance** con experimento práctico

@@ -133,9 +133,10 @@ Estos atajos te llevan directo a la sección **"Cómo usar este módulo (modo 0�
 
 **Entregables Fase 2:**
 - `logistic_regression.py` con regularización L2
+- `scripts/decision_tree_from_scratch.py` (Tree-Based Models: árbol de decisión desde cero)
 - `kmeans.py` y `pca.py` funcionales
 - `neural_network.py` con backprop manual (MLP)
-- Teoría de CNNs (convolución, pooling, stride)
+- CNNs: teoría + forward pass (NumPy) + entrenamiento CNN con PyTorch (`scripts/train_cnn_pytorch.py`)
 - Rescate cognitivo y transferencia (Protocolo E): puente teoría↔código semanal, badges por módulo y simulacro PB-16
 
 ---
@@ -155,7 +156,7 @@ Estos atajos te llevan directo a la sección **"Cómo usar este módulo (modo 0�
 | 21 | EDA + PCA + K-Means | Unsupervised Algorithms |
 | 22 | Regresión Logística One-vs-All | Supervised Learning |
 | 23 | MLP con Backprop desde cero | Deep Learning |
-| 24 | Informe + Comparación de Modelos | Integración |
+| 24 | Informe + Comparación + Deployment mínimo | Integración |
 
 Extensión Protocolo E (motivación + simulacro):
 

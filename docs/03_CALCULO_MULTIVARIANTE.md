@@ -52,7 +52,7 @@ Enlaces rápidos:
 | Prioridad | Recurso | Cuándo usarlo en este módulo | Para qué |
 |----------|---------|------------------------------|----------|
 | **Obligatorio** | `study_tools/VISUALIZACION_GRADIENT_DESCENT.md` | Al implementar Gradient Descent (cuando ajustes `learning_rate` y criterios de parada) | Ver si “baja” o diverge y por qué |
-| **Complementario** | [`visualizations/viz_gradient_3d.ipynb`](../visualizations/viz_gradient_3d.ipynb) | Semana 7, cuando ya entiendas `∇J` pero el `learning_rate` se sienta “mágico” | Ver en 3D la superficie + la trayectoria y entender divergencia por overshooting |
+| **Complementario** | [`visualizations/viz_gradient_3d.py`](../visualizations/viz_gradient_3d.py) | Semana 7, cuando ya entiendas `∇J` pero el `learning_rate` se sienta “mágico” | Generar un HTML interactivo con superficie 3D + trayectoria (convergencia/overshooting) |
 | **Complementario** | [3Blue1Brown: Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr) | Antes de Chain Rule (o si derivar se siente mecánico) | Intuición visual de derivadas y composición |
 | **Complementario** | [Mathematics for ML: Multivariate Calculus](https://www.coursera.org/learn/multivariate-calculus-machine-learning) | Cuando pases de derivadas 1D a gradiente/derivadas parciales | Práctica estructurada con ejercicios |
 | **Obligatorio** | `study_tools/SIMULACRO_EXAMEN_TEORICO.md` | Tras terminar Chain Rule (antes de saltar a M05/M07) | Verificar que puedes derivar sin mirar apuntes |
@@ -457,9 +457,16 @@ Checklist de diagnóstico rápido:
 
 #### Código generador de intuición (Protocolo D): superficie 3D + slider de `learning_rate`
 
-Ejecuta el notebook:
+Ejecuta el script (genera un HTML interactivo):
 
-- [`visualizations/viz_gradient_3d.ipynb`](../visualizations/viz_gradient_3d.ipynb)
+- [`visualizations/viz_gradient_3d.py`](../visualizations/viz_gradient_3d.py)
+
+Ejemplos:
+
+```bash
+python3 visualizations/viz_gradient_3d.py --lr 0.01 --steps 30 --html-out artifacts/gd_lr0_01.html
+python3 visualizations/viz_gradient_3d.py --lr 1.0 --steps 30 --html-out artifacts/gd_lr1_0.html
+```
 
 Checklist de uso:
 

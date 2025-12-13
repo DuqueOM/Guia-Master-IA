@@ -1,6 +1,6 @@
 # Módulo 07 - Deep Learning
 
-> **🎯 Objetivo:** Implementar MLP con backprop + entender fundamentos de CNNs
+> **🎯 Objetivo:** Implementar MLP con backprop + CNN forward (NumPy) + entrenamiento CNN con PyTorch
 > **Fase:** 2 - Núcleo de ML | **Semanas 17-20**
 > **Curso del Pathway:** Introduction to Deep Learning
 
@@ -24,7 +24,8 @@ Al terminar este módulo podrás:
 - **Implementar** un MLP que resuelva XOR.
 - **Explicar** backprop como chain rule aplicada a un grafo computacional.
 - **Depurar** entrenamiento con overfit test (si no memoriza, hay bug).
-- **Entender** teoría de CNNs (convolución, stride, padding, pooling).
+- **Implementar** forward pass de una CNN simple (convolución + pooling) en NumPy para dominar dimensiones.
+- **Entrenar** una CNN equivalente usando PyTorch (`torch.nn`) sin implementar backward manual.
 
 Enlaces rápidos:
 
@@ -89,8 +90,8 @@ Visualización sugerida:
 |--------|------|------------|
 | 17 | Perceptrón y MLP | `activations.py` + forward pass |
 | 18 | Backpropagation | `backward()` con Chain Rule |
-| 19 | **CNNs: Teoría** | Entender convolución, pooling, stride |
-| 20 | Optimizadores y Entrenamiento | `neural_network.py` completo |
+| 19 | **CNNs: Teoría + Forward (NumPy)** | Convolución/pooling (forward) + quiz de dimensiones |
+| 20 | **PyTorch para CNNs** | `scripts/train_cnn_pytorch.py` |
 
 ---
 
@@ -1104,7 +1105,7 @@ if __name__ == "__main__":
 
 ## 💻 Parte 5: CNNs - Redes Convolucionales (Semana 19)
 
-> ⚠️ **Nota:** En este módulo NO implementamos CNNs desde cero (es complejo). El objetivo es **entender la teoría** para el curso de Deep Learning de CU Boulder.
+> ⚠️ **Nota:** En este módulo implementas **solo el forward pass** de una CNN simple en NumPy (para dominar dimensiones). El entrenamiento completo de una CNN se hace con **PyTorch** (sin implementar backward manual de CNN).
 
 ### Protocolo D (visualización generativa): convolución sobre una imagen real
 
@@ -1707,6 +1708,10 @@ Explica en **máximo 5 líneas** sin jerga técnica:
 - [ ] Entiendo qué es convolución, stride, padding y pooling
 - [ ] Puedo calcular dimensiones de output de una CNN
 - [ ] Conozco la arquitectura LeNet-5
+
+### CNNs (Práctica)
+- [ ] Implementé forward pass (NumPy) de convolución + pooling para una arquitectura tipo LeNet
+- [ ] Entrené una CNN equivalente con PyTorch usando `scripts/train_cnn_pytorch.py`
 
 ### Entregables de Código
 - [ ] `neural_network.py` con tests pasando

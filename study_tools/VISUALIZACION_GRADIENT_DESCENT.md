@@ -448,7 +448,8 @@ comparar_optimizadores()
 
 ## 🎯 Tarea Final
 
-Crea tu propia visualización de una función de costo de regresión lineal:
-- f(m, b) = Σ(y_i - (m*x_i + b))²
-- Usa datos simples: x = [1, 2, 3], y = [2, 4, 6]
-- Visualiza cómo GD encuentra los parámetros óptimos
+Ejecuta una visualización ya provista y registra observaciones:
+
+- Ejecuta `visualizations/viz_gradient_3d.py` con `lr` pequeño y grande (convergencia vs divergencia).
+- Cambia `steps` y describe cómo cambia la trayectoria.
+- Entrega una captura/export del HTML y una explicación en 5 líneas.

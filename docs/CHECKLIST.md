@@ -119,6 +119,8 @@ Uso recomendado:
 - [ ] SGD, Momentum, Adam implementados
 - [ ] Red resuelve problema XOR
 - [ ] **CNNs (teoría):** convolución, stride, padding, pooling
+- [ ] Implementé forward pass de una CNN simple (NumPy)
+- [ ] Entrené una CNN con PyTorch (`torch.nn`) sin implementar backward manual
 
 #### Derivación Analítica (v3.2 - Obligatorio)
 - [ ] **Derivé las ecuaciones de backprop para red de 2 capas**
@@ -162,6 +164,9 @@ Uso recomendado:
 - [ ] `MODEL_COMPARISON.md` explicando diferencias
 - [ ] `README.md` profesional en inglés
 - [ ] Demo notebook completo
+ - [ ] Benchmark alternativo: probé **Fashion-MNIST** (o justifiqué por qué no)
+ - [ ] Dirty Data Check: generé un dataset corrupto con `scripts/corrupt_mnist.py` y documenté limpieza
+ - [ ] Deployment mínimo: guardé un checkpoint de CNN (`scripts/train_cnn_pytorch.py`) y corrí `scripts/predict.py`
 
 ### Requisitos v3.2 (Obligatorios)
 - [ ] **Análisis Bias-Variance** con experimento práctico (3 tamaños de MLP)

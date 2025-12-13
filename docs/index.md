@@ -3,6 +3,8 @@
 > **De Python Básico a Candidato de Élite para el MS in AI**
 > **24 semanas | Validación Matemática Rigurosa | Código Profesional**
 
+**Idioma:** Español | [English →](en/index.md)
+
 ---
 
 ## 🎯 Objetivo
@@ -64,7 +66,8 @@ Dominio absoluto de las **3 materias de la Línea de Machine Learning** del MS i
 ## 📌 Restricciones
 
 - ✅ **NumPy + Pandas permitidos** desde la semana 1
-- ❌ **Sin sklearn, tensorflow, pytorch** para implementaciones
+- ❌ **Sin sklearn / tensorflow** para implementaciones core
+- ✅ **PyTorch permitido de forma acotada**: entrenamiento de CNN (M07 / proyecto) sin implementar backward manual
 - ✅ **Desde cero** - Cada algoritmo implementado manualmente
 - ✅ **Type hints** - Código tipado con mypy
 

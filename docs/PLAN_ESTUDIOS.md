@@ -3,6 +3,8 @@
 > **24 Semanas | 6 horas/día | Lunes a Sábado**
 > **Preparación para MS in AI Pathway - Línea 1: Machine Learning**
 
+**Idioma:** Español | [English →](en/PLAN_ESTUDIOS.md)
+
 ---
 
 ## 🗓️ Vista General: 24 Semanas

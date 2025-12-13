@@ -4,6 +4,8 @@
 > **24 Semanas (6 Meses Exactos) | Enfoque: Línea 1 - Machine Learning**
 > **Filosofía: "Matemáticas Aplicadas a Código"**
 
+**Idioma:** Español | [English →](en/00_INDICE.md)
+
 ---
 
 ## 🎯 Objetivo de Esta Guía

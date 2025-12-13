@@ -2,6 +2,8 @@
 
 > Verificación completa del programa de **24 semanas** con validación matemática rigurosa.
 
+**Idioma:** Español | [English →](en/CHECKLIST.md)
+
 ---
 
 ## 📏 Rúbrica (evaluación formal)

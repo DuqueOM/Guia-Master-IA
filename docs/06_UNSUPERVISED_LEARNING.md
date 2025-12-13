@@ -31,6 +31,7 @@ Enlaces rápidos:
 - [RECURSOS.md](RECURSOS.md)
 - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
 - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
+- Evaluación (rúbrica): [study_tools/RUBRICA_v1.md](../study_tools/RUBRICA_v1.md) (scope `M06` en `rubrica.csv`; incluye PB-16)
 
 ### Recursos (cuándo usarlos)
 

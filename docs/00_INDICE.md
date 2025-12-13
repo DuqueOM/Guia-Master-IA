@@ -230,22 +230,6 @@ mnist-analyst/
 
 ---
 
-## ❌ Qué Se Eliminó del Plan Original
-
-Para que esto quepa en 6 meses y sea efectivo para la **Línea 1 de ML**:
-
-| Eliminado | Razón |
-|-----------|-------|
-| Linked Lists, Stacks, Queues | Irrelevante para matemáticas del Pathway |
-| Binary Trees, BST | No se usa en los 3 cursos de ML |
-| Grafos (BFS/DFS) | No es parte del currículo |
-| QuickSort, MergeSort | En ML usas `numpy.sort()` |
-| Inverted Index, TF-IDF | Proyecto de IR, no de CV/ML |
-| Cadenas de Markov | Pertenece a Línea 2 (Estadística) |
-| Motor de Búsqueda | Reemplazado por MNIST Pipeline |
-
----
-
 ## 📦 Material de Referencia
 
 | Documento | Descripción | Uso |

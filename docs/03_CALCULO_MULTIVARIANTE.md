@@ -42,6 +42,7 @@ Enlaces rápidos:
 
 - Visualización de optimización: `study_tools/VISUALIZACION_GRADIENT_DESCENT.md`
 - Simulacros: `study_tools/SIMULACRO_EXAMEN_TEORICO.md`
+- Evaluación (rúbrica): [study_tools/RUBRICA_v1.md](../study_tools/RUBRICA_v1.md) (scope `M03` en `rubrica.csv`)
 - Protocolo completo:
   - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
   - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
@@ -695,39 +696,45 @@ Consejo práctico: cuando ya tienes `a = σ(z)`, usa `a(1-a)` para derivar, en v
 
 ### 4.1 Chain Rule en 1D
 
-"""
-REGLA DE LA CADENA (Chain Rule)
+!!! note "REGLA DE LA CADENA (Chain Rule)"
+    Si `y = f(g(x))`, entonces:
 
-Si y = f(g(x)), entonces:
-    dy/dx = df/dg · dg/dx
+    `dy/dx = df/dg · dg/dx`
 
-O en notación de composición:
-    (f ∘ g)'(x) = f'(g(x)) · g'(x)
+    O en notación de composición:
 
-Esto es FUNDAMENTAL para Backpropagation.
-"""
+    `(f ∘ g)'(x) = f'(g(x)) · g'(x)`
 
-# Ejemplo: y = (x² + 1)³
-#
-# Sea g(x) = x² + 1  y  f(u) = u³
-# Entonces y = f(g(x))
-#
-# dy/dx = f'(g(x)) · g'(x)
-#       = 3(x² + 1)² · 2x
-#       = 6x(x² + 1)²
+    Esto es **fundamental** para Backpropagation.
 
+```text
+Ejemplo: y = (x² + 1)³
+
+Sea g(x) = x² + 1  y  f(u) = u³
+Entonces y = f(g(x))
+
+dy/dx = f'(g(x)) · g'(x)
+      = 3(x² + 1)² · 2x
+      = 6x(x² + 1)²
+```
+
+```python
 def g(x):
     return x**2 + 1
+
 
 def f(u):
     return u**3
 
+
 def y(x):
     return f(g(x))
+
 
 def dy_dx_analytical(x):
     """Derivada usando chain rule."""
     return 6 * x * (x**2 + 1)**2
+
 
 def dy_dx_numerical(x, h=1e-7):
     """Derivada numérica."""
@@ -739,25 +746,29 @@ x = 2.0
 print(f"y({x}) = {y(x)}")
 print(f"dy/dx analítica:  {dy_dx_analytical(x)}")
 print(f"dy/dx numérica:   {dy_dx_numerical(x):.6f}")
+```
 
 
 ### 4.2 Chain Rule para Funciones Compuestas (Backprop Preview)
 
-"""
-CHAIN RULE PARA REDES NEURONALES
+!!! note "CHAIN RULE PARA REDES NEURONALES"
+    Una capa de red neuronal:
 
-Una capa de red neuronal:
-    z = Wx + b       (transformación lineal)
-    a = σ(z)         (activación)
+    `z = Wx + b` (transformación lineal)
 
-Si L es la pérdida, necesitamos:
-    ∂L/∂W, ∂L/∂b     (para actualizar los pesos)
+    `a = σ(z)` (activación)
 
-Usando Chain Rule:
-    ∂L/∂W = ∂L/∂a · ∂a/∂z · ∂z/∂W
-    ∂L/∂b = ∂L/∂a · ∂a/∂z · ∂z/∂b
-"""
+    Si `L` es la pérdida, necesitamos:
 
+    `∂L/∂W`, `∂L/∂b` (para actualizar los pesos)
+
+    Usando Chain Rule:
+
+    `∂L/∂W = ∂L/∂a · ∂a/∂z · ∂z/∂W`
+
+    `∂L/∂b = ∂L/∂a · ∂a/∂z · ∂z/∂b`
+
+```python
 def simple_forward_backward():
     """
     Ejemplo simplificado de forward y backward pass.
@@ -831,25 +842,23 @@ def simple_forward_backward():
 
 simple_forward_backward()
 
+```
+
 
 ### 4.3 Backpropagation en una Red de 2 Capas
 
-"""
-RED NEURONAL DE 2 CAPAS
+!!! note "RED NEURONAL DE 2 CAPAS"
+    Arquitectura:
 
-Arquitectura:
-    x (input)
-    → z₁ = W₁x + b₁
-    → a₁ = sigmoid(z₁)
-    → z₂ = W₂a₁ + b₂
-    → a₂ = sigmoid(z₂)
-    → L = MSE(a₂, y)
+    `x (input) → z₁ = W₁x + b₁ → a₁ = sigmoid(z₁) → z₂ = W₂a₁ + b₂ → a₂ = sigmoid(z₂) → L = MSE(a₂, y)`
 
-Backpropagation usa Chain Rule repetidamente:
-    ∂L/∂W₂ = ∂L/∂a₂ · ∂a₂/∂z₂ · ∂z₂/∂W₂
-    ∂L/∂W₁ = ∂L/∂a₂ · ∂a₂/∂z₂ · ∂z₂/∂a₁ · ∂a₁/∂z₁ · ∂z₁/∂W₁
-"""
+    Backpropagation usa Chain Rule repetidamente:
 
+    `∂L/∂W₂ = ∂L/∂a₂ · ∂a₂/∂z₂ · ∂z₂/∂W₂`
+
+    `∂L/∂W₁ = ∂L/∂a₂ · ∂a₂/∂z₂ · ∂z₂/∂a₁ · ∂a₁/∂z₁ · ∂z₁/∂W₁`
+
+```python
 class SimpleNeuralNet:
     """Red neuronal de 2 capas para demostrar backprop."""
 
@@ -975,12 +984,15 @@ def demo_xor():
 
 demo_xor()
 
+```
+
 
 ---
 ## Entregable del Módulo
 
 ### Script: `gradient_descent_demo.py`
 
+```python
 """
 Gradient Descent Demo - Visualización de Optimización
 
@@ -1149,12 +1161,15 @@ def main():
 if __name__ == "__main__":
     main()
 
+```
+
 
 ---
 ## Entregable Obligatorio v3.3
 
 ### Script: `grad_check.py`
 
+```python
 """
 Gradient Checking - Validación de Derivadas
 Técnica estándar de CS231n Stanford para debugging de backprop.
@@ -1237,9 +1252,7 @@ def gradient_check(
     return passed, relative_error
 
 
-# ============================================================
-# EJEMPLO: Validar gradiente de MSE Loss
-# ============================================================
+# === EJEMPLO: Validar gradiente de MSE Loss ===
 
 def mse_loss(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """Mean Squared Error."""
@@ -1281,9 +1294,7 @@ def test_mse_gradient():
     return passed
 
 
-# ============================================================
-# EJEMPLO: Validar gradiente de Sigmoid
-# ============================================================
+# === EJEMPLO: Validar gradiente de Sigmoid ===
 
 def sigmoid(z: np.ndarray) -> np.ndarray:
     """Sigmoid activation."""
@@ -1324,9 +1335,7 @@ def test_sigmoid_gradient():
     return passed
 
 
-# ============================================================
-# EJEMPLO: Validar gradiente de una capa lineal
-# ============================================================
+# === EJEMPLO: Validar gradiente de una capa lineal ===
 
 def test_linear_layer_gradient():
     """Test: Validar gradiente de capa lineal y = Wx + b."""
@@ -1408,9 +1417,8 @@ def main():
 if __name__ == "__main__":
     main()
 
-
+```
 ---
-
 ## 🧩 Consolidación (errores comunes + debugging v5 + reto Feynman)
 
 ### Errores comunes

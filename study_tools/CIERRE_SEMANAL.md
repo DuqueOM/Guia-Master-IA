@@ -54,6 +54,11 @@ Puedes tomar preguntas de:
 - `study_tools/SIMULACRO_EXAMEN_TEORICO.md`
 - Tus propios errores del `DIARIO_ERRORES.md`
 
+### 6) Scoring rápido con rúbrica (5 min)
+
+- Aplica scoring rápido con `study_tools/RUBRICA_v1.md`.
+- Registra brechas y acciones correctivas (y, si aplica, amarra el error a un `criterion_id` de `rubrica.csv`).
+
 ---
 
 ## 🧾 Plantilla (copia/pega cada sábado)

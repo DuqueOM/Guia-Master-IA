@@ -7,6 +7,8 @@ GENERADOR PDF PRO v9.0 - WeasyPrint Edition
 - Portadas y contenido integrados
 """
 
+import argparse
+import csv
 import re
 from dataclasses import dataclass
 from html import escape as html_escape
@@ -584,6 +586,128 @@ class PDFGenerator:
         self.font_config = FontConfiguration()
         self.css = CSS(string=CONTENT_CSS, font_config=self.font_config)
 
+    def _module_id_from_path(self, path: str) -> str:
+        filename = Path(path).name
+        base_name = filename.replace(".md", "")
+        return "mod_" + re.sub(r"[^\w]+", "_", base_name)
+
+    def _read_csv_rows(self, path: Path) -> list[dict[str, str]]:
+        with path.open("r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            return [dict(r) for r in reader]
+
+    def _rubrica_csv_to_reference_markdown(self, path: Path) -> str:
+        rows = self._read_csv_rows(path)
+        scopes: list[str] = []
+        by_scope: dict[str, list[dict[str, str]]] = {}
+        for r in rows:
+            scope = (r.get("scope") or "").strip()
+            if not scope:
+                continue
+            if scope not in by_scope:
+                by_scope[scope] = []
+                scopes.append(scope)
+            by_scope[scope].append(r)
+
+        lines: list[str] = []
+        lines.append("### rubrica.csv (vista legible)")
+        lines.append("")
+        lines.append(
+            "Este archivo es la **fuente estructurada** de la rúbrica (pesos/criterios/gates). Para editarlo, hazlo en el repositorio; aquí se muestra en formato tabla."
+        )
+        lines.append("")
+
+        columns = [
+            "criterion_id",
+            "weight_points",
+            "hard_gate",
+            "category",
+            "criterion",
+            "evidence_required",
+        ]
+        header = "| " + " | ".join(columns) + " |"
+        sep = "|" + "|".join(["---"] * len(columns)) + "|"
+
+        for scope in scopes:
+            lines.append(f"#### Scope: {scope}")
+            lines.append("")
+            lines.append(header)
+            lines.append(sep)
+            for r in by_scope[scope]:
+                vals = [(r.get(c) or "").replace("\n", " ").strip() for c in columns]
+                lines.append("| " + " | ".join(vals) + " |")
+            lines.append("")
+
+        return "\n".join(lines)
+
+    def build_rubric_scoring_sheet_markdown(self) -> str:
+        csv_path = PROJECT_DIR / "rubrica.csv"
+        if not csv_path.exists():
+            return "## Hoja de scoring\n\nNo se encontró `rubrica.csv`.\n"
+
+        rows = self._read_csv_rows(csv_path)
+        scopes: list[str] = []
+        by_scope: dict[str, list[dict[str, str]]] = {}
+        for r in rows:
+            scope = (r.get("scope") or "").strip()
+            if not scope:
+                continue
+            if scope not in by_scope:
+                by_scope[scope] = []
+                scopes.append(scope)
+            by_scope[scope].append(r)
+
+        lines: list[str] = []
+        lines.append("## Hoja de scoring (para imprimir / registrar)")
+        lines.append("")
+        lines.append(
+            "Marca un nivel por criterio y agrega evidencia. Luego calcula el total ponderado (0–100)."
+        )
+        lines.append("")
+        lines.append("Niveles:")
+        lines.append("")
+        lines.append("- Exceeds = 1.0")
+        lines.append("- Meets = 0.8")
+        lines.append("- Approaching = 0.5")
+        lines.append("- Not met = 0.0")
+        lines.append("")
+        lines.append("Registro rápido de simulacros:")
+        lines.append("")
+        lines.append("- PB-8: ________/100")
+        lines.append("- PB-16: ________/100")
+        lines.append("- PB-23: ________/100  (condición dura: **PB-23 ≥ 80**) ")
+        lines.append("")
+
+        table_cols = [
+            "criterion_id",
+            "weight_points",
+            "nivel (E/M/A/N)",
+            "evidencia / notas",
+        ]
+        header = "| " + " | ".join(table_cols) + " |"
+        sep = "|" + "|".join(["---"] * len(table_cols)) + "|"
+
+        for scope in scopes:
+            lines.append(f"### {scope}")
+            lines.append("")
+            lines.append(header)
+            lines.append(sep)
+            for r in by_scope[scope]:
+                cid = (r.get("criterion_id") or "").strip()
+                pts = (r.get("weight_points") or "").strip()
+                gate = (r.get("hard_gate") or "").strip().lower() == "true"
+                if gate:
+                    cid = f"{cid} (GATE)"
+                lines.append(f"| {cid} | {pts} | ____ | __________________________ |")
+            lines.append("")
+
+        lines.append("### Total")
+        lines.append("")
+        lines.append("- TOTAL: ________/100")
+        lines.append("- Estado: __________ (Listo / Aún no listo)")
+        lines.append("")
+        return "\n".join(lines)
+
     def _demote_headings(self, md: str, level_offset: int = 1) -> str:
         parts = self._split_by_fenced_codeblocks(md)
         out: List[str] = []
@@ -651,7 +775,17 @@ class PDFGenerator:
 
         if (PROJECT_DIR / "study_tools").exists():
             for p in sorted((PROJECT_DIR / "study_tools").glob("*.md")):
+                if p.name == "RUBRICA_v1.md":
+                    continue
                 items.append(AppendixItem(f"study_tools/{p.name}", p, "markdown"))
+
+        if (PROJECT_DIR / "prompts").exists():
+            for p in sorted((PROJECT_DIR / "prompts").glob("*.md")):
+                items.append(AppendixItem(f"prompts/{p.name}", p, "markdown"))
+
+        if (PROJECT_DIR / "scripts").exists():
+            for p in sorted((PROJECT_DIR / "scripts").glob("*.py")):
+                items.append(AppendixItem(f"scripts/{p.name}", p, "python"))
 
         if (PROJECT_DIR / "visualizations").exists():
             for p in sorted((PROJECT_DIR / "visualizations").iterdir()):
@@ -665,25 +799,23 @@ class PDFGenerator:
                     lang = "text"
                 items.append(AppendixItem(f"visualizations/{p.name}", p, lang))
 
-        for p, lang in [
-            (PROJECT_DIR / "requirements.txt", "text"),
-            (PROJECT_DIR / "pyproject.toml", "toml"),
-            (PROJECT_DIR / "setup_env.sh", "bash"),
-            (PROJECT_DIR / ".gitignore", "text"),
-            (PROJECT_DIR / "pdf" / "_style.css", "css"),
-            (PROJECT_DIR / "pdf" / "_style_pro.css", "css"),
-            (PROJECT_DIR / "pdf" / "_content.css", "css"),
-            (PROJECT_DIR / "pdf" / "generate_pdfs_pro.py", "python"),
-        ]:
-            if p.exists():
-                items.append(AppendixItem(p.name, p, lang))
+        rubrica_csv = PROJECT_DIR / "rubrica.csv"
+        if rubrica_csv.exists():
+            items.append(AppendixItem("rubrica.csv", rubrica_csv, "csv"))
 
         for item in items:
             raw = item.path.read_text(encoding="utf-8", errors="ignore")
+
+            filename = Path(item.title).name
+            base_name = filename.replace(".md", "")
+            clean_id = "mod_" + re.sub(r"[^\w]+", "_", base_name)
+            lines.append(f'<a id="{clean_id}"></a>')
             lines.append(f"## {html_escape(item.title)}")
             lines.append("")
             if item.language == "markdown":
                 lines.append(self._demote_headings(raw, level_offset=1))
+            elif item.language == "csv":
+                lines.append(self._rubrica_csv_to_reference_markdown(item.path))
             else:
                 lines.append(self._fence_code_block(raw, item.language))
             lines.append("")
@@ -749,7 +881,12 @@ class PDFGenerator:
 
         return "\n".join(cleaned)
 
-    def transform_internal_links(self, text: str, debug: bool = False) -> str:
+    def transform_internal_links(
+        self,
+        text: str,
+        debug: bool = False,
+        allowed_internal_ids: set[str] | None = None,
+    ) -> str:
         """
         Convierte enlaces Markdown [Texto](archivo.md) a enlaces internos HTML <a href="#archivo">Texto</a>.
         """
@@ -770,6 +907,11 @@ class PDFGenerator:
                 # ID: mod_FILENAME (sin extensión, limpio)
                 base_name = filename.replace(".md", "")
                 clean_id = "mod_" + re.sub(r"[^\w]+", "_", base_name)
+                if (
+                    allowed_internal_ids is not None
+                    and clean_id not in allowed_internal_ids
+                ):
+                    return match.group(0)
                 transformed_count += 1
                 return f"[{link_text}](#{clean_id})"
 
@@ -903,127 +1045,164 @@ def main():
     print("  GENERADOR PDF PRO v9.1 (WeasyPrint - Single Document)")
     print("=" * 50)
 
+    parser = argparse.ArgumentParser(add_help=True)
+    parser.add_argument(
+        "--mode",
+        choices=["lean", "full", "both"],
+        default="both",
+    )
+    args = parser.parse_args()
+
     gen = PDFGenerator()
 
-    # Generar TODO como un solo HTML para preservar links internos
-    print("\n[1] Generando documento único...")
+    def collect_allowed_internal_ids(include_appendix: bool) -> set[str]:
+        ids: set[str] = set()
+        for f in ORDERED_FILES:
+            ids.add(gen._module_id_from_path(f))
+        ids.add(gen._module_id_from_path("RUBRICA_v1.md"))
+        ids.add("mod_RUBRICA_SHEET")
+        if include_appendix:
+            ids.add("mod_APPENDIX")
+            if (PROJECT_DIR / "study_tools").exists():
+                for p in (PROJECT_DIR / "study_tools").glob("*.md"):
+                    ids.add(gen._module_id_from_path(p.name))
+            if (PROJECT_DIR / "prompts").exists():
+                for p in (PROJECT_DIR / "prompts").glob("*.md"):
+                    ids.add(gen._module_id_from_path(p.name))
+        return ids
 
-    all_html_parts = []
-
-    # Portada global
-    all_html_parts.append(gen.generate_global_cover_html())
-    print("  > Portada global")
-
-    # Módulos
-    print("\n[2] Procesando módulos:")
-    for f in ORDERED_FILES:
-        path = DOCS_DIR / f
-        if not path.exists():
-            continue
-
-        print(f"  > {f}")
-        raw = path.read_text(encoding="utf-8")
-        clean = gen.clean_markdown(raw)
-        title = gen.get_cover_title(f)
-
-        # Transformar links
-        linked_md = gen.transform_internal_links(clean, debug=True)
-
-        # Convertir a HTML
+    def render_section(
+        title: str,
+        module_id: str,
+        md_text: str,
+        allowed_ids: set[str],
+        icon: str = "💎",
+        subtitle: str = "MS in AI Pathway - ML Specialist v3.0",
+    ) -> str:
+        clean = gen.clean_markdown(md_text)
+        linked_md = gen.transform_internal_links(
+            clean, debug=True, allowed_internal_ids=allowed_ids
+        )
         md_extensions, md_extension_configs = get_markdown_extensions()
         content_html = markdown.markdown(
             linked_md,
             extensions=md_extensions,
             extension_configs=md_extension_configs,
         )
-
-        # ID para el ancla
-        base_name = f.replace(".md", "")
-        module_id = "mod_" + re.sub(r"[^\w]+", "_", base_name)
-
-        # HTML del módulo - ID en el título visible para que WeasyPrint genere el destino PDF
-        module_html = f"""
-            <!-- MÓDULO: {f} -->
-            <div class="cover-page">
-                <div class="cover-content">
-                    <div style="font-size:40pt;margin-bottom:20px;">💎</div>
-                    <div id="{module_id}" class="cover-title">{title}</div>
-                    <div class="cover-subtitle">MS in AI Pathway - ML Specialist v3.0</div>
-                    <div class="cover-badge">MATEMÁTICAS APLICADAS A CÓDIGO</div>
+        return f"""
+            <div class=\"cover-page\">
+                <div class=\"cover-content\">
+                    <div style=\"font-size:40pt;margin-bottom:20px;\">{icon}</div>
+                    <div id=\"{module_id}\" class=\"cover-title\">{title}</div>
+                    <div class=\"cover-subtitle\">{subtitle}</div>
+                    <div class=\"cover-badge\">MATEMÁTICAS APLICADAS A CÓDIGO</div>
                 </div>
-                <div style="position:absolute;bottom:30px;font-size:10pt;opacity:0.6;">DUQUEOM | 2025</div>
+                <div style=\"position:absolute;bottom:30px;font-size:10pt;opacity:0.6;\">DUQUEOM | 2025</div>
             </div>
-            <div class="content">
+            <div class=\"content\">
                 {content_html}
             </div>
         """
-        all_html_parts.append(module_html)
 
-    # Apéndice (archivos no-.md y herramientas)
-    print("\n[2.1] Construyendo apéndice:")
-    appendix_md = gen.build_appendix_markdown()
-    md_extensions, md_extension_configs = get_markdown_extensions()
-    appendix_html = markdown.markdown(
-        appendix_md,
-        extensions=md_extensions,
-        extension_configs=md_extension_configs,
-    )
-    appendix_id = "mod_APPENDIX"
-    appendix_block = f"""
-        <!-- APÉNDICE -->
-        <div class="cover-page">
-            <div class="cover-content">
-                <div style="font-size:40pt;margin-bottom:20px;">📎</div>
-                <div id="{appendix_id}" class="cover-title">APÉNDICE</div>
-                <div class="cover-subtitle">Archivos del repositorio (referencia)</div>
-                <div class="cover-badge">RECURSOS + CONFIG + SCRIPTS</div>
-            </div>
-            <div style="position:absolute;bottom:30px;font-size:10pt;opacity:0.6;">DUQUEOM | 2025</div>
-        </div>
-        <div class="content">
-            {appendix_html}
-        </div>
-    """
-    all_html_parts.append(appendix_block)
+    def build_html(include_appendix: bool) -> str:
+        allowed_ids = collect_allowed_internal_ids(include_appendix=include_appendix)
 
-    # Combinar todo en un solo HTML
-    print("\n[3] Combinando en documento único...")
+        parts: list[str] = []
+        parts.append(gen.generate_global_cover_html())
 
-    # Extraer solo el body content de la portada global
-    global_cover_body = gen.generate_global_cover_html()
-    # Buscar el contenido del body
-    import re as re_module
+        for f in ORDERED_FILES:
+            path = DOCS_DIR / f
+            if not path.exists():
+                continue
+            raw = path.read_text(encoding="utf-8")
+            title = gen.get_cover_title(f)
+            module_id = gen._module_id_from_path(f)
+            parts.append(render_section(title, module_id, raw, allowed_ids))
 
-    body_match = re_module.search(
-        r"<body>(.*?)</body>", global_cover_body, re_module.DOTALL
-    )
-    global_cover_content = body_match.group(1) if body_match else ""
+        rubric_path = PROJECT_DIR / "study_tools" / "RUBRICA_v1.md"
+        if rubric_path.exists():
+            rubric_raw = rubric_path.read_text(encoding="utf-8")
+            rubric_md = gen._demote_headings(rubric_raw, level_offset=1)
+            parts.append(
+                render_section(
+                    "RÚBRICA (Referencia)",
+                    gen._module_id_from_path("RUBRICA_v1.md"),
+                    rubric_md,
+                    allowed_ids,
+                    icon="📋",
+                )
+            )
 
-    full_html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="UTF-8"></head>
-    <body>
-        {global_cover_content}
-        {"".join(all_html_parts[1:])}
-    </body>
-    </html>
-    """
+        sheet_md = gen.build_rubric_scoring_sheet_markdown()
+        parts.append(
+            render_section(
+                "RÚBRICA: Hoja de scoring",
+                "mod_RUBRICA_SHEET",
+                sheet_md,
+                allowed_ids,
+                icon="🧾",
+            )
+        )
 
-    # Guardar HTML de debug
-    debug_path = OUTPUT_DIR / "_DEBUG_FULL.html"
-    debug_path.write_text(full_html, encoding="utf-8")
-    print(f"  [DEBUG] HTML completo guardado en {debug_path}")
+        if include_appendix:
+            appendix_md = gen.build_appendix_markdown()
+            appendix_md = gen.transform_internal_links(
+                appendix_md, debug=True, allowed_internal_ids=allowed_ids
+            )
+            md_extensions, md_extension_configs = get_markdown_extensions()
+            appendix_html = markdown.markdown(
+                appendix_md,
+                extensions=md_extensions,
+                extension_configs=md_extension_configs,
+            )
+            appendix_id = "mod_APPENDIX"
+            appendix_block = f"""
+                <div class=\"cover-page\">
+                    <div class=\"cover-content\">
+                        <div style=\"font-size:40pt;margin-bottom:20px;\">📎</div>
+                        <div id=\"{appendix_id}\" class=\"cover-title\">APÉNDICE</div>
+                        <div class=\"cover-subtitle\">Archivos del repositorio (referencia)</div>
+                        <div class=\"cover-badge\">RECURSOS + CONFIG + SCRIPTS</div>
+                    </div>
+                    <div style=\"position:absolute;bottom:30px;font-size:10pt;opacity:0.6;\">DUQUEOM | 2025</div>
+                </div>
+                <div class=\"content\">{appendix_html}</div>
+            """
+            parts.append(appendix_block)
 
-    # Generar PDF único
-    print("\n[4] Generando PDF final...")
-    final_path = OUTPUT_DIR / "GUIA_MS_AI_ML_SPECIALIST_v10.10.pdf"
+        global_cover_body = gen.generate_global_cover_html()
+        body_match = re.search(r"<body>(.*?)</body>", global_cover_body, re.DOTALL)
+        global_cover_content = body_match.group(1) if body_match else ""
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset=\"UTF-8\"></head>
+        <body>
+            {global_cover_content}
+            {"".join(parts[1:])}
+        </body>
+        </html>
+        """
 
-    HTML(string=full_html, base_url=str(PROJECT_DIR)).write_pdf(
-        target=final_path, stylesheets=[gen.css]
-    )
+    outputs: list[tuple[str, str, bool]] = []
+    if args.mode in {"lean", "both"}:
+        outputs.append(("LEAN", "GUIA_MS_AI_ML_SPECIALIST_LEAN.pdf", False))
+    if args.mode in {"full", "both"}:
+        outputs.append(("FULL", "GUIA_MS_AI_ML_SPECIALIST_FULL.pdf", True))
 
-    print(f"\n[OK] {final_path.name} ({final_path.stat().st_size / 1e6:.1f} MB)")
+    for tag, filename, include_appendix in outputs:
+        print("\n[1] Generando documento único...")
+        html = build_html(include_appendix=include_appendix)
+        debug_path = OUTPUT_DIR / f"_DEBUG_{tag}.html"
+        debug_path.write_text(html, encoding="utf-8")
+        print(f"  [DEBUG] HTML completo guardado en {debug_path}")
+        print("\n[4] Generando PDF final...")
+        final_path = OUTPUT_DIR / filename
+        HTML(string=html, base_url=str(PROJECT_DIR)).write_pdf(
+            target=final_path, stylesheets=[gen.css]
+        )
+        print(f"\n[OK] {final_path.name} ({final_path.stat().st_size / 1e6:.1f} MB)")
+
     print("\n" + "=" * 50)
 
 

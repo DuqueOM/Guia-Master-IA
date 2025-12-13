@@ -43,6 +43,7 @@ Enlaces rápidos:
 
 - Refuerzo diario de shapes: `study_tools/DRILL_DIMENSIONES_NUMPY.md`
 - Simulacros: `study_tools/SIMULACRO_EXAMEN_TEORICO.md`
+- Evaluación (rúbrica): [study_tools/RUBRICA_v1.md](../study_tools/RUBRICA_v1.md) (scope `M02` en `rubrica.csv`)
 - Protocolos completos:
   - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
   - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)

@@ -1,0 +1,25 @@
+scope,category,criterion_id,criterion,weight_points,level_exceeds,level_meets,level_approaching,level_not_met,evidence_required,hard_gate
+GLOBAL,A,A1,Dominio Teórico (derivaciones, conceptos),25,"Derivaciones impecables + explica con claridad","Cumple requisitos con faltantes menores","Conceptos presentes pero falta rigor","Incompleto o errores críticos","Notas/derivaciones + respuesta oral/escrita",false
+GLOBAL,B,B1,Implementación & Calidad de Código,25,"Código limpio + tests + pre-commit ok","Funciona y cumple, faltantes menores","Funciona pero frágil (edge cases/shapes)","No funciona o incorrecto","Código + pytest + pre-commit",true
+GLOBAL,C,C1,Simulacros Performance-Based (PB),20,">= objetivo con margen + post-mortem",">= objetivo","Cerca del objetivo","Muy por debajo","Registro de score + post-mortem",false
+GLOBAL,D,D1,Proyecto & Documentación Científica,15,"Pipeline reproducible + reporte sólido","Proyecto completo + docs mínimas","Parcial / reproducibilidad débil","Incompleto","Repo + README + docs",false
+GLOBAL,E,E1,Metacognición & Proceso,10,"Diario + cierres consistentes + acciones correctivas","Cumple rutina","Inconsistente","No hay evidencia","DIARIO + CIERRE + DDC",false
+GLOBAL,BONUS,X,X1,Badges/Challenges (opcional),5,">=4 badges o retos","2-3 badges","1 badge","0","BADGES_CHECKPOINTS",false
+M01,E,E_M01_DDC,Dirty Data Check (Caso 1),2,"5+ issues reales + decisiones justificadas",">=5 issues documentados","<5 issues o superficial","No entregado","study_tools/DIRTY_DATA_CHECK.md (Caso 1)",true
+M01,B,B_M01_PIPE,Pipeline CSV→NumPy reproducible,3,"Reproducible + validaciones + tests","Reproducible","Funciona manual","No funciona","script + ejemplo",false
+M02,A,A_M02_LIN,Álgebra lineal (normas, producto, SVD),4,"Explica y calcula sin ayuda","Correcto con 1 error menor","Intuición pero errores","No domina","notas + ejercicios",false
+M03,A,A_M03_CALC,Cálculo (gradiente, chain rule, GD),4,"Deriva y valida con ejemplos","Correcto","Parcial","No","derivaciones + código",false
+M03,B,B_M03_GCHECK,Gradient Checking (obligatorio),3,"Errores <1e-7 en tests","Cumple umbral","Parcial","No","grad_check + tests",true
+M04,A,A_M04_PROB,Probabilidad (Bayes, MLE, softmax estable),4,"Explica MLE→CE + softmax estable","Correcto","Parcial","No","probability.py + tests",false
+PB8,C,C_PB8,PB-8 (Fundamentos integrados),10,">=85",">=75","65-74","<65","score + post-mortem",false
+M05,A,A_M05_DER,Derivaciones MSE + Cross-Entropy,4,"Paso a paso + supuestos","Correcto con error menor","Faltan pasos","No","doc derivación",false
+M05,B,B_M05_LOGREG,Logistic Regression NumPy (sin sklearn),4,"Tipado + tests edge + vectorizado","Funciona con faltantes menores","Falla corner cases/shapes","No funciona","logistic_regression.py + tests",true
+M05,C,C_M05_CV,Validación / métricas / CV,2,"K-fold + learning curves + análisis","CV correcto","Solo train/test","Sin evaluación","notebook/doc",false
+M05,E,E_M05_DDC,Dirty Data Check (Caso 2),2,"Decisiones justificadas + trazabilidad",">=5 decisiones","Superficial","No","DIRTY_DATA_CHECK (Caso 2)",true
+M06,B,B_M06_KPCA,K-Means + PCA desde cero,6,"Implementa + evalúa + explica límites","Implementa y prueba","Parcial","No","kmeans/pca + tests",false
+PB16,C,C_PB16,PB-16 (Unsupervised Core),10,">=85",">=75","65-74","<65","score + post-mortem",false
+M07,B,B_M07_MLP,MLP + backprop manual + overfit test,8,"Backprop sólido + overfit minibatch","Funciona y converge","Inestable","No","neural_net.py + tests",true
+M08,D,D_M08_PIPE,Proyecto MNIST reproducible,8,"Scripts + README inglés + tests","Completo","Parcial","No","repo",false
+M08,C,C_M08_METR,Métricas Logistic>=85 / MLP>=90,6,">92/87 + análisis",">=90/>=85","85-90/80-85","<85/<80","reporte resultados",false
+M08,E,E_M08_REPORT,MODEL_COMPARISON.md (análisis y errores),5,"Análisis profundo + gráficos","Correcto","Superficial","No","docs/",false
+PB23,C,C_PB23,PB-23 (Examen admisión simulado),20,">=90",">=80","70-79","<70","EXAMEN_ADMISION_SIMULADO + score",true

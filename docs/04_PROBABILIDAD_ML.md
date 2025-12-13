@@ -56,6 +56,7 @@ Enlaces rápidos:
 - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
 - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)
 - Registro de errores: `study_tools/DIARIO_ERRORES.md`
+- Evaluación (rúbrica): [study_tools/RUBRICA_v1.md](../study_tools/RUBRICA_v1.md) (scope `M04` en `rubrica.csv`; incluye PB-8)
 
 ### Recursos (cuándo usarlos)
 

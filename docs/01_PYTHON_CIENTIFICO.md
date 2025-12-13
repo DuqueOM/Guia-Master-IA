@@ -36,6 +36,7 @@ Enlaces rápidos:
 
 - Drill diario de shapes: `study_tools/DRILL_DIMENSIONES_NUMPY.md`
 - Registro de errores: `study_tools/DIARIO_ERRORES.md`
+- Evaluación (rúbrica): [study_tools/RUBRICA_v1.md](../study_tools/RUBRICA_v1.md) (scope `M01` en `rubrica.csv`)
 - Protocolo completo:
   - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md)
   - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md)

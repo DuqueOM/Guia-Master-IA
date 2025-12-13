@@ -4,6 +4,17 @@
 
 ---
 
+## 📏 Rúbrica (evaluación formal)
+
+- `study_tools/RUBRICA_v1.md`
+- `rubrica.csv`
+
+Uso recomendado:
+
+- **Cierre semanal:** scoring rápido (auto).
+- **Cierres de módulo (Semanas 12, 16, 20):** scoring completo (auto + IA/pareja).
+- **PB-8 / PB-16 / PB-23:** scoring de simulacro + post-mortem.
+
 ## 📚 Fase 1: Fundamentos (Semanas 1-8)
 
 ### Módulo 01: Python + Pandas + NumPy (Semanas 1-2)
@@ -56,6 +67,10 @@
 - [ ] **Softmax con Log-Sum-Exp trick implementado (v3.3)**
 - [ ] `probability.py` con tests pasando
 
+#### Evaluación (PB-8)
+- [ ] **PB-8 ≥ 75/100** y evaluado con la rúbrica
+- [ ] Post-mortem: 3 fallos registrados en `study_tools/DIARIO_ERRORES.md`
+
 ---
 
 ## 🤖 Fase 2: Núcleo de ML (Semanas 9-20) ⭐ PATHWAY
@@ -89,6 +104,10 @@
 - [ ] Reconstrucción desde componentes principales
 - [ ] `kmeans.py` y `pca.py` con tests pasando
 
+#### Evaluación (PB-16)
+- [ ] **PB-16 ≥ 75/100** y evaluado con la rúbrica
+- [ ] Cierre de módulo: rúbrica completa aplicada (auto + IA/pareja)
+
 ### Módulo 07: Deep Learning + CNNs (Semanas 17-20)
 
 #### Conocimiento
@@ -107,6 +126,9 @@
 
 #### Metodología Feynman
 - [ ] Puedo explicar backpropagation en 5 líneas sin jerga
+
+#### Cierre de módulo (Semana 20)
+- [ ] Rúbrica completa aplicada (auto + IA/pareja)
 
 ---
 
@@ -131,6 +153,9 @@
 - [ ] Forward y backward pass funcionales
 - [ ] Mini-batch SGD funcionando
 - [ ] Accuracy > 90% en test set
+
+#### Evaluación (PB-23 / Examen de admisión simulado)
+- [ ] **PB-23 ≥ 80/100** (requisito duro) y evaluado con la rúbrica
 
 ### Semana 24: Benchmark + Informe
 - [ ] Comparación MLP vs Logistic Regression

@@ -42,6 +42,11 @@
 | 23 | Deep Learning | Introduction to Deep Learning | MLP con backprop |
 | 24 | Benchmark + Informe | Integración | MODEL_COMPARISON.md |
 
+Evaluación (rúbrica):
+
+- [study_tools/RUBRICA_v1.md](../study_tools/RUBRICA_v1.md) (scope `M08` en `rubrica.csv`)
+- Condición dura de admisión: **PB-23 ≥ 80/100** (si PB-23 < 80 ⇒ estado “Aún no listo” aunque el total global sea alto)
+
 ### Estructura de Archivos
 
 ```

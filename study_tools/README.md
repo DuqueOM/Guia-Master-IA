@@ -15,6 +15,7 @@ Este directorio contiene los materiales del **Plan de Acción Mejorado v4.0** pa
 | `SIMULACRO_EXAMEN_TEORICO.md` | Banco de preguntas tipo examen | Sábados, 1 hora |
 | `SIMULACRO_PERFORMANCE_BASED.md` | Simulacros 50% teoría / 50% pseudocódigo-código (PB) | Semanas 8, 16 y 23 |
 | `CIERRE_SEMANAL.md` | Consolidación + rescate cognitivo (mapa mental, Feynman, autoevaluación) | Sábados, 1 hora |
+| `RUBRICA_v1.md` | Rúbrica de evaluación (criterios, pesos, condiciones duras) | Semana 0 (crear/calibrar) + checkpoints (PB-8/16/23 y fin de módulos) |
 | `VISUALIZACION_GRADIENT_DESCENT.md` | Código para visualizar optimización | Semanas 6-7 |
 | `DRYRUN_BACKPROPAGATION.md` | Plantilla para backprop en papel | Semana 18, antes de codificar |
 | `PUENTE_NUMPY_PYTORCH.md` | Traducción NumPy → PyTorch | Semana 24 |
@@ -28,6 +29,8 @@ Este directorio contiene los materiales del **Plan de Acción Mejorado v4.0** pa
 - [ ] Instalar pre-commit hooks: `pip install pre-commit && pre-commit install`
 - [ ] Configurar AI Code Reviewer (ver `../prompts/AI_CODE_REVIEWER.md`)
 - [ ] Leer este README completo
+- [ ] Crear y calibrar rúbrica (ver `RUBRICA_v1.md` + `../rubrica.csv`)
+- [ ] Test rápido: evaluar 1 entregable pequeño (p.ej. `DRILL_DIMENSIONES_NUMPY.md`) y ajustar descriptores/pesos
 
 ### Semanas 1-2
 - [ ] Completar `DRILL_DIMENSIONES_NUMPY.md` (1 hora extra)
@@ -49,6 +52,7 @@ Este directorio contiene los materiales del **Plan de Acción Mejorado v4.0** pa
 - [ ] Simulacro de 1 hora usando `SIMULACRO_EXAMEN_TEORICO.md`
 - [ ] Sin IDE, sin internet, solo lápiz y papel
 - [ ] Cierre semanal usando `CIERRE_SEMANAL.md`
+- [ ] Autoevaluación rápida con la rúbrica (ver `RUBRICA_v1.md`) y registrar brechas
 
 ### Cada día (5 min)
 - [ ] Diario metacognitivo en `DIARIO_METACOGNITIVO.md`

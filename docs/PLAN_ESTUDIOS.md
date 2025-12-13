@@ -77,6 +77,17 @@ Bloques fijos (para reducir fatiga y mejorar retención):
 - **Sábado (1 hora):** `study_tools/CIERRE_SEMANAL.md`
 - **Badges por módulo:** `study_tools/BADGES_CHECKPOINTS.md`
 - **Simulacros performance-based (PB):** `study_tools/SIMULACRO_PERFORMANCE_BASED.md` (Semanas **8, 16, 23**)
+- **Rúbrica (scoring semanal + checkpoints):** `study_tools/RUBRICA_v1.md` + `rubrica.csv`
+
+---
+
+## 🗓️ SEMANA 0: Preparación (Setup + Rúbrica)
+
+**Objetivo:** dejar el repo listo para ejecución + calibrar evaluación.
+
+- Crear plantilla y pesos de rúbrica: `study_tools/RUBRICA_v1.md` + `rubrica.csv`.
+- Definir roles de evaluación: auto (estudiante), IA/pareja (AI Code Reviewer), mentor externo (si existe).
+- Test rápido: aplicar la rúbrica a 1 entregable pequeño (p.ej. drill NumPy) y ajustar descriptores/pesos.
 
 ---
 
@@ -118,6 +129,11 @@ Bloques fijos (para reducir fatiga y mejorar retención):
 **Extensión v5.0 – Dirty Data Check (Módulo 01):**
 Además del script, documenta al menos **5 problemas reales** del CSV (nulos, outliers, tipos incorrectos, codificación rara, duplicados) y tus decisiones de limpieza en:
 `study_tools/DIRTY_DATA_CHECK.md` (Caso 1).
+
+**Evaluación (rúbrica):**
+
+- Scoring rápido semanal en `study_tools/CIERRE_SEMANAL.md` usando `study_tools/RUBRICA_v1.md`.
+- Registrar errores relevantes en `study_tools/DIARIO_ERRORES.md` y, si aplica, enlazarlos a un `criterion_id` de `rubrica.csv`.
 
 **Recursos:**
 - [Pandas Getting Started](https://pandas.pydata.org/docs/getting_started/)
@@ -163,15 +179,16 @@ Además del script, documenta al menos **5 problemas reales** del CSV (nulos, ou
 | V | Aplicación: PCA preview | Reducción dimensional | Demo visual |
 | S | **Checkpoint** | `linear_algebra.py` completo | Entregable |
 
-Extensión Protocolo D (visualización generativa):
-
-- ejecutar `visualizations/viz_transformations.py` y experimentar con matrices (estiramiento/rotación/shear)
-
 **Entregable:** Librería `linear_algebra.py` que implementa:
 - Producto punto, normas L1/L2
 - Distancia euclidiana y coseno
 - Proyección de vectores
 - Wrapper para eigenvalues
+
+**Evaluación (rúbrica):**
+
+- Scoring rápido semanal en `study_tools/CIERRE_SEMANAL.md` usando `study_tools/RUBRICA_v1.md`.
+- Al checkpoint (Semana 5): scoring parcial del módulo (scope M02 en `rubrica.csv`).
 
 ---
 
@@ -191,10 +208,6 @@ Extensión Protocolo D (visualización generativa):
 | V | Gradient Descent (código) | Minimizar $f(x,y) = x^2 + y^2$ | Implementar |
 | S | **Repaso** | Learning rate y convergencia | Visualización |
 
-Extensión Protocolo D (visualización generativa):
-
-- ejecutar `visualizations/viz_gradient_3d.ipynb` y variar `learning_rate` con el slider
-
 ### Semana 7: Chain Rule
 
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
@@ -208,8 +221,10 @@ Extensión Protocolo D (visualización generativa):
 
 **Entregable:** Gradient Descent manual con visualización de trayectoria.
 
-**Recursos:**
-- [3Blue1Brown: Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr)
+**Evaluación (rúbrica):**
+
+- Scoring rápido semanal en `study_tools/CIERRE_SEMANAL.md` usando `study_tools/RUBRICA_v1.md`.
+- Al checkpoint (Semana 7): scoring parcial del módulo (scope M03 en `rubrica.csv`).
 
 ---
 
@@ -231,14 +246,11 @@ Extensión Protocolo D (visualización generativa):
 
 **Entregable:** Librería `probability.py` con Gaussiana, MLE y softmax.
 
-Extensión Protocolo E:
+**Extensión Protocolo E:**
 
 - **Simulacro PB-8 (90 min):** `study_tools/SIMULACRO_PERFORMANCE_BASED.md`
 - **Cierre semanal (1 hora):** `study_tools/CIERRE_SEMANAL.md`
-
-**Recursos:**
-- [3Blue1Brown: Bayes Theorem](https://www.youtube.com/watch?v=HZGCoVF3YvM)
-- [StatQuest: Maximum Likelihood](https://www.youtube.com/watch?v=XepXtl9YKwc)
+- **Evaluación con rúbrica:** aplicar scoring de PB-8 y hacer scoring completo al cierre del módulo (Semana 8)
 
 ---
 
@@ -308,6 +320,11 @@ Para el dataset supervisado usado en regresión logística:
 - Incluir variables numéricas que requieran escalado (MinMax/Standard manual).
 - Documentar al menos **5 decisiones clave** de limpieza y preprocesamiento en `study_tools/DIRTY_DATA_CHECK.md` (Caso 2).
 
+**Evaluación (rúbrica):**
+
+- Al checkpoint (Semana 12): ejecutar **rúbrica completa** (auto + IA/pareja) y registrar acciones correctivas.
+- Objetivo de calibración: PB-8 y/o scoring global ≥ 75 para marcar checkpoint como sólido.
+
 ---
 
 ## 🗓️ SEMANA 13-16: Unsupervised Learning (Módulo 06)
@@ -362,13 +379,11 @@ Teorema de la semana (concepto-guía): PCA como maximización de varianza.
 
 **Entregable:** `kmeans.py` y `pca.py`. Usar PCA para comprimir una imagen y visualizar cuánta varianza se pierde con diferentes números de componentes.
 
-Extensión Protocolo E:
+**Extensión Protocolo E:**
 
 - **Simulacro PB-16 (90 min):** `study_tools/SIMULACRO_PERFORMANCE_BASED.md`
 - **Cierre semanal (1 hora):** `study_tools/CIERRE_SEMANAL.md`
-
-**Extensión v5.0 – Desafío del Tablero Blanco:**
-En las semanas 4, 8, 12 y 16, realiza el "Desafío del Tablero Blanco" descrito en `study_tools/DESAFIO_TABLERO_BLANCO.md`, explicando en 5–7 minutos un concepto clave (Regla de la Cadena, Gradient Descent, K-Means, PCA, Regresión Logística, etc.) y registrando feedback externo.
+- **Evaluación con rúbrica:** aplicar scoring de PB-16 y hacer scoring completo al cierre del módulo (Semana 16)
 
 ---
 
@@ -409,10 +424,6 @@ En las semanas 4, 8, 12 y 16, realiza el "Desafío del Tablero Blanco" descrito 
 | V | Max pooling implementación | Concepto simple | Código básico |
 | S | **Repaso** | Quiz de dimensiones CNN | Test teórico |
 
-Extensión Protocolo D (visualización generativa):
-
-- ejecutar `visualizations/viz_convolution.py` sobre una imagen propia y observar el feature map (Sobel)
-
 ### Semana 20: Optimizadores y Entrenamiento
 
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
@@ -425,6 +436,10 @@ Extensión Protocolo D (visualización generativa):
 | S | **Checkpoint** | MLP resuelve XOR | Entregable |
 
 **Entregable:** `neural_net.py` - Una red neuronal que resuelve el problema XOR y clasifica dígitos simples, implementando `backward()` manualmente.
+
+**Evaluación (rúbrica):**
+
+- Al checkpoint (Semana 20): ejecutar **rúbrica completa** (auto + IA/pareja) y registrar acciones correctivas.
 
 ---
 
@@ -490,9 +505,10 @@ Extensión Protocolo D (visualización generativa):
 **Extensión v5.0 – Examen de Admisión Simulado:**
 En las semanas 22 y 23, realizar los simulacros definidos en `study_tools/EXAMEN_ADMISION_SIMULADO.md` (2 horas, sin IDE ni internet, 40% pseudocódigo, 60% teoría). El simulacro de la semana 23 debe alcanzar ≥ 80/100 como métrica de "listo para admisión".
 
-Extensión Protocolo E:
+**Evaluación (rúbrica):**
 
 - **Simulacro PB-23:** se considera cubierto por el examen final de `study_tools/EXAMEN_ADMISION_SIMULADO.md`.
+- **Evaluación con rúbrica:** PB-23 ≥ 80/100 es requisito duro para marcar "Listo para admisión"
 
 ---
 

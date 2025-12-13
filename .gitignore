@@ -40,6 +40,7 @@ ENV/
 # Data
 data/
 *.csv
+!rubrica.csv
 *.pkl
 *.npy
 *.npz

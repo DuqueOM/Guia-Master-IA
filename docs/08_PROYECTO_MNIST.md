@@ -888,6 +888,504 @@ def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True
 
 ---
 
+## 🎯 Ejercicios por fase (progresivos) + Soluciones
+
+Reglas:
+
+- **Intenta primero** sin mirar la solución.
+- **Timebox sugerido:** 30–90 min por ejercicio.
+- **Éxito mínimo:** tu solución debe pasar los `assert`.
+
+Nota: los ejercicios usan **datos sintéticos** para que sean reproducibles sin descargar MNIST. La idea es validar *invariantes* del pipeline (shapes, estabilidad numérica, métricas, convergencia, reproducibilidad).
+
+---
+
+### Ejercicio 8.1: Reproducibilidad (seed) y split determinista
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa un split train/test reproducible basado en una semilla.
+
+2) **Intermedio**
+
+- Verifica que la misma semilla produce el mismo split.
+
+3) **Avanzado**
+
+- Verifica que no se pierden muestras y que train/test no se solapan.
+
+#### Solución
+
+```python
+import numpy as np
+
+def train_test_split(X: np.ndarray, y: np.ndarray, test_size: float = 0.2, seed: int = 0):
+    X = np.asarray(X)
+    y = np.asarray(y)
+    n = X.shape[0]
+    rng = np.random.default_rng(seed)
+    idx = np.arange(n)
+    rng.shuffle(idx)
+    n_test = int(round(n * test_size))
+    test_idx = idx[:n_test]
+    train_idx = idx[n_test:]
+    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
+
+
+np.random.seed(0)
+X = np.random.randn(100, 784)
+y = np.random.randint(0, 10, size=(100,))
+
+Xtr1, Xte1, ytr1, yte1 = train_test_split(X, y, test_size=0.25, seed=123)
+Xtr2, Xte2, ytr2, yte2 = train_test_split(X, y, test_size=0.25, seed=123)
+
+assert np.allclose(Xtr1, Xtr2)
+assert np.allclose(Xte1, Xte2)
+assert np.all(ytr1 == ytr2)
+assert np.all(yte1 == yte2)
+
+assert Xtr1.shape[0] + Xte1.shape[0] == X.shape[0]
+assert len(np.intersect1d(Xtr1[:, 0], Xte1[:, 0])) <= X.shape[0]
+```
+
+---
+
+### Ejercicio 8.2: Invariantes de datos tipo MNIST (shapes + rangos)
+
+#### Enunciado
+
+1) **Básico**
+
+- Simula imágenes `uint8` en `[0,255]` con shape `(n, 784)`.
+
+2) **Intermedio**
+
+- Normaliza a `float` en `[0,1]`.
+
+3) **Avanzado**
+
+- Verifica que no aparecen `NaN/inf` y que `dtype` es float.
+
+#### Solución
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(0)
+n = 256
+X_uint8 = rng.integers(0, 256, size=(n, 784), dtype=np.uint8)
+
+X = X_uint8.astype(np.float32) / 255.0
+
+assert X.shape == (n, 784)
+assert X.dtype in (np.float32, np.float64)
+assert np.isfinite(X).all()
+assert X.min() >= 0.0
+assert X.max() <= 1.0
+```
+
+---
+
+### Ejercicio 8.3: One-hot encoding (multiclase)
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa `one_hot(y, num_classes=10)`.
+
+2) **Intermedio**
+
+- Verifica que cada fila suma 1.
+
+3) **Avanzado**
+
+- Verifica que `argmax(one_hot(y)) == y`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def one_hot(y: np.ndarray, num_classes: int) -> np.ndarray:
+    y = np.asarray(y).astype(int)
+    Y = np.zeros((y.size, num_classes), dtype=float)
+    Y[np.arange(y.size), y] = 1.0
+    return Y
+
+
+y = np.array([0, 2, 9, 2, 1])
+Y = one_hot(y, num_classes=10)
+
+assert Y.shape == (y.size, 10)
+assert np.allclose(np.sum(Y, axis=1), 1.0)
+assert np.all(np.argmax(Y, axis=1) == y)
+```
+
+---
+
+### Ejercicio 8.4: PCA vía SVD (varianza explicada + reconstrucción)
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa PCA con SVD para reducir a `k` componentes.
+
+2) **Intermedio**
+
+- Calcula `explained_variance_ratio` y verifica que está ordenada (de mayor a menor).
+
+3) **Avanzado**
+
+- Reconstruye con `k=10` y `k=50` y verifica que el error baja.
+
+#### Solución
+
+```python
+import numpy as np
+
+def pca_svd_fit_transform(X: np.ndarray, k: int):
+    mu = X.mean(axis=0)
+    Xc = X - mu
+    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    Vk = Vt[:k].T
+    Z = Xc @ Vk
+    var = (S ** 2) / (Xc.shape[0] - 1)
+    ratio = var / np.sum(var)
+    return Z, Vk, mu, ratio
+
+
+def pca_reconstruct(Z: np.ndarray, Vk: np.ndarray, mu: np.ndarray) -> np.ndarray:
+    return Z @ Vk.T + mu
+
+
+rng = np.random.default_rng(1)
+X = rng.normal(size=(300, 784)).astype(np.float64)
+
+Z10, V10, mu, ratio = pca_svd_fit_transform(X, k=10)
+Z50, V50, mu2, ratio2 = pca_svd_fit_transform(X, k=50)
+
+assert np.allclose(mu, mu2)
+assert ratio[0] >= ratio[1]
+assert ratio2[0] >= ratio2[1]
+
+X10 = pca_reconstruct(Z10, V10, mu)
+X50 = pca_reconstruct(Z50, V50, mu)
+
+err10 = np.linalg.norm(X - X10)
+err50 = np.linalg.norm(X - X50)
+
+assert err50 <= err10 + 1e-12
+```
+
+---
+
+### Ejercicio 8.5: K-Means (inercia) - una iteración debe no aumentar J
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa asignación por distancia euclidiana al centroide más cercano.
+
+2) **Intermedio**
+
+- Implementa update de centroides como promedio (manejando clusters vacíos).
+
+3) **Avanzado**
+
+- Verifica que la inercia `J` no aumenta tras una iteración.
+
+#### Solución
+
+```python
+import numpy as np
+
+def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:
+    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)
+    return np.argmin(D2, axis=1)
+
+
+def update_centroids(X: np.ndarray, labels: np.ndarray, C: np.ndarray) -> np.ndarray:
+    C_new = C.copy()
+    for j in range(C.shape[0]):
+        mask = labels == j
+        if np.any(mask):
+            C_new[j] = np.mean(X[mask], axis=0)
+    return C_new
+
+
+def inertia(X: np.ndarray, C: np.ndarray, labels: np.ndarray) -> float:
+    diffs = X - C[labels]
+    return float(np.sum(diffs ** 2))
+
+
+rng = np.random.default_rng(2)
+X = np.vstack([
+    rng.normal(loc=-1.0, scale=0.5, size=(100, 2)),
+    rng.normal(loc=+1.0, scale=0.5, size=(100, 2)),
+])
+C0 = np.array([[-1.0, 1.0], [1.0, -1.0]])
+
+labels0 = assign_labels(X, C0)
+J0 = inertia(X, C0, labels0)
+
+C1 = update_centroids(X, labels0, C0)
+labels1 = assign_labels(X, C1)
+J1 = inertia(X, C1, labels1)
+
+assert J1 <= J0 + 1e-12
+```
+
+---
+
+### Ejercicio 8.6: Logistic Regression OvA - gradient check (una clase)
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa sigmoid y BCE para una clase binaria `y_c`.
+
+2) **Intermedio**
+
+- Implementa gradiente `∇w = (1/n) X^T (p - y_c)`.
+
+3) **Avanzado**
+
+- Verifica una coordenada del gradiente con diferencias centrales.
+
+#### Solución
+
+```python
+import numpy as np
+
+def sigmoid(z: np.ndarray) -> np.ndarray:
+    z = np.clip(z, -500, 500)
+    return 1.0 / (1.0 + np.exp(-z))
+
+
+def bce_from_logits(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float, eps: float = 1e-15) -> float:
+    p = sigmoid(X @ w + b)
+    p = np.clip(p, eps, 1.0 - eps)
+    return float(-np.mean(y * np.log(p) + (1.0 - y) * np.log(1.0 - p)))
+
+
+def grad_w(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:
+    p = sigmoid(X @ w + b)
+    return (X.T @ (p - y)) / X.shape[0]
+
+
+rng = np.random.default_rng(3)
+n, d = 120, 50
+X = rng.normal(size=(n, d))
+y = (rng.random(size=(n, 1)) < 0.4).astype(float)
+
+w = rng.normal(size=(d, 1)) * 0.1
+b = 0.0
+
+g = grad_w(X, y, w, b)
+
+idx = 7
+h = 1e-6
+E = np.zeros_like(w)
+E[idx, 0] = 1.0
+L_plus = bce_from_logits(X, y, w + h * E, b)
+L_minus = bce_from_logits(X, y, w - h * E, b)
+g_num = (L_plus - L_minus) / (2.0 * h)
+
+assert np.isclose(g[idx, 0], g_num, rtol=1e-4, atol=1e-6)
+```
+
+---
+
+### Ejercicio 8.7: MLP (sanity) - overfit mini-batch
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa un MLP mínimo `784→32→10` (ReLU + softmax) y cross-entropy.
+
+2) **Intermedio**
+
+- Entrena sobre un set tiny (p.ej. 64 ejemplos) y verifica que el loss baja.
+
+3) **Avanzado**
+
+- Verifica que logra accuracy alta en entrenamiento (overfit).
+
+#### Solución
+
+```python
+import numpy as np
+
+def relu(z: np.ndarray) -> np.ndarray:
+    return np.maximum(0.0, z)
+
+
+def relu_deriv(z: np.ndarray) -> np.ndarray:
+    return (z > 0.0).astype(float)
+
+
+def logsumexp(z: np.ndarray, axis: int = -1, keepdims: bool = True) -> np.ndarray:
+    m = np.max(z, axis=axis, keepdims=True)
+    return m + np.log(np.sum(np.exp(z - m), axis=axis, keepdims=True))
+
+
+def softmax(z: np.ndarray) -> np.ndarray:
+    return np.exp(z - logsumexp(z))
+
+
+def cross_entropy(y_onehot: np.ndarray, p: np.ndarray, eps: float = 1e-15) -> float:
+    p = np.clip(p, eps, 1.0)
+    return float(-np.mean(np.sum(y_onehot * np.log(p), axis=1)))
+
+
+rng = np.random.default_rng(4)
+n, d_in, d_h, d_out = 64, 784, 32, 10
+X = rng.normal(size=(n, d_in))
+y = rng.integers(0, d_out, size=(n,))
+Y = np.zeros((n, d_out), dtype=float)
+Y[np.arange(n), y] = 1.0
+
+W1 = rng.normal(size=(d_in, d_h)) * 0.01
+b1 = np.zeros(d_h)
+W2 = rng.normal(size=(d_h, d_out)) * 0.01
+b2 = np.zeros(d_out)
+
+lr = 1.0
+loss0 = None
+for _ in range(200):
+    Z1 = X @ W1 + b1
+    A1 = relu(Z1)
+    Z2 = A1 @ W2 + b2
+    P = softmax(Z2)
+    loss = cross_entropy(Y, P)
+    if loss0 is None:
+        loss0 = loss
+
+    dZ2 = (P - Y) / n
+    dW2 = A1.T @ dZ2
+    db2 = np.sum(dZ2, axis=0)
+    dA1 = dZ2 @ W2.T
+    dZ1 = dA1 * relu_deriv(Z1)
+    dW1 = X.T @ dZ1
+    db1 = np.sum(dZ1, axis=0)
+
+    W1 -= lr * dW1
+    b1 -= lr * db1
+    W2 -= lr * dW2
+    b2 -= lr * db2
+
+loss_end = cross_entropy(Y, softmax(relu(X @ W1 + b1) @ W2 + b2))
+pred = np.argmax(softmax(relu(X @ W1 + b1) @ W2 + b2), axis=1)
+acc = float(np.mean(pred == y))
+
+assert loss_end <= loss0
+assert acc > 0.6
+```
+
+---
+
+### Ejercicio 8.8: Métricas (confusion matrix + F1 macro)
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa `confusion_matrix(y_true, y_pred, k)`.
+
+2) **Intermedio**
+
+- Implementa precision/recall/F1 por clase.
+
+3) **Avanzado**
+
+- Implementa F1 macro y verifica rango `[0,1]`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray, k: int) -> np.ndarray:
+    y_true = np.asarray(y_true).astype(int)
+    y_pred = np.asarray(y_pred).astype(int)
+    cm = np.zeros((k, k), dtype=int)
+    for t, p in zip(y_true, y_pred):
+        cm[t, p] += 1
+    return cm
+
+
+def prf_from_cm(cm: np.ndarray):
+    k = cm.shape[0]
+    eps = 1e-12
+    precision = np.zeros(k)
+    recall = np.zeros(k)
+    f1 = np.zeros(k)
+    for c in range(k):
+        tp = cm[c, c]
+        fp = np.sum(cm[:, c]) - tp
+        fn = np.sum(cm[c, :]) - tp
+        precision[c] = tp / (tp + fp + eps)
+        recall[c] = tp / (tp + fn + eps)
+        f1[c] = 2 * precision[c] * recall[c] / (precision[c] + recall[c] + eps)
+    return precision, recall, f1
+
+
+y_true = np.array([0, 1, 2, 2, 2, 1])
+y_pred = np.array([0, 2, 2, 2, 1, 1])
+cm = confusion_matrix(y_true, y_pred, k=3)
+
+prec, rec, f1 = prf_from_cm(cm)
+f1_macro = float(np.mean(f1))
+
+assert cm.shape == (3, 3)
+assert 0.0 <= f1_macro <= 1.0
+```
+
+---
+
+### Ejercicio 8.9: Comparación de modelos (tabla consistente)
+
+#### Enunciado
+
+1) **Básico**
+
+- Dado un dict `{modelo: accuracy}`, construye una lista ordenada de mejor a peor.
+
+2) **Intermedio**
+
+- Verifica que el mejor accuracy es el primero.
+
+3) **Avanzado**
+
+- Verifica que todos los accuracies están en `[0,1]`.
+
+#### Solución
+
+```python
+import numpy as np
+
+results = {
+    "K-Means": 0.00,
+    "Logistic Regression": 0.88,
+    "MLP": 0.94,
+}
+
+items = sorted(results.items(), key=lambda kv: kv[1], reverse=True)
+
+assert items[0][1] == max(results.values())
+for _, acc in items:
+    assert 0.0 <= acc <= 1.0
+```
+
+---
+
 ## 📦 Entregable Final
 
 ### `MODEL_COMPARISON.md`

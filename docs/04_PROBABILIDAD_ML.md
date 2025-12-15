@@ -901,6 +901,465 @@ print(f"Categorical Cross-Entropy: {loss:.4f}")
 
 ---
 
+## 🎯 Ejercicios por tema (progresivos) + Soluciones
+
+Reglas:
+
+- **Intenta primero** sin mirar la solución.
+- **Timebox sugerido:** 15–30 min por ejercicio.
+- **Éxito mínimo:** tu solución debe pasar los `assert`.
+
+---
+
+### Ejercicio 4.1: Probabilidad condicional (P(A|B)) y consistencia
+
+#### Enunciado
+
+1) **Básico**
+
+- Dado un conjunto de conteos de eventos, calcula `P(A)`, `P(B)` y `P(A ∩ B)`.
+
+2) **Intermedio**
+
+- Calcula `P(A|B) = P(A∩B)/P(B)` y verifica que está en `[0,1]`.
+
+3) **Avanzado**
+
+- Verifica que `P(A∩B) = P(A|B)·P(B)`.
+
+#### Solución
+
+```python
+import numpy as np
+
+# Simulación con conteos (dataset pequeño)
+n = 100
+count_A = 40
+count_B = 50
+count_A_and_B = 20
+
+P_A = count_A / n
+P_B = count_B / n
+P_A_and_B = count_A_and_B / n
+
+P_A_given_B = P_A_and_B / P_B
+
+assert 0.0 <= P_A <= 1.0
+assert 0.0 <= P_B <= 1.0
+assert 0.0 <= P_A_given_B <= 1.0
+assert np.isclose(P_A_and_B, P_A_given_B * P_B)
+```
+
+---
+
+### Ejercicio 4.2: Bayes en modo clasificador (posterior sin normalizar)
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa el cálculo de posterior sin normalizar:
+  - `score_spam = P(x|spam)·P(spam)`
+  - `score_ham = P(x|ham)·P(ham)`
+
+2) **Intermedio**
+
+- Normaliza y obtén `P(spam|x)` y `P(ham|x)`.
+
+3) **Avanzado**
+
+- Verifica que las probabilidades normalizadas suman 1.
+
+#### Solución
+
+```python
+import numpy as np
+
+P_spam = 0.3
+P_ham = 1.0 - P_spam
+
+P_x_given_spam = 0.8
+P_x_given_ham = 0.1
+
+score_spam = P_x_given_spam * P_spam
+score_ham = P_x_given_ham * P_ham
+
+Z = score_spam + score_ham
+P_spam_given_x = score_spam / Z
+P_ham_given_x = score_ham / Z
+
+assert np.isclose(P_spam_given_x + P_ham_given_x, 1.0)
+assert P_spam_given_x > P_ham_given_x
+```
+
+---
+
+### Ejercicio 4.3: Independencia (test empírico)
+
+#### Enunciado
+
+1) **Básico**
+
+- Simula dos variables binarias independientes `A` y `B`.
+
+2) **Intermedio**
+
+- Estima `P(A)`, `P(B)`, `P(A∩B)` y verifica `P(A∩B) ≈ P(A)P(B)`.
+
+3) **Avanzado**
+
+- Simula un caso dependiente y verifica que la igualdad se rompe.
+
+#### Solución
+
+```python
+import numpy as np
+
+np.random.seed(0)
+n = 20000
+
+# Independientes
+A = (np.random.rand(n) < 0.4)
+B = (np.random.rand(n) < 0.5)
+
+P_A = A.mean()
+P_B = B.mean()
+P_A_and_B = (A & B).mean()
+
+assert abs(P_A_and_B - (P_A * P_B)) < 0.01
+
+# Dependientes: B es casi A
+B_dep = (A | (np.random.rand(n) < 0.05))
+P_B_dep = B_dep.mean()
+P_A_and_B_dep = (A & B_dep).mean()
+
+assert abs(P_A_and_B_dep - (P_A * P_B_dep)) > 0.02
+```
+
+---
+
+### Ejercicio 4.4: MLE de Bernoulli ("fracción de heads")
+
+#### Enunciado
+
+1) **Básico**
+
+- Genera muestras Bernoulli con `p_true`.
+
+2) **Intermedio**
+
+- Implementa el estimador MLE `p_hat = mean(x)`.
+
+3) **Avanzado**
+
+- Verifica que `p_hat` se aproxima a `p_true` con suficientes muestras.
+
+#### Solución
+
+```python
+import numpy as np
+
+np.random.seed(1)
+p_true = 0.7
+n = 5000
+x = (np.random.rand(n) < p_true).astype(float)
+
+p_hat = float(np.mean(x))
+assert abs(p_hat - p_true) < 0.02
+```
+
+---
+
+### Ejercicio 4.5: PDF Gaussiana univariada (sanity check)
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa la PDF de una normal `N(μ,σ²)`.
+
+2) **Intermedio**
+
+- Verifica que para `N(0,1)` en `x=0` la densidad ≈ `0.39894228`.
+
+3) **Avanzado**
+
+- Verifica que `pdf(x)` es simétrica: `pdf(a) == pdf(-a)` cuando `μ=0`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:
+    x = np.asarray(x, dtype=float)
+    sigma = float(sigma)
+    assert sigma > 0
+    z = (x - mu) / sigma
+    return (1.0 / (np.sqrt(2.0 * np.pi) * sigma)) * np.exp(-0.5 * z**2)
+
+
+val0 = gaussian_pdf(np.array([0.0]), mu=0.0, sigma=1.0)[0]
+assert np.isclose(val0, 0.39894228, atol=1e-4)
+
+a = 1.7
+assert np.isclose(
+    gaussian_pdf(np.array([a]), 0.0, 1.0)[0],
+    gaussian_pdf(np.array([-a]), 0.0, 1.0)[0],
+    rtol=1e-12,
+    atol=1e-12,
+)
+```
+
+---
+
+### Ejercicio 4.6: Gaussiana multivariada (2D) + covarianza válida
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa la densidad `N(μ, Σ)` en 2D.
+
+2) **Intermedio**
+
+- Para `μ=0` y `Σ=I`, verifica que `pdf(0) = 1/(2π)`.
+
+3) **Avanzado**
+
+- Verifica que `Σ` es definida positiva (eigenvalores > 0) antes de invertir.
+
+#### Solución
+
+```python
+import numpy as np
+
+def multivariate_gaussian_pdf(x: np.ndarray, mu: np.ndarray, cov: np.ndarray) -> float:
+    x = np.asarray(x, dtype=float)
+    mu = np.asarray(mu, dtype=float)
+    cov = np.asarray(cov, dtype=float)
+    d = x.shape[0]
+
+    assert mu.shape == (d,)
+    assert cov.shape == (d, d)
+    assert np.allclose(cov, cov.T)
+    eigvals = np.linalg.eigvals(cov)
+    assert np.all(eigvals > 0)
+
+    diff = x - mu
+    inv = np.linalg.inv(cov)
+    det = np.linalg.det(cov)
+    norm = 1.0 / (np.sqrt(((2.0 * np.pi) ** d) * det))
+    expo = -0.5 * float(diff.T @ inv @ diff)
+    return float(norm * np.exp(expo))
+
+
+mu = np.array([0.0, 0.0])
+cov = np.eye(2)
+pdf0 = multivariate_gaussian_pdf(np.array([0.0, 0.0]), mu, cov)
+assert np.isclose(pdf0, 1.0 / (2.0 * np.pi), atol=1e-6)
+assert pdf0 > 0.0
+```
+
+---
+
+### Ejercicio 4.7: Log-Sum-Exp y log-softmax estable
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa `logsumexp(z)` de forma estable (restando `max(z)`).
+
+2) **Intermedio**
+
+- Implementa `log_softmax(z) = z - logsumexp(z)`.
+
+3) **Avanzado**
+
+- Verifica que `sum(exp(log_softmax(z))) == 1` y que no hay `inf` con logits grandes.
+
+#### Solución
+
+```python
+import numpy as np
+
+def logsumexp(z: np.ndarray) -> float:
+    z = np.asarray(z, dtype=float)
+    m = np.max(z)
+    return float(m + np.log(np.sum(np.exp(z - m))))
+
+
+def log_softmax(z: np.ndarray) -> np.ndarray:
+    z = np.asarray(z, dtype=float)
+    return z - logsumexp(z)
+
+
+z = np.array([1000.0, 0.0, -1000.0])
+lsm = log_softmax(z)
+probs = np.exp(lsm)
+assert np.isfinite(lsm).all()
+assert np.isfinite(probs).all()
+assert np.isclose(np.sum(probs), 1.0)
+```
+
+---
+
+### Ejercicio 4.8: Softmax estable (invariancia a constantes)
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa softmax estable: `exp(z-max)/sum(exp(z-max))`.
+
+2) **Intermedio**
+
+- Verifica que suma 1.
+
+3) **Avanzado**
+
+- Verifica invariancia: `softmax(z) == softmax(z + c)`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def softmax(z: np.ndarray) -> np.ndarray:
+    z = np.asarray(z, dtype=float)
+    z_shift = z - np.max(z)
+    expz = np.exp(z_shift)
+    return expz / np.sum(expz)
+
+
+z = np.array([2.0, 1.0, 0.0])
+p = softmax(z)
+assert np.isclose(np.sum(p), 1.0)
+
+c = 100.0
+p2 = softmax(z + c)
+assert np.allclose(p, p2)
+assert np.argmax(p) == np.argmax(z)
+```
+
+---
+
+### Ejercicio 4.9: Binary Cross-Entropy estable (evitar log(0))
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa BCE: `-mean(y log(p) + (1-y) log(1-p))`.
+
+2) **Intermedio**
+
+- Usa `clip`/`epsilon` para evitar `log(0)`.
+
+3) **Avanzado**
+
+- Verifica:
+  - BCE cerca de 0 para predicciones casi perfectas.
+  - BCE ≈ `-log(0.9)` cuando `y=1` y `p=0.9`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def binary_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
+    y_pred = np.clip(y_pred, eps, 1.0 - eps)
+    return float(-np.mean(y_true * np.log(y_pred) + (1.0 - y_true) * np.log(1.0 - y_pred)))
+
+
+y_true = np.array([1.0, 0.0, 1.0, 0.0])
+y_pred_good = np.array([0.999, 0.001, 0.999, 0.001])
+assert binary_cross_entropy(y_true, y_pred_good) < 0.01
+
+assert np.isclose(binary_cross_entropy(np.array([1.0]), np.array([0.9])), -np.log(0.9), atol=1e-12)
+```
+
+---
+
+### Ejercicio 4.10: Categorical Cross-Entropy (multiclase) + one-hot
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa CCE: `-mean(sum(y_true * log(y_pred)))`.
+
+2) **Intermedio**
+
+- Asegura que `y_pred` no contiene ceros (epsilon).
+
+3) **Avanzado**
+
+- Verifica que el loss baja cuando aumenta la probabilidad de la clase correcta.
+
+#### Solución
+
+```python
+import numpy as np
+
+def categorical_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
+    y_true = np.asarray(y_true, dtype=float)
+    y_pred = np.asarray(y_pred, dtype=float)
+    y_pred = np.clip(y_pred, eps, 1.0)
+    return float(-np.mean(np.sum(y_true * np.log(y_pred), axis=1)))
+
+
+y_true = np.array([[0, 1, 0], [1, 0, 0]], dtype=float)
+y_pred_bad = np.array([[0.34, 0.33, 0.33], [0.34, 0.33, 0.33]], dtype=float)
+y_pred_good = np.array([[0.05, 0.90, 0.05], [0.90, 0.05, 0.05]], dtype=float)
+
+loss_bad = categorical_cross_entropy(y_true, y_pred_bad)
+loss_good = categorical_cross_entropy(y_true, y_pred_good)
+assert loss_good < loss_bad
+```
+
+---
+
+### (Bonus) Ejercicio 4.11: Cadena de Markov (matriz de transición)
+
+#### Enunciado
+
+1) **Básico**
+
+- Define una matriz de transición `P` (filas suman 1).
+
+2) **Intermedio**
+
+- Propaga una distribución `π_{t+1} = π_t P` y verifica que sigue siendo distribución.
+
+3) **Avanzado**
+
+- Encuentra una distribución estacionaria aproximada iterando muchas veces y verifica `π ≈ πP`.
+
+#### Solución
+
+```python
+import numpy as np
+
+P = np.array([
+    [0.9, 0.1],
+    [0.2, 0.8],
+], dtype=float)
+assert np.allclose(P.sum(axis=1), 1.0)
+
+pi = np.array([1.0, 0.0])
+for _ in range(50):
+    pi = pi @ P
+    assert np.isclose(np.sum(pi), 1.0)
+    assert np.all(pi >= 0)
+
+pi_star = pi.copy()
+assert np.allclose(pi_star, pi_star @ P, atol=1e-6)
+```
+
 ## 🔨 Entregables del Módulo
 
 ### E1: `probability.py`

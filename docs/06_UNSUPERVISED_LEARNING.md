@@ -1337,6 +1337,399 @@ def visualize_pca_2d(X: np.ndarray, labels: np.ndarray = None, title: str = "PCA
 
 ---
 
+## 🎯 Ejercicios por tema (progresivos) + Soluciones
+
+Reglas:
+
+- **Intenta primero** sin mirar la solución.
+- **Timebox sugerido:** 25–60 min por ejercicio.
+- **Éxito mínimo:** tu solución debe pasar los `assert`.
+
+---
+
+### Ejercicio 6.1: Distancias vectorizadas (K-Means) - shapes y argmin
+
+#### Enunciado
+
+1) **Básico**
+
+- Dado `X` con shape `(n,d)` y centroides `C` con shape `(k,d)`, construye una matriz `D2` con shape `(n,k)` donde `D2[i,j] = ||X_i - C_j||^2`.
+
+2) **Intermedio**
+
+- Obtén asignaciones `labels = argmin_j D2[i,j]`.
+
+3) **Avanzado**
+
+- Verifica por `assert` que el resultado coincide con un cálculo manual en un punto.
+
+#### Solución
+
+```python
+import numpy as np
+
+X = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 2.0], [3.0, 3.0]])
+C = np.array([[0.0, 0.0], [2.0, 2.0]])
+
+# (n,1,d) - (1,k,d) -> (n,k,d)
+diff = X[:, None, :] - C[None, :, :]
+D2 = np.sum(diff ** 2, axis=2)
+
+assert D2.shape == (X.shape[0], C.shape[0])
+
+labels = np.argmin(D2, axis=1)
+assert labels.shape == (X.shape[0],)
+assert labels.min() >= 0 and labels.max() < C.shape[0]
+
+i = 2  # X[i] = [0,2]
+manual0 = np.sum((X[i] - C[0]) ** 2)
+manual1 = np.sum((X[i] - C[1]) ** 2)
+assert np.isclose(D2[i, 0], manual0)
+assert np.isclose(D2[i, 1], manual1)
+assert labels[i] == int(np.argmin([manual0, manual1]))
+```
+
+---
+
+### Ejercicio 6.2: Paso de actualización (centroides como promedio)
+
+#### Enunciado
+
+1) **Básico**
+
+- Dado `X` y `labels`, recalcula `C_new[j] = mean(X[labels==j])`.
+
+2) **Intermedio**
+
+- Verifica shapes y que no aparecen `NaN`.
+
+3) **Avanzado**
+
+- Maneja el caso de cluster vacío: si no hay puntos para un `j`, conserva el centroide anterior.
+
+#### Solución
+
+```python
+import numpy as np
+
+X = np.array([[0.0, 0.0], [1.0, 0.0], [10.0, 10.0], [11.0, 10.0]])
+C = np.array([[0.0, 0.0], [10.0, 10.0]])
+
+diff = X[:, None, :] - C[None, :, :]
+labels = np.argmin(np.sum(diff ** 2, axis=2), axis=1)
+
+C_new = C.copy()
+for j in range(C.shape[0]):
+    mask = labels == j
+    if np.any(mask):
+        C_new[j] = np.mean(X[mask], axis=0)
+
+assert C_new.shape == C.shape
+assert np.isfinite(C_new).all()
+```
+
+---
+
+### Ejercicio 6.3: Inercia (función objetivo) + monotonía de Lloyd
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa `inertia(X, C, labels) = sum_i ||X_i - C_{labels_i}||^2`.
+
+2) **Intermedio**
+
+- Ejecuta 1 iteración de Lloyd (asignación → actualización) y compara inercia.
+
+3) **Avanzado**
+
+- Verifica que la inercia **no aumenta** tras la iteración (debe bajar o quedar igual).
+
+#### Solución
+
+```python
+import numpy as np
+
+def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:
+    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)
+    return np.argmin(D2, axis=1)
+
+
+def update_centroids(X: np.ndarray, labels: np.ndarray, C: np.ndarray) -> np.ndarray:
+    C_new = C.copy()
+    for j in range(C.shape[0]):
+        mask = labels == j
+        if np.any(mask):
+            C_new[j] = np.mean(X[mask], axis=0)
+    return C_new
+
+
+def inertia(X: np.ndarray, C: np.ndarray, labels: np.ndarray) -> float:
+    diffs = X - C[labels]
+    return float(np.sum(diffs ** 2))
+
+
+np.random.seed(0)
+X = np.vstack([
+    np.random.randn(50, 2) + np.array([0.0, 0.0]),
+    np.random.randn(50, 2) + np.array([5.0, 5.0]),
+])
+
+C0 = np.array([[0.0, 5.0], [5.0, 0.0]])
+labels0 = assign_labels(X, C0)
+J0 = inertia(X, C0, labels0)
+
+C1 = update_centroids(X, labels0, C0)
+labels1 = assign_labels(X, C1)
+J1 = inertia(X, C1, labels1)
+
+assert J1 <= J0 + 1e-12
+assert J0 >= 0.0 and J1 >= 0.0
+```
+
+---
+
+### Ejercicio 6.4: K-Means++ (probabilidades correctas)
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa K-Means++ para elegir `k` centroides desde `X`.
+
+2) **Intermedio**
+
+- Verifica que los centroides pertenecen a `X`.
+
+3) **Avanzado**
+
+- Verifica que las probabilidades de muestreo suman 1 (en cada paso).
+
+#### Solución
+
+```python
+import numpy as np
+
+def kmeans_plus_plus(X: np.ndarray, k: int, seed: int = 0) -> np.ndarray:
+    rng = np.random.default_rng(seed)
+    n = X.shape[0]
+    centroids = [X[rng.integers(n)]]
+
+    for _ in range(1, k):
+        C = np.array(centroids)
+        d2 = np.min(np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2), axis=1)
+        assert np.all(d2 >= 0)
+        probs = d2 / np.sum(d2)
+        assert np.isclose(np.sum(probs), 1.0)
+        centroids.append(X[rng.choice(n, p=probs)])
+
+    return np.array(centroids)
+
+
+np.random.seed(1)
+X = np.random.randn(30, 2)
+C = kmeans_plus_plus(X, k=3, seed=123)
+
+assert C.shape == (3, 2)
+for j in range(C.shape[0]):
+    assert np.any(np.all(np.isclose(X, C[j]), axis=1))
+```
+
+---
+
+### Ejercicio 6.5: Sensibilidad a escala (por qué normalizar importa)
+
+#### Enunciado
+
+1) **Básico**
+
+- Construye un ejemplo donde escalar una feature cambie la asignación al centroide más cercano.
+
+2) **Intermedio**
+
+- Calcula labels con una escala `s=0.1` y con `s=10`.
+
+3) **Avanzado**
+
+- Verifica que hay al menos un punto cuyo label cambia.
+
+#### Solución
+
+```python
+import numpy as np
+
+def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:
+    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)
+    return np.argmin(D2, axis=1)
+
+
+# Punto cerca en x pero lejos en y (y domina si la escalas)
+X = np.array([
+    [2.0, 0.0],
+], dtype=float)
+C = np.array([
+    [0.0, 0.0],
+    [2.0, 2.0],
+], dtype=float)
+
+labels_s_small = assign_labels(X * np.array([1.0, 0.1]), C * np.array([1.0, 0.1]))
+labels_s_big = assign_labels(X * np.array([1.0, 10.0]), C * np.array([1.0, 10.0]))
+
+assert labels_s_small.shape == (1,)
+assert labels_s_big.shape == (1,)
+assert labels_s_small[0] != labels_s_big[0]
+```
+
+---
+
+### Ejercicio 6.6: PCA vía SVD (shapes + varianza explicada ordenada)
+
+#### Enunciado
+
+1) **Básico**
+
+- Centra `X` y calcula `U,S,Vt = svd(Xc)`.
+
+2) **Intermedio**
+
+- Proyecta a `k=2` componentes y verifica shapes.
+
+3) **Avanzado**
+
+- Calcula varianza explicada y verifica que está ordenada de mayor a menor.
+
+#### Solución
+
+```python
+import numpy as np
+
+def pca_svd(X: np.ndarray, k: int):
+    Xc = X - X.mean(axis=0)
+    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    comps = Vt[:k].T
+    Xk = Xc @ comps
+    var = (S ** 2) / (Xc.shape[0] - 1)
+    ratio = var / np.sum(var)
+    return Xk, comps, ratio[:k]
+
+
+np.random.seed(0)
+n = 300
+z = np.random.randn(n)
+X = np.stack([z, 2.0 * z + 0.1 * np.random.randn(n), -z + 0.1 * np.random.randn(n)], axis=1)
+
+X2, comps, r = pca_svd(X, k=2)
+
+assert X2.shape == (n, 2)
+assert comps.shape == (3, 2)
+assert r.shape == (2,)
+assert r[0] >= r[1]
+assert 0.0 <= r.sum() <= 1.0
+```
+
+---
+
+### Ejercicio 6.7: Reconstrucción PCA (error decrece al aumentar componentes)
+
+#### Enunciado
+
+1) **Básico**
+
+- Reconstruye `X` desde `k` componentes: `X_rec = Xc @ V_k @ V_k^T + mean`.
+
+2) **Intermedio**
+
+- Compara el error de reconstrucción con `k=1` vs `k=2`.
+
+3) **Avanzado**
+
+- Verifica que el error con `k=2` es menor o igual.
+
+#### Solución
+
+```python
+import numpy as np
+
+def pca_reconstruct(X: np.ndarray, k: int) -> np.ndarray:
+    mu = X.mean(axis=0)
+    Xc = X - mu
+    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    Vk = Vt[:k].T
+    Xk = Xc @ Vk
+    X_rec = Xk @ Vk.T + mu
+    return X_rec
+
+
+np.random.seed(1)
+n = 200
+z = np.random.randn(n)
+X = np.stack([z, 2.0 * z + 0.2 * np.random.randn(n), -z + 0.2 * np.random.randn(n)], axis=1)
+
+X1 = pca_reconstruct(X, k=1)
+X2 = pca_reconstruct(X, k=2)
+
+err1 = np.linalg.norm(X - X1)
+err2 = np.linalg.norm(X - X2)
+
+assert err2 <= err1 + 1e-12
+```
+
+---
+
+### (Bonus) Ejercicio 6.8: Silhouette (implementación mínima para dataset pequeño)
+
+#### Enunciado
+
+- Implementa silhouette para un dataset pequeño.
+- Verifica que el score promedio está en `[-1, 1]`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def pairwise_dist(X: np.ndarray) -> np.ndarray:
+    D2 = np.sum((X[:, None, :] - X[None, :, :]) ** 2, axis=2)
+    return np.sqrt(np.maximum(D2, 0.0))
+
+
+def silhouette_score(X: np.ndarray, labels: np.ndarray) -> float:
+    X = np.asarray(X, dtype=float)
+    labels = np.asarray(labels, dtype=int)
+    D = pairwise_dist(X)
+    n = X.shape[0]
+    uniq = np.unique(labels)
+    s = np.zeros(n, dtype=float)
+    for i in range(n):
+        same = labels == labels[i]
+        same[i] = False
+        a = np.mean(D[i, same]) if np.any(same) else 0.0
+
+        b = np.inf
+        for c in uniq:
+            if c == labels[i]:
+                continue
+            mask = labels == c
+            if np.any(mask):
+                b = min(b, float(np.mean(D[i, mask])))
+
+        if b == np.inf:
+            s[i] = 0.0
+        else:
+            denom = max(a, b)
+            s[i] = 0.0 if denom == 0.0 else (b - a) / denom
+    return float(np.mean(s))
+
+
+X = np.array([[0.0, 0.0], [0.2, 0.1], [5.0, 5.0], [5.1, 4.9]])
+labels = np.array([0, 0, 1, 1])
+score = silhouette_score(X, labels)
+assert -1.0 <= score <= 1.0
+```
+
+---
+
 ## 📦 Entregable del Módulo
 
 ### `unsupervised_learning.py`

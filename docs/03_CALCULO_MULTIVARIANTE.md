@@ -995,6 +995,470 @@ demo_xor()
 
 
 ---
+
+## 🎯 Ejercicios por tema (progresivos) + Soluciones
+
+Reglas:
+
+- **Intenta primero** sin mirar la solución.
+- **Timebox sugerido:** 15–30 min por ejercicio.
+- **Éxito mínimo:** tu solución debe pasar los `assert`.
+
+---
+
+### Ejercicio 3.1: Derivada numérica (diferencias finitas) vs derivada analítica
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa la derivada numérica central: `f'(x) ≈ (f(x+h)-f(x-h))/(2h)`.
+
+2) **Intermedio**
+
+- Para `f(x) = x^3 + 2x`, implementa `f'(x)` analítica y compara en varios puntos.
+
+3) **Avanzado**
+
+- Prueba `h=1e-2, 1e-4, 1e-6` y verifica que el error no crece de forma absurda.
+
+#### Solución
+
+```python
+import numpy as np
+
+def num_derivative_central(f, x: float, h: float = 1e-6) -> float:
+    return float((f(x + h) - f(x - h)) / (2.0 * h))
+
+
+def f(x: float) -> float:
+    return x**3 + 2.0 * x
+
+
+def f_prime(x: float) -> float:
+    return 3.0 * x**2 + 2.0
+
+
+xs = [-2.0, -0.5, 0.0, 1.0, 3.0]
+for x in xs:
+    approx = num_derivative_central(f, x, h=1e-6)
+    exact = f_prime(x)
+    assert np.isclose(approx, exact, rtol=1e-6, atol=1e-6)
+
+
+x0 = 1.234
+errs = []
+for h in [1e-2, 1e-4, 1e-6]:
+    approx = num_derivative_central(f, x0, h=h)
+    errs.append(abs(approx - f_prime(x0)))
+assert errs[1] <= errs[0] + 1e-6
+```
+
+---
+
+### Ejercicio 3.2: Derivadas parciales y gradiente (2D)
+
+#### Enunciado
+
+Sea `f(x, y) = x^2 y + sin(y)`.
+
+1) **Básico**
+
+- Deriva analíticamente `∂f/∂x` y `∂f/∂y`.
+
+2) **Intermedio**
+
+- Implementa el gradiente `∇f(x,y)` y evalúalo en un punto.
+
+3) **Avanzado**
+
+- Verifica con gradiente numérico (diferencias centrales) que tu gradiente analítico es correcto.
+
+#### Solución
+
+```python
+import numpy as np
+
+def f_xy(x: float, y: float) -> float:
+    return x**2 * y + np.sin(y)
+
+
+def grad_f_xy(x: float, y: float) -> np.ndarray:
+    dfdx = 2.0 * x * y
+    dfdy = x**2 + np.cos(y)
+    return np.array([dfdx, dfdy], dtype=float)
+
+
+def num_grad_2d(f, x: float, y: float, h: float = 1e-6) -> np.ndarray:
+    dfdx = (f(x + h, y) - f(x - h, y)) / (2.0 * h)
+    dfdy = (f(x, y + h) - f(x, y - h)) / (2.0 * h)
+    return np.array([dfdx, dfdy], dtype=float)
+
+
+x0, y0 = 1.2, -0.7
+g_anal = grad_f_xy(x0, y0)
+g_num = num_grad_2d(f_xy, x0, y0)
+assert np.allclose(g_anal, g_num, rtol=1e-5, atol=1e-6)
+```
+
+---
+
+### Ejercicio 3.3: Derivada direccional (intuición: el gradiente manda)
+
+#### Enunciado
+
+1) **Básico**
+
+- Para `f(x,y)=x^2 y + sin(y)`, calcula `∇f(x0,y0)`.
+
+2) **Intermedio**
+
+- Dado un vector dirección unitario `u`, calcula la derivada direccional `D_u f = ∇f · u`.
+
+3) **Avanzado**
+
+- Verifica numéricamente `D_u f` con diferencias finitas sobre `p(t)=p0 + t u`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def f_xy(x: float, y: float) -> float:
+    return x**2 * y + np.sin(y)
+
+
+def grad_f_xy(x: float, y: float) -> np.ndarray:
+    return np.array([2.0 * x * y, x**2 + np.cos(y)], dtype=float)
+
+
+x0, y0 = 0.5, 1.0
+g = grad_f_xy(x0, y0)
+
+u = np.array([3.0, 4.0], dtype=float)
+u = u / np.linalg.norm(u)
+
+dir_anal = float(np.dot(g, u))
+
+h = 1e-6
+f_plus = f_xy(x0 + h * u[0], y0 + h * u[1])
+f_minus = f_xy(x0 - h * u[0], y0 - h * u[1])
+dir_num = float((f_plus - f_minus) / (2.0 * h))
+
+assert np.isclose(dir_anal, dir_num, rtol=1e-5, atol=1e-6)
+```
+
+---
+
+### Ejercicio 3.4: Jacobiano (función vectorial)
+
+#### Enunciado
+
+Sea `g(x1,x2) = [x1^2 + x2, sin(x1 x2)]`.
+
+1) **Básico**
+
+- Escribe el Jacobiano `J` (matriz 2x2) a mano.
+
+2) **Intermedio**
+
+- Implementa `J_analytical(x)`.
+
+3) **Avanzado**
+
+- Verifica con Jacobiano numérico (diferencias centrales) que `J` coincide.
+
+#### Solución
+
+```python
+import numpy as np
+
+def g(x: np.ndarray) -> np.ndarray:
+    x1, x2 = float(x[0]), float(x[1])
+    return np.array([x1**2 + x2, np.sin(x1 * x2)], dtype=float)
+
+
+def J_analytical(x: np.ndarray) -> np.ndarray:
+    x1, x2 = float(x[0]), float(x[1])
+    dg1_dx1 = 2.0 * x1
+    dg1_dx2 = 1.0
+    dg2_dx1 = np.cos(x1 * x2) * x2
+    dg2_dx2 = np.cos(x1 * x2) * x1
+    return np.array([[dg1_dx1, dg1_dx2], [dg2_dx1, dg2_dx2]], dtype=float)
+
+
+def J_numeric(g, x: np.ndarray, h: float = 1e-6) -> np.ndarray:
+    x = x.astype(float)
+    m = g(x).shape[0]
+    n = x.shape[0]
+    J = np.zeros((m, n), dtype=float)
+    for j in range(n):
+        e = np.zeros(n)
+        e[j] = 1.0
+        J[:, j] = (g(x + h * e) - g(x - h * e)) / (2.0 * h)
+    return J
+
+
+x0 = np.array([0.7, -1.1])
+Ja = J_analytical(x0)
+Jn = J_numeric(g, x0)
+assert np.allclose(Ja, Jn, rtol=1e-5, atol=1e-6)
+```
+
+---
+
+### Ejercicio 3.5: Hessiano (curvatura local) + convexidad
+
+#### Enunciado
+
+Sea `f(x1,x2) = x1^2 + 2 x2^2`.
+
+1) **Básico**
+
+- Calcula el Hessiano `H`.
+
+2) **Intermedio**
+
+- Verifica que `H` es simétrico.
+
+3) **Avanzado**
+
+- Verifica que `H` es definido positivo (eigenvalores > 0).
+
+#### Solución
+
+```python
+import numpy as np
+
+H = np.array([[2.0, 0.0], [0.0, 4.0]], dtype=float)
+assert np.allclose(H, H.T)
+
+eigvals = np.linalg.eigvals(H)
+assert np.all(eigvals > 0)
+```
+
+---
+
+### Ejercicio 3.6: Gradient Descent 1D (convergencia)
+
+#### Enunciado
+
+Minimiza `f(x) = (x - 3)^2` con Gradient Descent.
+
+1) **Básico**
+
+- Implementa la regla de actualización: `x <- x - α f'(x)`.
+
+2) **Intermedio**
+
+- Registra `x_t` y `f(x_t)`.
+
+3) **Avanzado**
+
+- Usa un criterio de parada por `|grad| < tol`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def f(x: float) -> float:
+    return (x - 3.0) ** 2
+
+
+def grad_f(x: float) -> float:
+    return 2.0 * (x - 3.0)
+
+
+x = 10.0
+alpha = 0.1
+history = []
+for _ in range(200):
+    g = grad_f(x)
+    history.append((x, f(x)))
+    if abs(g) < 1e-8:
+        break
+    x = x - alpha * g
+
+assert abs(x - 3.0) < 1e-4
+assert history[-1][1] <= history[0][1]
+```
+
+---
+
+### Ejercicio 3.7: Efecto del learning rate (estabilidad)
+
+#### Enunciado
+
+Minimiza `f(x)=x^2` con Gradient Descent desde `x0=1`.
+
+1) **Básico**
+
+- Deriva la actualización: `x_{t+1} = (1 - 2α) x_t`.
+
+2) **Intermedio**
+
+- Prueba con `α=0.25` y verifica que `|x_t|` decrece.
+
+3) **Avanzado**
+
+- Prueba con `α=1.1` y verifica divergencia (`|x_t|` crece).
+
+#### Solución
+
+```python
+import numpy as np
+
+def run_gd_x2(alpha: float, steps: int = 10) -> np.ndarray:
+    x = 1.0
+    xs = [x]
+    for _ in range(steps):
+        grad = 2.0 * x
+        x = x - alpha * grad
+        xs.append(x)
+    return np.array(xs)
+
+
+xs_good = run_gd_x2(alpha=0.25, steps=10)
+assert abs(xs_good[-1]) < abs(xs_good[0])
+
+xs_bad = run_gd_x2(alpha=1.1, steps=10)
+assert abs(xs_bad[-1]) > abs(xs_bad[0])
+```
+
+---
+
+### Ejercicio 3.8: Gradient checking (vector) + error relativo
+
+#### Enunciado
+
+1) **Básico**
+
+- Implementa gradiente numérico (diferencias centrales) para `f(w)`.
+
+2) **Intermedio**
+
+- Usa `f(w)=∑ w_i^3` cuyo gradiente analítico es `3 w_i^2`.
+
+3) **Avanzado**
+
+- Calcula error relativo `||g_num - g_anal|| / (||g_num|| + ||g_anal|| + eps)`.
+
+#### Solución
+
+```python
+import numpy as np
+
+def f(w: np.ndarray) -> float:
+    return float(np.sum(w ** 3))
+
+
+def grad_analytical(w: np.ndarray) -> np.ndarray:
+    return 3.0 * (w ** 2)
+
+
+def grad_numeric(f, w: np.ndarray, h: float = 1e-6) -> np.ndarray:
+    w = w.astype(float)
+    g = np.zeros_like(w)
+    for i in range(w.size):
+        e = np.zeros_like(w)
+        e[i] = 1.0
+        g[i] = (f(w + h * e) - f(w - h * e)) / (2.0 * h)
+    return g
+
+
+np.random.seed(0)
+w = np.random.randn(5)
+g_a = grad_analytical(w)
+g_n = grad_numeric(f, w)
+
+eps = 1e-12
+rel_err = np.linalg.norm(g_n - g_a) / (np.linalg.norm(g_n) + np.linalg.norm(g_a) + eps)
+assert rel_err < 1e-7
+```
+
+---
+
+### Ejercicio 3.9: Chain Rule (neurona + MSE) + verificación numérica
+
+#### Enunciado
+
+Una neurona:
+
+- `z = w·x + b`
+- `ŷ = σ(z)`
+- `L = (ŷ - y)^2`
+
+1) **Básico**
+
+- Deriva `dL/dz` usando chain rule.
+
+2) **Intermedio**
+
+- Deriva `dL/dw` y `dL/db`.
+
+3) **Avanzado**
+
+- Verifica tus gradientes con diferencias centrales.
+
+#### Solución
+
+```python
+import numpy as np
+
+def sigmoid(z: float) -> float:
+    return float(1.0 / (1.0 + np.exp(-z)))
+
+
+def loss_mse(y_hat: float, y: float) -> float:
+    return float((y_hat - y) ** 2)
+
+
+def forward(w: np.ndarray, b: float, x: np.ndarray, y: float) -> float:
+    z = float(np.dot(w, x) + b)
+    y_hat = sigmoid(z)
+    return loss_mse(y_hat, y)
+
+
+def grads_analytical(w: np.ndarray, b: float, x: np.ndarray, y: float):
+    z = float(np.dot(w, x) + b)
+    y_hat = sigmoid(z)
+
+    dL_dyhat = 2.0 * (y_hat - y)
+    dyhat_dz = y_hat * (1.0 - y_hat)
+    dL_dz = dL_dyhat * dyhat_dz
+
+    dL_dw = dL_dz * x
+    dL_db = dL_dz
+    return dL_dw.astype(float), float(dL_db)
+
+
+def grads_numeric(w: np.ndarray, b: float, x: np.ndarray, y: float, h: float = 1e-6):
+    gw = np.zeros_like(w, dtype=float)
+    for i in range(w.size):
+        e = np.zeros_like(w)
+        e[i] = 1.0
+        gw[i] = (forward(w + h * e, b, x, y) - forward(w - h * e, b, x, y)) / (2.0 * h)
+
+    gb = (forward(w, b + h, x, y) - forward(w, b - h, x, y)) / (2.0 * h)
+    return gw, float(gb)
+
+
+np.random.seed(1)
+w = np.random.randn(3)
+b = 0.1
+x = np.random.randn(3)
+y = 1.0
+
+gw_a, gb_a = grads_analytical(w, b, x, y)
+gw_n, gb_n = grads_numeric(w, b, x, y)
+
+assert np.allclose(gw_a, gw_n, rtol=1e-5, atol=1e-6)
+assert np.isclose(gb_a, gb_n, rtol=1e-5, atol=1e-6)
+```
+
+---
+
 ## Entregable del Módulo
 
 ### Script: `gradient_descent_demo.py`

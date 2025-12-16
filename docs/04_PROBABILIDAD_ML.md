@@ -386,9 +386,9 @@ Parámetros:
 #### 3.3 Implementación
 
 ```python
-import numpy as np
+import numpy as np  # NumPy: arrays, operaciones vectorizadas y funciones matemáticas (exp, sqrt)
 
-def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:
+def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:  # PDF univariada: f(x) de N(μ, σ²)
     """
     Probability Density Function de la Gaussiana.
 
@@ -400,35 +400,35 @@ def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:
     Returns:
         Densidad de probabilidad en cada punto
     """
-    coefficient = 1 / (sigma * np.sqrt(2 * np.pi))
-    exponent = -((x - mu) ** 2) / (2 * sigma ** 2)
-    return coefficient * np.exp(exponent)
+    coefficient = 1 / (sigma * np.sqrt(2 * np.pi))  # Coeficiente de normalización: 1/(σ√(2π))
+    exponent = -((x - mu) ** 2) / (2 * sigma ** 2)  # Exponente: - (x-μ)² / (2σ²) (forma estándar)
+    return coefficient * np.exp(exponent)  # Evaluación final: coef * exp(exponente) (vectorizado)
 
 
 # Visualización
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # Matplotlib: gráficos para construir intuición visual
 
-x = np.linspace(-5, 5, 1000)
+x = np.linspace(-5, 5, 1000)  # Eje 1D de evaluación (1000 puntos para curva suave)
 
 # Diferentes Gaussianas
-plt.figure(figsize=(10, 6))
-plt.plot(x, gaussian_pdf(x, mu=0, sigma=1), label='μ=0, σ=1 (estándar)')
-plt.plot(x, gaussian_pdf(x, mu=0, sigma=2), label='μ=0, σ=2 (más ancha)')
-plt.plot(x, gaussian_pdf(x, mu=2, sigma=1), label='μ=2, σ=1 (desplazada)')
-plt.legend()
-plt.title('Distribuciones Gaussianas')
-plt.xlabel('x')
-plt.ylabel('f(x)')
-plt.grid(True)
-plt.savefig('gaussian_distributions.png')
+plt.figure(figsize=(10, 6))  # Crea un lienzo con tamaño controlado
+plt.plot(x, gaussian_pdf(x, mu=0, sigma=1), label='μ=0, σ=1 (estándar)')  # Curva “campana” estándar
+plt.plot(x, gaussian_pdf(x, mu=0, sigma=2), label='μ=0, σ=2 (más ancha)')  # Aumentar σ ensancha y baja el pico
+plt.plot(x, gaussian_pdf(x, mu=2, sigma=1), label='μ=2, σ=1 (desplazada)')  # Cambiar μ desplaza la curva
+plt.legend()  # Muestra leyenda con labels
+plt.title('Distribuciones Gaussianas')  # Título descriptivo
+plt.xlabel('x')  # Etiqueta del eje x
+plt.ylabel('f(x)')  # Etiqueta del eje y (densidad)
+plt.grid(True)  # Rejilla para lectura más fácil
+plt.savefig('gaussian_distributions.png')  # Guarda imagen (útil para reportes)
 ```
 
 #### 3.4 Gaussiana Multivariada (Para GMM)
 
 ```python
-def multivariate_gaussian_pdf(x: np.ndarray,
-                               mu: np.ndarray,
-                               cov: np.ndarray) -> float:
+def multivariate_gaussian_pdf(x: np.ndarray,  # x:(d,) vector de características (una muestra)
+                               mu: np.ndarray,  # mu:(d,) vector de medias
+                               cov: np.ndarray) -> float:  # cov:(d,d) matriz de covarianza
     """
     Gaussiana multivariada para vectores.
 
@@ -440,30 +440,30 @@ def multivariate_gaussian_pdf(x: np.ndarray,
     Returns:
         Densidad de probabilidad
     """
-    d = len(mu)
-    diff = x - mu
+    d = len(mu)  # d: dimensión del espacio (número de features)
+    diff = x - mu  # diff:(d,) centra el punto restando la media
 
     # Determinante e inversa de la covarianza
-    det_cov = np.linalg.det(cov)
-    inv_cov = np.linalg.inv(cov)
+    det_cov = np.linalg.det(cov)  # |Σ|: controla el “volumen” de la elipse gaussiana
+    inv_cov = np.linalg.inv(cov)  # Σ^{-1}: aparece en la forma cuadrática (Mahalanobis)
 
     # Coeficiente de normalización
-    coefficient = 1 / (np.sqrt((2 * np.pi) ** d * det_cov))
+    coefficient = 1 / (np.sqrt((2 * np.pi) ** d * det_cov))  # 1 / sqrt((2π)^d |Σ|)
 
     # Exponente (forma cuadrática)
-    exponent = -0.5 * diff.T @ inv_cov @ diff
+    exponent = -0.5 * diff.T @ inv_cov @ diff  # -(1/2)(x-μ)^T Σ^{-1} (x-μ)
 
-    return coefficient * np.exp(exponent)
+    return coefficient * np.exp(exponent)  # Devuelve densidad (escala) * exp(exponente)
 
 
 # Ejemplo 2D
-mu = np.array([0, 0])
-cov = np.array([[1, 0.5],
-                [0.5, 1]])  # Correlación positiva
+mu = np.array([0, 0])  # μ:(2,) media en 2D
+cov = np.array([[1, 0.5],  # Σ[0,0]=var(x1), Σ[0,1]=cov(x1,x2)
+                [0.5, 1]])  # Correlación positiva: elipses rotadas respecto a los ejes
 
-x = np.array([0.5, 0.5])
-prob = multivariate_gaussian_pdf(x, mu, cov)
-print(f"P(x=[0.5, 0.5]) = {prob:.4f}")
+x = np.array([0.5, 0.5])  # Punto a evaluar (una muestra)
+prob = multivariate_gaussian_pdf(x, mu, cov)  # Escalar: densidad en ese punto
+print(f"P(x=[0.5, 0.5]) = {prob:.4f}")  # Imprime densidad (ojo: no es probabilidad discreta)
 ```
 
 ---
@@ -770,6 +770,8 @@ Al restar max(z), todos los exponentes son ≤ 0, evitando overflow.
 > Regla práctica: si vas a calcular cross-entropy, prefiere **log-softmax** estable en vez de `np.log(softmax(z))`.
 
 ```python
+import numpy as np  # NumPy: necesario para exp/log/max/sum en softmax estable
+
 def softmax(z: np.ndarray) -> np.ndarray:
     """
     Softmax numéricamente estable usando Log-Sum-Exp trick.
@@ -784,10 +786,10 @@ def softmax(z: np.ndarray) -> np.ndarray:
         Probabilidades que suman 1
     """
     # Log-Sum-Exp trick: restar el máximo
-    z_stable = z - np.max(z, axis=-1, keepdims=True)
+    z_stable = z - np.max(z, axis=-1, keepdims=True)  # Shift: ancla numérica por fila (mantiene invariancia)
 
-    exp_z = np.exp(z_stable)
-    return exp_z / np.sum(exp_z, axis=-1, keepdims=True)
+    exp_z = np.exp(z_stable)  # exp() seguro: valores <= 0 evitan overflow
+    return exp_z / np.sum(exp_z, axis=-1, keepdims=True)  # Normaliza para que sumen 1 (distribución)
 
 
 def log_softmax(z: np.ndarray) -> np.ndarray:
@@ -797,9 +799,9 @@ def log_softmax(z: np.ndarray) -> np.ndarray:
     log(softmax(z)) calculado de forma estable.
     Evita calcular softmax primero y luego log (pierde precisión).
     """
-    z_stable = z - np.max(z, axis=-1, keepdims=True)
-    log_sum_exp = np.log(np.sum(np.exp(z_stable), axis=-1, keepdims=True))
-    return z_stable - log_sum_exp
+    z_stable = z - np.max(z, axis=-1, keepdims=True)  # Mismo shift: reduce rango numérico
+    log_sum_exp = np.log(np.sum(np.exp(z_stable), axis=-1, keepdims=True))  # log(sum(exp(z_stable))) por fila
+    return z_stable - log_sum_exp  # log_softmax = z - logsumexp(z)
 
 
 def categorical_cross_entropy_from_logits(y_true: np.ndarray, logits: np.ndarray) -> float:
@@ -809,8 +811,8 @@ def categorical_cross_entropy_from_logits(y_true: np.ndarray, logits: np.ndarray
     Evita calcular softmax explícito.
     Útil cuando entrenas modelos y quieres estabilidad.
     """
-    log_probs = log_softmax(logits)
-    return -np.mean(np.sum(y_true * log_probs, axis=1))
+    log_probs = log_softmax(logits)  # Convierte logits a log-probabilidades estables
+    return -np.mean(np.sum(y_true * log_probs, axis=1))  # NLL promedio: -E[log p(clase correcta)]
 
 
 # ============================================================
@@ -821,18 +823,18 @@ def demo_numerical_stability():
     """Muestra por qué necesitamos el Log-Sum-Exp trick."""
 
     # Caso peligroso: logits muy grandes
-    z_dangerous = np.array([1000.0, 1001.0, 1002.0])
+    z_dangerous = np.array([1000.0, 1001.0, 1002.0])  # Logits extremos: exp() desborda sin protección
 
     # Sin el trick (INCORRECTO)
     def softmax_naive(z):
-        exp_z = np.exp(z)  # ¡Overflow!
-        return exp_z / np.sum(exp_z)
+        exp_z = np.exp(z)  # ¡Overflow! exp(1000) -> inf
+        return exp_z / np.sum(exp_z)  # inf/inf -> NaN (resultado no es una distribución válida)
 
     # Con el trick (CORRECTO)
     def softmax_stable(z):
-        z_stable = z - np.max(z)
-        exp_z = np.exp(z_stable)
-        return exp_z / np.sum(exp_z)
+        z_stable = z - np.max(z)  # Restar max: invariancia de softmax pero con estabilidad
+        exp_z = np.exp(z_stable)  # Ahora exp() es seguro (valores <= 0)
+        return exp_z / np.sum(exp_z)  # Normaliza a suma 1
 
     print("Logits peligrosos:", z_dangerous)
     print()
@@ -840,15 +842,15 @@ def demo_numerical_stability():
     # Naive (falla)
     import warnings
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        result_naive = softmax_naive(z_dangerous)
-        print(f"Softmax NAIVE: {result_naive}")
-        print(f"  → Suma: {np.sum(result_naive)} (debería ser 1.0)")
+        warnings.simplefilter("ignore")  # Ignora warning esperado por overflow (demo)
+        result_naive = softmax_naive(z_dangerous)  # Resultado ingenuo (suele contener NaN)
+        print(f"Softmax NAIVE: {result_naive}")  # Imprime el vector (para ver NaN/inf)
+        print(f"  → Suma: {np.sum(result_naive)} (debería ser 1.0)")  # Verifica que no normaliza bien
 
     # Estable (funciona)
-    result_stable = softmax_stable(z_dangerous)
-    print(f"\nSoftmax ESTABLE: {result_stable}")
-    print(f"  → Suma: {np.sum(result_stable):.6f} ✓")
+    result_stable = softmax_stable(z_dangerous)  # Resultado estable: finito y normalizado
+    print(f"\nSoftmax ESTABLE: {result_stable}")  # Imprime el vector estable
+    print(f"  → Suma: {np.sum(result_stable):.6f} ✓")  # Suma ~1 confirma distribución válida
 
 demo_numerical_stability()
 
@@ -1196,7 +1198,126 @@ assert np.allclose(q, 4.0, atol=1e-6)
 
 ---
 
-### Ejercicio 4.7: Log-Sum-Exp y log-softmax estable
+### Ejercicio 4.6B: Visualización (Gaussiana 2D variando covarianza) (OBLIGATORIO)
+
+#### Enunciado
+
+Construye una visualización que haga **visible** la covarianza:
+
+1) **Básico**
+
+- Crea un grid 2D y grafica contornos (`contour`) de `N(μ, Σ)`.
+
+2) **Intermedio**
+
+- Compara al menos 3 covarianzas:
+  - isotrópica (`Σ = I`)
+  - elíptica (varianzas distintas)
+  - correlacionada (términos fuera de la diagonal)
+
+3) **Avanzado**
+
+- Sobre cada plot, dibuja la **elipse de covarianza** para `k=2` y verifica que sus puntos cumplen `(x-μ)^T Σ^{-1} (x-μ) ≈ k^2`.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy: grid 2D, álgebra lineal y evaluación vectorizada
+import matplotlib.pyplot as plt  # Matplotlib: contornos 2D y trazado de elipses
+
+
+def multivariate_gaussian_pdf_grid(xx: np.ndarray, yy: np.ndarray, mu: np.ndarray, cov: np.ndarray) -> np.ndarray:
+    # xx, yy: grids 2D (H,W) típicamente creados con np.meshgrid
+    xx = np.asarray(xx, dtype=float)  # Asegura dtype float para evitar ints en exp/log
+    yy = np.asarray(yy, dtype=float)  # Mismo contrato: (H,W)
+    mu = np.asarray(mu, dtype=float)  # mu:(2,) media 2D
+    cov = np.asarray(cov, dtype=float)  # cov:(2,2) covarianza
+
+    assert mu.shape == (2,)  # Sanidad: trabajamos en 2D
+    assert cov.shape == (2, 2)  # Sanidad: covarianza 2D
+    assert np.allclose(cov, cov.T)  # Debe ser simétrica
+
+    eigvals = np.linalg.eigvalsh(cov)  # Eigenvalues reales para matriz simétrica (más estable)
+    assert np.all(eigvals > 0.0)  # Covarianza debe ser definida positiva (invertible)
+
+    inv = np.linalg.inv(cov)  # Σ^{-1} para la forma cuadrática
+    det = np.linalg.det(cov)  # |Σ| para el coeficiente de normalización
+
+    pos = np.dstack([xx, yy])  # pos:(H,W,2) apila coordenadas (x,y) en el último eje
+    diff = pos - mu.reshape(1, 1, 2)  # diff:(H,W,2) resta μ por broadcasting
+
+    quad = np.einsum('...i,ij,...j->...', diff, inv, diff)  # (x-μ)^T Σ^{-1} (x-μ) para cada punto del grid
+    expo = -0.5 * quad  # Exponente de la Gaussiana
+
+    norm = 1.0 / (2.0 * np.pi * np.sqrt(det))  # Normalización en 2D: 1 / (2π sqrt(|Σ|))
+    pdf = norm * np.exp(expo)  # pdf:(H,W) densidad evaluada en el grid
+
+    return pdf  # Devuelve matriz 2D lista para contour/contourf
+
+
+def covariance_ellipse_points(mu: np.ndarray, cov: np.ndarray, k: float = 2.0, n: int = 200) -> np.ndarray:
+    # Esta función genera puntos sobre la elipse: (x-μ)^T Σ^{-1} (x-μ) = k^2
+    mu = np.asarray(mu, dtype=float)  # mu:(2,) asegura float
+    cov = np.asarray(cov, dtype=float)  # cov:(2,2) asegura float
+
+    assert mu.shape == (2,)  # Solo soportamos 2D para visualización
+    assert cov.shape == (2, 2)  # Covarianza 2D
+    assert np.allclose(cov, cov.T)  # Simetría
+
+    eigvals, eigvecs = np.linalg.eigh(cov)  # Descomposición simétrica: cov = Q Λ Q^T
+    assert np.all(eigvals > 0.0)  # PD: eigenvalues positivos
+
+    t = np.linspace(0.0, 2.0 * np.pi, n, endpoint=False)  # Parámetro angular para un círculo unitario
+    circle = np.stack([np.cos(t), np.sin(t)], axis=0)  # circle:(2,n) círculo unitario
+
+    transform = eigvecs @ np.diag(np.sqrt(eigvals))  # Transformación que mapea círculo -> elipse base (k=1)
+    pts = (mu.reshape(2, 1) + (k * transform @ circle)).T  # pts:(n,2) traslada por μ y escala por k
+
+    return pts  # Puntos listos para plt.plot(pts[:,0], pts[:,1])
+
+
+mu = np.array([0.0, 0.0], dtype=float)  # μ:(2,) centramos en el origen para comparar solo Σ
+
+covs = [
+    np.eye(2, dtype=float),  # Σ1: isotrópica (círculo)
+    np.array([[3.0, 0.0], [0.0, 1.0]], dtype=float),  # Σ2: elíptica (varianza distinta por eje)
+    np.array([[2.0, 1.2], [1.2, 1.0]], dtype=float),  # Σ3: correlacionada (término fuera de diagonal)
+]  # Lista de covarianzas a comparar
+
+labels = [
+    "Σ = I (isotrópica)",  # Texto para subplot 1
+    "Σ = diag(3,1) (elíptica)",  # Texto para subplot 2
+    "Σ con correlación (elipse rotada)",  # Texto para subplot 3
+]  # Etiquetas
+
+grid = np.linspace(-4.0, 4.0, 250)  # Rejilla 1D para construir el grid 2D
+xx, yy = np.meshgrid(grid, grid)  # xx,yy:(H,W) coordenadas del plano
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4), constrained_layout=True)  # 1 fila, 3 columnas
+
+for ax, cov, title in zip(axes, covs, labels):  # Iteramos por cada Σ y su eje
+    Z = multivariate_gaussian_pdf_grid(xx, yy, mu, cov)  # Z:(H,W) densidad en el plano
+
+    ax.contour(xx, yy, Z, levels=10)  # Contornos: líneas de igual densidad
+
+    pts = covariance_ellipse_points(mu, cov, k=2.0, n=240)  # pts:(n,2) elipse k=2
+    ax.plot(pts[:, 0], pts[:, 1])  # Dibuja la elipse encima de los contornos
+
+    inv = np.linalg.inv(cov)  # Σ^{-1} para verificar la ecuación cuadrática
+    q = np.einsum('...i,ij,...j->...', pts - mu, inv, pts - mu)  # q:(n,) valor de (x-μ)^T Σ^{-1} (x-μ)
+    assert np.allclose(q, 4.0, atol=1e-6)  # Debe ser ≈ k^2 = 4 si la elipse es correcta
+
+    ax.set_title(title)  # Título por subplot
+    ax.set_aspect('equal', 'box')  # Aspect ratio 1:1 para que la elipse no se distorsione
+    ax.set_xlabel('x1')  # Eje x
+    ax.set_ylabel('x2')  # Eje y
+
+plt.savefig('gaussian_covariance_contours.png', dpi=160)  # Guarda la figura (útil para reportes)
+```
+
+---
+
+### Ejercicio 4.7: Log-Sum-Exp y log-softmax estable (OBLIGATORIO)
 
 #### Enunciado
 
@@ -1215,25 +1336,60 @@ assert np.allclose(q, 4.0, atol=1e-6)
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # NumPy: arrays, exp/log y validación numérica
 
 def logsumexp(z: np.ndarray) -> float:
-    z = np.asarray(z, dtype=float)
-    m = np.max(z)
-    return float(m + np.log(np.sum(np.exp(z - m))))
+    z = np.asarray(z, dtype=float)  # Asegura float para que exp/log sean numéricamente consistentes
+    m = np.max(z)  # m = max(z) sirve como “ancla” para evitar overflow en exp
+    return float(m + np.log(np.sum(np.exp(z - m))))  # Log-Sum-Exp: m + log(sum(exp(z-m)))
 
 
 def log_softmax(z: np.ndarray) -> np.ndarray:
-    z = np.asarray(z, dtype=float)
-    return z - logsumexp(z)
+    z = np.asarray(z, dtype=float)  # Asegura float y copia segura
+    return z - logsumexp(z)  # log_softmax(z) = z - log(sum(exp(z)))
 
 
-z = np.array([1000.0, 0.0, -1000.0])
-lsm = log_softmax(z)
-probs = np.exp(lsm)
-assert np.isfinite(lsm).all()
-assert np.isfinite(probs).all()
-assert np.isclose(np.sum(probs), 1.0)
+z = np.array([1000.0, 0.0, -1000.0])  # Logits extremos para estresar estabilidad numérica
+lsm = log_softmax(z)  # lsm:(3,) log-probabilidades estables
+probs = np.exp(lsm)  # Convertimos a probabilidades (deben ser finitas)
+assert np.isfinite(lsm).all()  # No debe haber NaN/inf en log-probabilidades
+assert np.isfinite(probs).all()  # No debe haber NaN/inf en probabilidades
+assert np.isclose(np.sum(probs), 1.0)  # Las probabilidades deben sumar 1
+```
+
+#### Solución (NaN trap: naive vs estable + verificación) (OBLIGATORIO)
+
+```python
+import numpy as np  # NumPy: exp/log y validación numérica
+import warnings  # warnings: suprimir warnings esperados en el caso naïve (overflow)
+
+
+def softmax_naive(z: np.ndarray) -> np.ndarray:  # Implementación ingenua (propensa a overflow/underflow)
+    z = np.asarray(z, dtype=float)  # Asegura float para que exp opere en floats
+    exp_z = np.exp(z)  # ¡Peligro! exp(1000) -> inf (overflow)
+    return exp_z / np.sum(exp_z)  # Normaliza (pero si hay inf/0 puede producir NaN)
+
+
+def softmax_stable(z: np.ndarray) -> np.ndarray:  # Softmax estable: aplica el Log-Sum-Exp trick
+    z = np.asarray(z, dtype=float)  # Convierte a float (contrato)
+    z_shift = z - np.max(z)  # Restar max(z) no cambia softmax pero evita overflow
+    exp_z = np.exp(z_shift)  # Ahora exp() recibe valores <= 0 (seguro)
+    return exp_z / np.sum(exp_z)  # Normaliza para que sum(p)=1
+
+
+z_big = np.array([1000.0, 1001.0, 1002.0])  # Logits peligrosos (magnitudes enormes)
+
+with warnings.catch_warnings():  # Contexto para que el notebook/terminal no se llene de warnings
+    warnings.simplefilter("ignore")  # Suprimimos RuntimeWarning por overflow (esperado aquí)
+    p_naive = softmax_naive(z_big)  # Resultado ingenuo (típicamente NaN)
+
+naive_ok = np.isfinite(p_naive).all() and np.isclose(np.sum(p_naive), 1.0)  # Criterio de “distribución válida”
+assert not naive_ok  # Debe fallar: aquí demostramos el NaN/inf trap
+
+p_stable = softmax_stable(z_big)  # Softmax estable (debe funcionar)
+assert np.isfinite(p_stable).all()  # No debe haber NaN/inf
+assert np.isclose(np.sum(p_stable), 1.0)  # Debe sumar 1
+assert np.argmax(p_stable) == np.argmax(z_big)  # Debe preservar el orden de logits
 ```
 
 ---

@@ -26,6 +26,88 @@ By the end of this module you can:
 - **Explain** eigenvalues/eigenvectors as “principal directions” and connect them to PCA.
 - **Explain** SVD and why it is the preferred, numerically stable method for PCA.
 
+### Capsule (required): Manual Computational Graph (bridge to M03/M07)
+
+Before you code backprop, you must be able to do this on paper:
+
+1. **Draw the graph** (nodes = operations; edges = dependencies).
+2. **Annotate shapes** on every edge (this prevents most ML bugs).
+3. **Run forward** and store intermediates.
+4. **Write local gradients** (derivative of each operation).
+5. **Propagate backward** by multiplying gradients (Chain Rule).
+
+Minimal graph (with shapes):
+
+```
+X:(N,D) ──► z = X@w + b : (N,) ──► a = sigmoid(z) : (N,) ──► L(a,y):(scalar)
+              w:(D,)  b:()                 y:(N,)
+```
+
+Executable example with strict **shape discipline** and line‑by‑line comments:
+
+```python
+import numpy as np  # NumPy: arrays + vectorized ops
+
+
+def sigmoid(z: np.ndarray) -> np.ndarray:  # Sigmoid maps real numbers to (0,1) element-wise
+    return 1.0 / (1.0 + np.exp(-z))  # Simple implementation (Log-Sum-Exp stability appears in Module 04)
+
+
+# ======== (1) DATA + SHAPES ========
+N = 4  # N: batch size (number of samples)
+D = 3  # D: number of features per sample
+
+X = np.random.randn(N, D).astype(float)  # X:(N,D) feature matrix
+assert X.shape == (N, D)  # Shape assert: X contract
+
+w = np.random.randn(D).astype(float)  # w:(D,) weight vector
+assert w.shape == (D,)  # Shape assert: w contract
+
+b = 0.1  # b:() scalar bias (broadcasted)
+
+y_true = (np.random.rand(N) > 0.5).astype(float)  # y_true:(N,) binary labels in {0,1}
+assert y_true.shape == (N,)  # Shape assert: y_true contract
+
+
+# ======== (2) FORWARD ========
+z = X @ w + b  # z:(N,) because (N,D)@(D,)=(N,) and +b broadcasts
+assert z.shape == (N,)  # Shape assert: z contract
+
+a = sigmoid(z)  # a:(N,) sigmoid activations per sample
+assert a.shape == (N,)  # Shape assert: a contract
+
+loss = float(np.mean((a - y_true) ** 2))  # L: scalar (mean MSE over the batch)
+
+
+# ======== (3) BACKWARD (CHAIN RULE) ========
+# Goal: dL/dw and dL/db. We go through dL/da, da/dz, dz/dw, dz/db.
+
+dL_da = (2.0 / N) * (a - y_true)  # dL/da:(N,) derivative of mean MSE w.r.t a
+assert dL_da.shape == (N,)  # Shape assert: dL/da
+
+da_dz = a * (1.0 - a)  # da/dz:(N,) sigmoid derivative per element (σ(z)(1-σ(z)))
+assert da_dz.shape == (N,)  # Shape assert: da/dz
+
+dL_dz = dL_da * da_dz  # dL/dz:(N,) chain rule: dL/dz = dL/da * da/dz
+assert dL_dz.shape == (N,)  # Shape assert: dL/dz
+
+# z = X@w + b => per sample i: z_i = sum_j X[i,j]*w[j] + b
+# Therefore:
+# - dz/dw aggregates across the batch
+# - dz/db is 1 per sample (so we sum)
+
+dL_dw = X.T @ dL_dz  # dL/dw:(D,) because (D,N)@(N,)=(D,) (batch accumulation)
+assert dL_dw.shape == (D,)  # Shape assert: dL/dw
+
+dL_db = float(np.sum(dL_dz))  # dL/db: scalar; sum because b affects every z_i with derivative 1
+
+
+# ======== (4) DEBUGGING INVARIANTS ========
+assert np.isfinite(loss)  # Loss must be finite (NaN/inf indicates a numerical bug)
+assert np.all(np.isfinite(dL_dw))  # Gradients must be finite
+assert np.isfinite(dL_db)  # Bias gradient must be finite
+```
+
 ### Prerequisites
 
 - `Module 01` (NumPy, vectorization, shapes).

@@ -26,6 +26,88 @@ Al terminar este módulo podrás:
 - **Explicar** eigenvalues/eigenvectors como “direcciones principales” y conectarlo con PCA.
 - **Explicar** SVD y por qué es el método preferido para PCA numéricamente estable.
 
+### Cápsula (obligatoria): Grafo Computacional Manual (puente a M03/M07)
+
+Antes de programar backprop, tienes que poder hacer esto en papel:
+
+1. **Dibuja el grafo** (nodos = operaciones; flechas = dependencias).
+2. **Anota shapes** en cada arista (esto evita el 80% de bugs en ML).
+3. **Haz forward** y guarda valores intermedios.
+4. **Escribe gradientes locales** (derivadas de cada operación).
+5. **Propaga hacia atrás** multiplicando gradientes (Chain Rule).
+
+Diagrama mínimo (con shapes):
+
+```
+X:(N,D) ──► z = X@w + b : (N,) ──► a = sigmoid(z) : (N,) ──► L(a,y):(scalar)
+              w:(D,)  b:()                 y:(N,)
+```
+
+Ejemplo “a mano” (ejecutable) con **disciplina de shapes** y comentarios línea‑por‑línea:
+
+```python
+import numpy as np  # NumPy: arrays + operaciones vectorizadas
+
+
+def sigmoid(z: np.ndarray) -> np.ndarray:  # Sigmoide: mapea valores reales a (0,1) elemento a elemento
+    return 1.0 / (1.0 + np.exp(-z))  # Implementación estable para valores moderados (ver Log-Sum-Exp en M04)
+
+
+# ======== (1) DATOS + SHAPES ========
+N = 4  # N: número de muestras del batch (mini-batch)
+D = 3  # D: número de features por muestra
+
+X = np.random.randn(N, D).astype(float)  # X:(N,D) matriz de features
+assert X.shape == (N, D)  # Assert shape: contrato de X
+
+w = np.random.randn(D).astype(float)  # w:(D,) vector de pesos
+assert w.shape == (D,)  # Assert shape: contrato de w
+
+b = 0.1  # b:() bias escalar (se suma por broadcasting)
+
+y_true = (np.random.rand(N) > 0.5).astype(float)  # y_true:(N,) etiquetas binarias en {0,1}
+assert y_true.shape == (N,)  # Assert shape: contrato de y_true
+
+
+# ======== (2) FORWARD ========
+z = X @ w + b  # z:(N,) porque (N,D)@(D,)=(N,) y luego +b se broadcast
+assert z.shape == (N,)  # Assert shape: contrato de z
+
+a = sigmoid(z)  # a:(N,) activación sigmoide por muestra
+assert a.shape == (N,)  # Assert shape: contrato de a
+
+loss = float(np.mean((a - y_true) ** 2))  # L: escalar (MSE promedio sobre el batch)
+
+
+# ======== (3) BACKWARD (CHAIN RULE) ========
+# Objetivo: dL/dw y dL/db. Para llegar ahí pasamos por dL/da, da/dz, dz/dw, dz/db.
+
+dL_da = (2.0 / N) * (a - y_true)  # dL/da:(N,) derivada del MSE promedio respecto a a
+assert dL_da.shape == (N,)  # Assert shape: dL/da
+
+da_dz = a * (1.0 - a)  # da/dz:(N,) derivada de la sigmoide por elemento (σ(z)(1-σ(z)))
+assert da_dz.shape == (N,)  # Assert shape: da/dz
+
+dL_dz = dL_da * da_dz  # dL/dz:(N,) regla de la cadena: dL/dz = dL/da * da/dz
+assert dL_dz.shape == (N,)  # Assert shape: dL/dz
+
+# z = X@w + b => para cada muestra i: z_i = sum_j X[i,j]*w[j] + b
+# Por eso:
+# - dz/dw se acumula sumando sobre el batch
+# - dz/db es 1 para cada muestra (y luego sumamos)
+
+dL_dw = X.T @ dL_dz  # dL/dw:(D,) porque (D,N)@(N,)=(D,) (acumula contribuciones del batch)
+assert dL_dw.shape == (D,)  # Assert shape: dL/dw
+
+dL_db = float(np.sum(dL_dz))  # dL/db: escalar; suma porque b afecta a todos los z_i con derivada 1
+
+
+# ======== (4) DEBUGGING INVARIANTS ========
+assert np.isfinite(loss)  # La pérdida debe ser finita (si hay NaN/inf, hay bug numérico)
+assert np.all(np.isfinite(dL_dw))  # Los gradientes deben ser finitos
+assert np.isfinite(dL_db)  # El gradiente del bias debe ser finito
+```
+
 ### Prerrequisitos
 
 - `Módulo 01` (NumPy, vectorización, shapes).

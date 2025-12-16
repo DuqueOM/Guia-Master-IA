@@ -621,6 +621,242 @@ except ValueError:  # NumPy raises ValueError for matmul dimension mismatches
     pass  # Success: we expected this error
 ```
 
+### 9.2 OOP for Scientists (ML-first): `__call__`, `__repr__`, `dataclasses`, and debugging
+
+The goal here is NOT “OOP for OOP’s sake”. This is the exact mindset you will need for PyTorch/Keras:
+
+- **Callable objects:** an object that behaves like a function (`layer(x)`) via `__call__`.
+- **Fast debugging:** `__repr__` shows critical state (shapes, dtypes) without digging.
+- **Reproducible configs:** `dataclasses` forces explicit hyperparameters.
+- **Shape discipline:** if a shape is wrong, fail early with `assert`.
+
+#### 9.2.1 `dataclass` configs (explicit hyperparameters)
+
+```python
+from dataclasses import dataclass  # dataclass: structured config objects with minimal boilerplate
+
+
+@dataclass(frozen=True)  # frozen=True makes it immutable (prevents accidental hyperparameter mutation)
+class LinearConfig:  # Minimal config for a linear layer
+    in_features: int  # Input dimension D
+    out_features: int  # Output dimension K
+    seed: int = 0  # RNG seed for reproducible initialization
+```
+
+#### 9.2.2 `__call__`: layers as functions (PyTorch style)
+
+```python
+import numpy as np  # NumPy: arrays + linear algebra
+
+
+class Linear:  # A simple “layer”: y = xW + b
+    def __init__(self, cfg: LinearConfig):  # Constructor receives explicit config
+        self.cfg = cfg  # Keep config as state for reproducibility + debugging
+
+        rng = np.random.default_rng(cfg.seed)  # Modern NumPy RNG (seed-controlled)
+
+        # Weights W have shape (D, K): D inputs -> K outputs
+        self.W = rng.standard_normal((cfg.in_features, cfg.out_features))  # Standard normal init
+
+        # Bias b has shape (K,) and starts at zero
+        self.b = np.zeros((cfg.out_features,), dtype=float)  # 1D bias vector
+
+    def __call__(self, x: np.ndarray) -> np.ndarray:  # Enables: y = layer(x)
+        # Assert 1: ML inputs are batched, so x should be 2D: (N, D)
+        assert x.ndim == 2, f"x must be 2D (N,D). Got ndim={x.ndim}, shape={x.shape}"  # Fail early
+
+        # Assert 2: feature dimension must match the layer's expected input dim
+        assert x.shape[1] == self.cfg.in_features, (
+            f"D mismatch: x.shape[1]={x.shape[1]} but cfg.in_features={self.cfg.in_features}"
+        )  # Prevent silent matmul bugs
+
+        # Forward: (N, D) @ (D, K) = (N, K)
+        y = x @ self.W  # Matrix multiply combines features with weights
+
+        # Controlled broadcasting: (N, K) + (K,) -> (N, K) (bias added to each row)
+        y = y + self.b  # Bias per output unit
+
+        # Assert 3: output must have shape (N, K)
+        assert y.shape == (x.shape[0], self.cfg.out_features), (
+            f"Bad output shape: y.shape={y.shape} expected {(x.shape[0], self.cfg.out_features)}"
+        )  # Enforce layer contract
+
+        return y  # Linear activations (logits in classification)
+
+    def __repr__(self) -> str:  # Debug representation: what are you and what shapes do you hold?
+        return (
+            "Linear("  # Class name prefix
+            f"in={self.cfg.in_features}, out={self.cfg.out_features}, "  # Key hyperparameters
+            f"W.shape={self.W.shape}, b.shape={self.b.shape}, "  # Critical internal state
+            f"W.dtype={self.W.dtype}, b.dtype={self.b.dtype}"  # Dtypes to catch accidental casts
+            ")"
+        )  # One-line diagnostic string
+
+
+# Minimal demo (shape discipline)
+cfg = LinearConfig(in_features=4, out_features=3, seed=42)  # Define a 4->3 layer
+layer = Linear(cfg)  # Build the layer object
+print(layer)  # __repr__ prints contract + internal state
+
+X = np.zeros((5, 4), dtype=float)  # Batch: N=5 samples, D=4 features
+assert X.shape == (5, 4)  # Rule of thumb: assert shapes when you build tensors
+Y = layer(X)  # Call like a function (thanks to __call__)
+assert Y.shape == (5, 3)  # Verify output contract (N,K)
+```
+
+#### 9.2.3 Debugging with VS Code (live NumPy inspection)
+
+Recommended workflow:
+
+- Set a **breakpoint** inside `__call__` right before/after `y = x @ self.W`.
+- Inspect: `x.shape`, `x.dtype`, `W.shape`, `y.shape`.
+- Validate broadcasting: `b.shape == (K,)`.
+- Treat failed asserts as **real bugs** (don't disable them).
+
+If you don't want the UI yet, you can force a pause with `breakpoint()`:
+
+```python
+import numpy as np  # NumPy for small debug arrays
+
+
+X = np.random.randn(2, 4).astype(float)  # Small batch for manual inspection
+breakpoint()  # Pause here in debug mode and inspect X, dtype, and shape
+```
+
+#### 9.2.4 “Real” OOP like PyTorch: `Module` + `forward()` (why `__call__` exists)
+
+In PyTorch, you implement `forward()`, but the framework calls `__call__()` and gives you:
+
+- validations
+- hooks
+- tracing
+- consistent behavior
+
+Below is a tiny skeleton to internalize that idea.
+
+```python
+from dataclasses import dataclass  # dataclass: explicit configs with minimal boilerplate
+from typing import List  # List: type annotation for layer composition
+
+import numpy as np  # NumPy: tensors + vectorized ops
+
+
+@dataclass(frozen=True)  # frozen=True: config is immutable (more reliable debugging)
+class LinearConfig:  # Config for a linear layer
+    in_features: int  # D: input feature dimension
+    out_features: int  # K: output dimension
+    seed: int = 0  # RNG seed for reproducible initialization
+
+
+class Module:  # Base “module” (similar spirit to nn.Module)
+    def __call__(self, x: np.ndarray) -> np.ndarray:  # Allows: y = m(x)
+        # Precondition 1: in this mini-framework, everything is a NumPy ndarray
+        assert isinstance(x, np.ndarray), f"x must be np.ndarray, got {type(x)}"  # Fail early
+
+        # Precondition 2: by convention we work with batches, so ndim should be >= 1
+        assert x.ndim >= 1, f"x.ndim must be >=1, got ndim={x.ndim}"  # Basic sanity
+
+        # Delegate the actual computation to forward() (your logic)
+        y = self.forward(x)  # forward defines the module's computation
+
+        # Postcondition: forward must return an ndarray
+        assert isinstance(y, np.ndarray), f"forward() must return np.ndarray, got {type(y)}"  # Contract
+
+        return y  # Return module output
+
+    def forward(self, x: np.ndarray) -> np.ndarray:  # Must be implemented by subclasses
+        raise NotImplementedError("Implement forward() in the subclass")  # Each layer defines its forward
+
+    def __repr__(self) -> str:  # Minimal debug representation
+        return f"{self.__class__.__name__}()"  # Consistent short repr
+
+
+class Linear(Module):  # Linear layer: y = xW + b
+    def __init__(self, cfg: LinearConfig):  # Constructor takes explicit config
+        self.cfg = cfg  # Store config as state (for logs and debugging)
+
+        rng = np.random.default_rng(cfg.seed)  # Modern RNG controlled by seed
+
+        # W: (D, K) maps D input features into K outputs
+        self.W = rng.standard_normal((cfg.in_features, cfg.out_features)).astype(float)  # Initial weights
+
+        # b: (K,) so it broadcasts over (N, K)
+        self.b = np.zeros((cfg.out_features,), dtype=float)  # Bias initialized to zero
+
+    def forward(self, x: np.ndarray) -> np.ndarray:  # Actual forward computation
+        # Shape assert: x must be (N, D)
+        assert x.ndim == 2, f"Linear expects x 2D (N,D). Got shape={x.shape}"  # Batch discipline
+
+        # D assert: feature dimension must match
+        assert x.shape[1] == self.cfg.in_features, (
+            f"D mismatch: x.shape[1]={x.shape[1]} but in_features={self.cfg.in_features}"
+        )  # Prevent invalid matmul
+
+        # Matmul: (N, D) @ (D, K) = (N, K)
+        y = x @ self.W  # Linear projection
+
+        # Bias: (N, K) + (K,) -> (N, K) via broadcasting (b repeats N times)
+        y = y + self.b  # Per-output shift
+
+        # Output assert: (N, K)
+        assert y.shape == (x.shape[0], self.cfg.out_features), (
+            f"Bad output shape: y.shape={y.shape}, expected={(x.shape[0], self.cfg.out_features)}"
+        )  # Explicit contract
+
+        return y  # Return linear activations
+
+    def __repr__(self) -> str:  # Rich repr: show shapes and dtypes
+        return (
+            "Linear("  # Class name
+            f"in={self.cfg.in_features}, out={self.cfg.out_features}, "  # Hyperparameters
+            f"W.shape={self.W.shape}, b.shape={self.b.shape}, "  # State
+            f"W.dtype={self.W.dtype}, b.dtype={self.b.dtype}"  # Dtypes
+            ")"
+        )  # Single diagnostic string
+
+
+class ReLU(Module):  # ReLU activation: max(0, x)
+    def forward(self, x: np.ndarray) -> np.ndarray:  # ReLU preserves shape, changes values
+        # Assert: dtype must be numeric
+        assert np.issubdtype(x.dtype, np.number), f"ReLU expects numeric dtype, got {x.dtype}"  # Sanity
+
+        # np.maximum is element-wise and vectorized
+        return np.maximum(0.0, x).astype(float)  # Clip negatives to 0
+
+
+class Sequential(Module):  # Composition: apply layers one after another
+    def __init__(self, layers: List[Module]):  # Constructor takes a list of modules
+        self.layers = layers  # Store layers as state
+
+        # Assert: every element must be a Module so it is callable
+        assert all(isinstance(layer, Module) for layer in layers), "All layers must be Module"  # Contract
+
+    def forward(self, x: np.ndarray) -> np.ndarray:  # Pipeline forward
+        out = x  # Accumulator for activations
+
+        for layer in self.layers:  # Iterating over a few layers is not the bottleneck
+            out = layer(out)  # Each layer enforces its own shape constraints
+
+        return out  # Return final activation
+
+    def __repr__(self) -> str:  # Debug: list layers in order
+        inner = ", ".join(repr(layer) for layer in self.layers)  # Repr of each sub-layer
+        return f"Sequential({inner})"  # Diagnostic string
+
+
+# Demo: 2-layer network (Linear + ReLU)
+cfg = LinearConfig(in_features=4, out_features=3, seed=42)  # Hyperparameters
+net = Sequential([Linear(cfg), ReLU()])  # Compose modules (like nn.Sequential)
+
+X = np.random.randn(5, 4).astype(float)  # Batch (N=5, D=4)
+assert X.shape == (5, 4)  # Rule: assert shapes when you build tensors
+
+Y = net(X)  # Full forward: Linear then ReLU
+assert Y.shape == (5, 3)  # Output must have K=3
+
+print(net)  # __repr__ prints architecture + shapes without opening the object
+```
+
 ### 10. Random data generation
 
 ```python

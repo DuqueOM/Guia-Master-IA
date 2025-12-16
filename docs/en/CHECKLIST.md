@@ -67,8 +67,8 @@ Deep Learning:
 
 ## Phase 3 (Weeks 21–24) – MNIST Analyst
 
-- Benchmark report (MODEL_COMPARISON)
-- Optional: Fashion-MNIST benchmark
+- Benchmark report: `docs/en/MODEL_COMPARISON.md`
+- Main benchmark: Fashion-MNIST
 - Dirty data check:
   - generate corrupted dataset: `scripts/corrupt_mnist.py`
   - document cleaning decisions

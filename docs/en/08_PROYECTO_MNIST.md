@@ -2,7 +2,7 @@
 
 > **Goal:** build an end-to-end pipeline that proves competence across the 3 Line-1 courses.
 > **Phase:** 3 - Capstone | **Weeks 21–24** (4 weeks)
-> **Dataset:** MNIST (digits, 28×28) / **Fashion-MNIST** (optional, same format)
+> **Dataset:** **Fashion-MNIST** (primary, 28×28, 10 classes) / MNIST (fallback, same format)
 
 ---
 
@@ -48,7 +48,7 @@ Rubric:
 
 ## Practical notes (Week 24)
 
-- **Fashion-MNIST (optional):** run the benchmark on Fashion-MNIST for a more realistic gap between LR vs MLP/CNN.
+- **Fashion-MNIST (main run):** benchmark on Fashion-MNIST for a more realistic gap between LR vs MLP/CNN.
 - **Dirty Data Check:** generate a corrupted dataset (noise/NaNs/inversion) with `scripts/corrupt_mnist.py` and document cleaning.
 - **Minimal deployment:** train + save a CNN with `scripts/train_cnn_pytorch.py`, then predict a single 28×28 image with `scripts/predict.py`.
 

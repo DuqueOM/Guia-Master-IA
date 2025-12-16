@@ -138,8 +138,8 @@ Si no tienes un entorno aislado, **no avances** a Semana 1.
 | Día | Mañana (Teoría) | Mediodía (Código) | Tarde (Práctica) |
 |-----|-----------------|-------------------|------------------|
 | L | Broadcasting (concepto) | Operaciones elemento a elemento | Ejercicio 1.6 |
-| M | np.dot, np.matmul, @ | Producto matricial | Ejercicio 1.7 |
-| X | Reshape, flatten, transpose | Manipulación de formas | Ejercicio 1.8 |
+| M | np.dot, np.matmul, @ + reshape/flatten/transpose | Producto matricial + manipulación de formas | Ejercicio 1.7 + 1.8 |
+| X | OOP para ML | Taller: `class Tensor` (__init__, __add__, __matmul__) | Entregable v5.1: Tensor v1 |
 | J | Agregaciones y ejes | sum, mean, std con axis | Ejercicio 1.9 |
 | V | Random en NumPy | Generación de datos sintéticos | Ejercicio 1.10 |
 | S | **Checkpoint** | Pipeline completo CSV → NumPy | Entregable |

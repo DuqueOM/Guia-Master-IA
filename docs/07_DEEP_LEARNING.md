@@ -612,6 +612,69 @@ Chequeo mental:
 - Los gradientes “se apagan” donde `ReLU'(z)=0`.
 - `dW` siempre tiene la misma shape que `W`.
 
+#### Protocolo (Semana 18): grafo computacional + shapes explícitos (antes de programar `backward()`)
+
+Antes de escribir cualquier `backward()`, fija dos cosas:
+
+- **Tu grafo computacional** (qué nodos existen y quién depende de quién).
+- **Tus shapes** (para que cada gradiente tenga una shape única y verificable).
+
+##### 1) Elige una convención y no la mezcles (recomendado: batch-first 2D)
+
+- `X`: `(n, d_in)`
+- `W`: `(d_in, d_out)`
+- `b`: `(d_out,)` (se “broadcastea” a `(n, d_out)`)
+- `Z = XW + b`: `(n, d_out)`
+- Activaciones `A`: `(n, d_out)`
+
+Evita mezclar `(d,)` y `(d,1)` a menos que decidas usar columna-vectores en TODO.
+
+##### 2) Red de 2 capas: shapes del forward que debes poder escribir de memoria
+
+Red (batch):
+
+- `Z1 = XW1 + b1`, `A1 = relu(Z1)`
+- `Z2 = A1W2 + b2`, `P = sigmoid(Z2)`
+
+Tabla de shapes:
+
+| Símbolo | Significado | Shape |
+|---|---|---|
+| `X` | batch de entrada | `(n, d_in)` |
+| `W1` | pesos capa 1 | `(d_in, d_h)` |
+| `b1` | bias capa 1 | `(d_h,)` |
+| `Z1`, `A1` | pre/post activación | `(n, d_h)` |
+| `W2` | pesos capa 2 | `(d_h, d_out)` |
+| `b2` | bias capa 2 | `(d_out,)` |
+| `Z2`, `P` | logits / probabilidades | `(n, d_out)` |
+| `y` | targets | `(n, d_out)` |
+
+##### 3) Invariantes de gradientes (no negociables)
+
+Si `Z = XW + b` con las shapes batch-first:
+
+- `dW` **debe** tener la misma shape que `W`.
+- `db` **debe** tener la misma shape que `b`.
+- `dX` **debe** tener la misma shape que `X`.
+
+Para la red de 2 capas:
+
+| Gradiente | Shape |
+|---|---|
+| `dZ2` | `(n, d_out)` |
+| `dW2 = A1.T @ dZ2` | `(d_h, d_out)` |
+| `db2 = sum(dZ2, axis=0)` | `(d_out,)` |
+| `dA1 = dZ2 @ W2.T` | `(n, d_h)` |
+| `dZ1 = dA1 * relu'(Z1)` | `(n, d_h)` |
+| `dW1 = X.T @ dZ1` | `(d_in, d_h)` |
+| `db1 = sum(dZ1, axis=0)` | `(d_h,)` |
+
+##### 4) Protocolo de depuración (antes de “tocar hyperparams”)
+
+- Agrega `assert` de shapes.
+- Haz **gradient checking** en 1–3 coordenadas.
+- Haz un **overfit test** en un dataset mini: si no memoriza, es bug.
+
 ##### f) Implementación práctica (laboratorio)
 
 Checklist mínimo de implementación (sin “magia”):

@@ -1129,6 +1129,10 @@ assert np.isclose(
 
 - Verifica que `Σ` es definida positiva (eigenvalores > 0) antes de invertir.
 
+4) **Bonus (elipse de covarianza)**
+
+- Para una matriz de covarianza no diagonal, genera puntos en la elipse de covarianza 2D para una escala `k` (por ejemplo, `k=2`) usando descomposición en eigenvalues/eigenvectors, y verifica que satisfacen `(x-μ)^T Σ^{-1} (x-μ) ≈ k^2`.
+
 #### Solución
 
 ```python
@@ -1159,6 +1163,35 @@ cov = np.eye(2)
 pdf0 = multivariate_gaussian_pdf(np.array([0.0, 0.0]), mu, cov)
 assert np.isclose(pdf0, 1.0 / (2.0 * np.pi), atol=1e-6)
 assert pdf0 > 0.0
+
+def covariance_ellipse_points(mu: np.ndarray, cov: np.ndarray, k: float = 2.0, n: int = 200) -> np.ndarray:
+    mu = np.asarray(mu, dtype=float)
+    cov = np.asarray(cov, dtype=float)
+    assert mu.shape == (2,)
+    assert cov.shape == (2, 2)
+    assert np.allclose(cov, cov.T)
+
+    eigvals, eigvecs = np.linalg.eigh(cov)
+    assert np.all(eigvals > 0)
+
+    t = np.linspace(0.0, 2.0 * np.pi, n, endpoint=False)
+    circle = np.stack([np.cos(t), np.sin(t)], axis=0)
+
+    transform = eigvecs @ np.diag(np.sqrt(eigvals))
+    pts = (mu.reshape(2, 1) + (k * transform @ circle)).T
+    return pts
+
+
+mu2 = np.array([0.0, 0.0])
+cov2 = np.array([
+    [2.0, 1.2],
+    [1.2, 1.0],
+], dtype=float)
+pts = covariance_ellipse_points(mu2, cov2, k=2.0, n=180)
+inv2 = np.linalg.inv(cov2)
+
+q = np.einsum('...i,ij,...j->...', pts - mu2, inv2, pts - mu2)
+assert np.allclose(q, 4.0, atol=1e-6)
 ```
 
 ---
@@ -1339,6 +1372,10 @@ assert loss_good < loss_bad
 
 - Encuentra una distribución estacionaria aproximada iterando muchas veces y verifica `π ≈ πP`.
 
+4) **Bonus (potencias de matrices)**
+
+- Verifica que iterar `π_{t+1} = π_t P` por `k` pasos coincide con `π_t P^k` usando `np.linalg.matrix_power`.
+
 #### Solución
 
 ```python
@@ -1350,11 +1387,16 @@ P = np.array([
 ], dtype=float)
 assert np.allclose(P.sum(axis=1), 1.0)
 
-pi = np.array([1.0, 0.0])
-for _ in range(50):
+k = 50
+pi0 = np.array([1.0, 0.0])
+pi = pi0.copy()
+for _ in range(k):
     pi = pi @ P
     assert np.isclose(np.sum(pi), 1.0)
     assert np.all(pi >= 0)
+
+pi_power = pi0 @ np.linalg.matrix_power(P, k)
+assert np.allclose(pi, pi_power, atol=1e-12)
 
 pi_star = pi.copy()
 assert np.allclose(pi_star, pi_star @ P, atol=1e-6)

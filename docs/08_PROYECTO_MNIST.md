@@ -2,7 +2,7 @@
 
 > **🎯 Objetivo:** Pipeline end-to-end que demuestra competencia en las 3 áreas del Pathway
 > **Fase:** 3 - Proyecto Integrador | **Semanas 21-24** (4 semanas)
-> **Dataset:** MNIST (dígitos escritos a mano, 28×28 píxeles) / **Fashion-MNIST** (alternativo, mismo formato)
+> **Dataset:** **Fashion-MNIST** (principal, 28×28, 10 clases) / MNIST (fallback, mismo formato)
 
 ---
 
@@ -1391,12 +1391,12 @@ for _, acc in items:
 ### `MODEL_COMPARISON.md`
 
 ```markdown
-# Model Comparison Report - MNIST Analyst
+# Model Comparison Report - Fashion-MNIST Analyst
 
 ## Executive Summary
 
 This project demonstrates competency in all three courses of the Machine Learning
-Pathway (Line 1) through a complete analysis of the MNIST dataset.
+Pathway (Line 1) through a complete analysis of the Fashion-MNIST dataset.
 
 ## Results
 

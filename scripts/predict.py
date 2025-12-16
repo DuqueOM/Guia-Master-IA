@@ -5,6 +5,19 @@ from pathlib import Path
 
 import numpy as np
 
+_FASHION_MNIST_LABELS = [
+    "T-shirt/top",
+    "Trouser",
+    "Pullover",
+    "Dress",
+    "Coat",
+    "Sandal",
+    "Shirt",
+    "Sneaker",
+    "Bag",
+    "Ankle boot",
+]
+
 
 def _require_torch():
     try:
@@ -102,6 +115,7 @@ def main() -> int:
         device = torch.device(args.device)
 
     payload = torch.load(str(ckpt_path), map_location="cpu")
+    dataset = str(payload.get("dataset", "mnist")).lower()
     arch = payload.get("arch", "SimpleCNN_v1")
     state_dict = payload["state_dict"]
 
@@ -123,7 +137,13 @@ def main() -> int:
         pred = int(torch.argmax(probs, dim=1).item())
         conf = float(torch.max(probs, dim=1).values.item())
 
+    if dataset == "fashion":
+        label = _FASHION_MNIST_LABELS[pred]
+    else:
+        label = str(pred)
+
     print(f"pred: {pred}")
+    print(f"label: {label}")
     print(f"confidence: {conf:.4f}")
 
     return 0

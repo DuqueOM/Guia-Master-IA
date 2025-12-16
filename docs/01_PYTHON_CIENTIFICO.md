@@ -117,8 +117,8 @@ En los cursos de CU Boulder:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  DÍA 1: Broadcasting                                            │
-│  DÍA 2: Producto matricial (@, np.dot, np.matmul)               │
-│  DÍA 3: Reshape, flatten, transpose                             │
+│  DÍA 2: Producto matricial (@, np.dot, np.matmul) + reshape/flatten │
+│  DÍA 3: OOP para ML (v5.1): class Tensor (__init__, __add__, @) │
 │  DÍA 4: Agregaciones y operaciones con ejes                     │
 │  DÍA 5: Random y generación de datos sintéticos                 │
 │  DÍA 6: Entregable: Pipeline Pandas → NumPy                     │
@@ -542,6 +542,82 @@ print(flat.shape)  # Comprueba que vuelve a tener 12 elementos en 1D: shape (12,
 # -1 para inferir dimensión automáticamente
 auto = a.reshape(4, -1)  # Usa -1 para que NumPy infiera la dimensión faltante: (4, 3)
 auto = a.reshape(-1, 6)  # Infiera la primera dimensión para que el total sea 12: (2, 6)
+```
+
+### 9.1 OOP para ML (v5.1): mini-framework `Tensor`
+
+**Objetivo práctico:** antes de llegar a redes neuronales (donde vas a tener que manejar `self`, estado y operaciones), crea una mini-abstracción que se comporte como un “tensor” simple.
+
+#### Qué debes dominar (sin teoría vacía)
+
+- **Clase vs instancia:** la clase define el “molde”; la instancia es el objeto real en memoria.
+- **`self`:** referencia a la instancia actual; ahí vive el estado.
+- **Estado:** variables guardadas en el objeto (`self.data`, `self.shape`).
+- **Operadores:** `+` llama a `__add__`, `@` llama a `__matmul__`.
+
+#### Entregable (taller)
+
+- Implementar una clase `Tensor` que:
+  - acepte lista o `np.ndarray` en `__init__`
+  - mantenga un estado interno `self.shape`
+  - implemente `__add__` y `__matmul__` usando NumPy por dentro
+
+#### Implementación (referencia)
+
+```python
+import numpy as np  # NumPy para convertir entrada a ndarray y reutilizar operaciones vectorizadas
+from typing import Union  # Union para aceptar múltiples tipos de entrada en el constructor
+
+ArrayLike = Union[list, np.ndarray]  # Tipo de entrada soportado: lista de Python o ndarray de NumPy
+
+class Tensor:  # Contenedor mínimo para entender OOP aplicado a ML (estado + operadores)
+    def __init__(self, data: ArrayLike):  # Constructor: recibe datos y construye el estado interno
+        self.data = np.array(data, dtype=float)  # Normaliza a ndarray float para operar consistentemente
+        self.shape = self.data.shape  # Guarda shape como parte del estado para inspección y debugging
+
+    def __add__(self, other: "Tensor") -> "Tensor":  # Define el operador + (suma elemento a elemento)
+        if not isinstance(other, Tensor):  # Si no es Tensor, delega a Python (permite otros tipos)
+            return NotImplemented  # Señal estándar: operación no implementada para ese tipo
+        return Tensor(self.data + other.data)  # Suma NumPy y devuelve un nuevo Tensor (no muta self)
+
+    def __matmul__(self, other: "Tensor") -> "Tensor":  # Define el operador @ (producto matricial)
+        if not isinstance(other, Tensor):  # Valida tipo para evitar errores silenciosos
+            return NotImplemented  # Permite que Python intente la operación reflejada si existe
+        return Tensor(self.data @ other.data)  # Usa @ de NumPy (matmul) y envuelve el resultado
+
+    def __repr__(self) -> str:  # Representación útil para ver shape y datos rápido al imprimir
+        return f"Tensor(shape={self.shape}, data={self.data})"  # String con información mínima de debugging
+
+#### Ejercicios (con `assert`) — tu mínimo aceptable
+
+```python
+import numpy as np  # NumPy para comparar arrays con allclose y construir datos de prueba
+
+# 1) Estado: shape debe reflejar el ndarray interno
+t = Tensor([1, 2, 3])  # Crea Tensor desde lista (se convierte internamente a ndarray)
+assert t.shape == (3,)  # Verifica que el shape se guardó correctamente
+
+# 2) Suma: + llama a __add__
+a = Tensor([1, 2, 3])  # Tensor A
+b = Tensor([10, 20, 30])  # Tensor B
+c = a + b  # Ejecuta __add__ y debe devolver un Tensor nuevo
+assert isinstance(c, Tensor)  # Debe devolver Tensor
+assert np.allclose(c.data, np.array([11.0, 22.0, 33.0]))  # Verifica el resultado numérico
+assert c.shape == (3,)  # El shape debe permanecer (3,)
+
+# 3) Producto matricial: @ llama a __matmul__
+A = Tensor([[1, 2], [3, 4]])  # Matriz 2x2
+x = Tensor([1, 1])  # Vector de entrada con shape (2,)
+y = A @ x  # Producto matriz-vector -> shape (2,)
+assert np.allclose(y.data, np.array([3.0, 7.0]))  # [1,2]·[1,1]=3 y [3,4]·[1,1]=7
+assert y.shape == (2,)  # Verifica el shape de salida
+
+# 4) Error de shape: debe fallar si dimensiones no son compatibles
+try:  # Captura excepción esperada de NumPy cuando shapes no son multiplicables
+    _ = Tensor([[1, 2, 3], [4, 5, 6]]) @ Tensor([1, 2])  # (2,3) @ (2,) no es válido
+    assert False  # Si no falló, el test debe fallar
+except ValueError:  # NumPy lanza ValueError ante incompatibilidad de shapes
+    pass  # Éxito: esperábamos el error
 ```
 
 ### 10. Generación de Datos Aleatorios

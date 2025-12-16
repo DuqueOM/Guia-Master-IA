@@ -150,7 +150,7 @@ Uso recomendado:
 ## 🎯 Fase 3: Proyecto MNIST Analyst (Semanas 21-24)
 
 ### Semana 21: EDA + No Supervisado
-- [ ] MNIST cargado y normalizado
+- [ ] Fashion-MNIST cargado y normalizado
 - [ ] PCA reduce a 2D con visualización
 - [ ] Varianza explicada analizada
 - [ ] K-Means agrupa dígitos sin etiquetas
@@ -174,10 +174,10 @@ Uso recomendado:
 
 ### Semana 24: Benchmark + Informe
 - [ ] Comparación MLP vs Logistic Regression
-- [ ] `MODEL_COMPARISON.md` explicando diferencias
+- [ ] `docs/MODEL_COMPARISON.md` explicando diferencias
 - [ ] `README.md` profesional en inglés
 - [ ] Demo notebook completo
- - [ ] Benchmark alternativo: probé **Fashion-MNIST** (o justifiqué por qué no)
+ - [ ] Benchmark principal: probé **Fashion-MNIST**
  - [ ] Dirty Data Check: generé un dataset corrupto con `scripts/corrupt_mnist.py` y documenté limpieza
  - [ ] Deployment mínimo: guardé un checkpoint de CNN (`scripts/train_cnn_pytorch.py`) y corrí `scripts/predict.py`
 

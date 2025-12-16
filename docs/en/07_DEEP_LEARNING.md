@@ -230,6 +230,69 @@ assert loss_good < loss_bad
 
 ---
 
+## Week 18 protocol: computation graph + explicit shapes (before `backward()`)
+
+Before coding any `backward()` function, lock in two things:
+
+- **Your computation graph** (what nodes exist, and what depends on what).
+- **Your shapes** (so every gradient has a unique, checkable shape).
+
+### 1) Pick one convention and stick to it (recommended: batch-first 2D)
+
+- `X`: `(n, d_in)`
+- `W`: `(d_in, d_out)`
+- `b`: `(d_out,)` (broadcast to `(n, d_out)`)
+- `Z = XW + b`: `(n, d_out)`
+- Activations `A`: `(n, d_out)`
+
+Avoid mixing `(d,)` and `(d,1)` unless you deliberately use column vectors everywhere.
+
+### 2) Two-layer network: forward shapes you must be able to write from memory
+
+Network (batch):
+
+- `Z1 = XW1 + b1`, `A1 = relu(Z1)`
+- `Z2 = A1W2 + b2`, `P = sigmoid(Z2)`
+
+Shape table:
+
+| Symbol | Meaning | Shape |
+|---|---|---|
+| `X` | input batch | `(n, d_in)` |
+| `W1` | layer 1 weights | `(d_in, d_h)` |
+| `b1` | layer 1 bias | `(d_h,)` |
+| `Z1`, `A1` | pre/post activation | `(n, d_h)` |
+| `W2` | layer 2 weights | `(d_h, d_out)` |
+| `b2` | layer 2 bias | `(d_out,)` |
+| `Z2`, `P` | logits / probs | `(n, d_out)` |
+| `y` | targets | `(n, d_out)` |
+
+### 3) Backward protocol: gradient-shape invariants (non-negotiable)
+
+If `Z = XW + b`, then for batch-first shapes above:
+
+- `dW` **must** have the same shape as `W`.
+- `db` **must** have the same shape as `b`.
+- `dX` **must** have the same shape as `X`.
+
+For the two-layer case:
+
+| Gradient | Shape |
+|---|---|
+| `dZ2` | `(n, d_out)` |
+| `dW2 = A1.T @ dZ2` | `(d_h, d_out)` |
+| `db2 = sum(dZ2, axis=0)` | `(d_out,)` |
+| `dA1 = dZ2 @ W2.T` | `(n, d_h)` |
+| `dZ1 = dA1 * relu'(Z1)` | `(n, d_h)` |
+| `dW1 = X.T @ dZ1` | `(d_in, d_h)` |
+| `db1 = sum(dZ1, axis=0)` | `(d_h,)` |
+
+### 4) Debug protocol (do this before “tuning hyperparameters”)
+
+- Add `assert` checks for all shapes.
+- Run **gradient checking** on 1–3 coordinates (Exercise 7.4).
+- Run an **overfit test** on a tiny dataset: if it cannot memorize, treat it as a bug.
+
 ### Exercise 7.4: Two-layer backprop + gradient checking
 
 #### Prompt

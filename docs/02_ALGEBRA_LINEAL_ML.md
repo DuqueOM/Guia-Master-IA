@@ -931,6 +931,479 @@ for k in [5, 10, 20, 50]:
 
 ---
 
+## 🎯 Ejercicios progresivos por tema + soluciones
+
+Reglas:
+
+- **Intenta primero** sin ver soluciones.
+- **Tiempo sugerido:** 15–25 min por ejercicio.
+- **Éxito mínimo:** tu solución debe pasar los `assert`.
+
+---
+
+### Ejercicio 2.1: Vectores - operaciones básicas y shapes
+
+#### Enunciado
+
+1) **Básico**
+
+- Crea dos vectores `a` y `b` en `R^3`.
+- Calcula `a + b`, `a - b` y `3*a`.
+
+2) **Intermedio**
+
+- Verifica con `assert` que la suma es conmutativa: `a + b == b + a`.
+
+3) **Avanzado**
+
+- Convierte un vector 1D `x` con shape `(3,)` en un vector columna `(3, 1)` y verifica shapes.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para arrays, operaciones vectorizadas y comparaciones numéricas
+
+a = np.array([1.0, 2.0, 3.0])  # Define el vector a en R^3
+b = np.array([4.0, 5.0, 6.0])  # Define el vector b en R^3
+
+s = a + b  # Suma elemento a elemento (suma vectorial)
+d = a - b  # Resta elemento a elemento (diferencia vectorial)
+scaled = 3 * a  # Multiplicación por escalar (escala cada componente)
+
+assert np.allclose(a + b, b + a)  # Verifica conmutatividad de la suma
+
+x = np.array([7.0, 8.0, 9.0])  # Vector 1D con shape (3,)
+x_col = x.reshape(-1, 1)  # Convierte a vector columna con shape (3, 1)
+assert x.shape == (3,)  # Confirma shape original (vector 1D)
+assert x_col.shape == (3, 1)  # Confirma shape del vector columna
+```
+
+---
+
+### Ejercicio 2.2: Producto punto, ángulo y proyección
+
+#### Enunciado
+
+1) **Básico**
+
+- Calcula `a·b` de 3 formas: `np.dot(a,b)`, `a @ b` y `np.sum(a*b)`.
+
+2) **Intermedio**
+
+- Implementa `cos_theta = (a·b)/(||a|| ||b||)` y verifica que esté en `[-1, 1]`.
+
+3) **Avanzado**
+
+- Implementa la proyección `proj_b(a) = (a·b)/(b·b) * b`.
+- Verifica que el residual `r = a - proj_b(a)` sea ortogonal a `b` (`r·b ≈ 0`).
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para producto punto, norma, clipping y tests numéricos
+
+a = np.array([1.0, 2.0, 3.0])  # Define vector a
+b = np.array([4.0, 5.0, 6.0])  # Define vector b
+
+d1 = np.dot(a, b)  # Producto punto usando np.dot
+d2 = a @ b  # Producto punto usando @ (1D @ 1D)
+d3 = np.sum(a * b)  # Producto punto como suma de productos elemento a elemento
+assert np.isclose(d1, d2) and np.isclose(d2, d3)  # Las tres formas deben coincidir
+
+cos_theta = d1 / (np.linalg.norm(a) * np.linalg.norm(b))  # cos(θ) = (a·b)/(||a|| ||b||)
+cos_theta = float(np.clip(cos_theta, -1.0, 1.0))  # Asegura dominio válido para arccos y castea a float
+assert -1.0 <= cos_theta <= 1.0  # cos(θ) debe estar en [-1, 1]
+
+proj = (np.dot(a, b) / np.dot(b, b)) * b  # Proyección de a sobre b
+r = a - proj  # Residual (debe ser ortogonal a b)
+assert np.isclose(np.dot(r, b), 0.0, atol=1e-10)  # Verifica ortogonalidad: r·b ≈ 0
+```
+
+---
+
+### Ejercicio 2.3: Normas L1/L2/L∞ (intuición + verificación)
+
+#### Enunciado
+
+1) **Básico**
+
+- Calcula `||x||_1`, `||x||_2`, `||x||_∞` para `x = [3, -4, 12]`.
+
+2) **Intermedio**
+
+- Verifica que coincidan con `np.linalg.norm(x, ord=...)`.
+
+3) **Avanzado**
+
+- Verifica la desigualdad `||x||_∞ <= ||x||_2 <= ||x||_1`.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para abs/sum/max, sqrt y normas de referencia
+
+x = np.array([3.0, -4.0, 12.0])  # Vector de ejemplo con signos mixtos
+
+n1 = np.sum(np.abs(x))  # Norma L1: suma de valores absolutos
+n2 = np.sqrt(np.sum(x * x))  # Norma L2: raíz de la suma de cuadrados
+ninf = np.max(np.abs(x))  # Norma L∞: máximo valor absoluto
+
+assert np.isclose(n1, np.linalg.norm(x, 1))  # Valida contra NumPy (L1)
+assert np.isclose(n2, np.linalg.norm(x, 2))  # Valida contra NumPy (L2)
+assert np.isclose(ninf, np.linalg.norm(x, np.inf))  # Valida contra NumPy (L∞)
+
+assert ninf <= n2 + 1e-12  # Desigualdad: ||x||∞ <= ||x||2
+assert n2 <= n1 + 1e-12  # Desigualdad: ||x||2 <= ||x||1
+```
+
+---
+
+### Ejercicio 2.4: Distancias (euclidiana y manhattan) + matriz de distancias
+
+#### Enunciado
+
+1) **Básico**
+
+- Calcula la distancia euclidiana entre `p1=[0,0]` y `p2=[3,4]`.
+
+2) **Intermedio**
+
+- Calcula la distancia Manhattan para los mismos puntos.
+
+3) **Avanzado**
+
+- Dada una matriz `X` con 3 puntos, construye una matriz de distancias euclidianas `D` de shape `3x3`.
+- Verifica que `D` sea simétrica y tenga ceros en la diagonal.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para arrays, norma, broadcasting y asserts
+
+p1 = np.array([0.0, 0.0])  # Punto origen
+p2 = np.array([3.0, 4.0])  # Punto a distancia 5 del origen
+
+d2 = np.linalg.norm(p2 - p1)  # Distancia euclidiana (norma L2)
+d1 = np.sum(np.abs(p2 - p1))  # Distancia Manhattan (norma L1)
+
+assert np.isclose(d2, 5.0)  # Triángulo 3-4-5
+assert np.isclose(d1, 7.0)  # |3| + |4| = 7
+
+X = np.array([[0.0, 0.0], [3.0, 4.0], [1.0, 1.0]])  # 3 puntos (n=3) en 2D
+sq_norms = np.sum(X ** 2, axis=1)  # Normas al cuadrado ||x_i||^2 por fila (shape: (n,))
+D_sq = sq_norms[:, np.newaxis] + sq_norms[np.newaxis, :] - 2 * (X @ X.T)  # Usa identidad: ||a-b||^2 = ||a||^2+||b||^2-2a·b
+D_sq = np.maximum(D_sq, 0.0)  # Corrige negativos por error numérico
+D = np.sqrt(D_sq)  # Matriz de distancias euclidianas
+
+assert D.shape == (3, 3)  # La matriz de distancias debe ser n×n
+assert np.allclose(D, D.T)  # Las distancias son simétricas
+assert np.allclose(np.diag(D), 0.0)  # Distancia a sí mismo = 0
+```
+
+---
+
+### Ejercicio 2.5: Similitud coseno (y el caso del vector cero)
+
+#### Enunciado
+
+1) **Básico**
+
+- Verifica que vectores idénticos tengan similitud coseno ≈ 1.
+
+2) **Intermedio**
+
+- Verifica que vectores ortogonales tengan similitud coseno ≈ 0.
+
+3) **Avanzado**
+
+- Define qué hacer cuando uno de los vectores es cero, evitando división por cero.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para norma, producto punto y pruebas con asserts
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:  # Calcula similitud coseno como dot normalizado
+    na = np.linalg.norm(a)  # ||a||_2: magnitud de a
+    nb = np.linalg.norm(b)  # ||b||_2: magnitud de b
+    if na == 0.0 or nb == 0.0:  # Si hay vector cero, la dirección no está definida
+        return 0.0  # Convención: devolver 0 para evitar división por cero
+    return float(np.dot(a, b) / (na * nb))  # cos(θ) = (a·b)/(||a|| ||b||)
+
+v1 = np.array([1.0, 2.0, 3.0])  # Vector de referencia
+v2 = np.array([1.0, 2.0, 3.0])  # Idéntico a v1
+v3 = np.array([1.0, 0.0, 0.0])  # Unitario en eje x
+v4 = np.array([0.0, 1.0, 0.0])  # Unitario en eje y (ortogonal a v3)
+z = np.array([0.0, 0.0, 0.0])  # Vector cero
+
+assert np.isclose(cosine_similarity(v1, v2), 1.0)  # Misma dirección => similitud ≈ 1
+assert np.isclose(cosine_similarity(v3, v4), 0.0)  # Ortogonales => similitud ≈ 0
+assert cosine_similarity(v1, z) == 0.0  # Convención del vector cero
+```
+
+---
+
+### Ejercicio 2.6: Multiplicación matricial y razonamiento de shapes
+
+#### Enunciado
+
+1) **Básico**
+
+- Calcula `A @ B` donde `A` es `(2,3)` y `B` es `(3,2)`.
+
+2) **Intermedio**
+
+- Para un dataset `X` con shape `(n,d)`, verifica:
+  - `X.T @ X` tiene shape `(d,d)`
+  - `X @ X.T` tiene shape `(n,n)`
+
+3) **Avanzado**
+
+- Implementa `y_hat = X @ w + b` con `w` de shape `(d,)` y `b` escalar.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para multiplicación matricial (@) y generación de datos aleatorios
+
+A = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])  # Matriz A con shape (2, 3)
+B = np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]])  # Matriz B con shape (3, 2)
+C = A @ B  # Producto matricial => shape (2, 2)
+assert C.shape == (2, 2)  # Regla: (2,3)@(3,2)=(2,2)
+
+n, d = 7, 4  # n samples (filas), d features (columnas)
+X = np.random.randn(n, d)  # Matriz de datos con shape (n, d)
+assert (X.T @ X).shape == (d, d)  # Gram de features: (d,n)@(n,d)=(d,d)
+assert (X @ X.T).shape == (n, n)  # Gram de samples: (n,d)@(d,n)=(n,n)
+
+w = np.random.randn(d)  # Vector de pesos con shape (d,)
+b = 0.25  # Bias escalar
+y_hat = X @ w + b  # Predicción lineal (b se “broadcastea” a (n,))
+assert y_hat.shape == (n,)  # Debe haber 1 predicción por sample
+```
+
+---
+
+### Ejercicio 2.7: Sistemas lineales: `solve` vs inversa (estabilidad)
+
+#### Enunciado
+
+1) **Básico**
+
+- Resuelve `Ax=b` usando `np.linalg.solve`.
+
+2) **Intermedio**
+
+- Resuelve con `np.linalg.inv(A) @ b` y compara resultados.
+
+3) **Avanzado**
+
+- Construye una matriz singular y verifica que `np.linalg.solve` lance error.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para solve/inv y asserts numéricos
+
+A = np.array([[3.0, 1.0], [1.0, 2.0]])  # Matriz de coeficientes 2x2
+b = np.array([9.0, 8.0])  # Vector del lado derecho (2,)
+
+x_solve = np.linalg.solve(A, b)  # Método preferido: resuelve Ax=b sin invertir A
+x_inv = np.linalg.inv(A) @ b  # Alternativa (menos estable): x = A^{-1} b
+
+assert np.allclose(A @ x_solve, b)  # La solución debe satisfacer Ax=b
+assert np.allclose(x_solve, x_inv)  # Para matrices bien condicionadas, deben coincidir cerca
+
+S = np.array([[1.0, 2.0], [2.0, 4.0]])  # Matriz singular (fila 2 = 2x fila 1)
+try:
+    np.linalg.solve(S, np.array([1.0, 1.0]))  # Debe fallar: no hay solución única
+    raise AssertionError("Se esperaba LinAlgError para matriz singular")  # Si no falla, el test debe fallar
+except np.linalg.LinAlgError:
+    pass  # Camino esperado
+```
+
+---
+
+### Ejercicio 2.8: Eigenvalues/eigenvectors (verificar Av=λv)
+
+#### Enunciado
+
+1) **Básico**
+
+- Calcula eigenvalues/eigenvectors de una matriz simétrica 2x2.
+
+2) **Intermedio**
+
+- Verifica numéricamente `A @ v ≈ λ v` para cada par.
+
+3) **Avanzado**
+
+- Para matriz simétrica, verifica que los eigenvectors sean ortogonales.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para eigendecomposition, dot y asserts
+
+A = np.array([[2.0, 1.0], [1.0, 2.0]])  # Matriz simétrica (sus eigenvectors deben ser ortogonales)
+vals, vecs = np.linalg.eig(A)  # Calcula autovalores/autovectores (pueden venir como complejos)
+
+for i in range(2):
+    v = vecs[:, i]  # i-ésimo eigenvector
+    lam = vals[i]  # eigenvalue correspondiente
+    assert np.allclose(A @ v, lam * v)  # Verifica Av = λv
+
+v0 = vecs[:, 0]  # Primer eigenvector
+v1 = vecs[:, 1]  # Segundo eigenvector
+assert np.isclose(np.dot(v0, v1), 0.0, atol=1e-10)  # Ortogonalidad (para A simétrica)
+```
+
+---
+
+### Ejercicio 2.9: PCA (eigen vs SVD) - consistencia de shapes
+
+#### Enunciado
+
+1) **Básico**
+
+- Genera un dataset `X` con shape `(200, 3)` con features correlacionadas.
+
+2) **Intermedio**
+
+- Implementa PCA vía eigendecomposition de la covarianza y reduce a 2D.
+
+3) **Avanzado**
+
+- Implementa PCA vía SVD y verifica:
+  - mismos shapes de salida
+  - varianza explicada ordenada descendentemente
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para datos aleatorios, eig/SVD y validación de shapes
+
+np.random.seed(0)  # Reproducibilidad
+n = 200  # Número de muestras
+z = np.random.randn(n)  # Factor latente 1D
+X = np.stack(
+    [
+        z,  # Feature 1
+        2.0 * z + 0.1 * np.random.randn(n),  # Feature 2 correlacionada con z
+        -z + 0.1 * np.random.randn(n),  # Feature 3 anti-correlacionada con z
+    ],
+    axis=1,
+)  # Shape (n, 3)
+
+
+def pca_eigen(X: np.ndarray, k: int):  # PCA usando eigendecomposition de la covarianza
+    Xc = X - X.mean(axis=0)  # Centra features (PCA asume media 0)
+    cov = (Xc.T @ Xc) / (Xc.shape[0] - 1)  # Matriz de covarianza muestral (3x3)
+    vals, vecs = np.linalg.eig(cov)  # vals ~ varianzas; vecs ~ direcciones principales
+    idx = np.argsort(vals)[::-1]  # Ordena por varianza descendente
+    vals = vals[idx].real  # Seguridad numérica: parte real
+    vecs = vecs[:, idx].real  # Reordena eigenvectors
+    comps = vecs[:, :k]  # Toma top-k componentes (3xk)
+    Xk = Xc @ comps  # Proyecta datos centrados (n x k)
+    ratio = vals[:k] / np.sum(vals)  # Varianza explicada por componente
+    return Xk, comps, ratio
+
+
+def pca_svd(X: np.ndarray, k: int):  # PCA usando SVD (más estable en práctica)
+    Xc = X - X.mean(axis=0)  # Centra datos
+    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)  # Xc = U diag(S) Vt
+    comps = Vt[:k].T  # Top-k vectores singulares derechos => direcciones principales (3xk)
+    Xk = Xc @ comps  # Proyección (n x k)
+    var = (S ** 2) / (Xc.shape[0] - 1)  # S^2/(n-1) ~ eigenvalues de covarianza
+    ratio = var[:k] / np.sum(var)  # Varianza explicada
+    return Xk, comps, ratio
+
+
+X_e, C_e, r_e = pca_eigen(X, 2)  # PCA por eigen
+X_s, C_s, r_s = pca_svd(X, 2)  # PCA por SVD
+
+assert X_e.shape == (n, 2)  # Shape de datos reducidos
+assert X_s.shape == (n, 2)
+assert C_e.shape == (3, 2)  # Shape de componentes: (n_features, k)
+assert C_s.shape == (3, 2)
+assert r_e.shape == (2,)  # Ratios de varianza explicada
+assert r_s.shape == (2,)
+assert r_e[0] >= r_e[1]  # Debe estar ordenado descendentemente
+assert r_s[0] >= r_s[1]
+```
+
+---
+
+### Ejercicio 2.10: SVD - reconstrucción y error (truncated SVD)
+
+#### Enunciado
+
+1) **Básico**
+
+- Calcula la SVD de una matriz `A`.
+
+2) **Intermedio**
+
+- Reconstruye `A` exactamente y verifica `A ≈ U Σ V^T`.
+
+3) **Avanzado**
+
+- Reconstruye con rango `k=1` y `k=2` y verifica que el error disminuya.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para SVD, reconstrucción y normas
+
+A = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])  # Matriz ejemplo no-cuadrada (3x2)
+U, S, Vt = np.linalg.svd(A, full_matrices=False)  # SVD económica: A = U diag(S) Vt
+
+A_full = U @ np.diag(S) @ Vt  # Reconstrucción usando todos los valores singulares
+assert np.allclose(A, A_full)  # Debe coincidir con A (tolerancia numérica)
+
+def trunc(U: np.ndarray, S: np.ndarray, Vt: np.ndarray, k: int):  # Reconstrucción rank-k
+    return U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]  # Aproximación de rango k (truncated SVD)
+
+A1 = trunc(U, S, Vt, 1)  # Mejor aproximación de rango 1
+A2 = trunc(U, S, Vt, 2)  # Mejor aproximación de rango 2 (aquí: rango completo para 3x2)
+
+err1 = np.linalg.norm(A - A1)  # Error de reconstrucción
+err2 = np.linalg.norm(A - A2)  # Error con mayor rango
+assert err2 <= err1 + 1e-12  # El error debe bajar al aumentar el rango
+```
+
+---
+
+### (Bonus) Ejercicio 2.11: De álgebra lineal a ML - regresión cerrada
+
+#### Enunciado
+
+- Genera `X` y `y` para un modelo lineal `y = Xw + noise`.
+- Estima `w_hat` con la ecuación normal usando `solve`: `(X^T X) w = X^T y`.
+- Verifica que `w_hat` sea cercano a `w_true`.
+
+#### Solución
+
+```python
+import numpy as np  # NumPy para datos aleatorios y resolución de sistemas lineales
+
+np.random.seed(1)  # Reproducibilidad
+n, d = 300, 3  # n muestras, d features
+X = np.random.randn(n, d)  # Matriz de diseño
+w_true = np.array([0.5, -1.2, 2.0])  # Pesos reales
+noise = 0.1 * np.random.randn(n)  # Ruido aditivo
+y = X @ w_true + noise  # Targets: modelo lineal con ruido
+
+XtX = X.T @ X  # Lado izquierdo de ecuación normal (d x d)
+Xty = X.T @ y  # Lado derecho (d,)
+w_hat = np.linalg.solve(XtX, Xty)  # Resuelve (X^T X) w = X^T y
+
+assert w_hat.shape == (d,)  # Shape esperado del vector de pesos
+assert np.linalg.norm(w_hat - w_true) < 0.2  # Debe recuperar pesos razonablemente
+```
+
+---
+
 ## 📦 Entregable del Módulo
 
 ### Librería: `linear_algebra.py`

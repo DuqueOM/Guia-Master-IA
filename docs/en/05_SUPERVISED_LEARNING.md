@@ -87,6 +87,55 @@ Decision trees are built **recursively**. If you don’t define and test stoppin
 - Minimum stopping conditions: `max_depth`, purity, `min_samples_split`, “no split improves”.
 - Recommended resource: https://realpython.com/python-recursion/
 
+### Micro-sprint (15 minutes): recursion you need for trees
+
+Two rules you must internalize:
+
+- **Base case:** the smallest case you can answer immediately (this is where recursion stops).
+- **Recursive step:** reduce the problem to a smaller version of itself.
+
+If you cannot state the base case in 1 line, your tree implementation will likely recurse forever.
+
+#### Example: recursive sum (practice the mental model)
+
+```python
+from typing import Sequence
+
+def sum_recursive(xs: Sequence[float]) -> float:
+    # Base case: the sum of an empty list is 0
+    if len(xs) == 0:
+        return 0.0
+
+    # Recursive step: reduce the problem size by removing the first element
+    return float(xs[0]) + sum_recursive(xs[1:])
+
+
+assert sum_recursive([]) == 0.0
+assert sum_recursive([3.0]) == 3.0
+assert sum_recursive([3.0, 2.0, 5.0]) == 10.0
+```
+
+#### Call stack (what Python is doing)
+
+```text
+sum_recursive([3, 2, 5])
+= 3 + sum_recursive([2, 5])
+    = 2 + sum_recursive([5])
+        = 5 + sum_recursive([])
+            = 0
+```
+
+#### Connection to Decision Trees: stopping conditions = base cases
+
+When building a tree node, your base case should trigger when:
+
+- `depth >= max_depth`
+- the node is **pure** (all labels are the same)
+- `n_samples < min_samples_split`
+- no candidate split improves impurity (information gain <= 0)
+
+Minimal debug during development: print `depth`, `n_samples`, and the chosen split criterion per node.
+
 ## Tree-Based Models (Week 12 add-on)
 
 ### Impurity and split quality

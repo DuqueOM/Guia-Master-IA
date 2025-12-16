@@ -1195,6 +1195,53 @@ La implementación de árboles se basa en **recursión**. Si no defines y prueba
 - Recurso recomendado: https://realpython.com/python-recursion/
 - Debug mínimo: imprime `depth`, `n_samples` y el criterio elegido por nodo durante desarrollo.
 
+### Micro-sprint (15 minutos): recursividad mínima para árboles
+
+Dos reglas que debes internalizar:
+
+- **Caso base:** el caso más pequeño que puedes responder inmediatamente (aquí se detiene la recursión).
+- **Paso recursivo:** reduces el problema a una versión más pequeña de sí mismo.
+
+Si no puedes decir el caso base en 1 línea, tu implementación del árbol probablemente recursará para siempre.
+
+#### Ejemplo: suma recursiva (practica el modelo mental)
+
+```python
+from typing import Sequence
+
+def sum_recursive(xs: Sequence[float]) -> float:
+    # Caso base: la suma de una lista vacía es 0
+    if len(xs) == 0:
+        return 0.0
+
+    # Paso recursivo: reduces el problema quitando el primer elemento
+    return float(xs[0]) + sum_recursive(xs[1:])
+
+
+assert sum_recursive([]) == 0.0
+assert sum_recursive([3.0]) == 3.0
+assert sum_recursive([3.0, 2.0, 5.0]) == 10.0
+```
+
+#### Pila de llamadas (lo que Python está haciendo)
+
+```text
+sum_recursive([3, 2, 5])
+= 3 + sum_recursive([2, 5])
+    = 2 + sum_recursive([5])
+        = 5 + sum_recursive([])
+            = 0
+```
+
+#### Conexión con Decision Trees: condiciones de parada = casos base
+
+Al construir un nodo, tu caso base debería dispararse cuando:
+
+- `depth >= max_depth`
+- el nodo es **puro** (todas las etiquetas son iguales)
+- `n_samples < min_samples_split`
+- ningún split mejora impureza (information gain <= 0)
+
 ## 🌳 Parte 5: Tree-Based Models (Semana 12)
 
 Esta semana cubre modelos supervisados **no diferenciables** (no entrenan con Gradient Descent). La lógica de entrenamiento es:

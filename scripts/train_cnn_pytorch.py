@@ -115,14 +115,14 @@ def main() -> int:
     _require_torch()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", choices=["mnist", "fashion"], default="mnist")
+    parser.add_argument("--dataset", choices=["mnist", "fashion"], default="fashion")
     parser.add_argument("--data-dir", default="data/torch_datasets")
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default="auto", help="auto|cpu|cuda")
-    parser.add_argument("--out", default="artifacts/cnn.pt")
+    parser.add_argument("--out", default="artifacts/cnn_fashion.pt")
     args = parser.parse_args()
 
     import torch

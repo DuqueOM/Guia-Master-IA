@@ -118,8 +118,8 @@ In the CU Boulder courses:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  DAY 1: Broadcasting                                            │
-│  DAY 2: Matrix product (@, np.dot, np.matmul)                   │
-│  DAY 3: Reshape, flatten, transpose                             │
+│  DAY 2: Matrix product (@, np.dot, np.matmul) + reshape/flatten │
+│  DAY 3: OOP for ML (v5.1): class Tensor (__init__, __add__, @)  │
 │  DAY 4: Axis-based reductions and ops                           │
 │  DAY 5: RNG and synthetic data generation                       │
 │  DAY 6: Deliverable: Pandas → NumPy pipeline                    │
@@ -542,6 +542,83 @@ print(flat.shape)  # (12,)  # Forma del vector resultante
 # -1 to infer a dimension automatically
 auto = a.reshape(4, -1)  # (4, 3)  # -1 hace que NumPy infiera la dimensión faltante
 auto = a.reshape(-1, 6)  # (2, 6)  # Aquí se reasigna 'auto': ahora infiere el número de filas
+```
+
+### 9.1 OOP for ML (v5.1): mini `Tensor` framework
+
+**Practical goal:** before you get to neural networks (where you must handle `self`, state, and operator overloading), build a tiny abstraction that behaves like a simple “tensor”.
+
+#### What you must internalize (no fluff)
+
+- **Class vs instance:** the class is the blueprint; an instance is the actual object.
+- **`self`:** the current instance; this is where state lives.
+- **State:** values stored on the object (`self.data`, `self.shape`).
+- **Operators:** `+` calls `__add__`, `@` calls `__matmul__`.
+
+#### Deliverable (workshop)
+
+- Implement a `Tensor` class that:
+  - accepts a Python list or a `np.ndarray` in `__init__`
+  - stores an internal `self.shape`
+  - implements `__add__` and `__matmul__` using NumPy internally
+
+#### Reference implementation
+
+```python
+import numpy as np  # NumPy: convert inputs to arrays and reuse fast vector/matrix ops
+from typing import Union  # Union: allow multiple input types for the constructor
+
+ArrayLike = Union[list, np.ndarray]  # Supported inputs: Python list or NumPy ndarray
+
+class Tensor:  # Minimal container to practice OOP for ML (state + operators)
+    def __init__(self, data: ArrayLike):  # Constructor: build internal state from raw input
+        self.data = np.array(data, dtype=float)  # Normalize to float ndarray for consistent math
+        self.shape = self.data.shape  # Keep shape as part of the object state (useful for debugging)
+
+    def __add__(self, other: "Tensor") -> "Tensor":  # Define + as element-wise addition
+        if not isinstance(other, Tensor):  # If the other operand is not a Tensor, we cannot add
+            return NotImplemented  # Standard Python signal: this operation is not supported
+        return Tensor(self.data + other.data)  # Return a NEW Tensor (do not mutate self)
+
+    def __matmul__(self, other: "Tensor") -> "Tensor":  # Define @ as matrix multiplication
+        if not isinstance(other, Tensor):  # Validate type to avoid confusing runtime errors
+            return NotImplemented  # Let Python try a reflected operation if available
+        return Tensor(self.data @ other.data)  # Use NumPy matmul and wrap the output
+
+    def __repr__(self) -> str:  # Friendly representation when you print a Tensor
+        return f"Tensor(shape={self.shape}, data={self.data})"  # Show shape + raw data for quick inspection
+```
+
+#### Exercises (with `assert`) — your minimum acceptable bar
+
+```python
+import numpy as np  # NumPy for array comparisons (allclose) and building reference arrays
+
+# 1) State: shape must reflect the internal ndarray
+t = Tensor([1, 2, 3])  # Build from a Python list
+assert t.shape == (3,)  # Shape of a 1D vector
+
+# 2) Addition: + must call __add__
+a = Tensor([1, 2, 3])  # Tensor A
+b = Tensor([10, 20, 30])  # Tensor B
+c = a + b  # Should return a new Tensor
+assert isinstance(c, Tensor)  # Result must be a Tensor
+assert np.allclose(c.data, np.array([11.0, 22.0, 33.0]))  # Element-wise addition
+assert c.shape == (3,)  # Shape should be preserved
+
+# 3) Matmul: @ must call __matmul__
+A = Tensor([[1, 2], [3, 4]])  # 2x2 matrix
+x = Tensor([1, 1])  # Vector with shape (2,)
+y = A @ x  # Matrix-vector product -> shape (2,)
+assert np.allclose(y.data, np.array([3.0, 7.0]))  # [1,2]·[1,1]=3 and [3,4]·[1,1]=7
+assert y.shape == (2,)  # Output shape check
+
+# 4) Shape mismatch: must fail if dimensions are not compatible
+try:  # We expect NumPy to raise ValueError on incompatible shapes
+    _ = Tensor([[1, 2, 3], [4, 5, 6]]) @ Tensor([1, 2])  # (2,3) @ (2,) is invalid
+    assert False  # If it did not fail, this test must fail
+except ValueError:  # NumPy raises ValueError for matmul dimension mismatches
+    pass  # Success: we expected this error
 ```
 
 ### 10. Random data generation

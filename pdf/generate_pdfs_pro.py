@@ -428,7 +428,8 @@ pre {
     word-wrap: break-word;
     word-break: normal;
     text-align: left;
-    break-inside: auto;
+    page-break-inside: avoid;
+    break-inside: avoid;
     border: 1px solid #1e293b;
 }
 pre code { background: none; color: inherit; padding: 0; word-break: normal; }
@@ -828,18 +829,32 @@ class PDFGenerator:
         lines = text.split("\n")
         cleaned = []
         in_code = False
+        code_fence_prefix: str = ""
 
         for line in lines:
             s = line.strip()
 
             # Manejo de bloques de código
             if s.startswith("```"):
+                leading = len(line) - len(line.lstrip(" \t"))
+                prefix = line[:leading]
                 in_code = not in_code
-                cleaned.append(line)
+                if in_code:
+                    code_fence_prefix = prefix
+                else:
+                    code_fence_prefix = ""
+
+                if leading <= 3:
+                    cleaned.append(line.lstrip(" \t"))
+                else:
+                    cleaned.append(line)
                 continue
 
             if in_code:
-                cleaned.append(line)
+                if code_fence_prefix and line.startswith(code_fence_prefix):
+                    cleaned.append(line[len(code_fence_prefix) :])
+                else:
+                    cleaned.append(line)
                 continue
 
             # Limpieza de regex (headers, nav, etc)

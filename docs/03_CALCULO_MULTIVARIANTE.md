@@ -1027,30 +1027,59 @@ Reglas:
 ```python
 import numpy as np
 
+
+# Aproximamos derivadas numéricamente usando *diferencias centrales*.
+# Intuición: medir la pendiente alrededor de x de forma simétrica (x+h y x-h)
+# cancela términos de error de primer orden y suele ser más preciso que la
+# diferencia hacia adelante.
+
 def num_derivative_central(f, x: float, h: float = 1e-6) -> float:
+    # f: función escalar f(x).
+    # x: punto donde evaluamos la derivada.
+    # h: tamaño de paso. Hay tradeoff:
+    # - h grande => error de truncamiento (aproximación) domina
+    # - h muy pequeño => cancelación numérica (floating point) domina
+    # Devolvemos float para facilitar asserts y logs.
     return float((f(x + h) - f(x - h)) / (2.0 * h))
 
 
 def f(x: float) -> float:
+    # Función de prueba (suave y derivable).
     return x**3 + 2.0 * x
 
 
 def f_prime(x: float) -> float:
+    # Derivada analítica:
+    # d/dx (x^3) = 3x^2
+    # d/dx (2x)  = 2
     return 3.0 * x**2 + 2.0
 
 
+# Probamos varios puntos para evitar que pase “por casualidad” en un solo x.
 xs = [-2.0, -0.5, 0.0, 1.0, 3.0]
 for x in xs:
+    # Aproximación numérica.
     approx = num_derivative_central(f, x, h=1e-6)
+    # Valor exacto (analítico).
     exact = f_prime(x)
+    # np.isclose compara igualdad aproximada con tolerancias:
+    # - rtol: tolerancia relativa (escala con el tamaño)
+    # - atol: tolerancia absoluta (útil cerca de 0)
     assert np.isclose(approx, exact, rtol=1e-6, atol=1e-6)
 
 
+# Estudiamos cómo cambia el error con distintos h.
+# Nota: no imponemos monotonía estricta porque h extremadamente pequeño puede
+# empeorar por precisión de máquina.
 x0 = 1.234
 errs = []
 for h in [1e-2, 1e-4, 1e-6]:
+    # Misma x0, distinto paso.
     approx = num_derivative_central(f, x0, h=h)
+    # Error absoluto vs derivada analítica.
     errs.append(abs(approx - f_prime(x0)))
+
+# Sanidad mínima: al refinar de 1e-2 a 1e-4, no debería empeorar.
 assert errs[1] <= errs[0] + 1e-6
 ```
 
@@ -1080,24 +1109,40 @@ Sea `f(x, y) = x^2 y + sin(y)`.
 import numpy as np
 
 def f_xy(x: float, y: float) -> float:
+    # Función escalar de 2 variables:
+    # f(x, y) = x^2 * y + sin(y)
     return x**2 * y + np.sin(y)
 
 
 def grad_f_xy(x: float, y: float) -> np.ndarray:
+    # Gradiente analítico (derivadas parciales):
+    # ∂f/∂x = 2xy
+    # ∂f/∂y = x^2 + cos(y)
     dfdx = 2.0 * x * y
     dfdy = x**2 + np.cos(y)
+    # Empaquetamos como vector [df/dx, df/dy].
     return np.array([dfdx, dfdy], dtype=float)
 
 
 def num_grad_2d(f, x: float, y: float, h: float = 1e-6) -> np.ndarray:
+    # Gradiente numérico con diferencias centrales.
+    # Para cada variable, perturbamos solo esa coordenada.
     dfdx = (f(x + h, y) - f(x - h, y)) / (2.0 * h)
     dfdy = (f(x, y + h) - f(x, y - h)) / (2.0 * h)
+    # Vector gradiente.
     return np.array([dfdx, dfdy], dtype=float)
 
 
+# Punto de evaluación (no trivial para evitar simetrías).
 x0, y0 = 1.2, -0.7
+
+# Gradiente analítico.
 g_anal = grad_f_xy(x0, y0)
+
+# Gradiente numérico (check independiente).
 g_num = num_grad_2d(f_xy, x0, y0)
+
+# Deben coincidir si las derivadas están bien.
 assert np.allclose(g_anal, g_num, rtol=1e-5, atol=1e-6)
 ```
 
@@ -1125,26 +1170,39 @@ assert np.allclose(g_anal, g_num, rtol=1e-5, atol=1e-6)
 import numpy as np
 
 def f_xy(x: float, y: float) -> float:
+    # Misma función del ejercicio anterior.
     return x**2 * y + np.sin(y)
 
 
 def grad_f_xy(x: float, y: float) -> np.ndarray:
+    # ∇f(x,y) = [∂f/∂x, ∂f/∂y]
     return np.array([2.0 * x * y, x**2 + np.cos(y)], dtype=float)
 
 
+# Punto base p0 = (x0, y0).
 x0, y0 = 0.5, 1.0
+
+# Gradiente en p0.
 g = grad_f_xy(x0, y0)
 
+# Vector dirección (aún no unitario).
 u = np.array([3.0, 4.0], dtype=float)
+
+# La derivada direccional se define sobre u unitario: ||u|| = 1.
 u = u / np.linalg.norm(u)
 
+# Derivada direccional analítica: D_u f = ∇f · u.
 dir_anal = float(np.dot(g, u))
 
+# Verificación numérica: avanzamos/retrocedemos h sobre la recta p(t)=p0 + t u.
 h = 1e-6
 f_plus = f_xy(x0 + h * u[0], y0 + h * u[1])
 f_minus = f_xy(x0 - h * u[0], y0 - h * u[1])
+
+# Diferencia central en la dirección u.
 dir_num = float((f_plus - f_minus) / (2.0 * h))
 
+# Comparación con tolerancia.
 assert np.isclose(dir_anal, dir_num, rtol=1e-5, atol=1e-6)
 ```
 
@@ -1174,34 +1232,64 @@ Sea `g(x1,x2) = [x1^2 + x2, sin(x1 x2)]`.
 import numpy as np
 
 def g(x: np.ndarray) -> np.ndarray:
+    # Función vectorial g: R^2 -> R^2.
+    # Convertimos a float para evitar dtypes raros (int) y asegurar operaciones reales.
     x1, x2 = float(x[0]), float(x[1])
+    # Definimos:
+    # g1 = x1^2 + x2
+    # g2 = sin(x1 * x2)
     return np.array([x1**2 + x2, np.sin(x1 * x2)], dtype=float)
 
 
 def J_analytical(x: np.ndarray) -> np.ndarray:
+    # Jacobiano J: matriz de derivadas parciales.
+    # J[i, j] = ∂g_i / ∂x_j
+    # Aquí hay 2 salidas y 2 entradas => J es 2x2.
     x1, x2 = float(x[0]), float(x[1])
+
+    # g1 = x1^2 + x2
+    # ∂g1/∂x1 = 2x1
+    # ∂g1/∂x2 = 1
     dg1_dx1 = 2.0 * x1
     dg1_dx2 = 1.0
+
+    # g2 = sin(x1*x2)
+    # Regla de la cadena:
+    # ∂g2/∂x1 = cos(x1*x2) * x2
+    # ∂g2/∂x2 = cos(x1*x2) * x1
     dg2_dx1 = np.cos(x1 * x2) * x2
     dg2_dx2 = np.cos(x1 * x2) * x1
+
+    # Empaquetamos en una matriz 2x2.
     return np.array([[dg1_dx1, dg1_dx2], [dg2_dx1, dg2_dx2]], dtype=float)
 
 
 def J_numeric(g, x: np.ndarray, h: float = 1e-6) -> np.ndarray:
+    # Jacobiano numérico con diferencias centrales.
+    # Para cada coordenada j, perturbamos x por ±h e_j y obtenemos la columna J[:, j].
     x = x.astype(float)
+    # m: dimensión de salida, n: dimensión de entrada.
     m = g(x).shape[0]
     n = x.shape[0]
+    # Inicializamos J.
     J = np.zeros((m, n), dtype=float)
     for j in range(n):
+        # Vector base e_j.
         e = np.zeros(n)
         e[j] = 1.0
+        # Diferencia central para todas las salidas a la vez.
         J[:, j] = (g(x + h * e) - g(x - h * e)) / (2.0 * h)
     return J
 
 
+# Punto de prueba.
 x0 = np.array([0.7, -1.1])
+
+# Comparamos Jacobiano analítico vs numérico.
 Ja = J_analytical(x0)
 Jn = J_numeric(g, x0)
+
+# Si la derivación está correcta, deben ser casi iguales.
 assert np.allclose(Ja, Jn, rtol=1e-5, atol=1e-6)
 ```
 
@@ -1230,9 +1318,17 @@ Sea `f(x1,x2) = x1^2 + 2 x2^2`.
 ```python
 import numpy as np
 
+# Para f(x1,x2)=x1^2 + 2x2^2:
+# - ∂²f/∂x1² = 2
+# - ∂²f/∂x2² = 4
+# - derivadas cruzadas = 0
 H = np.array([[2.0, 0.0], [0.0, 4.0]], dtype=float)
+
+# El Hessiano de una función escalar dos-veces derivable debe ser simétrico.
 assert np.allclose(H, H.T)
 
+# Hessiano definido positivo => función estrictamente convexa.
+# En particular, un criterio suficiente aquí es: eigenvalores > 0.
 eigvals = np.linalg.eigvals(H)
 assert np.all(eigvals > 0)
 ```
@@ -1263,24 +1359,38 @@ Minimiza `f(x) = (x - 3)^2` con Gradient Descent.
 import numpy as np
 
 def f(x: float) -> float:
+    # Función convexa con mínimo global en x=3.
     return (x - 3.0) ** 2
 
 
 def grad_f(x: float) -> float:
+    # Derivada: d/dx (x-3)^2 = 2(x-3)
     return 2.0 * (x - 3.0)
 
 
+# Inicialización.
 x = 10.0
+
+# Learning rate (tamaño de paso).
 alpha = 0.1
+
+# Historial de iteraciones para inspección y asserts.
 history = []
 for _ in range(200):
+    # Gradiente en el punto actual.
     g = grad_f(x)
+    # Guardamos (x, f(x)) antes de actualizar.
     history.append((x, f(x)))
+    # Criterio de parada: gradiente cerca de 0 => cerca del mínimo.
     if abs(g) < 1e-8:
         break
+    # Actualización de Gradient Descent.
     x = x - alpha * g
 
+# Debe converger cerca de 3.
 assert abs(x - 3.0) < 1e-4
+
+# La pérdida final no debería ser mayor que la inicial.
 assert history[-1][1] <= history[0][1]
 ```
 
@@ -1310,18 +1420,29 @@ Minimiza `f(x)=x^2` con Gradient Descent desde `x0=1`.
 import numpy as np
 
 def run_gd_x2(alpha: float, steps: int = 10) -> np.ndarray:
+    # Minimizamos f(x)=x^2 con GD. Su gradiente es 2x.
     x = 1.0
+    # Guardamos la trayectoria.
     xs = [x]
     for _ in range(steps):
+        # Gradiente en el punto actual.
         grad = 2.0 * x
+        # Paso de GD.
         x = x - alpha * grad
+        # Guardamos el nuevo x.
         xs.append(x)
+    # Convertimos a np.array para análisis.
     return np.array(xs)
 
 
+# Con alpha=0.25, el factor (1-2α)=0.5 => converge.
 xs_good = run_gd_x2(alpha=0.25, steps=10)
+
+# La magnitud debe decrecer.
 assert abs(xs_good[-1]) < abs(xs_good[0])
 
+
+# Con alpha=1.1, |1-2α| = |1-2.2| = 1.2 > 1 => diverge.
 xs_bad = run_gd_x2(alpha=1.1, steps=10)
 assert abs(xs_bad[-1]) > abs(xs_bad[0])
 ```
@@ -1350,30 +1471,46 @@ assert abs(xs_bad[-1]) > abs(xs_bad[0])
 import numpy as np
 
 def f(w: np.ndarray) -> float:
+    # Función escalar sobre un vector: f(w) = sum_i w_i^3.
+    # Convertimos a float para devolver un escalar Python.
     return float(np.sum(w ** 3))
 
 
 def grad_analytical(w: np.ndarray) -> np.ndarray:
+    # Gradiente analítico: ∂/∂w_i (w_i^3) = 3 w_i^2.
     return 3.0 * (w ** 2)
 
 
 def grad_numeric(f, w: np.ndarray, h: float = 1e-6) -> np.ndarray:
+    # Gradiente numérico con diferencias centrales.
+    # Para cada coordenada i, perturbamos w por ±h e_i.
     w = w.astype(float)
+    # Vector de gradientes numéricos.
     g = np.zeros_like(w)
     for i in range(w.size):
+        # Vector base e_i.
         e = np.zeros_like(w)
         e[i] = 1.0
+        # Diferencia central: ∂f/∂w_i ≈ (f(w+h e_i) - f(w-h e_i)) / (2h)
         g[i] = (f(w + h * e) - f(w - h * e)) / (2.0 * h)
     return g
 
 
+# Semilla para reproducibilidad.
 np.random.seed(0)
+
+# Vector de prueba.
 w = np.random.randn(5)
+
+# Gradientes analítico y numérico.
 g_a = grad_analytical(w)
 g_n = grad_numeric(f, w)
 
+# Error relativo: más robusto que el error absoluto porque normaliza escalas.
 eps = 1e-12
 rel_err = np.linalg.norm(g_n - g_a) / (np.linalg.norm(g_n) + np.linalg.norm(g_a) + eps)
+
+# Si falla, normalmente indica error en derivada o un h inapropiado.
 assert rel_err < 1e-7
 ```
 
@@ -1407,52 +1544,78 @@ Una neurona:
 import numpy as np
 
 def sigmoid(z: float) -> float:
+    # Sigmoide σ(z) = 1 / (1 + exp(-z)).
+    # Convertimos a float para devolver escalar.
     return float(1.0 / (1.0 + np.exp(-z)))
 
 
 def loss_mse(y_hat: float, y: float) -> float:
+    # Pérdida MSE para un solo ejemplo: (ŷ - y)^2
     return float((y_hat - y) ** 2)
 
 
 def forward(w: np.ndarray, b: float, x: np.ndarray, y: float) -> float:
+    # Forward de una neurona:
+    # z = w·x + b
+    # ŷ = σ(z)
+    # L = (ŷ - y)^2
     z = float(np.dot(w, x) + b)
     y_hat = sigmoid(z)
     return loss_mse(y_hat, y)
 
 
 def grads_analytical(w: np.ndarray, b: float, x: np.ndarray, y: float):
+    # Gradientes analíticos vía Chain Rule.
     z = float(np.dot(w, x) + b)
     y_hat = sigmoid(z)
 
+    # dL/dŷ cuando L=(ŷ-y)^2.
     dL_dyhat = 2.0 * (y_hat - y)
+    # dŷ/dz para sigmoide: σ'(z)=σ(z)(1-σ(z)).
     dyhat_dz = y_hat * (1.0 - y_hat)
+    # Chain rule: dL/dz = dL/dŷ * dŷ/dz.
     dL_dz = dL_dyhat * dyhat_dz
 
+    # z = w·x + b => dz/dw = x y dz/db = 1.
+    # Entonces:
+    # dL/dw = dL/dz * x
+    # dL/db = dL/dz
     dL_dw = dL_dz * x
     dL_db = dL_dz
     return dL_dw.astype(float), float(dL_db)
 
 
 def grads_numeric(w: np.ndarray, b: float, x: np.ndarray, y: float, h: float = 1e-6):
+    # Gradientes numéricos por diferencias centrales.
     gw = np.zeros_like(w, dtype=float)
     for i in range(w.size):
+        # Vector base e_i.
         e = np.zeros_like(w)
         e[i] = 1.0
+        # ∂L/∂w_i ≈ (L(w+h e_i) - L(w-h e_i)) / (2h)
         gw[i] = (forward(w + h * e, b, x, y) - forward(w - h * e, b, x, y)) / (2.0 * h)
 
+    # ∂L/∂b ≈ (L(b+h) - L(b-h)) / (2h)
     gb = (forward(w, b + h, x, y) - forward(w, b - h, x, y)) / (2.0 * h)
     return gw, float(gb)
 
 
+# Reproducibilidad.
 np.random.seed(1)
+
+# Parámetros y entrada de ejemplo.
 w = np.random.randn(3)
 b = 0.1
 x = np.random.randn(3)
+
+# Etiqueta objetivo.
 y = 1.0
 
+# Comparamos gradientes.
 gw_a, gb_a = grads_analytical(w, b, x, y)
 gw_n, gb_n = grads_numeric(w, b, x, y)
 
+# Si la derivación por chain rule está bien, deben coincidir.
 assert np.allclose(gw_a, gw_n, rtol=1e-5, atol=1e-6)
 assert np.isclose(gb_a, gb_n, rtol=1e-5, atol=1e-6)
 ```

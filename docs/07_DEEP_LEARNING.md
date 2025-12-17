@@ -1094,6 +1094,27 @@ g_ana = sigmoid_deriv(z)
 assert np.allclose(g_num, g_ana, rtol=1e-5, atol=1e-6)
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 7.1: Activaciones y derivadas (chequeo numérico)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M07-E07_1`
+- **Duración estimada:** 20–45 min
+- **Nivel:** Intermedio
+
+#### 2) Objetivos
+- Entender la diferencia entre **activación** `f(z)` y **derivada** `f'(z)`.
+- Validar una derivada con **diferencias finitas centrales**.
+
+#### 3) Errores comunes
+- Usar diferencias hacia delante (más error) en lugar de centrales.
+- Elegir `h` demasiado grande (sesgo) o demasiado pequeño (error numérico).
+- No “clipear” `z` en sigmoid y obtener `inf/NaN`.
+
+#### 4) Nota docente
+- Pide que el alumno explique por qué el chequeo numérico es una prueba de sanidad (no una demostración formal).
+</details>
+
 ---
 
 ### Ejercicio 7.2: Forward de una capa densa (batch) + shapes
@@ -1136,6 +1157,26 @@ for i in range(n):
 
 assert np.allclose(Z, Z_loop)
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 7.2: Forward denso (batch) y contratos de shape</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M07-E07_2`
+- **Duración estimada:** 20–40 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- En convención batch-first, `X @ W + b` responde a:
+  - `X:(n,d_in)`, `W:(d_in,d_out)`, `b:(d_out,)` → `Z:(n,d_out)`.
+
+#### 3) Errores comunes
+- Poner `W` como `(d_out,d_in)` y luego forzar traspuestas por “arreglo rápido”.
+- Confundir `axis` al sumar bias (debe broadcast a la segunda dimensión).
+
+#### 4) Nota docente
+- Pide que el alumno escriba los shapes de memoria antes de correr el código.
+</details>
 
 ---
 
@@ -1192,6 +1233,27 @@ loss_good = categorical_cross_entropy(y_true, np.array([[0.9, 0.05, 0.05]]))
 loss_bad = categorical_cross_entropy(y_true, np.array([[0.4, 0.3, 0.3]]))
 assert loss_good < loss_bad
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 7.3: Softmax estable + Cross-Entropy</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M07-E07_3`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- Estabilidad: `softmax(z) = exp(z - logsumexp(z))` evita overflow.
+- Para clasificación, lo importante es **comparar probabilidades** sin caer en `NaN`.
+
+#### 3) Errores comunes
+- Hacer `exp(z)` directamente con logits grandes.
+- Olvidar `eps` al hacer `log(y_pred)`.
+- Confundir CCE para `y_true` one-hot con BCE binaria.
+
+#### 4) Nota docente
+- Pide que el alumno explique por qué restar el máximo no cambia el resultado de softmax.
+</details>
 
 ---
 
@@ -1291,6 +1353,30 @@ g_num = (L_plus - L_minus) / (2.0 * h)
 assert np.isclose(dW2[i, j], g_num, rtol=1e-4, atol=1e-6)
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 7.4: Backprop + gradient checking</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M07-E07_4`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Avanzado
+
+#### 2) Invariante principal
+- Para `Z = XW + b` (batch-first):
+  - `dW` tiene shape de `W`, `db` de `b`, `dX` de `X`.
+
+#### 3) Gradient checking (mínimo viable)
+- Chequea 1 coordenada (o pocas) de un gradiente grande (`dW2`) con diferencias centrales.
+- Ajusta `h` y tolerancias si estás en float64 vs float32.
+
+#### 4) Errores comunes
+- Olvidar dividir por `n` en la loss (o en `dZ2`) y “mover” el bug de lugar.
+- Mezclar `y` como `(n,)` con `P` como `(n,1)`.
+
+#### 5) Nota docente
+- Pide que el alumno explique por qué un único chequeo no garantiza que TODO el gradiente esté correcto.
+</details>
+
 ---
 
 ### Ejercicio 7.5: Overfit test (sanity check obligatorio)
@@ -1357,6 +1443,26 @@ assert loss_end <= loss0
 assert acc > 0.95
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 7.5: Overfit test (sanity check)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M07-E07_5`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Regla de oro
+- Si tu modelo no puede **memorizar** un dataset tiny, asume bug (no “mala suerte”).
+
+#### 3) Errores comunes
+- Learning rate demasiado bajo (parece bug, pero sólo no se mueve).
+- Dataset no separable o etiquetas con shape inconsistente.
+- Error en el gradiente (signo, normalización por `n`, broadcasting de `b`).
+
+#### 4) Nota docente
+- Pide que el alumno haga el mismo test con 2–3 seeds y compare estabilidad.
+</details>
+
 ---
 
 ### Ejercicio 7.6: Optimizadores en una función cuadrática (SGD vs Adam)
@@ -1416,6 +1522,26 @@ assert abs(w_sgd - 3.0) < 1e-2
 assert abs(w_adam - 3.0) < 1e-2
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 7.6: SGD vs Adam (intuición)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M07-E07_6`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- SGD usa el gradiente “tal cual”.
+- Adam introduce momentos (media y varianza) y suele ser más estable en problemas mal condicionados.
+
+#### 3) Errores comunes
+- Olvidar corrección de bias (`m_hat`, `v_hat`).
+- Elegir `lr` de Adam igual que el de SGD sin validar.
+
+#### 4) Nota docente
+- Pide que el alumno grafique `w_t` para comparar trayectorias.
+</details>
+
 ---
 
 ### Ejercicio 7.7: Gradient clipping (evitar exploding gradients)
@@ -1458,6 +1584,25 @@ g_keep = clip_by_norm(g_small, max_norm=1.0)
 assert np.allclose(g_small, g_keep)
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 7.7: Gradient clipping</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M07-E07_7`
+- **Duración estimada:** 20–45 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- Clipping por norma no “arregla” el gradiente: sólo evita pasos gigantes.
+
+#### 3) Errores comunes
+- Hacer clipping por componente (otra técnica) pensando que es lo mismo.
+- No manejar el caso `||g||=0`.
+
+#### 4) Nota docente
+- Pide que el alumno explique por qué clipping puede estabilizar RNN/transformers (conceptual).
+</details>
+
 ---
 
 ### Ejercicio 7.8: Convolución - cálculo de output shape (padding/stride)
@@ -1470,11 +1615,11 @@ assert np.allclose(g_small, g_keep)
 
 2) **Intermedio**
 
-- Verifica el caso MNIST: `28x28` con kernel `5x5`, `stride=1`, `padding=0` -> `24x24`.
+- Verifica el caso MNIST: `28x28` con kernel `5x5`, `stride=1`, `padding=0` → `24x24`.
 
 3) **Avanzado**
 
-- Verifica un caso con padding: `28x28`, `5x5`, `stride=1`, `padding=2` -> `28x28`.
+- Verifica un caso con padding: `28x28`, `5x5`, `stride=1`, `padding=2` → `28x28`.
 
 #### Solución
 
@@ -1486,10 +1631,29 @@ def conv2d_out(H: int, W: int, KH: int, KW: int, stride: int = 1, padding: int =
     W_out = (W + 2 * padding - KW) // stride + 1
     return int(H_out), int(W_out)
 
-
 assert conv2d_out(28, 28, 5, 5, stride=1, padding=0) == (24, 24)
 assert conv2d_out(28, 28, 5, 5, stride=1, padding=2) == (28, 28)
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 7.8: Output shape de conv (stride/padding)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M07-E07_8`
+- **Duración estimada:** 20–45 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- Fórmula sin dilatación: `H_out = (H + 2P - KH)//S + 1` (igual para `W_out`).
+- Si no cuadra, normalmente el error está en `padding` o en entero vs float.
+
+#### 3) Errores comunes
+- Olvidar que `padding` aplica a ambos lados (por eso `2P`).
+- Usar `/` en vez de `//` y obtener floats.
+
+#### 4) Nota docente
+- Pide que el alumno derive la fórmula a partir de “cuántas posiciones cabe el kernel”.
+</details>
 
 ---
 

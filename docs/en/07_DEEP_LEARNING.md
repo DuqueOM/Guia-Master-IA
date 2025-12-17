@@ -129,6 +129,27 @@ g_ana = sigmoid_deriv(z)
 assert np.allclose(g_num, g_ana, rtol=1e-5, atol=1e-6)
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 7.1: Activations + derivatives (numerical check)</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M07-E07_1`
+- **Estimated duration:** 20–45 min
+- **Level:** Intermediate
+
+#### 2) Objectives
+- Understand the difference between an **activation** `f(z)` and its **derivative** `f'(z)`.
+- Validate a derivative with **central finite differences**.
+
+#### 3) Common mistakes
+- Using forward differences (higher error) instead of central differences.
+- Picking `h` too large (bias) or too small (numerical error).
+- Not clipping `z` inside sigmoid and getting `inf/NaN`.
+
+#### 4) Teaching note
+- Ask the student to explain why numerical checking is a sanity check (not a formal proof).
+</details>
+
 ---
 
 ### Exercise 7.2: Dense layer forward (batch) + shape reasoning
@@ -171,6 +192,26 @@ for i in range(n):
 
 assert np.allclose(Z, Z_loop)
 ```
+
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 7.2: Dense forward (batch) and shape contracts</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M07-E07_2`
+- **Estimated duration:** 20–40 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- With the batch-first convention, `X @ W + b` means:
+  - `X:(n,d_in)`, `W:(d_in,d_out)`, `b:(d_out,)` → `Z:(n,d_out)`.
+
+#### 3) Common mistakes
+- Defining `W` as `(d_out,d_in)` and then “fixing it” with transposes everywhere.
+- Confusing the bias broadcasting axis (it must broadcast along the second dimension).
+
+#### 4) Teaching note
+- Ask the student to write the shapes from memory before running the code.
+</details>
 
 ---
 
@@ -228,6 +269,27 @@ loss_bad = categorical_cross_entropy(y_true, np.array([[0.4, 0.3, 0.3]]))
 assert loss_good < loss_bad
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 7.3: Stable softmax + cross-entropy</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M07-E07_3`
+- **Estimated duration:** 30–60 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- Stability: `softmax(z) = exp(z - logsumexp(z))` avoids overflow.
+- For classification, the key is to compare probabilities without producing `NaN`.
+
+#### 3) Common mistakes
+- Computing `exp(z)` directly for large logits.
+- Forgetting `eps` when computing `log(y_pred)`.
+- Mixing categorical cross-entropy (one-hot) with binary cross-entropy.
+
+#### 4) Teaching note
+- Ask the student to explain why subtracting the max does not change the softmax result.
+</details>
+
 ---
 
 ## Week 18 protocol: computation graph + explicit shapes (before `backward()`)
@@ -237,140 +299,7 @@ Before coding any `backward()` function, lock in two things:
 - **Your computation graph** (what nodes exist, and what depends on what).
 - **Your shapes** (so every gradient has a unique, checkable shape).
 
-### 1) Pick one convention and stick to it (recommended: batch-first 2D)
-
-- `X`: `(n, d_in)`
-- `W`: `(d_in, d_out)`
-- `b`: `(d_out,)` (broadcast to `(n, d_out)`)
-- `Z = XW + b`: `(n, d_out)`
-- Activations `A`: `(n, d_out)`
-
-Avoid mixing `(d,)` and `(d,1)` unless you deliberately use column vectors everywhere.
-
-### 2) Two-layer network: forward shapes you must be able to write from memory
-
-Network (batch):
-
-- `Z1 = XW1 + b1`, `A1 = relu(Z1)`
-- `Z2 = A1W2 + b2`, `P = sigmoid(Z2)`
-
-Shape table:
-
-| Symbol | Meaning | Shape |
-|---|---|---|
-| `X` | input batch | `(n, d_in)` |
-| `W1` | layer 1 weights | `(d_in, d_h)` |
-| `b1` | layer 1 bias | `(d_h,)` |
-| `Z1`, `A1` | pre/post activation | `(n, d_h)` |
-| `W2` | layer 2 weights | `(d_h, d_out)` |
-| `b2` | layer 2 bias | `(d_out,)` |
-| `Z2`, `P` | logits / probs | `(n, d_out)` |
-| `y` | targets | `(n, d_out)` |
-
-### 3) Backward protocol: gradient-shape invariants (non-negotiable)
-
-If `Z = XW + b`, then for batch-first shapes above:
-
-- `dW` **must** have the same shape as `W`.
-- `db` **must** have the same shape as `b`.
-- `dX` **must** have the same shape as `X`.
-
-For the two-layer case:
-
-| Gradient | Shape |
-|---|---|
-| `dZ2` | `(n, d_out)` |
-| `dW2 = A1.T @ dZ2` | `(d_h, d_out)` |
-| `db2 = sum(dZ2, axis=0)` | `(d_out,)` |
-| `dA1 = dZ2 @ W2.T` | `(n, d_h)` |
-| `dZ1 = dA1 * relu'(Z1)` | `(n, d_h)` |
-| `dW1 = X.T @ dZ1` | `(d_in, d_h)` |
-| `db1 = sum(dZ1, axis=0)` | `(d_h,)` |
-
-### 4) Debug protocol (do this before “tuning hyperparameters”)
-
-- Add `assert` checks for all shapes.
-- Run **gradient checking** on 1–3 coordinates (Exercise 7.4).
-- Run an **overfit test** on a tiny dataset: if it cannot memorize, treat it as a bug.
-
-#### 4.1 Capsule: Shape checks (decorator + asserts)
-
-Practical rule: if a function consumes tensors/arrays, validate **shapes** at the start (and, if applicable, validate the output). This prevents silent shape bugs in `forward()`/`backward()`.
-
-```python
-import numpy as np
-from typing import Any, Callable, Dict, Optional, Sequence
-
-def assert_shape(x: np.ndarray, shape: Sequence[Optional[int]], name: str = "x") -> np.ndarray:
-    x = np.asarray(x)
-    assert x.ndim == len(shape), f"{name}.ndim={x.ndim}, expected={len(shape)}"
-    for i, (got, exp) in enumerate(zip(x.shape, shape)):
-        if exp is not None:
-            assert got == exp, f"{name}.shape[{i}]={got}, expected={exp}"
-    return x
-
-def shape_check(
-    spec: Dict[str, Sequence[Optional[int]]],
-    out: Optional[Sequence[Optional[int]]] = None,
-) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-    def deco(fn: Callable[..., Any]) -> Callable[..., Any]:
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            for k, shp in spec.items():
-                if k in kwargs:
-                    assert_shape(kwargs[k], shp, name=k)
-            y = fn(*args, **kwargs)
-            if out is not None:
-                assert_shape(y, out, name="out")
-            return y
-
-        return wrapper
-
-    return deco
-
-@shape_check({"X": (None, 3), "W": (3, 4), "b": (4,)}, out=(None, 4))
-def dense_forward(X: np.ndarray, W: np.ndarray, b: np.ndarray) -> np.ndarray:
-    return X @ W + b
-
-X = np.random.randn(5, 3)
-W = np.random.randn(3, 4)
-b = np.random.randn(4)
-Z = dense_forward(X=X, W=W, b=b)
-assert Z.shape == (5, 4)
-```
-
-#### 4.2 Capsule: Initialization (Xavier vs He/Kaiming)
-
-Practical rule for MLPs:
-
-- `tanh/sigmoid` hidden activations often pair well with **Xavier/Glorot**.
-- `ReLU` hidden activations often pair well with **He/Kaiming**.
-
-```python
-import numpy as np
-from typing import Literal, Optional
-
-def init_linear(
-    fan_in: int,
-    fan_out: int,
-    mode: Literal["xavier", "kaiming"] = "xavier",
-    seed: Optional[int] = None,
-) -> np.ndarray:
-    rng = np.random.default_rng(seed)
-
-    if mode == "kaiming":
-        std = np.sqrt(2.0 / fan_in)
-    else:
-        std = np.sqrt(1.0 / fan_in)
-
-    W = rng.standard_normal((fan_in, fan_out)) * std
-    return W
-
-d_in, d_out = 784, 128
-W_relu = init_linear(d_in, d_out, mode="kaiming", seed=0)
-W_tanh = init_linear(d_in, d_out, mode="xavier", seed=0)
-assert W_relu.shape == (d_in, d_out)
-assert W_tanh.shape == (d_in, d_out)
-```
+---
 
 ### Exercise 7.4: Two-layer backprop + gradient checking
 
@@ -466,6 +395,30 @@ g_num = (L_plus - L_minus) / (2.0 * h)
 assert np.isclose(dW2[i, j], g_num, rtol=1e-4, atol=1e-6)
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 7.4: Backprop + gradient checking</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M07-E07_4`
+- **Estimated duration:** 45–90 min
+- **Level:** Advanced
+
+#### 2) Key idea
+- Gradient checking compares your analytical gradients vs a numerical approximation on a few coordinates.
+- If this fails, the bug is almost always:
+  - a missing `/ n` normalization
+  - a wrong transpose
+  - or a silent broadcasting mistake
+
+#### 3) Common mistakes
+- Using too large `h` (biased estimate) or too small `h` (floating-point noise).
+- Checking “too many” coordinates instead of 1–3 targeted ones.
+- Forgetting that `dW2` must match `W2.shape` exactly.
+
+#### 4) Teaching note
+- Require the student to justify each gradient shape in the table before coding.
+</details>
+
 ---
 
 ### Exercise 7.5: Overfit test (mandatory sanity check)
@@ -531,6 +484,27 @@ assert loss_end <= loss0
 assert acc > 0.95
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 7.5: Overfit test (sanity check)</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M07-E07_5`
+- **Estimated duration:** 30–60 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- If your model cannot memorize a tiny dataset, you should assume there is a bug.
+- This is the fastest way to distinguish “bad hyperparameters” from “wrong gradients”.
+
+#### 3) Common mistakes
+- Using too low learning rate and misreading it as “the model cannot learn”.
+- Forgetting to clip logits inside sigmoid and causing instability.
+- Measuring accuracy incorrectly (shape mismatch in `pred == y`).
+
+#### 4) Teaching note
+- Ask the student to reduce the dataset to 8 points and still reach >95% accuracy.
+</details>
+
 ---
 
 ### Exercise 7.6: Optimizers on a quadratic (SGD vs Adam)
@@ -590,6 +564,27 @@ assert abs(w_sgd - 3.0) < 1e-2
 assert abs(w_adam - 3.0) < 1e-2
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 7.6: SGD vs Adam (intuition)</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M07-E07_6`
+- **Estimated duration:** 25–45 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- SGD: same step size in every direction.
+- Adam: keeps running estimates of first/second moments (mean/variance), adapting the step size.
+
+#### 3) Common mistakes
+- Forgetting bias-correction (`m_hat`, `v_hat`).
+- Choosing `lr` for Adam as if it were SGD (often too large/too small depending on the setup).
+- Not verifying convergence on a toy function before using the optimizer in a network.
+
+#### 4) Teaching note
+- Ask the student to plot `w_t` for both methods and compare speed vs stability.
+</details>
+
 ---
 
 ### Exercise 7.7: Gradient clipping (prevent exploding gradients)
@@ -632,6 +627,27 @@ g_keep = clip_by_norm(g_small, max_norm=1.0)
 assert np.allclose(g_small, g_keep)
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 7.7: Gradient clipping</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M07-E07_7`
+- **Estimated duration:** 20–35 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- Clipping keeps the direction of the gradient but caps its magnitude.
+- This reduces “exploding gradients” without changing small gradients.
+
+#### 3) Common mistakes
+- Clipping element-wise instead of by norm (changes direction).
+- Not handling the `||g|| = 0` case.
+- Applying clipping to parameters instead of gradients.
+
+#### 4) Teaching note
+- Ask the student to show that the clipped gradient is a scalar multiple of the original.
+</details>
+
 ---
 
 ### Exercise 7.8: Convolution output shape (padding/stride)
@@ -662,6 +678,28 @@ def conv2d_out(H: int, W: int, KH: int, KW: int, stride: int = 1, padding: int =
 assert conv2d_out(28, 28, 5, 5, stride=1, padding=0) == (24, 24)
 assert conv2d_out(28, 28, 5, 5, stride=1, padding=2) == (28, 28)
 ```
+
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 7.8: Convolution output shape (stride/padding)</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M07-E07_8`
+- **Estimated duration:** 20–40 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- For each spatial dimension:
+  - `out = floor((in + 2p - k) / s) + 1`
+- If `in + 2p - k` is not divisible by `s`, you must decide whether to floor (standard) or change padding.
+
+#### 3) Common mistakes
+- Mixing “kernel size” and “receptive field” (same here, different with dilation).
+- Forgetting to apply padding on both sides (`+ 2p`).
+- Confusing stride in the forward pass with downsampling from pooling.
+
+#### 4) Teaching note
+- Ask the student to compute 2–3 cases by hand before implementing the function.
+</details>
 
 ---
 

@@ -1389,6 +1389,30 @@ assert np.isclose(D2[i, 1], manual1)
 assert labels[i] == int(np.argmin([manual0, manual1]))
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 6.1: Distancias vectorizadas (shapes + broadcasting + argmin)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** De `||x-c||²` a una matriz `(n,k)` sin loops
+- **ID (opcional):** `M06-E06_1`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+- **Dependencias:** Broadcasting + `axis` (M01), norma L2 (M02)
+
+#### 2) Objetivos
+- Construir `D2:(n,k)` sin bucles sobre `n` ni `k`.
+- Elegir el `axis` correcto en `sum` y `argmin`.
+- Debuggear shapes con un ejemplo pequeño y verificable.
+
+#### 3) Errores comunes
+- Reducir el eje equivocado en `sum` (debe ser el eje de features `d`).
+- Calcular `sqrt` sin necesidad (para `argmin`, dist y dist² ordenan igual).
+- Usar `argmin(axis=0)` (contesta otra pregunta).
+
+#### 4) Nota docente
+- Pide que el alumno explique qué representa cada eje de `D2`.
+</details>
+
 ---
 
 ### Ejercicio 6.2: Paso de actualización (centroides como promedio)
@@ -1427,6 +1451,32 @@ for j in range(C.shape[0]):
 assert C_new.shape == C.shape
 assert np.isfinite(C_new).all()
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 6.2: Actualización de centroides (promedios + clusters vacíos)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Por qué el centroide es la media (y qué hacer si un cluster queda vacío)
+- **ID (opcional):** `M06-E06_2`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Ideas clave
+- Con `labels` fijos, la media minimiza `Σ ||x-μ||²`.
+- Si `labels==j` no selecciona puntos, `mean` sobre slice vacío produce `NaN`.
+
+#### 3) Estrategias para cluster vacío
+- Conservar el centroide anterior (simple y estable).
+- Reinicializar en un punto aleatorio de `X`.
+- Reinicializar en el punto con mayor error (más avanzado).
+
+#### 4) Errores comunes
+- Promediar con `axis=1` (debe ser `axis=0` para obtener un vector `(d,)`).
+- No validar con `np.isfinite` y propagar `NaN`.
+
+#### 5) Nota docente
+- Pide que el alumno cree a propósito un cluster vacío y explique el fallo.
+</details>
 
 ---
 
@@ -1488,6 +1538,31 @@ assert J1 <= J0 + 1e-12
 assert J0 >= 0.0 and J1 >= 0.0
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 6.3: Inercia y monotonía de Lloyd (convergencia ≠ óptimo global)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Qué mide la inercia y por qué Lloyd la baja
+- **ID (opcional):** `M06-E06_3`
+- **Duración estimada:** 30–75 min
+- **Nivel:** Intermedio
+
+#### 2) Idea central
+- Asignación: con `C` fijo, elegir el centro más cercano minimiza `J` respecto a `labels`.
+- Actualización: con `labels` fijos, poner cada centro en la media minimiza `J` respecto a `C`.
+- Alternar ambos pasos ⇒ `J` baja o queda igual.
+
+#### 3) Convergencia ≠ óptimo global
+- Lloyd converge, pero depende de la inicialización y puede caer en mínimos locales.
+- Por eso K-Means++ y reinicios múltiples son estándar.
+
+#### 4) Debugging
+- Si `J` aumenta, casi siempre es un error de `axis`, indexado (`C[labels]`) o `NaN`.
+
+#### 5) Nota docente
+- Pide que el alumno explique en 2 líneas: “converge” vs “mejor clustering posible”.
+</details>
+
 ---
 
 ### Ejercicio 6.4: K-Means++ (probabilidades correctas)
@@ -1536,6 +1611,31 @@ for j in range(C.shape[0]):
     assert np.any(np.all(np.isclose(X, C[j]), axis=1))
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 6.4: K-Means++ (probabilidades correctas)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Inicialización que reduce mínimos locales malos
+- **ID (opcional):** `M06-E06_4`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- K-Means++ elige nuevos centroides con probabilidad proporcional a la distancia² al centroide más cercano.
+- Intuición: fuerza a que los centroides iniciales queden separados, cubriendo mejor el espacio.
+
+#### 3) Chequeos importantes
+- `d2 >= 0` siempre (son distancias cuadradas).
+- `probs` debe sumar 1.
+- Los centroides seleccionados deben ser puntos existentes de `X`.
+
+#### 4) Caso borde
+- Si todos los puntos ya están a distancia 0 de algún centroide (`sum(d2)=0`), no hay señal para muestrear: en práctica puedes romper el loop o elegir aleatorio.
+
+#### 5) Nota docente
+- Pide que el alumno compare K-Means con init aleatoria vs K-Means++ en un dataset con dos clusters separados.
+</details>
+
 ---
 
 ### Ejercicio 6.5: Sensibilidad a escala (por qué normalizar importa)
@@ -1580,6 +1680,27 @@ assert labels_s_small.shape == (1,)
 assert labels_s_big.shape == (1,)
 assert labels_s_small[0] != labels_s_big[0]
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 6.5: Sensibilidad a escala (normalización)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Por qué K-Means necesita features comparables
+- **ID (opcional):** `M06-E06_5`
+- **Duración estimada:** 20–45 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- K-Means optimiza distancias euclidianas: si una feature está en escala 100× mayor, domina la distancia.
+
+#### 3) Regla práctica
+- Antes de K-Means/PCA, suele ser obligatorio:
+  - estandarizar (media 0, var 1) o
+  - normalizar por rango, según el dominio.
+
+#### 4) Nota docente
+- Pide que el alumno explique por qué “normalizar cambia el significado de ‘cerca’”.
+</details>
 
 ---
 
@@ -1628,6 +1749,29 @@ assert r[0] >= r[1]
 assert 0.0 <= r.sum() <= 1.0
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 6.6: PCA vía SVD (shapes + varianza explicada)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** PCA estable en código (SVD) sin construir covarianza
+- **ID (opcional):** `M06-E06_6`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio/Avanzado
+
+#### 2) Shapes que debes poder justificar
+- `X:(n,d)` → `Xc:(n,d)` (centrado)
+- `Vt:(d,d)` (o `(d,rank)` si `full_matrices=False` y `n<d`)
+- `comps = Vt[:k].T → (d,k)`
+- `Xk = Xc @ comps → (n,k)`
+
+#### 3) Varianza explicada
+- Con SVD, los valores singulares `S` te dan varianzas: `var = S^2/(n-1)`.
+- El ratio `var/sum(var)` indica qué porcentaje explica cada componente.
+
+#### 4) Nota docente
+- Pide que el alumno explique por qué centrar `X` es obligatorio para PCA.
+</details>
+
 ---
 
 ### Ejercicio 6.7: Reconstrucción PCA (error decrece al aumentar componentes)
@@ -1674,6 +1818,23 @@ err2 = np.linalg.norm(X - X2)
 
 assert err2 <= err1 + 1e-12
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 6.7: Reconstrucción PCA (sesgo vs compresión)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Más componentes ⇒ menos error (pero menos compresión)
+- **ID (opcional):** `M06-E06_7`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- `Vk Vk^T` es el proyector al subespacio de dimensión `k`.
+- Si aumentas `k`, el subespacio crece y la proyección puede “explicar” más energía ⇒ el error no aumenta.
+
+#### 3) Nota docente
+- Pide que el alumno conecte “error de reconstrucción” con “varianza explicada acumulada”.
+</details>
 
 ---
 
@@ -1727,6 +1888,29 @@ labels = np.array([0, 0, 1, 1])
 score = silhouette_score(X, labels)
 assert -1.0 <= score <= 1.0
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 6.8: Silhouette (intuición y límites)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Métrica de clustering “interna” (sin etiquetas)
+- **ID (opcional):** `M06-E06_8`
+- **Duración estimada:** 30–75 min
+- **Nivel:** Avanzado
+
+#### 2) Intuición
+- Para cada punto:
+  - `a` = distancia media a su propio cluster
+  - `b` = mejor (mínima) distancia media a otro cluster
+- `s = (b-a)/max(a,b)` ∈ [-1, 1]
+
+#### 3) Limitaciones
+- Requiere distancias pairwise: costo O(n²) (por eso lo hacemos “mini”).
+- Depende de la métrica de distancia (igual que K-Means).
+
+#### 4) Nota docente
+- Pide que el alumno interprete 3 casos: `s≈1`, `s≈0`, `s<0`.
+</details>
 
 ---
 

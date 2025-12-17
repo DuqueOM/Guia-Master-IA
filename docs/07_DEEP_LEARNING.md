@@ -91,7 +91,20 @@ Visualización sugerida:
 | 17 | Perceptrón y MLP | `activations.py` + forward pass |
 | 18 | Backpropagation | `backward()` con Chain Rule |
 | 19 | **CNNs: Teoría + Forward (NumPy)** | Convolución/pooling (forward) + quiz de dimensiones |
-| 20 | **PyTorch para CNNs** | `scripts/train_cnn_pytorch.py` |
+| 20 | **PyTorch para CNNs + Sequence Modeling (Light)** | `scripts/train_cnn_pytorch.py` + `scripts/simple_rnn_forward.py` |
+
+---
+
+## 🧵 Semana 20 (extra): Sequence Modeling (Light) — RNN forward pass
+
+**Objetivo:** entender dimensiones en datos secuenciales sin entrenar.
+
+- **Ejecutable:**
+  - `python3 scripts/simple_rnn_forward.py`
+- **Qué debes entender:**
+  - `x.shape = (batch, time, features)`
+  - `h.shape = (batch, time, hidden)`
+  - `y.shape = (batch, time, out)`
 
 ---
 
@@ -2479,6 +2492,10 @@ Explica en **máximo 5 líneas** sin jerga técnica:
 ### CNNs (Práctica)
 - [ ] Implementé forward pass (NumPy) de convolución + pooling para una arquitectura tipo LeNet
 - [ ] Entrené una CNN equivalente con PyTorch usando `scripts/train_cnn_pytorch.py`
+
+### Sequence Modeling (Light)
+- [ ] Ejecuté `scripts/simple_rnn_forward.py` y verifiqué shapes `(batch,time,features)`
+- [ ] Puedo explicar qué cambia al variar `batch`, `time` y `hidden`
 
 ### Entregables de Código
 - [ ] `neural_network.py` con tests pasando

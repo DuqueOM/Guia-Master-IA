@@ -1934,6 +1934,36 @@ sizes_to_test = [
 
 ---
 
+## 🧪 Método Científico: Ablation Studies (v3.4 - Obligatorio)
+La meta no es “buscar el mejor modelo” únicamente: es demostrar que sabes **razonar causalmente** sobre qué componentes aportan rendimiento.
+En el informe final, incluye una sección de **Ablation Studies** donde cambies **una cosa a la vez** (controlando el resto) y reportes el impacto.
+Reglas:
+
+- Cambia **una variable** por experimento.
+- Reporta **métrica** (accuracy) + **costo** (tiempo/compute si aplica).
+- Concluye en 2–4 líneas: qué aprendiste y qué harías después.
+
+Ejemplos (elige al menos 2):
+
+- Quitar normalización vs mantener normalización.
+- Inicialización aleatoria vs Xavier/He.
+- Mini-batch vs full-batch.
+- L2 regularization on/off.
+
+Formato sugerido (en `docs/MODEL_COMPARISON.md`):
+
+```markdown
+## Ablation Studies
+
+| Ablation | Cambio | Test Accuracy | Δ vs baseline | Interpretación |
+|---|---|---:|---:|---|
+| Baseline | (tu baseline) | ___ | 0.00 | referencia |
+| Sin normalización | X en [0,255] | ___ | ___ | (qué pasó y por qué) |
+| Init aleatoria | sin Xavier/He | ___ | ___ | (qué pasó y por qué) |
+```
+
+---
+
 ## 🔎 Análisis de Errores: Nivel Senior (v3.3)
 
 > 💎 **Profesionalismo:** No solo muestres el accuracy. Muestra las imágenes que la red falló y explica por qué.
@@ -2145,6 +2175,7 @@ Esto sugiere que:
 
 ### Semana 24: Benchmark + Informe
 - [ ] MODEL_COMPARISON.md completo
+- [ ] Sección "Ablation Studies" completa en MODEL_COMPARISON.md
 - [ ] README.md profesional en inglés
  - [ ] Benchmark alternativo: probé **Fashion-MNIST** (o justifiqué por qué no)
  - [ ] Dirty Data Check: generé un dataset corrupto con `scripts/corrupt_mnist.py` y documenté limpieza
@@ -2157,6 +2188,7 @@ Esto sugiere que:
 - [ ] **Análisis de Errores** con visualización de fallos
 - [ ] **Curvas de Aprendizaje** con diagnóstico Bias-Variance
 - [ ] Sección "Error Analysis" en MODEL_COMPARISON.md
+- [ ] Sección "Ablation Studies" en MODEL_COMPARISON.md
 - [ ] `mypy src/` pasa sin errores
 - [ ] `pytest tests/` pasa sin errores
 

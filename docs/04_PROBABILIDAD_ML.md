@@ -1215,6 +1215,22 @@ print(f"P(x=[0.5, 0.5]) = {prob:.4f}")  # Imprime densidad (ojo: no es probabili
 - Pedir al alumno que dibuje cómo cambia la elipse al variar covarianza.
 </details>
 
+#### 3.5 GMM Just-in-Time: Mezcla de 3 gaussianas + contornos (preámbulo a Unsupervised)
+
+**Objetivo:** que la “Gaussiana multivariada” no se quede teórica: vas a **generar datos** de una mezcla de 3 gaussianas y a **visualizar contornos** (componentes y mezcla). Esto es el puente directo a **GMM** (Módulo 06).
+
+- **Ejecutable:**
+  - `python3 scripts/gmm_3_gaussians_contours.py`
+- **Entregable:**
+  - una figura (pantallazo o archivo guardado con `--out`) y una explicación breve:
+    - **Qué representa** el contorno negro (mezcla)
+    - **Qué representan** los contornos coloreados (componentes)
+    - **Qué cambia** si modificas una covarianza (rotación / elongación)
+
+- **Preguntas (nivel maestría):**
+  - **K-Means vs GMM:** ¿por qué K-Means es *hard assignment* y GMM es *soft assignment*?
+  - **Covarianza:** ¿qué hace `Σ` geométricamente (orientación/forma) y por qué aparece `Σ^{-1}` en el exponente?
+
 ---
 
 ### Día 6: Maximum Likelihood Estimation (MLE)
@@ -1771,6 +1787,66 @@ cross_entropy_from_mle()
 #### 15) Nota docente
 - Pedir que el alumno identifique, en una implementación, dónde se aplica `max(z)` para estabilizar.
 </details>
+
+---
+
+### Día 6.5: Teoría de la Información (Entropía + KL-Divergence)
+
+Este bloque existe para que puedas leer “cross-entropy” como **divergencia KL + constante** y para que puedas derivar la equivalencia central:
+
+- **Minimizar KL** (entre distribución real y modelo) es **maximizar log-likelihood**.
+
+#### 6.5.1 Entropía
+
+Para una distribución discreta `p`:
+
+```text
+H(p) = - Σ_x p(x) log p(x)
+```
+
+Intuición: “costo promedio de sorpresa” bajo `p`.
+
+#### 6.5.2 Divergencia KL
+
+Para dos distribuciones discretas `p` y `q`:
+
+```text
+KL(p||q) = Σ_x p(x) log( p(x) / q(x) )
+         = Σ_x p(x) log p(x) - Σ_x p(x) log q(x)
+```
+
+#### 6.5.3 Derivación clave: minimizar KL ⇔ maximizar log-likelihood
+
+Sea `p_data` la distribución “real” y `p_θ` tu modelo.
+
+```text
+KL(p_data || p_θ)
+= E_{x~p_data}[log p_data(x)] - E_{x~p_data}[log p_θ(x)]
+```
+
+El primer término no depende de `θ`. Por lo tanto:
+
+```text
+argmin_θ KL(p_data || p_θ)  =  argmax_θ E_{x~p_data}[log p_θ(x)]
+```
+
+Y con datos i.i.d. `{x_i}`:
+
+```text
+E_{p_data}[log p_θ(x)]  ≈  (1/n) Σ_i log p_θ(x_i)
+```
+
+Así conectas KL directamente con MLE.
+
+#### 6.5.4 Cross-Entropy como KL + constante
+
+Cuando `y` es una distribución (por ejemplo one-hot) y `p` es la predicción:
+
+```text
+H(y,p) = H(y) + KL(y||p)
+```
+
+Como `H(y)` es constante respecto al modelo, minimizar cross-entropy equivale a minimizar `KL(y||p)`.
 
 ## 🌱 Extensión Estratégica (Línea 2): Markov Chains (intro conceptual)
 
@@ -3120,9 +3196,12 @@ Explica en 5 líneas o menos:
 - [ ] Puedo explicar el Teorema de Bayes con un ejemplo
 - [ ] Sé calcular la PDF de una Gaussiana a mano
 - [ ] Entiendo por qué MLE da Cross-Entropy como loss
+- [ ] Puedo explicar entropía y por qué `cross-entropy = H(y) + KL(y||p)`
+- [ ] Puedo derivar por qué minimizar `KL(p_data||p_θ)` equivale a maximizar log-likelihood
 - [ ] Implementé softmax numéricamente estable
 - [ ] Puedo derivar el MLE de una Bernoulli (moneda) y explicarlo
 - [ ] Puedo explicar qué es una Markov Chain y qué representa una matriz de transición
+- [ ] Ejecuté `scripts/gmm_3_gaussians_contours.py` y entiendo los contornos de componentes vs mezcla
 - [ ] Los tests de `probability.py` pasan
 
 ---

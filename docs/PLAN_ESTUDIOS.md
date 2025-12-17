@@ -251,7 +251,7 @@ Además del script, documenta al menos **5 problemas reales** del CSV (nulos, ou
 ## 🗓️ SEMANA 8: Probabilidad para ML (Módulo 04)
 
 **Objetivo:** Bayes, Gaussiana, MLE - lo mínimo para entender loss functions
-**Conexión con Pathway:** Cross-Entropy viene de MLE. GMM usa Gaussianas.
+**Conexión con Pathway:** Cross-Entropy viene de MLE. GMM usa Gaussianas. Extra (nivel maestría): Entropía + KL.
 
 ### Semana 8: Probabilidad Esencial
 
@@ -261,8 +261,8 @@ Además del script, documenta al menos **5 problemas reales** del CSV (nulos, ou
 | M | Teorema de Bayes | Prior, Likelihood, Posterior | Implementar |
 | X | Distribución Gaussiana | PDF, μ, σ | `gaussian_pdf()` |
 | J | Gaussiana multivariada | Matriz de covarianza | Implementar |
-| V | MLE (Maximum Likelihood) | Por qué da Cross-Entropy | Demostración |
-| S | **Checkpoint Fase 1** | `probability.py` completo | Entregable |
+| V | MLE + Teoría de la Información | Entropía + KL (KL ⇔ MLE) | Derivación |
+| S | **Checkpoint Fase 1** | `probability.py` completo | Ejecutar `scripts/gmm_3_gaussians_contours.py` |
 
 **Entregable:** Librería `probability.py` con Gaussiana, MLE y softmax.
 
@@ -463,7 +463,7 @@ Teorema de la semana (concepto-guía): PCA como maximización de varianza.
 | M | Momentum / Adam | Acelerar convergencia | Implementar |
 | X | **Intro a PyTorch** | Tensores, `nn.Module`, `DataLoader` | Primer forward |
 | J | **CNN Training con PyTorch** | Entrenar una CNN (sin backward manual) | Código |
-| V | Comparación | CNN NumPy (forward) vs CNN PyTorch (training) | Notas |
+| V | Comparación + secuencias (light) | CNN NumPy (forward) vs CNN PyTorch (training) | `scripts/simple_rnn_forward.py` |
 | S | **Checkpoint** | MLP resuelve XOR | Entregable |
 
 **Entregable:** `neural_net.py` - Una red neuronal que resuelve el problema XOR implementando `backward()` manualmente **+** `scripts/train_cnn_pytorch.py` (entrenamiento CNN con PyTorch).
@@ -553,7 +553,7 @@ En las semanas 22 y 23, realizar los simulacros definidos en `study_tools/EXAMEN
 | M | Benchmark alternativo (recomendado): **Fashion-MNIST** |
 | X | Dirty Data Check: generar dataset corrupto (`scripts/corrupt_mnist.py`) + limpieza |
 | J | Deployment mínimo: guardar checkpoint + `scripts/predict.py` |
-| V | Escribir MODEL_COMPARISON.md + crear README.md profesional (inglés) |
+| V | Escribir MODEL_COMPARISON.md (incluye Ablation Studies) + crear README.md profesional (inglés) |
 | S | **Entrega final + Autoevaluación** |
 
 **Entregable Final:**
@@ -588,12 +588,12 @@ mnist-analyst/
 - [ ] Python + Pandas + NumPy dominado
 - [ ] Álgebra lineal: normas, distancias, SVD, eigenvalues
 - [ ] Cálculo: gradientes, chain rule, gradient descent
-- [ ] Probabilidad: Bayes, Gaussiana, MLE, softmax
+- [ ] Probabilidad: Bayes, Gaussiana, MLE, softmax, entropía y KL
 
 ### Fase 2: ML Core (Módulos 05-07) ⭐ PATHWAY
 - [ ] **Supervised (05):** Logistic Regression con métricas
 - [ ] **Unsupervised (06):** K-Means y PCA desde cero
-- [ ] **Deep Learning (07):** MLP con backprop + teoría CNNs
+- [ ] **Deep Learning (07):** MLP con backprop + teoría CNNs + forward pass RNN (light)
 
 ### Fase 3: Proyecto MNIST (Módulo 08)
 - [ ] PCA reduce MNIST a 2D con visualización
@@ -601,6 +601,7 @@ mnist-analyst/
 - [ ] Logistic Regression clasifica con >85% accuracy
 - [ ] MLP supera a Logistic con >90% accuracy
 - [ ] MODEL_COMPARISON.md explica matemáticamente las diferencias
+- [ ] MODEL_COMPARISON.md incluye Ablation Studies (cambiar una cosa a la vez y reportar impacto)
 - [ ] README.md profesional en inglés
 
 ### Verificación Final

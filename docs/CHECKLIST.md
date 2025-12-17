@@ -75,7 +75,10 @@ Uso recomendado:
 - [ ] Gaussiana univariada: PDF implementada
 - [ ] Gaussiana multivariada: concepto entendido
 - [ ] MLE: conexión con Cross-Entropy explicada
+- [ ] Entropía y KL-Divergence: entiendo la relación `H(y,p)=H(y)+KL(y||p)`
+- [ ] Entiendo por qué minimizar `KL(p_data||p_θ)` equivale a maximizar log-likelihood
 - [ ] **Softmax con Log-Sum-Exp trick implementado (v3.3)**
+- [ ] Ejecuté `scripts/gmm_3_gaussians_contours.py` y entiendo contornos de mezcla vs componentes
 - [ ] `probability.py` con tests pasando
 
 #### Evaluación (PB-8)
@@ -134,6 +137,7 @@ Uso recomendado:
 - [ ] **CNNs (teoría):** convolución, stride, padding, pooling
 - [ ] Implementé forward pass de una CNN simple (NumPy)
 - [ ] Entrené una CNN con PyTorch (`torch.nn`) sin implementar backward manual
+- [ ] Ejecuté `scripts/simple_rnn_forward.py` (forward RNN) y entiendo shapes `(batch,time,features)`
 
 #### Derivación Analítica (v3.2 - Obligatorio)
 - [ ] **Derivé las ecuaciones de backprop para red de 2 capas**
@@ -180,6 +184,7 @@ Uso recomendado:
  - [ ] Benchmark principal: probé **Fashion-MNIST**
  - [ ] Dirty Data Check: generé un dataset corrupto con `scripts/corrupt_mnist.py` y documenté limpieza
  - [ ] Deployment mínimo: guardé un checkpoint de CNN (`scripts/train_cnn_pytorch.py`) y corrí `scripts/predict.py`
+ - [ ] Informe incluye sección de "Ablation Studies" (ablation: cambiar una cosa a la vez y reportar impacto)
 
 ### Requisitos v3.2 (Obligatorios)
 - [ ] **Análisis Bias-Variance** con experimento práctico (3 tamaños de MLP)

@@ -95,6 +95,16 @@ Report at least one learning-curve experiment:
 - plot train vs test accuracy for Logistic vs MLP
 - diagnose which side (bias/variance) is limiting each model
 
+## Ablation Studies (required)
+
+Include at least 2 ablations where you change **one thing at a time** and quantify the effect.
+
+| Ablation | Change | Test Accuracy | Δ vs baseline | Interpretation |
+|---|---|---:|---:|---|
+| Baseline | (your baseline config) | ___ | 0.00 | reference |
+| No normalization | X in [0,255] (or missing standardization) | ___ | ___ | explain what changed and why |
+| Random init | no Xavier/He | ___ | ___ | explain what changed and why |
+
 ## How to reproduce (minimal)
 
 - Train CNN on Fashion-MNIST:

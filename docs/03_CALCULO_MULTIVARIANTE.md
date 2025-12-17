@@ -64,6 +64,15 @@ Enlaces rápidos:
 - Puedes explicar chain rule en 5 líneas y aplicarla a una composición.
 - Puedes ejecutar gradient checking y entender qué significa el error relativo.
 
+### Ritmo semanal recomendado (aplicado a Semanas 6–8)
+
+- **Lunes y Martes (Concepto):** prioriza Chain Rule. Si solo dominas 1 cosa de cálculo para DL, es esta.
+- **Miércoles y Jueves (Implementación):** implementa y valida: gradientes analíticos + diferencias finitas.
+- **Viernes (Romper cosas):** fuerza fallos típicos y explícales con teoría:
+  - sube `learning_rate` hasta divergir y describe la señal en `history_f`
+  - prueba entradas grandes en sigmoide (`z` muy positivo/negativo) y explica saturación (gradiente ~ 0)
+  - cambia `epsilon` en diferencias finitas y observa cuándo se rompe (ruido numérico)
+
 ## 🧠 ¿Por Qué Cálculo para ML?
 
 ### ⚠️ CRÍTICO: Sin Chain Rule No Hay Deep Learning
@@ -1140,7 +1149,7 @@ dL/db = dL/da · da/dz · dz/db
 - Este patrón mental es el corazón de backpropagation: derivadas locales + composición.
 
 #### 4) Mapa conceptual mínimo
-- **Composición:** `L(a,y)` depende de `a`, que depende de `z`, que depende de `w,b,x`.
+- **Composición:** `x → u → y`.
 - **Backward:** se propagan derivadas desde `L` hacia los parámetros.
 
 #### 5) Definiciones esenciales
@@ -1264,7 +1273,42 @@ Resultado clave:
 σ'(z) = σ(z)(1 - σ(z))
 ```
 
-Consejo práctico: cuando ya tienes `a = σ(z)`, usa `a(1-a)` para derivar, en vez de re-calcular `exp`.
+Derivación (paso a paso, conectada a código):
+
+ 1) Reescribe la sigmoide como potencia:
+
+ ```
+ σ(z) = (1 + e^{-z})^{-1}
+ ```
+
+ 2) Deriva usando Chain Rule (derivada de `u^{-1}` y de `e^{-z}`):
+
+ ```
+ σ'(z) = - (1 + e^{-z})^{-2} · d/dz(1 + e^{-z})
+       = - (1 + e^{-z})^{-2} · (-e^{-z})
+       = e^{-z} / (1 + e^{-z})^2
+ ```
+
+ 3) Demuestra que es equivalente a `σ(z)(1-σ(z))`:
+
+ ```
+ 1 - σ(z) = 1 - 1/(1+e^{-z})
+          = (1+e^{-z}-1)/(1+e^{-z})
+          = e^{-z}/(1+e^{-z})
+
+ σ(z)(1-σ(z)) = [1/(1+e^{-z})] · [e^{-z}/(1+e^{-z})]
+              = e^{-z}/(1+e^{-z})^2
+              = σ'(z)
+ ```
+
+ Conexión directa con `grad_check.py`:
+
+ - En el script, esto aparece como:
+   - `s = sigmoid(z)`
+   - `return s * (1 - s)`
+ - La razón práctica: si ya calculaste `s` en el forward, el backward usa `s(1-s)` y evita recalcular `exp`.
+
+ Consejo práctico: cuando ya tienes `a = σ(z)`, usa `a(1-a)` para derivar, en vez de re-calcular `exp`.
 
 <details open>
 <summary><strong>📌 Complemento pedagógico — Tema 4.0.2: Derivación paso a paso: sigmoide σ(z)</strong></summary>

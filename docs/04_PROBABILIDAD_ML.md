@@ -74,6 +74,25 @@ Enlaces rápidos:
 - **Gaussiana multivariada:** es el “átomo” de GMM (Módulo 06).
 - **Softmax + Log-Sum-Exp:** evita inestabilidad numérica en clasificación multiclase (Módulo 05/07).
 
+### Ritmo semanal recomendado (Semana 8, sin extender)
+
+- **Lunes y Martes (Concepto):** Bayes + MLE como idea central (qué maximizas y respecto a qué variable).
+- **Miércoles y Jueves (Implementación):** implementa versiones estables (log-sum-exp, `clip/eps`) y valida con ejemplos pequeños.
+- **Viernes (Romper cosas):** provoca `log(0)`, overflow/underflow y documenta el fix (esto se repite en M05/M07).
+
+### Ajuste crítico de profundidad (Semana 8): MLE como “puente obligatorio” a Cross-Entropy
+
+Este módulo es corto por diseño, pero MLE NO es opcional si quieres entender por qué usamos cross-entropy.
+
+- Objetivo mínimo: poder explicar en 5–10 líneas por qué
+  - **maximizar likelihood**
+  - equivale a **minimizar negative log-likelihood (NLL)**
+  - y por qué eso se ve como **cross-entropy** en clasificación.
+
+Prompt sugerido (si usas IA):
+
+- "Explícame Maximum Likelihood Estimation (MLE) y muéstrame cómo la cross-entropy es el negative log-likelihood para una Bernoulli (BCE) y para una distribución categórica (softmax). No te saltes pasos."
+
 ---
 
 ## 📚 Contenido

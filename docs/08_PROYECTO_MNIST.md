@@ -31,6 +31,31 @@
 
 > 💡 **Nota (upgrade):** si quieres un benchmark más realista, usa **Fashion-MNIST**. Mantiene 28×28 y 10 clases, pero es más difícil y diferencia mejor LR vs MLP/CNN.
 
+## 🎯 Benchmark principal: Fashion-MNIST (feedback honesto)
+
+La guía menciona “MNIST” por compatibilidad histórica, pero para el **nivel real** del proyecto:
+
+- **Primero corre en Fashion-MNIST**.
+- **Luego corre en MNIST** solo como baseline (para confirmar que tu pipeline no está roto).
+
+Criterio cualitativo:
+
+- Si una arquitectura “simple” te da un resultado demasiado alto en MNIST, **no significa** que esté bien; Fashion-MNIST te da una señal más honesta.
+
+Checklist de diagnóstico (mínimo):
+
+- **Datos**: `shape`, `dtype`, rangos, conteo de clases, visualización de 25 muestras.
+- **PCA**: valida que centras (`X - mean`) y que la varianza explicada tiene sentido.
+- **Entrenamiento**: `loss` baja de forma estable; si diverge, revisa `learning_rate` y gradientes.
+- **Generalización**: gap train/test; si es alto, sospecha overfitting.
+
+Viernes (Romper cosas) — obligatorio en el proyecto:
+
+- **Learning rate extremo:** compara `0.01` vs `10.0` y documenta si diverge, oscila o explota a `NaN`.
+- **Inicialización patológica:** inicializa pesos en cero y explica qué se rompe (simetría / no-aprendizaje en redes).
+- **PCA sin centrado:** quita el centrado y describe el síntoma (componentes capturan el offset, proyección sin sentido).
+- **Normalización invertida:** cambia el orden (normalizar antes/después de reshape o centrar) y registra el efecto.
+
 ---
 
 ## 📚 Estructura del Proyecto
@@ -51,6 +76,7 @@ Evaluación (rúbrica):
 
 Notas prácticas (Week 24):
 
+- **Fashion-MNIST (principal):** usa este benchmark como tu “examen real” del pipeline.
 - **Fashion-MNIST (alternativo):** en vez de MNIST dígitos, corre el benchmark en Fashion-MNIST para ver degradación realista.
 - **Dirty Data Check:** genera un dataset corrupto (ruido/NaNs/inversión) con `scripts/corrupt_mnist.py` y documenta cómo lo limpiaste.
 - **Deployment mínimo:** entrena y guarda una CNN con `scripts/train_cnn_pytorch.py` y luego predice una imagen 28×28 con `scripts/predict.py`.
@@ -90,6 +116,8 @@ mnist-analyst/
 ---
 
 ## 💻 Parte 1: Cargar MNIST
+
+Nota: Fashion-MNIST usa el mismo formato (IDX, 28×28, 10 clases). La implementación es intercambiable cambiando los archivos de dataset.
 
 ### 1.1 Data Loader
 

@@ -26,6 +26,32 @@ Al terminar este módulo podrás:
 - **Explicar** eigenvalues/eigenvectors como “direcciones principales” y conectarlo con PCA.
 - **Explicar** SVD y por qué es el método preferido para PCA numéricamente estable.
 
+### Ajuste recomendado (Semanas 3–5, sin cambiar fechas): +2 días de Transformaciones Lineales
+
+Antes de “entrar” a PCA/SVD, dedica 2 días extra a que una matriz deje de ser una tabla y se vuelva una **deformación geométrica**.
+
+- **Día 1 (concepto):** transformaciones lineales como función `R²→R²`, base canónica, determinante como cambio de área.
+- **Día 2 (concepto + visual):** eigenvectors como direcciones que la transformación “respeta”.
+
+Ejecución obligatoria (visualización):
+
+- [`visualizations/viz_transformations.py`](../visualizations/viz_transformations.py)
+
+Prompt sugerido para IA (si lo usas):
+
+- "Genera un script de Python usando matplotlib que visualice cómo una matriz de 2x2 deforma una rejilla de puntos unitarios. Quiero ver visualmente qué significa un Eigenvector."
+
+Resultado esperado (criterio de salida de estos 2 días):
+
+- Puedes mirar una matriz `2×2` y predecir cualitativamente si **rota**, **estira**, **inclina (shear)** o **aplasta**.
+- Puedes explicar con un dibujo qué significa `Av = λv`.
+
+### Ritmo semanal recomendado (aplicado a Semanas 3–5)
+
+- **Lunes y Martes (Concepto):** lectura + tablero blanco (matriz como transformación; shapes como contrato).
+- **Miércoles y Jueves (Implementación):** ejercicios de la guía + asserts de shapes + mini-validaciones.
+- **Viernes (Romper cosas):** cambia una matriz “bonita” por una mala (det≈0, rotación + shear) y explica el síntoma (pérdida de dimensión, eigenvalues complejos, inestabilidad).
+
 ### Cápsula (obligatoria): Grafo Computacional Manual (puente a M03/M07)
 
 Antes de programar backprop, tienes que poder hacer esto en papel:

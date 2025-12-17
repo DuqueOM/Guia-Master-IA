@@ -70,6 +70,31 @@
 
 ---
 
+## 🗓️ Ritmo semanal recomendado (sin cambiar fechas)
+
+Este ritmo te permite mantener las **24 semanas** sin quemarte, pero subiendo la profundidad.
+
+- **Lunes y Martes (Días de Concepto)**
+  - No escribas código nuevo.
+  - Lee la explicación matemática y escribe tus propias notas.
+  - Dibuja el concepto en papel (tablero blanco) hasta que puedas explicarlo sin mirar.
+  - Si usas IA, úsala para *entender* (no para “copiar código”): pide derivaciones, intuición geométrica y contraejemplos.
+
+- **Miércoles y Jueves (Días de Implementación)**
+  - Escribe el código de la guía.
+  - Revisa invariantes (shapes, rangos, estabilidad numérica) y valida con pruebas/`assert`.
+  - Si aparece un concepto (ej. producto punto), tu objetivo es poder **visualizar** qué representa.
+
+- **Viernes (Día de “Romper cosas”)**
+  - Haz que falle a propósito y documenta qué aprendiste.
+  - Preguntas obligatorias:
+    - ¿Qué pasa si cambio el `learning_rate` de `0.01` a `10.0`?
+    - ¿Qué pasa si inicializo pesos en cero en lugar de aleatorio?
+    - ¿Qué pasa si quito el centrado en PCA o cambio el orden de una normalización?
+  - Registra el experimento y el síntoma (divergencia, `NaN`, saturación, overfitting) y qué concepto lo explica.
+
+---
+
 ## 👤 Perfil de Entrada
 
 ```

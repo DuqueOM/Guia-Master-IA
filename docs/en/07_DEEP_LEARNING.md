@@ -293,6 +293,85 @@ For the two-layer case:
 - Run **gradient checking** on 1–3 coordinates (Exercise 7.4).
 - Run an **overfit test** on a tiny dataset: if it cannot memorize, treat it as a bug.
 
+#### 4.1 Capsule: Shape checks (decorator + asserts)
+
+Practical rule: if a function consumes tensors/arrays, validate **shapes** at the start (and, if applicable, validate the output). This prevents silent shape bugs in `forward()`/`backward()`.
+
+```python
+import numpy as np
+from typing import Any, Callable, Dict, Optional, Sequence
+
+def assert_shape(x: np.ndarray, shape: Sequence[Optional[int]], name: str = "x") -> np.ndarray:
+    x = np.asarray(x)
+    assert x.ndim == len(shape), f"{name}.ndim={x.ndim}, expected={len(shape)}"
+    for i, (got, exp) in enumerate(zip(x.shape, shape)):
+        if exp is not None:
+            assert got == exp, f"{name}.shape[{i}]={got}, expected={exp}"
+    return x
+
+def shape_check(
+    spec: Dict[str, Sequence[Optional[int]]],
+    out: Optional[Sequence[Optional[int]]] = None,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    def deco(fn: Callable[..., Any]) -> Callable[..., Any]:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            for k, shp in spec.items():
+                if k in kwargs:
+                    assert_shape(kwargs[k], shp, name=k)
+            y = fn(*args, **kwargs)
+            if out is not None:
+                assert_shape(y, out, name="out")
+            return y
+
+        return wrapper
+
+    return deco
+
+@shape_check({"X": (None, 3), "W": (3, 4), "b": (4,)}, out=(None, 4))
+def dense_forward(X: np.ndarray, W: np.ndarray, b: np.ndarray) -> np.ndarray:
+    return X @ W + b
+
+X = np.random.randn(5, 3)
+W = np.random.randn(3, 4)
+b = np.random.randn(4)
+Z = dense_forward(X=X, W=W, b=b)
+assert Z.shape == (5, 4)
+```
+
+#### 4.2 Capsule: Initialization (Xavier vs He/Kaiming)
+
+Practical rule for MLPs:
+
+- `tanh/sigmoid` hidden activations often pair well with **Xavier/Glorot**.
+- `ReLU` hidden activations often pair well with **He/Kaiming**.
+
+```python
+import numpy as np
+from typing import Literal, Optional
+
+def init_linear(
+    fan_in: int,
+    fan_out: int,
+    mode: Literal["xavier", "kaiming"] = "xavier",
+    seed: Optional[int] = None,
+) -> np.ndarray:
+    rng = np.random.default_rng(seed)
+
+    if mode == "kaiming":
+        std = np.sqrt(2.0 / fan_in)
+    else:
+        std = np.sqrt(1.0 / fan_in)
+
+    W = rng.standard_normal((fan_in, fan_out)) * std
+    return W
+
+d_in, d_out = 784, 128
+W_relu = init_linear(d_in, d_out, mode="kaiming", seed=0)
+W_tanh = init_linear(d_in, d_out, mode="xavier", seed=0)
+assert W_relu.shape == (d_in, d_out)
+assert W_tanh.shape == (d_in, d_out)
+```
+
 ### Exercise 7.4: Two-layer backprop + gradient checking
 
 #### Prompt

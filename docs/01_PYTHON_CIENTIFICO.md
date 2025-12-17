@@ -1247,6 +1247,7 @@ print(flat.shape)  # Comprueba que vuelve a tener 12 elementos en 1D: shape (12,
 # -1 para inferir dimensión automáticamente
 auto = a.reshape(4, -1)  # Usa -1 para que NumPy infiera la dimensión faltante: (4, 3)
 auto = a.reshape(-1, 6)  # Infiera la primera dimensión para que el total sea 12: (2, 6)
+```
 
 <details>
 <summary><strong>📌 Complemento pedagógico — Tema 9: Reshape y Manipulación de Forma</strong></summary>
@@ -2076,6 +2077,29 @@ assert B.shape == (4, 3)  # Sumar un vector alineado a columnas no cambia la for
 assert X_norm.shape == (100, 5)  # La normalización por columnas debe conservar (n,d)
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 1.6: Broadcasting (reglas de compatibilidad)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M01-E01_6`
+- **Duración estimada:** 20–35 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- Broadcasting permite operar arrays de shapes distintos sin loops, siempre que sean compatibles por eje.
+- En normalización por columnas, `mean` y `std` suelen ser `(d,)` y se aplican a `X` de shape `(n, d)`.
+- La regla mental: alinear por la derecha; dimensiones iguales o 1.
+
+#### 3) Errores comunes
+- Usar `mean = X.mean()` cuando se pretende `mean(axis=0)`.
+- Olvidar `eps` y obtener `inf/nan` si alguna columna tiene `std == 0`.
+- Confundir broadcasting con “repetir” explícitamente un array.
+
+#### 4) Nota docente
+- Pide al alumno escribir los shapes de `X`, `mean`, `std` y `X_norm` antes de ejecutar.
+- Haz que compare `X - X.mean(axis=0)` vs `X - X.mean(axis=0, keepdims=True)`.
+</details>
+
 ---
 
 ### Ejercicio 1.7: NumPy - Producto matricial (`@`, `np.dot`, `np.matmul`)
@@ -2128,6 +2152,29 @@ assert matmul.shape == (2, 2)  # Matmul entre 2x2 produce 2x2
 assert y_hat.shape == (50,)  # Una predicción por muestra
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 1.7: Producto matricial vs Hadamard (shapes como contrato)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M01-E01_7`
+- **Duración estimada:** 20–35 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- `A * B` es elemento a elemento y depende de broadcasting.
+- `A @ B` es álgebra lineal: `(m,k) @ (k,n) -> (m,n)`.
+- En ML, una predicción lineal típica es `(n,d) @ (d,) -> (n,)`.
+
+#### 3) Errores comunes
+- Confundir `np.dot` y `@` cuando hay más de 1 dimensión.
+- Usar `w` como `(d,1)` y sorprenderse por obtener `(n,1)` en vez de `(n,)`.
+- “Arreglar” shapes con `reshape` sin entender el contrato.
+
+#### 4) Nota docente
+- Pide que el alumno escriba el diagrama de shapes antes de correr el código.
+- Haz que compare `y_hat.shape` con `w.reshape(-1, 1)`.
+</details>
+
 ---
 
 ### Ejercicio 1.8: NumPy - `reshape`, `flatten`, `transpose`
@@ -2165,6 +2212,29 @@ assert T.shape == (2, 2, 3)  # Verifica forma del tensor
 assert flat.shape == (12,)  # Verifica que el aplanado recupera 12 elementos
 assert np.array_equal(flat, a)  # Verifica que el contenido (y el orden) se conserva
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 1.8: `reshape`/`transpose`/`flatten` (views vs copias)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M01-E01_8`
+- **Duración estimada:** 20–35 min
+- **Nivel:** Básico → Intermedio
+
+#### 2) Idea clave
+- Invariante: el número total de elementos se conserva (producto de dimensiones).
+- `T` (transpuesta) reordena ejes: en 2D, `(m,n)->(n,m)`.
+- `flatten()` devuelve copia; `ravel()` intenta devolver vista.
+
+#### 3) Errores comunes
+- Intentar un `reshape` incompatible (producto distinto) y no leer el error.
+- Confundir transpuesta de matriz con permutación general de ejes en tensores (`np.transpose(x, axes=...)`).
+- Asumir que `flatten` no copia y luego gastar memoria.
+
+#### 4) Nota docente
+- Pide comparar `flatten()` vs `ravel()` y qué pasa si mutan el resultado.
+- Pide que predigan shapes antes de ejecutar cada operación.
+</details>
 
 ---
 
@@ -2215,6 +2285,29 @@ assert X_centered.shape == (2, 3)  # Restar mu no debe cambiar la forma
 assert np.allclose(X_centered.mean(axis=0), 0.0)  # Tras centrar, la media por columna debe ser ~0
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 1.9: `axis` y `keepdims` (predice shapes antes de ejecutar)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M01-E01_9`
+- **Duración estimada:** 20–30 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- `axis=0` reduce filas (produce un valor por columna).
+- `axis=1` reduce columnas (produce un valor por fila).
+- `keepdims=True` conserva el número de dimensiones y hace broadcasting más explícito.
+
+#### 3) Errores comunes
+- Usar agregación global (sin `axis`) cuando se pretendía por eje.
+- Perder un eje y luego “arreglar” a golpes con `reshape`.
+- Confundir “sumar columnas” con “sumar por columna”.
+
+#### 4) Nota docente
+- Pide una tabla de predicción de shapes antes de ejecutar cada agregación.
+- Haz que comparen `keepdims=False` vs `keepdims=True` al restar medias.
+</details>
+
 ---
 
 ### Ejercicio 1.10: NumPy - `random` y datos sintéticos
@@ -2252,8 +2345,8 @@ noise = 0.1 * np.random.randn(n)  # Ruido gaussiano pequeño para simular variac
 y = X @ w_true + noise  # Targets: combinación lineal (X@w) + ruido -> vector (200,)
 
 eps = 1e-8  # Epsilon: evita división por cero (estabilidad numérica)
-X_mean = X.mean(axis=0)  # Media por columna (por feature) -> (2,)
-X_std = X.std(axis=0)  # Desviación estándar por columna -> (2,)
+X_mean = X.mean(axis=0)  # Media por columna (por feature) => shape (2,)
+X_std = X.std(axis=0)  # Desviación estándar por columna => shape (2,)
 Xz = (X - X_mean) / (X_std + eps)  # Estandariza por columnas usando broadcasting -> (200,2)
 
 assert z.shape == (5,)  # Confirma 5 valores
@@ -2263,6 +2356,29 @@ assert y.shape == (200,)  # Confirma un target por muestra
 assert np.allclose(Xz.mean(axis=0), np.zeros(2), atol=1e-7)  # Media ~0 por feature
 assert np.allclose(Xz.std(axis=0), np.ones(2), atol=1e-6)  # Std ~1 por feature
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 1.10: `seed`, reproducibilidad y estandarización (datos sintéticos)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M01-E01_10`
+- **Duración estimada:** 25–40 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- `np.random.seed(...)` fija el generador pseudoaleatorio: misma semilla => mismos datos.
+- Dataset sintético: `y = X @ w_true + noise` simula una relación lineal con ruido.
+- Estandarizar por columna ayuda a que los features sean comparables.
+
+#### 3) Errores comunes
+- No fijar semilla y no poder depurar por no reproducibilidad.
+- Estandarizar sin `axis=0`.
+- Olvidar un `eps` cuando `std` es muy pequeño.
+
+#### 4) Nota docente
+- Pide variar el nivel de ruido y describir cómo afecta a `y`.
+- Pide justificar tolerancias (`atol`) en `np.allclose`.
+</details>
 
 ---
 
@@ -2311,6 +2427,29 @@ assert np.isclose(sigmoid(np.array([0.0]))[0], 0.5)  # Propiedad clave: sigmoid(
 assert relu(np.array([-5.0, 5.0])).tolist() == [0.0, 5.0]  # ReLU anula negativos y deja positivos
 assert np.isclose(softmax(np.array([1.0, 2.0, 3.0])).sum(), 1.0)  # Softmax debe sumar 1
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 1.11: Vectorización + activaciones (estabilidad numérica)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M01-E01_11`
+- **Duración estimada:** 25–45 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- Vectorizar = expresar el cálculo con operaciones NumPy para evitar loops en Python.
+- `sigmoid` y `softmax` usan `exp`: hay riesgo de overflow si no estabilizas.
+- Softmax estable: restar el máximo antes de `exp`.
+
+#### 3) Errores comunes
+- Implementar distancia con loops y perder rendimiento.
+- No estabilizar softmax y obtener `inf/nan`.
+- Confundir softmax (vector) con sigmoid (element-wise).
+
+#### 4) Nota docente
+- Pide probar `softmax([1000, 1001, 1002])` y observar el efecto del shift.
+- Pide contrastar `relu` vs `sigmoid` en saturación (intuición, no derivadas).
+</details>
 
 ---
 

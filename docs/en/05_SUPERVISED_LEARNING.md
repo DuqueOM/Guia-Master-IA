@@ -28,6 +28,78 @@ By the end of this module you can:
 - Use **Shadow Mode (sklearn)** as a ground truth reference.
 - Explain **Entropy vs Gini**, **Information Gain**, and the difference **Bagging vs Boosting** (concept-level).
 
+### Capsule (required): Extreme vectorization (no Python loops)
+
+Practical rule for the whole module:
+
+- **Forbidden**: `for` loops over samples (`N`) or features (`D`) to compute predictions, losses, or gradients.
+- **Allowed**: loops over training steps / epochs (`for step in range(...)`).
+
+Target mental model: the ML core should look like:
+
+- `logits = X @ W`
+- `grad = X.T @ something`
+
+Canonical NumPy patterns (with strict **shape discipline**, no loops):
+
+```python
+import numpy as np  # NumPy: linear algebra and vectorized operations
+
+
+# ============================================================
+# 1) Multiclass forward: logits = X @ W
+# ============================================================
+N = 5  # N: number of samples
+D = 4  # D: number of features
+K = 3  # K: number of classes
+
+X = np.random.randn(N, D).astype(float)  # X:(N,D) input batch
+assert X.shape == (N, D)  # Shape contract for X
+
+W = np.random.randn(D, K).astype(float)  # W:(D,K) weights per class
+assert W.shape == (D, K)  # Shape contract for W
+
+logits = X @ W  # logits:(N,K) because (N,D)@(D,K)=(N,K)
+assert logits.shape == (N, K)  # Contract: logits must be 2D (batch x classes)
+
+
+# ============================================================
+# 2) Binary logistic regression: vectorized gradient ∇w = (1/N) X^T(ŷ - y)
+# ============================================================
+w = np.random.randn(D).astype(float)  # w:(D,) binary weights
+assert w.shape == (D,)  # Shape contract for w
+
+y = (np.random.rand(N) > 0.5).astype(float)  # y:(N,) binary labels in {0,1}
+assert y.shape == (N,)  # Shape contract for y
+
+z = X @ w  # z:(N,) logits
+assert z.shape == (N,)  # Shape contract for z
+
+y_hat = 1.0 / (1.0 + np.exp(-z))  # sigmoid(z) vectorized (no loops)
+assert y_hat.shape == (N,)  # Shape contract for ŷ
+
+grad_w = (X.T @ (y_hat - y)) / N  # (D,N)@(N,)=(D,) (exam form)
+assert grad_w.shape == (D,)  # Contract: gradient must match w shape
+# ============================================================
+# 3) Pairwise distances without loops (kNN / clustering):
+#    dist2[i,j] = ||X_query[i] - X_train[j]||^2
+# ============================================================
+M = 6  # M: number of queries
+X_train = np.random.randn(N, D).astype(float)  # X_train:(N,D)
+X_query = np.random.randn(M, D).astype(float)  # X_query:(M,D)
+assert X_train.shape == (N, D)  # Shape contract: X_train must be (N,D) to ensure correct broadcasting
+assert X_query.shape == (M, D)  # Shape contract: X_query must be (M,D) to ensure correct broadcasting
+
+# Algebra trick: ||a-b||^2 = ||a||^2 + ||b||^2 - 2 a·b
+q_norm2 = np.sum(X_query ** 2, axis=1, keepdims=True)  # (M,1) ||q_i||^2, sum of squares along each query vector
+t_norm2 = np.sum(X_train ** 2, axis=1, keepdims=True).T  # (1,N) ||t_j||^2, sum of squares along each training vector
+cross = X_query @ X_train.T  # (M,N) dot products between each (q_i, t_j), measures similarity between query and training vectors
+
+dist2 = q_norm2 + t_norm2 - 2.0 * cross  # (M,N) squared distances, applying the algebra trick
+dist2 = np.maximum(dist2, 0.0)  # Guard against negative zeros due to float error, ensuring distances are non-negative
+assert dist2.shape == (M, N)  # Shape contract: distance matrix must be (M,N) to represent pairwise distances
+```
+
 Quick references (Spanish source):
 
 - [Module 04 (Probability → Cross-Entropy)](04_PROBABILIDAD_ML.md)

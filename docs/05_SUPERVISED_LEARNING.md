@@ -28,6 +28,78 @@ Al terminar este módulo podrás:
 - **Validar** tu implementación con Shadow Mode (sklearn) como ground truth.
 - **Explicar** Entropía/Gini, Information Gain y el contraste **Bagging vs Boosting** (Random Forest vs Gradient Boosting) a nivel conceptual.
 
+### Cápsula (obligatoria): Vectorización extrema (prohibido usar loops)
+
+Regla práctica para todo el módulo:
+
+- **Prohibido** iterar con `for` sobre muestras (`N`) o features (`D`) para computar predicciones, pérdidas o gradientes.
+- **Permitido** iterar sobre iteraciones de entrenamiento (`for step in range(...)`) o épocas.
+
+Objetivo: que el *core* de ML sea una composición de operaciones tipo:
+
+- `logits = X @ W`
+- `grad = X.T @ something`
+
+Ejemplos canónicos (con **disciplina de shapes** y sin loops):
+
+```python
+import numpy as np  # NumPy: álgebra lineal y vectorización
+
+
+# ============================================================
+# 1) Forward multiclase: logits = X @ W
+# ============================================================
+N = 5  # N: número de muestras
+D = 4  # D: número de features
+K = 3  # K: número de clases
+
+X = np.random.randn(N, D).astype(float)  # X:(N,D) batch de entrada
+assert X.shape == (N, D)  # Contrato de shape para X
+
+W = np.random.randn(D, K).astype(float)  # W:(D,K) pesos por clase
+assert W.shape == (D, K)  # Contrato de shape para W
+
+logits = X @ W  # logits:(N,K) porque (N,D)@(D,K)=(N,K)
+assert logits.shape == (N, K)  # Contrato: logits debe ser 2D (batch x clases)
+
+
+# ============================================================
+# 2) Logística binaria: gradiente vectorizado ∇w = (1/N) X^T(ŷ - y)
+# ============================================================
+w = np.random.randn(D).astype(float)  # w:(D,) pesos binarios (una clase)
+assert w.shape == (D,)  # Contrato de shape para w
+
+y = (np.random.rand(N) > 0.5).astype(float)  # y:(N,) etiquetas binarias en {0,1}
+assert y.shape == (N,)  # Contrato de shape para y
+
+z = X @ w  # z:(N,) logits binarios
+assert z.shape == (N,)  # Contrato de shape para z
+
+y_hat = 1.0 / (1.0 + np.exp(-z))  # sigmoid(z) vectorizada (sin loops)
+assert y_hat.shape == (N,)  # Contrato de shape para ŷ
+
+grad_w = (X.T @ (y_hat - y)) / N  # (D,N)@(N,)=(D,) (forma de examen)
+assert grad_w.shape == (D,)  # Contrato: gradiente debe tener el shape de w
+# ============================================================
+# 3) Distancias pairwise sin loops (kNN / clustering):
+#    dist2[i,j] = ||X_query[i] - X_train[j]||^2
+# ============================================================
+M = 6  # M: número de queries
+X_train = np.random.randn(N, D).astype(float)  # X_train:(N,D)
+X_query = np.random.randn(M, D).astype(float)  # X_query:(M,D)
+assert X_train.shape == (N, D)  # Shape correcto para broadcasting
+assert X_query.shape == (M, D)  # Shape correcto para broadcasting
+
+# Trick algebraico: ||a-b||^2 = ||a||^2 + ||b||^2 - 2 a·b
+q_norm2 = np.sum(X_query ** 2, axis=1, keepdims=True)  # (M,1) ||q_i||^2
+t_norm2 = np.sum(X_train ** 2, axis=1, keepdims=True).T  # (1,N) ||t_j||^2
+cross = X_query @ X_train.T  # (M,N) producto punto entre cada par (q_i, t_j)
+
+dist2 = q_norm2 + t_norm2 - 2.0 * cross  # (M,N) distancias cuadradas
+dist2 = np.maximum(dist2, 0.0)  # Evita negativos por error numérico (float)
+assert dist2.shape == (M, N)  # Shape correcto de matriz de distancias
+```
+
 Enlaces rápidos:
 
 - [04_PROBABILIDAD_ML.md](04_PROBABILIDAD_ML.md) (MLE → cross-entropy)
@@ -117,6 +189,66 @@ def predict_linear(X: np.ndarray, theta: np.ndarray) -> np.ndarray:
     return X @ theta
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 1.1: Modelo (Regresión Lineal)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** De la hipótesis `ŷ=Xθ` a un contrato de shapes (y por qué el bias es “feature 0”)
+- **ID (opcional):** `M05-T01_1`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Básico–Intermedio
+- **Dependencias:** Álgebra lineal mínima (producto matriz-vector), noción de dataset tabular
+
+#### 2) Objetivos
+- Escribir la hipótesis en forma escalar y matricial y explicar qué representa cada símbolo.
+- Usar una convención de shapes sin ambigüedad: `X:(m,n)` y `θ:(n+1,)` tras agregar bias.
+- Verificar rápidamente si una implementación está “bien cableada” (shape checks).
+
+#### 3) Relevancia
+- Todo el resto del módulo (logística, métricas, regularización) depende de tener claro el *forward* `X @ θ`.
+- La mayoría de bugs “misteriosos” en ML-from-scratch son bugs de shapes, no de matemáticas.
+
+#### 4) Mapa conceptual mínimo
+- **Datos** `X` (features) + **parámetros** `θ` → **predicción** `ŷ`.
+- **Bias** → se implementa como `x₀=1` y `θ₀`.
+
+#### 5) Definiciones esenciales
+- `m`: número de muestras.
+- `n`: número de features (sin bias).
+- `θ₀`: intercepto/bias.
+
+#### 6) Explicación didáctica
+- Trátalo como “contrato”: si `add_bias_term(X)` devuelve `(m,n+1)`, entonces `θ` debe tener longitud `n+1`.
+
+#### 7) Ejemplo modelado
+- Dataset 1D (`n=1`): `X:(m,1)` → con bias `X_b:(m,2)` y `θ:(2,)`.
+
+#### 8) Práctica guiada
+- Escribe 3 asserts: shapes de `X_b`, `θ`, `X_b @ θ`.
+
+#### 9) Práctica independiente
+- Convierte un dataset con 3 features a `X_b` y verifica que el forward funciona sin loops.
+
+#### 10) Autoevaluación
+- ¿Por qué `x₀=1` hace que el intercepto sea un peso más?
+
+#### 11) Errores comunes
+- Duplicar bias (agregar columna de 1s dos veces).
+- Usar `θ` como columna `(n+1,1)` y luego mezclar con `(n+1,)` sin querer.
+
+#### 12) Retención
+- Mantra: `ŷ = X_b @ θ` y el bias es `x₀=1`.
+
+#### 13) Diferenciación
+- Avanzado: generaliza a multiclase `logits = X @ W`.
+
+#### 14) Recursos
+- Cheatsheet de shapes y producto matricial.
+
+#### 15) Nota docente
+- Pide que el alumno “debuggee en voz alta” un error de shape típico (ej. `(m,n)@(n+1,)`).
+</details>
+
 ### 1.2 Función de Costo (MSE)
 
 ```python
@@ -148,6 +280,63 @@ def mse_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
     return (1 / m) * X.T @ errors
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 1.2: Función de Costo (MSE)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** MSE como “penalización cuadrática” y como `||Xθ-y||²` (con lectura geométrica)
+- **ID (opcional):** `M05-T01_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Básico–Intermedio
+- **Dependencias:** 1.1, suma de cuadrados, producto `X.T @ v`
+
+#### 2) Objetivos
+- Explicar el MSE en lenguaje natural (errores grandes se penalizan más).
+- Reconocer la forma vectorizada del gradiente `∇θ = (1/m) Xᵀ(Xθ - y)`.
+- Entender por qué aparece `Xᵀ` (proyección del error hacia parámetros).
+
+#### 3) Relevancia
+- Este patrón de gradiente `Xᵀ(ŷ-y)` reaparece en logística (BCE) y en softmax (CCE).
+
+#### 4) Mapa conceptual mínimo
+- **Predicción** `ŷ` → **residuo** `(ŷ-y)` → **gradiente** `Xᵀ(residuo)`.
+
+#### 5) Definiciones esenciales
+- **Residuo**: `r = ŷ - y`.
+- **Costo**: promedio (o suma) de `r²`.
+
+#### 6) Explicación didáctica
+- El factor `1/2` en el costo suele usarse para simplificar derivadas; el mínimo no cambia.
+
+#### 7) Ejemplo modelado
+- Si duplicas un error (de 2 a 4), la contribución al costo se cuadruplica (4→16).
+
+#### 8) Práctica guiada
+- Implementa un test: si `theta` es perfecto (`X@theta==y`), entonces `mse_cost==0` y `mse_gradient==0`.
+
+#### 9) Práctica independiente
+- Compara `mse_cost` con `np.mean((X@theta - y)**2)` y explica la diferencia del `1/2`.
+
+#### 10) Autoevaluación
+- ¿Qué significa que el gradiente apunte hacia donde el costo sube más rápido?
+
+#### 11) Errores comunes
+- Confundir shapes: `y` como `(m,1)` vs `(m,)`.
+- Olvidar el promedio por `m` (magnitud del gradiente depende del batch size).
+
+#### 12) Retención
+- Fórmula clave: `∇θ MSE = (1/m) Xᵀ(Xθ-y)`.
+
+#### 13) Diferenciación
+- Avanzado: conecta con mínimos cuadrados y proyecciones (subespacios).
+
+#### 14) Recursos
+- Notas de least squares, interpretación geométrica.
+
+#### 15) Nota docente
+- Pide que el alumno derive la forma vectorizada desde la forma sumatoria (una vez, con calma).
+</details>
+
 ### 1.3 Solución Cerrada (Normal Equation)
 
 ```python
@@ -176,18 +365,75 @@ def normal_equation(X: np.ndarray, y: np.ndarray) -> np.ndarray:
     return theta
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 1.3: Solución Cerrada (Normal Equation)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Normal Equation: cuándo sirve, cuándo falla y por qué `solve` es mejor que `inv`
+- **ID (opcional):** `M05-T01_3`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.1–1.2, noción de matriz singular/condicionamiento
+
+#### 2) Objetivos
+- Implementar `θ = argmin ||Xθ-y||²` vía ecuaciones normales.
+- Explicar por qué `XᵀX` puede ser singular o mal condicionada.
+- Preferir `np.linalg.solve` sobre `inv` por estabilidad.
+
+#### 3) Relevancia
+- Te da un “baseline” para validar GD: si ambos dan resultados parecidos (cuando aplica), tu GD está bien.
+
+#### 4) Mapa conceptual mínimo
+- Minimizar SSE → derivada = 0 → `XᵀXθ = Xᵀy`.
+
+#### 5) Definiciones esenciales
+- **Singular**: no invertible.
+- **Condicionamiento**: sensibilidad numérica a perturbaciones.
+
+#### 6) Explicación didáctica
+- En alta dimensión o con colinealidad fuerte, `XᵀX` puede “romperse” numéricamente.
+
+#### 7) Ejemplo modelado
+- Si una feature es combinación lineal de otra (duplicada), `XᵀX` tiende a singular.
+
+#### 8) Práctica guiada
+- Crea una feature duplicada en `X` y observa qué ocurre con `np.linalg.solve`.
+
+#### 9) Práctica independiente
+- Implementa Ridge cerrada: `θ=(XᵀX+λI)^{-1}Xᵀy` (solo conceptual aquí).
+
+#### 10) Autoevaluación
+- ¿Por qué la complejidad crece como `O(n³)`?
+
+#### 11) Errores comunes
+- Usar `inv` por costumbre.
+- Olvidar agregar bias antes de la ecuación normal.
+
+#### 12) Retención
+- Regla: si puedes usar closed-form, úsala para validar GD (no necesariamente para producción).
+
+#### 13) Diferenciación
+- Avanzado: `np.linalg.lstsq` y pseudo-inversa (SVD) como alternativa estable.
+
+#### 14) Recursos
+- Documentación NumPy: `solve`, `lstsq`, conceptos de singularidad.
+
+#### 15) Nota docente
+- Pedir un “diagnóstico” cuando falla: ¿singularidad real o numérica?
+</details>
+
 ### 1.4 Gradient Descent para Regresión
 
 ```python
-import numpy as np
-from typing import List, Tuple
+import numpy as np  # Importa NumPy para operaciones matemáticas
+from typing import List, Tuple  # Importa tipos para anotaciones
 
 class LinearRegression:
     """Regresión Lineal implementada desde cero."""
 
     def __init__(self):
-        self.theta = None
-        self.cost_history = []
+        self.theta = None  # Parámetros del modelo (pesos + bias)
+        self.cost_history = []  # Historial de costos para monitoreo
 
     def fit(
         self,
@@ -207,24 +453,24 @@ class LinearRegression:
             learning_rate: tasa de aprendizaje (solo para GD)
             n_iterations: número de iteraciones (solo para GD)
         """
-        # Añadir bias
+        # Añadir bias a las features
         X_b = add_bias_term(X)
-        m, n = X_b.shape
+        m, n = X_b.shape  # m: muestras, n: features + bias
 
         if method == 'normal_equation':
-            self.theta = normal_equation(X_b, y)
+            self.theta = normal_equation(X_b, y)  # Solución analítica directa
         else:
             # Inicializar theta con ceros o valores pequeños
             self.theta = np.zeros(n)
 
             for i in range(n_iterations):
-                # Calcular gradiente
+                # Calcular gradiente del MSE
                 gradient = mse_gradient(X_b, y, self.theta)
 
-                # Actualizar theta
+                # Actualizar theta usando gradient descent
                 self.theta = self.theta - learning_rate * gradient
 
-                # Guardar costo para monitoreo
+                # Guardar costo para monitoreo de convergencia
                 cost = mse_cost(X_b, y, self.theta)
                 self.cost_history.append(cost)
 
@@ -232,29 +478,89 @@ class LinearRegression:
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predice valores."""
-        X_b = add_bias_term(X)
-        return X_b @ self.theta
+        X_b = add_bias_term(X)  # Añade bias para predicción
+        return X_b @ self.theta  # Predicción lineal: y = X·θ
 
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         """R² score."""
-        y_pred = self.predict(X)
-        ss_res = np.sum((y - y_pred) ** 2)
-        ss_tot = np.sum((y - np.mean(y)) ** 2)
-        return 1 - (ss_res / ss_tot)
+        y_pred = self.predict(X)  # Predicciones del modelo
+        ss_res = np.sum((y - y_pred) ** 2)  # Suma de residuos al cuadrado
+        ss_tot = np.sum((y - np.mean(y)) ** 2)  # Suma total de cuadrados
+        return 1 - (ss_res / ss_tot)  # R² = 1 - (residuos/total)
 
 
-# Demo
-np.random.seed(42)
-X = 2 * np.random.rand(100, 1)
-y = 4 + 3 * X.flatten() + np.random.randn(100) * 0.5  # y = 4 + 3x + ruido
+# Demo de regresión lineal
+np.random.seed(42)  # Fija semilla para reproducibilidad
+X = 2 * np.random.rand(100, 1)  # 100 puntos entre 0 y 2
+y = 4 + 3 * X.flatten() + np.random.randn(100) * 0.5  # y = 4 + 3x + ruido gaussiano
 
-model = LinearRegression()
-model.fit(X, y, method='gradient_descent', learning_rate=0.1, n_iterations=1000)
+model = LinearRegression()  # Crea instancia del modelo
+model.fit(X, y, method='gradient_descent', learning_rate=0.1, n_iterations=1000)  # Entrena
 
-print(f"Parámetros aprendidos: {model.theta}")
-print(f"Esperados: [4, 3]")
-print(f"R² score: {model.score(X, y):.4f}")
+print(f"Parámetros aprendidos: {model.theta}")  # Muestra θ aprendido
+print(f"Esperados: [4, 3]")  # Valores teóricos (bias=4, pendiente=3)
+print(f"R² score: {model.score(X, y):.4f}")  # Calidad del ajuste
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 1.4: Gradient Descent para Regresión</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Gradient Descent “de examen”: convergence, learning rate, y checks de sanidad
+- **ID (opcional):** `M05-T01_4`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.1–1.3, gradiente MSE, noción de iteración/épocas
+
+#### 2) Objetivos
+- Entrenar regresión lineal por GD con un `learning_rate` razonable.
+- Leer el `cost_history` y detectar divergencia o estancamiento.
+- Entender por qué la vectorización es obligatoria (performance + claridad).
+
+#### 3) Relevancia
+- GD es la base del entrenamiento de modelos más grandes (logística, MLP). Aquí practicas el ciclo “forward → loss → grad → update”.
+
+#### 4) Mapa conceptual mínimo
+- Inicializar `θ` → repetir: `grad = Xᵀ(ŷ-y)/m` → `θ ← θ - α grad`.
+
+#### 5) Definiciones esenciales
+- **Learning rate (α)**: tamaño del paso.
+- **Divergencia**: el costo sube o se vuelve NaN/inf.
+- **Convergencia**: el costo baja y se estabiliza.
+
+#### 6) Explicación didáctica
+- Si `α` es muy grande: saltas el mínimo y explota.
+- Si `α` es muy pequeño: entrenas “para siempre”.
+
+#### 7) Ejemplo modelado
+- En el demo, la solución esperada es ~`[4,3]` (con ruido). Si sale lejísimos, revisa shapes, bias y `α`.
+
+#### 8) Práctica guiada
+- Imprime cada 100 iteraciones: costo actual. Debe decrecer (aprox).
+
+#### 9) Práctica independiente
+- Implementa early stopping: si la mejora del costo < `tol` por varias iteraciones, detén.
+
+#### 10) Autoevaluación
+- ¿Qué pasa si omites el bias? ¿Cómo cambia la recta aprendida?
+
+#### 11) Errores comunes
+- No normalizar features → GD lento o inestable.
+- Mezclar `X` con `X_b` en gradiente/predicción.
+- Reportar R² en train y creer que generaliza (falta split).
+
+#### 12) Retención
+- Checklist: bias, shapes, costo decrece, no NaNs, params razonables.
+
+#### 13) Diferenciación
+- Avanzado: batch vs mini-batch vs SGD (conceptual) y efecto en el ruido del gradiente.
+
+#### 14) Recursos
+- Notas de optimización básica, escalado de features.
+
+#### 15) Nota docente
+- Pide un “protocolo de debugging”: 1) overfit test en dataset pequeño, 2) comparar con normal equation.
+</details>
 
 ---
 
@@ -512,10 +818,74 @@ Y verifica que `X @ θ` te da `(m,)`.
 - **v4.0:** usa `study_tools/SIMULACRO_EXAMEN_TEORICO.md` para preguntas tipo examen (sigmoid vs softmax, BCE vs MSE).
 - **v5.0:** ejecuta **Shadow Mode** como verificación externa antes de dar por terminado el módulo.
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 2.0: Regresión Logística (marco mental completo)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Qué estás construyendo realmente: probabilidades, decisión, loss y gradiente (una sola historia)
+- **ID (opcional):** `M05-T02_0`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio (core)
+- **Dependencias:** M03 (chain rule), M04 (MLE → cross-entropy)
+
+#### 2) Objetivos
+- Unificar en una frase el pipeline: `z = Xθ` → `p = σ(z)` → `loss = BCE(p,y)` → `grad = Xᵀ(p-y)/m` → update.
+- Explicar por qué logística es “lineal” en la frontera, aunque `σ` sea no lineal.
+- Saber qué debes observar cuando algo falla (NaNs, saturación, signos, shapes).
+
+#### 3) Relevancia
+- Esta sección es el puente directo a MLP/softmax (M07): cambia `σ` por softmax y `BCE` por CCE, pero el esqueleto es el mismo.
+
+#### 4) Mapa conceptual mínimo
+- **Modelo:** `p(y=1|x) = σ(θᵀx)`.
+- **Decisión:** `p ≥ threshold`.
+- **Entrenamiento (MLE):** minimizar NLL = BCE.
+- **Gradiente vectorizado:** siempre termina en `Xᵀ(something)`.
+
+#### 5) Definiciones esenciales
+- **Logit:** `z = θᵀx` (score sin acotar).
+- **Probabilidad:** `p = σ(z)`.
+- **Loss BCE:** castiga fuerte “seguro y equivocado”.
+
+#### 6) Explicación didáctica
+- Lo más importante no es memorizar fórmulas, sino saber qué variable inspeccionar:
+  - si `p` es 0/1 exacto → `log(0)` rompe → `eps`.
+  - si `|z|` es enorme → saturación → gradiente pequeño.
+
+#### 7) Ejemplo modelado
+- Si tu modelo predice `p=0.01` cuando `y=1`, BCE es grande; eso fuerza una corrección fuerte del gradiente.
+
+#### 8) Práctica guiada
+- Haz un “overfit test” con 20 ejemplos y confirma que BCE cae y accuracy sube.
+
+#### 9) Práctica independiente
+- Cambia `threshold` y observa el tradeoff precision/recall (lo conectarás con métricas en Parte 3).
+
+#### 10) Autoevaluación
+- ¿Cuál es la única pieza que convierte un score lineal en probabilidad? (respuesta: `σ`).
+
+#### 11) Errores comunes
+- Entrenar con `y∈{-1,1}` usando BCE estándar.
+- Olvidar bias.
+- Mezclar `X` con `X_b` (con bias) en distintas funciones.
+
+#### 12) Retención
+- Recita el mantra: `z→σ(z)→BCE→Xᵀ(p-y)`.
+
+#### 13) Diferenciación
+- Avanzado: interpreta `θ` como dirección normal al hiperplano; magnitud controla “confianza”.
+
+#### 14) Recursos
+- M04 (MLE/cross-entropy) y glosario de sigmoid/logistic regression.
+
+#### 15) Nota docente
+- Pide al alumno un diagrama de flujo con shapes: `X:(m,n)`, `θ:(n,)`, `z:(m,)`, `p:(m,)`, `grad:(n,)`.
+</details>
+
 ### 2.1 Función Sigmoid
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para operaciones matemáticas
 
 def sigmoid(z: np.ndarray) -> np.ndarray:
     """
@@ -528,24 +898,80 @@ def sigmoid(z: np.ndarray) -> np.ndarray:
     - σ(0) = 0.5
     - σ'(z) = σ(z)(1 - σ(z))
     """
-    # Clip para evitar overflow
+    # Clip para evitar overflow en exp() con valores extremos
     z = np.clip(z, -500, 500)
-    return 1 / (1 + np.exp(-z))
+    return 1 / (1 + np.exp(-z))  # Fórmula matemática de la sigmoide
 
-# Visualizar
-import matplotlib.pyplot as plt
+# Visualizar la función sigmoid
+import matplotlib.pyplot as plt  # Importa matplotlib para gráficos
 
-z = np.linspace(-10, 10, 100)
-plt.figure(figsize=(8, 4))
-plt.plot(z, sigmoid(z))
-plt.axhline(y=0.5, color='r', linestyle='--', alpha=0.5)
-plt.axvline(x=0, color='r', linestyle='--', alpha=0.5)
-plt.xlabel('z')
-plt.ylabel('σ(z)')
-plt.title('Función Sigmoid')
-plt.grid(True)
-# plt.show()
+z = np.linspace(-10, 10, 100)  # Valores de prueba de -10 a 10
+plt.figure(figsize=(8, 4))  # Crea figura de 8x4 pulgadas
+plt.plot(z, sigmoid(z))  # Grafica sigmoid(z)
+plt.axhline(y=0.5, color='r', linestyle='--', alpha=0.5)  # Línea horizontal en y=0.5
+plt.axvline(x=0, color='r', linestyle='--', alpha=0.5)  # Línea vertical en x=0
+plt.xlabel('z')  # Etiqueta eje x
+plt.ylabel('σ(z)')  # Etiqueta eje y
+plt.title('Función Sigmoid')  # Título del gráfico
+plt.grid(True)  # Activa cuadrícula
+# plt.show()  # Descomentar para mostrar gráfico
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 2.1: Sigmoid (intuición + estabilidad numérica)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Sigmoid como “puerta” a probabilidades y por qué hay que hacer `clip`
+- **ID (opcional):** `M05-T02_1`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Básico–Intermedio
+- **Dependencias:** Exponencial/log, overflow/underflow
+
+#### 2) Objetivos
+- Entender que `σ(z)` solo reescala el score a `(0,1)`; no hace la frontera no lineal.
+- Reconocer saturación: `z>>0 → σ≈1` y `z<<0 → σ≈0`.
+- Justificar `clip(z)` como protección numérica.
+
+#### 3) Relevancia
+- Si no controlas overflow/saturación, tu BCE se vuelve NaN y el entrenamiento colapsa.
+
+#### 4) Mapa conceptual mínimo
+- `z` crece → `exp(-z)` puede underflow; `z` muy negativo → `exp(-z)` overflow.
+
+#### 5) Definiciones esenciales
+- `σ(0)=0.5`.
+- `σ'(z)=σ(z)(1-σ(z))` (máxima en 0, mínima en extremos).
+
+#### 6) Explicación didáctica
+- Cuando `σ` se satura, el gradiente se vuelve pequeño: puede “aprender lento” aunque el error sea real.
+
+#### 7) Ejemplo modelado
+- Prueba `z=[-1000,0,1000]` y observa que sin `clip` puedes romper `exp`.
+
+#### 8) Práctica guiada
+- Escribe un test: `sigmoid(np.array([0.0]))==0.5` (aprox).
+
+#### 9) Práctica independiente
+- Implementa una sigmoid estable alternativa (log-sum-exp) y compara.
+
+#### 10) Autoevaluación
+- ¿Qué pasa con `σ'(z)` cuando `z` es muy grande en valor absoluto?
+
+#### 11) Errores comunes
+- Creer que sigmoid “hace no lineal” la frontera.
+
+#### 12) Retención
+- “Sigmoid curva la probabilidad, no la geometría del plano”.
+
+#### 13) Diferenciación
+- Avanzado: relación entre sigmoid y logit.
+
+#### 14) Recursos
+- Material de estabilidad numérica (overflow/underflow).
+
+#### 15) Nota docente
+- Pedir al alumno que explique por qué `clip` es un *guardrail* y no un “hack”.
+</details>
 
 ### 2.2 Hipótesis Logística
 
@@ -576,6 +1002,61 @@ def predict_class(X: np.ndarray, theta: np.ndarray, threshold: float = 0.5) -> n
     """Predice clase (0 o 1)."""
     return (predict_proba(X, theta) >= threshold).astype(int)
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 2.2: Hipótesis + umbral (qué significa predecir)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Probabilidad vs clase: `predict_proba` y `predict_class` no son lo mismo
+- **ID (opcional):** `M05-T02_2`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1
+
+#### 2) Objetivos
+- Separar claramente: score `z`, probabilidad `p`, decisión `ŷ`.
+- Entender el papel del `threshold` como decisión de negocio (no matemática fija).
+
+#### 3) Relevancia
+- Cambiar `threshold` es una de las maneras más simples y potentes de controlar FP vs FN (verás esto en métricas).
+
+#### 4) Mapa conceptual mínimo
+- `predict_proba` te da un ranking de “confianza”.
+- `predict_class` es una política: “si p≥t, digo 1”.
+
+#### 5) Definiciones esenciales
+- **Frontera:** `θᵀx=0` si `t=0.5`.
+
+#### 6) Explicación didáctica
+- `t=0.5` es convencional; si el costo de FN es alto, baja el umbral.
+
+#### 7) Ejemplo modelado
+- En spam: prefieres recall alto → `threshold` más bajo (aceptas más FP).
+
+#### 8) Práctica guiada
+- Evalúa el mismo modelo con `t=0.3,0.5,0.7` y registra cambios de precision/recall.
+
+#### 9) Práctica independiente
+- Encuentra un `threshold` que maximice F1 en un dataset de validación.
+
+#### 10) Autoevaluación
+- ¿Por qué dos modelos con igual accuracy pueden ser muy distintos cuando cambias `threshold`?
+
+#### 11) Errores comunes
+- Calcular métricas usando probabilidades como si fueran clases.
+
+#### 12) Retención
+- “Primero calibro y evalúo probabilidades; luego decido clases con un umbral”.
+
+#### 13) Diferenciación
+- Avanzado: curva ROC/PR (conceptual) como barrido de thresholds.
+
+#### 14) Recursos
+- Glosario: precision/recall y confusion matrix.
+
+#### 15) Nota docente
+- Pide que el alumno explique verbalmente qué significa: “predigo 1 si p≥0.3”.
+</details>
 
 ### 2.3 Binary Cross-Entropy Loss
 
@@ -623,6 +1104,64 @@ def bce_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
     h = sigmoid(X @ theta)
     return (1/m) * X.T @ (h - y)
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 2.3: BCE + gradiente (lo que debes saber de memoria)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** BCE como NLL (MLE) y por qué el gradiente termina en `Xᵀ(p-y)`
+- **ID (opcional):** `M05-T02_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1–2.2, logaritmos
+
+#### 2) Objetivos
+- Entender BCE como “castigo logarítmico” a la probabilidad asignada a la clase correcta.
+- Memorizar la forma del gradiente vectorizado.
+- Entender por qué `eps` evita `log(0)` sin cambiar el objetivo conceptual.
+
+#### 3) Relevancia
+- Esta es la pérdida estándar para binario y base de softmax cross-entropy en multiclase.
+
+#### 4) Mapa conceptual mínimo
+- Si `y=1`: loss = `-log(p)`.
+- Si `y=0`: loss = `-log(1-p)`.
+
+#### 5) Definiciones esenciales
+- `p = σ(Xθ)`.
+- `∇θ = (1/m) Xᵀ(p-y)`.
+
+#### 6) Explicación didáctica
+- El gradiente “mide error en probabilidad”: si `p>y`, empuja hacia abajo; si `p<y`, empuja hacia arriba.
+
+#### 7) Ejemplo modelado
+- Una sola muestra: si `y=1` y `p=0.1`, el error `(p-y)` es negativo y el update mueve `θ` para subir `z`.
+
+#### 8) Práctica guiada
+- Haz un gradient check numérico en 1 coordenada (diferencias centrales) con dataset pequeño.
+
+#### 9) Práctica independiente
+- Grafica BCE vs `p` para `y=1` y `y=0` y explica la asimetría.
+
+#### 10) Autoevaluación
+- ¿Por qué BCE penaliza más el caso “seguro y equivocado” que MSE?
+
+#### 11) Errores comunes
+- Usar `y` como int pero con shape `(m,1)` y romper broadcasting.
+- No hacer `clip` en `p` antes del log.
+
+#### 12) Retención
+- Fórmula clave: `grad = Xᵀ(p-y)/m`.
+
+#### 13) Diferenciación
+- Avanzado: relación con la entropía cruzada y KL-divergence.
+
+#### 14) Recursos
+- M04 (MLE→cross-entropy), glosario BCE.
+
+#### 15) Nota docente
+- Pide que el alumno derive el gradiente una vez y luego lo trate como “patrón” reusable.
+</details>
 
 ### 2.4 Implementación Completa
 
@@ -697,9 +1236,123 @@ print(f"Accuracy: {model.score(X, y):.2%}")
 print(f"Parámetros: {model.theta}")
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 2.4: Implementación completa (checklist de robustez)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Cómo saber que tu LogReg “funciona”: contratos, overfit test y Shadow Mode
+- **ID (opcional):** `M05-T02_4`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1–2.3
+
+#### 2) Objetivos
+- Establecer invariantes: `theta` tamaño correcto, `cost_history` finito, `predict_proba` en `(0,1)`.
+- Detectar rápido si GD diverge (cost sube/NaN).
+- Ejecutar “overfit test” como prueba unitaria del entrenamiento.
+
+#### 3) Relevancia
+- Un modelo que “corre” no necesariamente aprende. Necesitas una batería mínima de checks.
+
+#### 4) Mapa conceptual mínimo
+- **Datos** → **bias** → **sigmoid** → **BCE** → **grad** → **update**.
+
+#### 5) Definiciones esenciales
+- `X_b = [1, X]`.
+- `theta[0]` es bias.
+
+#### 6) Explicación didáctica
+- Si el costo no baja en un dataset fácil, asume bug antes de “tocar hiperparámetros”.
+
+#### 7) Ejemplo modelado
+- Con datos separables (dos gaussianas separadas), deberías obtener accuracy alta.
+
+#### 8) Práctica guiada
+- Imprime cada 100 iteraciones: `cost`. Debe caer en promedio.
+
+#### 9) Práctica independiente
+- Añade early stopping y guarda el mejor `theta` por costo.
+
+#### 10) Autoevaluación
+- ¿Qué síntoma te indica signo invertido en el update? (costo sube sistemáticamente).
+
+#### 11) Errores comunes
+- No escalar features.
+- Confundir `predict_proba` con `predict` en métricas.
+
+#### 12) Retención
+- Checklist mínimo: `finite`, `monotonic-ish`, `overfit test`, `shadow mode`.
+
+#### 13) Diferenciación
+- Avanzado: regularización L2 (MAP) y su efecto en estabilidad.
+
+#### 14) Recursos
+- Plan v5: validación externa y rutina de checks.
+
+#### 15) Nota docente
+- Pide evidencia: captura de `cost_history` (inicio vs final) + comparación con sklearn.
+</details>
+
 ---
 
 ## 🧩 Consolidación (Regresión Logística)
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Consolidación LogReg: interpretación y criterio de dominio</strong></summary>
+
+#### 1) Metadatos
+- **Título:** De “entrenar un modelo” a “entender qué aprendió” (pesos como explicación)
+- **ID (opcional):** `M05-CONS-LOGREG`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.4
+
+#### 2) Objetivos
+- Interpretar el vector de pesos como “dirección” que favorece una clase.
+- En imágenes (MNIST), mapear `theta[1:]` a 28×28 y explicar regiones importantes.
+
+#### 3) Relevancia
+- Esto te entrena para hacer informes: no solo reportar accuracy, sino justificar el comportamiento del modelo.
+
+#### 4) Mapa conceptual mínimo
+- Pesos positivos aumentan `z` → suben probabilidad de clase 1.
+- Pesos negativos disminuyen `z` → bajan probabilidad.
+
+#### 5) Definiciones esenciales
+- `theta[0]`: bias.
+- `theta[1:]`: pesos por feature.
+
+#### 6) Explicación didáctica
+- Interpretación correcta es “si sube esta feature, sube/baja el logit”, no “causa”.
+
+#### 7) Ejemplo modelado
+- Para 0 vs 1, pesos en trazos típicos del “1” deberían ser positivos (según cómo codifiques la clase).
+
+#### 8) Práctica guiada
+- Guarda el mapa de pesos y escribe 5 líneas de interpretación con hipótesis verificables.
+
+#### 9) Práctica independiente
+- Repite con otra pareja (3 vs 8) y discute por qué es más difícil.
+
+#### 10) Autoevaluación
+- ¿Cómo cambia la interpretación si inviertes qué clase es 1 y cuál es 0?
+
+#### 11) Errores comunes
+- Olvidar remover el bias antes del reshape.
+- Interpretar magnitudes sin normalizar features.
+
+#### 12) Retención
+- “Pesos → logit → probabilidad”: siempre explica primero qué clase corresponde a `y=1`.
+
+#### 13) Diferenciación
+- Avanzado: inspeccionar errores (top confusiones) y correlacionarlos con regiones de peso.
+
+#### 14) Recursos
+- Herramientas de visualización y notas de interpretabilidad lineal.
+
+#### 15) Nota docente
+- Pide consistencia: la explicación debe predecir qué píxeles cambiarían la predicción.
+</details>
 
 ### Entregable conceptual (v3.3): Interpretación de pesos (LogReg)
 
@@ -783,7 +1436,6 @@ La métrica es una traducción explícita de “qué error es más caro”:
 - **Caso desbalanceado:** crea un dataset donde 95% sea clase 0 y muestra por qué accuracy engaña.
 
 #### Errores comunes (los que más dañan resultados)
-
 - **Evaluar en training:** te da una “métrica falsa” por overfitting.
 - **Leakage:** normalizar/seleccionar features usando todo el dataset antes del split.
 - **No fijar semilla:** resultados no reproducibles.
@@ -793,6 +1445,69 @@ Integración con Plan v4/v5:
 - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md) (rutina + simulacros)
 - [PLAN_V5_ESTRATEGICO.md](PLAN_V5_ESTRATEGICO.md) (validación externa / rigor)
 - Diario: `study_tools/DIARIO_ERRORES.md`
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 3.0: Métricas (cómo elegir y no autoengañarte)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Métricas como decisión: qué optimizas depende del costo (FP vs FN) y del umbral
+- **ID (opcional):** `M05-T03_0`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** LogReg (probabilidades + threshold), matriz de confusión
+
+#### 2) Objetivos
+- Pasar de “sé calcular” a “sé elegir” la métrica correcta según el problema.
+- Entender cómo el `threshold` cambia precision/recall sin re-entrenar el modelo.
+- Detectar el caso clásico de autoengaño: accuracy alta con dataset desbalanceado.
+
+#### 3) Relevancia
+- En proyectos reales, la métrica es parte del producto: define qué errores toleras.
+- Métricas conectan directamente con tu política de decisión (umbral) y con el tipo de informe.
+
+#### 4) Mapa conceptual mínimo
+- **Modelo** produce `p(y=1|x)`.
+- **Threshold** produce `ŷ`.
+- `ŷ` + `y` → **confusion matrix** → métricas.
+
+#### 5) Definiciones esenciales
+- **TP/TN/FP/FN:** conteos base.
+- **Precision:** de lo que dije “positivo”, cuánto era positivo.
+- **Recall:** de lo positivo real, cuánto capturé.
+
+#### 6) Explicación didáctica
+- Si tu modelo solo da clases, ya tomaste una decisión de threshold (implícita). Mejor separar: proba → threshold → métricas.
+
+#### 7) Ejemplo modelado
+- Detección de cáncer: FN es caro → prioriza recall.
+- Filtro de spam: FP es caro → prioriza precision.
+
+#### 8) Práctica guiada
+- Para un mismo modelo, evalúa `threshold` en `{0.3, 0.5, 0.7}` y anota cómo cambian precision/recall.
+
+#### 9) Práctica independiente
+- Crea un dataset con 95% clase 0 y muestra:
+  - baseline “siempre 0” → accuracy alta, pero recall para clase 1 = 0.
+
+#### 10) Autoevaluación
+- ¿Por qué no puedes comparar modelos con thresholds distintos sin decir el threshold?
+
+#### 11) Errores comunes
+- Reportar solo accuracy.
+- Evaluar sobre train y reportar métricas “perfectas”.
+
+#### 12) Retención
+- Regla: “métrica = costo implícito” (si no lo defines, el modelo decide por ti).
+
+#### 13) Diferenciación
+- Avanzado: curva PR/ROC como barrido de thresholds (sin cambiar el modelo).
+
+#### 14) Recursos
+- Glosario de confusion matrix/precision/recall/F1.
+
+#### 15) Nota docente
+- Pide que el alumno justifique una métrica con una frase de costo (“FN cuesta más que FP”).
+</details>
 
 ### 3.1 Matriz de Confusión
 
@@ -833,6 +1548,67 @@ def extract_tp_tn_fp_fn(y_true: np.ndarray, y_pred: np.ndarray):
     fn = np.sum((y_true == 1) & (y_pred == 0))
     return tp, tn, fp, fn
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 3.1: Matriz de Confusión (la base de todo)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** TP/TN/FP/FN como diagnóstico (no como tabla)
+- **ID (opcional):** `M05-T03_1`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** Definir explícitamente cuál es la clase positiva
+
+#### 2) Objetivos
+- Leer la matriz 2×2 sin confundirte entre FP y FN.
+- Traducir el problema (spam, fraude, cáncer, etc.) a “qué error es más caro”.
+- Usar la matriz para explicar cambios de precision/recall al mover el threshold.
+
+#### 3) Relevancia
+- Todas las métricas son funciones de estos cuatro números.
+- Si FP/FN están invertidos, todo el análisis posterior queda inválido.
+
+#### 4) Mapa conceptual mínimo
+- `y_true` vs `y_pred` → conteos → métricas.
+- Cambiar `threshold` mueve masa entre celdas (no crea magia).
+
+#### 5) Definiciones esenciales
+- **FP:** predije 1 pero era 0 (alarma falsa).
+- **FN:** predije 0 pero era 1 (caso perdido).
+
+#### 6) Explicación didáctica
+- Subir threshold suele:
+  - bajar FP (menos alarmas)
+  - subir FN (pierdes positivos)
+
+#### 7) Ejemplo modelado
+- Si “positivo” = cáncer, FN suele ser más grave que FP.
+
+#### 8) Práctica guiada
+- Crea 10 pares (true,pred) y llena la matriz a mano.
+
+#### 9) Práctica independiente
+- Repite con una definición distinta de “positivo” y observa cómo cambia la interpretación.
+
+#### 10) Autoevaluación
+- ¿Qué celda corresponde a “dije 0 pero era 1”?
+
+#### 11) Errores comunes
+- No declarar clase positiva.
+- Intercambiar FP/FN.
+
+#### 12) Retención
+- Atajo: FP = (pred 1, true 0), FN = (pred 0, true 1).
+
+#### 13) Diferenciación
+- Multiclase: matriz K×K, y cada clase se puede analizar como one-vs-rest.
+
+#### 14) Recursos
+- Glosario: Confusion Matrix.
+
+#### 15) Nota docente
+- Exige que el alumno explique un FP y un FN con un ejemplo de su dominio.
+</details>
 
 ### 3.2 Accuracy, Precision, Recall, F1
 
@@ -905,6 +1681,66 @@ def specificity(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     return tn / (tn + fp)
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 3.2: Accuracy/Precision/Recall/F1 (cuándo usar cada una)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Elegir métrica = declarar costo (y reportar threshold)
+- **ID (opcional):** `M05-T03_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1
+
+#### 2) Objetivos
+- Identificar cuándo accuracy es engañosa (desbalance).
+- Elegir precision vs recall según el costo de FP vs FN.
+- Entender F1 como balance: cae si una de las dos es baja.
+
+#### 3) Relevancia
+- Aquí defines “qué significa que el modelo sea bueno”.
+
+#### 4) Mapa conceptual mínimo
+- accuracy: desempeño global.
+- precision: control de FP.
+- recall: control de FN.
+- F1: balance precision/recall.
+
+#### 5) Definiciones esenciales
+- **Precision** responde: “si dije 1, ¿cuántas veces acerté?”
+- **Recall** responde: “de los 1 reales, ¿cuántos encontré?”
+
+#### 6) Explicación didáctica
+- Al subir threshold, normalmente sube precision y baja recall.
+
+#### 7) Ejemplo modelado
+- Modelo conservador: predice pocos 1 → precision alta, recall baja.
+
+#### 8) Práctica guiada
+- Con el mismo conjunto, evalúa `threshold` en 0.3/0.5/0.7 y compara.
+
+#### 9) Práctica independiente
+- Busca un threshold que maximice F1 en validación y reporta (F1, threshold).
+
+#### 10) Autoevaluación
+- ¿Qué te falta para reproducir el mismo reporte mañana?
+
+#### 11) Errores comunes
+- Reportar métricas sin decir threshold.
+- Optimizar F1 sin justificar el costo del error.
+
+#### 12) Retención
+- Regla: costo → métrica → threshold.
+
+#### 13) Diferenciación
+- Multiclase: macro vs micro (cuando las clases están desbalanceadas).
+
+#### 14) Recursos
+- Glosario: Precision/Recall/F1.
+
+#### 15) Nota docente
+- Obliga a que el alumno elija una métrica y la defienda con una frase de costo.
+</details>
+
 ### 3.3 Clase Metrics Completa
 
 ```python
@@ -957,6 +1793,61 @@ report = classification_report(y_true, y_pred)
 print(report)
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 3.3: Reporte de métricas (de números a diagnóstico)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Del reporte a la acción: qué cambiar si precision/recall no cumplen
+- **ID (opcional):** `M05-T03_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1–3.2
+
+#### 2) Objetivos
+- Empaquetar métricas para comparar experimentos sin confusión.
+- Interpretar el reporte como diagnóstico: qué tipo de error domina.
+- Mantener reproducibilidad: mismo split/seed/threshold.
+
+#### 3) Relevancia
+- En un proyecto, el reporte es lo que justifica decisiones (no solo el código).
+
+#### 4) Mapa conceptual mínimo
+- confusion matrix → métricas → reporte → decisión (threshold/feature/modelo).
+
+#### 5) Definiciones esenciales
+- “Reporte” no es solo números: requiere contexto (dataset/split/threshold).
+
+#### 6) Explicación didáctica
+- Si el reporte no incluye contexto, es fácil autoengañarse con comparaciones inválidas.
+
+#### 7) Ejemplo modelado
+- Recall bajo: baja threshold o mejora features; Precision baja: sube threshold o reduce ruido.
+
+#### 8) Práctica guiada
+- Cambia 2 predicciones del demo y observa cómo cambian todas las métricas.
+
+#### 9) Práctica independiente
+- Extiende a macro-F1 en multiclase (one-vs-rest).
+
+#### 10) Autoevaluación
+- ¿Qué te falta para reproducir el mismo reporte mañana?
+
+#### 11) Errores comunes
+- Comparar reportes de datasets distintos.
+
+#### 12) Retención
+- “Métrica sin contexto = número sin significado”.
+
+#### 13) Diferenciación
+- Avanzado: incluir `mean±std` vía cross-validation.
+
+#### 14) Recursos
+- Plan v5: disciplina de validación y registro de resultados.
+
+#### 15) Nota docente
+- Pide una recomendación concreta basada en el reporte (threshold/features/datos).
+</details>
+
 ---
 
 ## 💻 Parte 4: Validación y Regularización
@@ -1004,6 +1895,66 @@ Conectar esto con el Pathway:
 - v4.0: usa simulacros para preguntas tipo examen (`study_tools/SIMULACRO_EXAMEN_TEORICO.md`).
 - v5.0: valida tu implementación con Shadow Mode (sklearn) antes de cerrar el módulo.
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 4.0: Validación + Regularización (workflow anti-autoengaño)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Cómo saber si generalizas: split correcto, validación y control de overfitting
+- **ID (opcional):** `M05-T04_0`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio/Avanzado
+- **Dependencias:** Métricas (Parte 3), LogReg (Parte 2)
+
+#### 2) Objetivos
+- Explicar la diferencia entre train/val/test y por qué el test no se toca.
+- Entender qué pregunta responde K-fold (variancia de performance).
+- Entender regularización como control de complejidad efectiva (bias-varianza).
+
+#### 3) Relevancia
+- Sin validación, puedes “ganar” en train y fallar en producción.
+- Regularización es una herramienta central para modelos lineales y redes.
+
+#### 4) Mapa conceptual mínimo
+- Entrenar en train.
+- Elegir hiperparámetros con val (o CV).
+- Reportar final en test una sola vez.
+
+#### 5) Definiciones esenciales
+- **Leakage:** usar info del test/val al entrenar.
+- **Overfitting:** buen train, mal test.
+
+#### 6) Explicación didáctica
+- Si miras el test repetidamente, el test se convierte en “val” sin querer.
+
+#### 7) Ejemplo modelado
+- Dos seeds distintas → dos splits distintos → accuracy distinta: eso es varianza.
+
+#### 8) Práctica guiada
+- Ejecuta 2 splits con semillas diferentes y reporta ambas métricas.
+
+#### 9) Práctica independiente
+- Haz K-fold y reporta `mean ± std`.
+
+#### 10) Autoevaluación
+- ¿Cuál conjunto se usa para elegir `lambda_`?
+
+#### 11) Errores comunes
+- Normalizar usando todo el dataset antes del split.
+- Elegir hiperparámetros “viendo” el test.
+
+#### 12) Retención
+- Regla: test se usa una vez, al final.
+
+#### 13) Diferenciación
+- Avanzado: nested CV (conceptual) para selección + evaluación robusta.
+
+#### 14) Recursos
+- Plan v5: Shadow Mode para validar implementaciones.
+
+#### 15) Nota docente
+- Exigir que el alumno declare explícitamente qué datos usó para cada decisión.
+</details>
+
 ### 4.1 Train/Test Split
 
 ```python
@@ -1036,6 +1987,60 @@ def train_test_split(
 
     return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 4.1: Train/Test Split (contratos y fugas)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Split reproducible: qué debe ser aleatorio y qué debe ser determinista
+- **ID (opcional):** `M05-T04_1`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.0
+
+#### 2) Objetivos
+- Verificar invariantes: tamaños de split, alineación X/y, sin duplicados.
+- Entender el rol de `random_state`.
+
+#### 3) Relevancia
+- Si tu split está mal, todo el benchmark se vuelve irrelevante.
+
+#### 4) Mapa conceptual mínimo
+- Permutar índices → cortar → indexar X/y.
+
+#### 5) Definiciones esenciales
+- **Reproducibilidad:** misma semilla → mismo split.
+
+#### 6) Explicación didáctica
+- Split debe hacerse antes de normalizar/seleccionar features (evita leakage).
+
+#### 7) Ejemplo modelado
+- Verifica que `len(train)+len(test)=n`.
+
+#### 8) Práctica guiada
+- Imprime tamaños y distribuciones de clase por split.
+
+#### 9) Práctica independiente
+- Implementa split estratificado (conceptual) para clasificación desbalanceada.
+
+#### 10) Autoevaluación
+- ¿Qué se rompe si `X` y `y` se permutan con índices distintos?
+
+#### 11) Errores comunes
+- Reusar el test para “ajustar” el modelo.
+
+#### 12) Retención
+- Regla: split primero; transformaciones después (fit en train).
+
+#### 13) Diferenciación
+- Avanzado: train/val/test + pipelines.
+
+#### 14) Recursos
+- Plan v4/v5: disciplina de evaluación.
+
+#### 15) Nota docente
+- Pide que el alumno identifique 2 formas de leakage y cómo evitarlas.
+</details>
 
 ### 4.2 K-Fold Cross Validation
 
@@ -1106,6 +2111,61 @@ def cross_validate(
 # cv_results = cross_validate(LogisticRegression, X, y, k=5, learning_rate=0.1, n_iterations=500)
 # print(f"CV Accuracy: {cv_results['mean']:.4f} ± {cv_results['std']:.4f}")
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 4.2: K-Fold (qué estima y qué no)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** K-fold como estimador de varianza y robustez (no como “mejorar accuracy”)
+- **ID (opcional):** `M05-T04_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.1
+
+#### 2) Objetivos
+- Entender que K-fold produce una distribución de scores.
+- Reportar `mean ± std`.
+- Evitar errores de leakage en CV (fit transforms dentro de cada fold).
+
+#### 3) Relevancia
+- Te da confianza en la estabilidad del modelo.
+
+#### 4) Mapa conceptual mínimo
+- Repartir índices en folds → entrenar k veces → evaluar k veces.
+
+#### 5) Definiciones esenciales
+- **Fold:** partición usada como validación.
+
+#### 6) Explicación didáctica
+- Si la std es alta, tu rendimiento depende demasiado del split.
+
+#### 7) Ejemplo modelado
+- `k=5` → 5 scores; promedia y reporta dispersión.
+
+#### 8) Práctica guiada
+- Ejecuta CV con 2 seeds y compara la std.
+
+#### 9) Práctica independiente
+- Implementa un “grid” pequeño sobre `learning_rate` y compara medias.
+
+#### 10) Autoevaluación
+- ¿Por qué CV no reemplaza el test final?
+
+#### 11) Errores comunes
+- Elegir hiperparámetros y evaluar todo en el mismo CV sin un test final (sobreajuste de selección).
+
+#### 12) Retención
+- Regla: CV para selección/estimación; test para cierre.
+
+#### 13) Diferenciación
+- Avanzado: nested CV (conceptual).
+
+#### 14) Recursos
+- Notas de validación y bias-varianza.
+
+#### 15) Nota docente
+- Pide que el alumno explique qué significa “std alta” con una analogía.
+</details>
 
 ### 4.3 Regularización
 
@@ -1184,6 +2244,63 @@ class LogisticRegressionRegularized:
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         return np.mean(self.predict(X) == y)
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 4.3: Regularización (L1/L2 y por qué se excluye el bias)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Regularización como control de complejidad: L2 (suaviza) vs L1 (sparse)
+- **ID (opcional):** `M05-T04_3`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.3 (BCE/gradiente), 4.0
+
+#### 2) Objetivos
+- Entender qué término se agrega al costo y cómo afecta el gradiente.
+- Justificar por qué el bias no se regulariza.
+- Relacionar `lambda_` con bias-varianza.
+
+#### 3) Relevancia
+- Regularización suele ser la diferencia entre generalizar o sobreajustar en modelos lineales.
+
+#### 4) Mapa conceptual mínimo
+- Loss base + penalización a pesos → update más “conservador”.
+
+#### 5) Definiciones esenciales
+- **L2:** penaliza cuadrados (shrink continuo).
+- **L1:** penaliza valores absolutos (promueve sparsity).
+
+#### 6) Explicación didáctica
+- Regularizar el bias puede desplazar la frontera innecesariamente.
+
+#### 7) Ejemplo modelado
+- Si `lambda_` sube, típicamente bajan magnitudes de `theta[1:]`.
+
+#### 8) Práctica guiada
+- Prueba `lambda_` en `{0,0.01,0.1,1.0}` y observa train/test.
+
+#### 9) Práctica independiente
+- Grafica norma de `theta` vs `lambda_`.
+
+#### 10) Autoevaluación
+- ¿Qué efecto esperas en el gap train-test cuando aumenta `lambda_`?
+
+#### 11) Errores comunes
+- Regularizar también `theta[0]`.
+- Olvidar ajustar el gradiente con el término de regularización.
+
+#### 12) Retención
+- Regla: penaliza pesos, no el bias.
+
+#### 13) Diferenciación
+- Avanzado: conexión con MAP (prior gaussiano / laplaciano).
+
+#### 14) Recursos
+- Notas de Ridge/Lasso y sesgo-varianza.
+
+#### 15) Nota docente
+- Pide que el alumno explique por qué L1 puede hacer pesos exactamente 0.
+</details>
 
 ---
 

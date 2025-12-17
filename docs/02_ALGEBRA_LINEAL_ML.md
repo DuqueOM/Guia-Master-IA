@@ -2091,6 +2091,18 @@ assert x.shape == (3,)  # Confirma shape original (vector 1D)
 assert x_col.shape == (3, 1)  # Confirma shape del vector columna
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.1: Vectores, operaciones y shapes</strong></summary>
+
+#### 1) Idea clave
+- En NumPy, un vector 1D tiene shape `(d,)`; un vector columna es 2D con shape `(d, 1)`.
+- Muchos “bugs” en ML vienen de mezclar estos dos casos y confiar en broadcasting sin querer.
+
+#### 2) Errores comunes
+- Esperar que `(d,)` se comporte siempre como columna.
+- Hacer `x.T` sobre un vector 1D: **no cambia** el shape.
+</details>
+
 ---
 
 ### Ejercicio 2.2: Producto punto, ángulo y proyección
@@ -2132,6 +2144,18 @@ r = a - proj  # Residual (debe ser ortogonal a b)
 assert np.isclose(np.dot(r, b), 0.0, atol=1e-10)  # Verifica ortogonalidad: r·b ≈ 0
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.2: Dot, coseno y proyección</strong></summary>
+
+#### 1) Idea clave
+- `cos(θ) = (a·b)/(||a|| ||b||)` puede salirse de `[-1,1]` por error numérico: por eso se usa `np.clip`.
+- La proyección separa `a` en parte paralela a `b` y residual ortogonal `r`.
+
+#### 2) Errores comunes
+- No controlar el caso `||a||=0` o `||b||=0` si generalizas.
+- Verificar ortogonalidad sin tolerancia (usar `atol`).
+</details>
+
 ---
 
 ### Ejercicio 2.3: Normas L1/L2/L∞ (intuición + verificación)
@@ -2168,6 +2192,18 @@ assert np.isclose(ninf, np.linalg.norm(x, np.inf))  # Valida contra NumPy (L∞)
 assert ninf <= n2 + 1e-12  # Desigualdad: ||x||∞ <= ||x||2
 assert n2 <= n1 + 1e-12  # Desigualdad: ||x||2 <= ||x||1
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.3: Normas L1/L2/L∞ y desigualdades</strong></summary>
+
+#### 1) Idea clave
+- `||x||_1` suma magnitudes, `||x||_2` mide energía/longitud, `||x||_∞` toma el “peor caso” por componente.
+- La cadena `||x||_∞ <= ||x||_2 <= ||x||_1` se cumple en dimensión finita.
+
+#### 2) Errores comunes
+- Olvidar `abs` en L1/L∞.
+- Comparar floats sin tolerancias (usar `np.isclose` o un epsilon pequeño).
+</details>
 
 ---
 
@@ -2213,6 +2249,18 @@ assert np.allclose(D, D.T)  # Las distancias son simétricas
 assert np.allclose(np.diag(D), 0.0)  # Distancia a sí mismo = 0
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.4: Matriz de distancias (vectorización)</strong></summary>
+
+#### 1) Idea clave
+- La identidad `||a-b||^2 = ||a||^2 + ||b||^2 - 2a·b` permite construir `D` sin bucles.
+- Por redondeo, `D_sq` puede quedar levemente negativo; por eso se hace `np.maximum(D_sq, 0.0)` antes de `sqrt`.
+
+#### 2) Errores comunes
+- No corregir negativos numéricos y obtener `nan` en `sqrt`.
+- No validar simetría y diagonal cero (invariantes de una matriz de distancias).
+</details>
+
 ---
 
 ### Ejercicio 2.5: Similitud coseno (y el caso del vector cero)
@@ -2253,6 +2301,18 @@ assert np.isclose(cosine_similarity(v1, v2), 1.0)  # Misma dirección => similit
 assert np.isclose(cosine_similarity(v3, v4), 0.0)  # Ortogonales => similitud ≈ 0
 assert cosine_similarity(v1, z) == 0.0  # Convención del vector cero
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.5: Similitud coseno y vector cero</strong></summary>
+
+#### 1) Idea clave
+- La similitud coseno compara **direcciones**, no magnitudes: normaliza por `||a||` y `||b||`.
+- Si alguno es vector cero, la dirección no existe: hay que definir una convención (aquí: devolver `0.0`).
+
+#### 2) Errores comunes
+- Dividir entre 0 por no checar `||a||` o `||b||`.
+- Confundir similitud con distancia (si quieres “distancia coseno”: `1 - cos`).
+</details>
 
 ---
 
@@ -2295,6 +2355,18 @@ y_hat = X @ w + b  # Predicción lineal (b se “broadcastea” a (n,))
 assert y_hat.shape == (n,)  # Debe haber 1 predicción por sample
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.6: Multiplicación matricial y contratos de shape</strong></summary>
+
+#### 1) Idea clave
+- `@` sigue la regla `(m,k)@(k,n)->(m,n)`.
+- En ML, `X:(n,d)` y `w:(d,)` producen `X @ w:(n,)` (una predicción por muestra).
+
+#### 2) Errores comunes
+- Confundir `*` (Hadamard/broadcasting) con `@` (álgebra lineal).
+- Usar `w` como `(d,1)` y sorprenderse con salida `(n,1)`.
+</details>
+
 ---
 
 ### Ejercicio 2.7: Sistemas lineales: `solve` vs inversa (estabilidad)
@@ -2335,6 +2407,20 @@ except np.linalg.LinAlgError:
     pass  # Camino esperado
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.7: `solve` vs inversa (estabilidad numérica)</strong></summary>
+
+#### 1) Idea clave
+- `np.linalg.solve(A, b)` es preferible a `np.linalg.inv(A) @ b`:
+  - evita formar explícitamente la inversa
+  - suele ser más estable y eficiente.
+- Si `A` es singular (o casi singular), `solve` debe fallar (no hay solución única).
+
+#### 2) Errores comunes
+- Usar la inversa “por costumbre” en vez de `solve`.
+- No testear el caso singular y asumir que siempre habrá solución.
+</details>
+
 ---
 
 ### Ejercicio 2.8: Eigenvalues/eigenvectors (verificar Av=λv)
@@ -2371,6 +2457,18 @@ v1 = vecs[:, 1]  # Segundo eigenvector
 assert np.isclose(np.dot(v0, v1), 0.0, atol=1e-10)  # Ortogonalidad (para A simétrica)
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.8: Verificación `Av = λv`</strong></summary>
+
+#### 1) Idea clave
+- Un eigenvector `v` mantiene su dirección bajo la transformación `A`, solo se escala por `λ`.
+- En matrices simétricas, los eigenvectors asociados a eigenvalues distintos son ortogonales.
+
+#### 2) Errores comunes
+- Olvidar tolerancia numérica al verificar `A @ v ≈ λ v`.
+- No considerar que NumPy puede devolver complejos (por eso a veces se usa `.real`).
+</details>
+
 ---
 
 ### Ejercicio 2.9: PCA (eigen vs SVD) - consistencia de shapes
@@ -2397,30 +2495,21 @@ assert np.isclose(np.dot(v0, v1), 0.0, atol=1e-10)  # Ortogonalidad (para A sim�
 import numpy as np  # NumPy para datos aleatorios, eig/SVD y validación de shapes
 
 np.random.seed(0)  # Reproducibilidad
-n = 200  # Número de muestras
-z = np.random.randn(n)  # Factor latente 1D
-X = np.stack(
-    [
-        z,  # Feature 1
-        2.0 * z + 0.1 * np.random.randn(n),  # Feature 2 correlacionada con z
-        -z + 0.1 * np.random.randn(n),  # Feature 3 anti-correlacionada con z
-    ],
-    axis=1,
-)  # Shape (n, 3)
+n, d = 200, 3  # n muestras, d features
+X = np.random.randn(n, d)  # Matriz de datos con shape (n, d)
+w_true = np.array([0.5, -1.2, 2.0])  # Pesos reales
+noise = 0.1 * np.random.randn(n)  # Ruido aditivo
+y = X @ w_true + noise  # Targets: modelo lineal con ruido
 
-
-def pca_eigen(X: np.ndarray, k: int):  # PCA usando eigendecomposition de la covarianza
-    Xc = X - X.mean(axis=0)  # Centra features (PCA asume media 0)
-    cov = (Xc.T @ Xc) / (Xc.shape[0] - 1)  # Matriz de covarianza muestral (3x3)
-    vals, vecs = np.linalg.eig(cov)  # vals ~ varianzas; vecs ~ direcciones principales
-    idx = np.argsort(vals)[::-1]  # Ordena por varianza descendente
-    vals = vals[idx].real  # Seguridad numérica: parte real
-    vecs = vecs[:, idx].real  # Reordena eigenvectors
-    comps = vecs[:, :k]  # Toma top-k componentes (3xk)
-    Xk = Xc @ comps  # Proyecta datos centrados (n x k)
-    ratio = vals[:k] / np.sum(vals)  # Varianza explicada por componente
-    return Xk, comps, ratio
-
+Xc = X - X.mean(axis=0)  # Centra features (PCA asume media 0)
+cov = (Xc.T @ Xc) / (Xc.shape[0] - 1)  # Matriz de covarianza muestral (3x3)
+vals, vecs = np.linalg.eig(cov)  # vals ~ varianzas; vecs ~ direcciones principales
+idx = np.argsort(vals)[::-1]  # Ordena por varianza descendente
+vals = vals[idx].real  # Seguridad numérica: parte real
+vecs = vecs[:, idx].real  # Reordena eigenvectors
+comps = vecs[:, :2]  # Toma top-2 componentes (3x2)
+Xk = Xc @ comps  # Proyecta datos centrados (n x 2)
+ratio = vals[:2] / np.sum(vals)  # Varianza explicada por componente
 
 def pca_svd(X: np.ndarray, k: int):  # PCA usando SVD (más estable en práctica)
     Xc = X - X.mean(axis=0)  # Centra datos
@@ -2431,19 +2520,29 @@ def pca_svd(X: np.ndarray, k: int):  # PCA usando SVD (más estable en práctica
     ratio = var[:k] / np.sum(var)  # Varianza explicada
     return Xk, comps, ratio
 
-
-X_e, C_e, r_e = pca_eigen(X, 2)  # PCA por eigen
 X_s, C_s, r_s = pca_svd(X, 2)  # PCA por SVD
 
-assert X_e.shape == (n, 2)  # Shape de datos reducidos
+assert Xk.shape == (n, 2)  # Shape de datos reducidos
 assert X_s.shape == (n, 2)
-assert C_e.shape == (3, 2)  # Shape de componentes: (n_features, k)
+assert comps.shape == (3, 2)  # Shape de componentes: (n_features, k)
 assert C_s.shape == (3, 2)
-assert r_e.shape == (2,)  # Ratios de varianza explicada
+assert ratio.shape == (2,)  # Ratios de varianza explicada
 assert r_s.shape == (2,)
-assert r_e[0] >= r_e[1]  # Debe estar ordenado descendentemente
+assert ratio[0] >= ratio[1]  # Debe estar ordenado descendentemente
 assert r_s[0] >= r_s[1]
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.9: PCA (eigen vs SVD)</strong></summary>
+
+#### 1) Idea clave
+- PCA busca direcciones de máxima varianza: eigenvectors de la covarianza.
+- SVD sobre datos centrados suele ser más estable numéricamente y evita formar `cov` explícita.
+
+#### 2) Errores comunes
+- No centrar `X` antes de PCA.
+- Confundir shapes: componentes deben ser `(n_features, k)` y proyección `(n_samples, k)`.
+</details>
 
 ---
 
@@ -2485,6 +2584,18 @@ err2 = np.linalg.norm(A - A2)  # Error con mayor rango
 assert err2 <= err1 + 1e-12  # El error debe bajar al aumentar el rango
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.10: Truncated SVD y trade-off</strong></summary>
+
+#### 1) Idea clave
+- Truncated SVD da la **mejor aproximación** de rango `k` (en norma Frobenius).
+- A mayor `k`, menor error de reconstrucción.
+
+#### 2) Errores comunes
+- Reconstruir usando shapes incorrectos (`U[:, :k]`, `S[:k]`, `Vt[:k, :]`).
+- Esperar que `k=2` siempre sea “aproximación”: si el rango ya es completo, reconstruye casi exacto.
+</details>
+
 ---
 
 ### (Bonus) Ejercicio 2.11: De álgebra lineal a ML - regresión cerrada
@@ -2514,6 +2625,18 @@ w_hat = np.linalg.solve(XtX, Xty)  # Resuelve (X^T X) w = X^T y
 assert w_hat.shape == (d,)  # Shape esperado del vector de pesos
 assert np.linalg.norm(w_hat - w_true) < 0.2  # Debe recuperar pesos razonablemente
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Ejercicio 2.11: Ecuación normal y por qué usar `solve`</strong></summary>
+
+#### 1) Idea clave
+- La ecuación normal es un sistema lineal: `(XᵀX) w = Xᵀy`.
+- `solve(XtX, Xty)` es la forma estándar (evita calcular `inv(XtX)`).
+
+#### 2) Errores comunes
+- Usar `inv(XtX) @ Xty` (menos estable).
+- Asumir que `XᵀX` siempre es invertible: si hay colinealidad fuerte puede ser singular o mal condicionada.
+</details>
 
 ---
 

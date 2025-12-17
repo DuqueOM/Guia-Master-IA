@@ -183,6 +183,63 @@ print(f"Derivada analítica: {analytical:.6f}")
 print(f"Error: {abs(numerical - analytical):.2e}")
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 1.1: Concepto de Derivada</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Derivada como pendiente local + verificación numérica
+- **ID (opcional):** `M03-T01_1`
+- **Duración estimada:** 60–90 min
+- **Nivel:** Fundamentos
+- **Dependencias:** Álgebra básica, intuición de función
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Calcular una derivada analítica simple (ej. `x²`) y **validarla** con diferencias finitas.
+- Explicar qué representa `h` y cómo afecta el error numérico.
+
+#### 3) Relevancia y contexto
+- En ML, el gradiente es “la derivada” que guía la optimización; si no controlas el concepto, backprop se vuelve magia.
+
+#### 4) Mapa conceptual / conceptos clave
+- derivada = tasa de cambio local
+- recta tangente
+- diferencias finitas (central)
+
+#### 5) Definiciones y fórmulas esenciales
+- `f'(x) = lim[h→0] (f(x+h) - f(x-h)) / (2h)` (central).
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** “qué tan inclinada está la curva en ese punto”.
+- **Operativa:** compara derivada analítica vs numérica y mira el error.
+
+#### 7) Ejemplo modelado
+- `f(x)=x²` → `f'(x)=2x`; valida en `x=3`.
+
+#### 8) Práctica guiada
+- Cambia `x` (ej. `-2`, `0.5`, `10`) y observa el error.
+
+#### 9) Práctica independiente / transferencia
+- Repite con `f(x)=x³` y `f(x)=sin(x)` (deriva y verifica).
+
+#### 10) Evaluación
+- ¿Por qué la diferencia central suele ser más precisa que la forward difference?
+
+#### 11) Errores comunes
+- Elegir `h` demasiado pequeño (ruido numérico) o demasiado grande (sesgo).
+
+#### 12) Retención
+- (día 2) escribe el esquema “analítica vs numérica → error” y explica qué valida.
+
+#### 13) Diferenciación
+- Avanzado: prueba funciones con cambios bruscos (ej. `abs`) y discute no-diferenciabilidad.
+
+#### 14) Recursos
+- GLOSARIO: Derivative.
+
+#### 15) Nota docente
+- Exigir siempre “derivada + validación numérica” al introducir un nuevo gradiente.
+</details>
+
 ### 1.2 Derivadas Comunes en ML
 
 ```python
@@ -254,6 +311,62 @@ verify_derivative(sigmoid, sigmoid_derivative, x, "Sigmoid")
 verify_derivative(np.tanh, tanh_derivative, x, "Tanh")
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 1.2: Derivadas Comunes en ML</strong></summary>
+
+#### 1) Metadatos
+- **Título:** “derivadas que debes memorizar” + verificación automática
+- **ID (opcional):** `M03-T01_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Fundamentos
+- **Dependencias:** 1.1
+
+#### 2) Objetivos
+- Memorizar y aplicar derivadas de `exp`, `log`, potencias y activaciones (sigmoid/tanh/ReLU).
+- Implementar un verificador numérico y usar el error para detectar bugs.
+
+#### 3) Relevancia
+- Estas derivadas aparecen en backprop: activación + loss + capa lineal.
+
+#### 4) Conceptos clave
+- `σ'(x) = σ(x)(1-σ(x))`
+- `tanh'(x) = 1-tanh(x)^2`
+- ReLU derivada por tramos
+
+#### 5) Fórmulas esenciales
+- Regla de la cadena (adelanto): derivadas se multiplican en composiciones.
+
+#### 6) Explicación didáctica
+- **Patrón ML:** implementa `f`, implementa `f'`, valida con diferencias finitas.
+
+#### 7) Ejemplo modelado
+- Verificación de `sigmoid` y `tanh` con error máximo.
+
+#### 8) Práctica guiada
+- Añade `relu` al verificador y discute el punto `x=0`.
+
+#### 9) Práctica independiente
+- Implementa `softplus(x)=log(1+exp(x))` y su derivada; verifica numéricamente.
+
+#### 10) Evaluación
+- ¿Por qué en `sigmoid_derivative` conviene reutilizar `σ(x)` en lugar de re-computar `exp`?
+
+#### 11) Errores comunes
+- Overflow en `exp` para `x` grande (necesidad de estabilidad numérica).
+
+#### 12) Retención
+- (día 7) recita 5 derivadas clave sin mirar (potencia, exp, log, sigmoid, tanh).
+
+#### 13) Diferenciación
+- Avanzado: explica por qué ReLU “funciona” pese a no ser derivable en 0.
+
+#### 14) Recursos
+- GLOSARIO: Gradient, Chain Rule.
+
+#### 15) Nota docente
+- Requerir “tabla personal” de derivadas + mini test de verificación.
+</details>
+
 ### 1.3 Derivadas Parciales
 
 ```python
@@ -316,6 +429,62 @@ print(f"\n∂f/∂y:")
 print(f"  Analítica: {df_dy(*point)}")
 print(f"  Numérica:  {partial_derivative(f, 1, point):.6f}")
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 1.3: Derivadas Parciales</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Parciales como “congelar variables” + check numérico
+- **ID (opcional):** `M03-T01_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Fundamentos
+- **Dependencias:** 1.1
+
+#### 2) Objetivos
+- Calcular `∂f/∂x` y `∂f/∂y` y verificarlas numéricamente en un punto.
+- Interpretar “mantener constante” y su conexión con gradiente.
+
+#### 3) Relevancia
+- Backprop calcula parciales “locales” en cada nodo del grafo.
+
+#### 4) Conceptos clave
+- parcial vs total
+- punto de evaluación
+- diferencias finitas por coordenada
+
+#### 5) Fórmulas
+- `∂f/∂x ≈ (f(x+h,y)-f(x-h,y)) / (2h)`.
+
+#### 6) Explicación didáctica
+- Cada parcial es “cómo cambia la salida si muevo solo una coordenada”.
+
+#### 7) Ejemplo modelado
+- `f(x,y)=x²+3xy+y²` con parciales analíticas y check.
+
+#### 8) Práctica guiada
+- Cambia el punto (ej. `[0,0]`, `[1,-2]`) y compara parciales.
+
+#### 9) Práctica independiente
+- Define `g(x,y)=sin(xy)+x` y deriva parciales; valida.
+
+#### 10) Evaluación
+- ¿Por qué el gradiente junta todas las parciales en un vector?
+
+#### 11) Errores comunes
+- Confundir `df/dx` (1D) con `∂f/∂x` (multivariable).
+
+#### 12) Retención
+- (día 2) explica la idea de “congelar variables” con un ejemplo propio.
+
+#### 13) Diferenciación
+- Avanzado: relacionar parciales con derivada direccional (preview del gradiente).
+
+#### 14) Recursos
+- GLOSARIO: Gradient.
+
+#### 15) Nota docente
+- Repetir: “primero analítica, luego numérica, luego interpretación”.
+</details>
 
 ---
 
@@ -385,6 +554,62 @@ print(f"Gradiente numérico:  {grad_numerical}")
 print(f"Gradiente analítico: {grad_analytical}")
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 2.1: Definición del Gradiente</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Gradiente como vector de derivadas parciales + verificación numérica
+- **ID (opcional):** `M03-T02_1`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Fundamentos
+- **Dependencias:** 1.3 (parciales)
+
+#### 2) Objetivos
+- Calcular un gradiente analítico simple (paraboloide) y **validarlo** con diferencias finitas.
+- Interpretar `∇f` como dirección de máximo ascenso y `-∇f` como dirección de descenso.
+
+#### 3) Relevancia
+- El gradiente es la señal que guía el entrenamiento en ML; si el gradiente está mal, el modelo no aprende.
+
+#### 4) Conceptos clave
+- `∇f` (vector)
+- norma del gradiente
+- diferencia central por coordenada
+
+#### 5) Fórmulas esenciales
+- `∇f = [∂f/∂x₁, …, ∂f/∂xₙ]`.
+
+#### 6) Explicación didáctica
+- **Mentalidad de debugging:** primero deriva, luego valida numéricamente, luego interpreta.
+
+#### 7) Ejemplo modelado
+- `f(x,y)=x²+y²` → `∇f=[2x,2y]`.
+
+#### 8) Práctica guiada
+- Cambia el punto (ej. `[1,1]`, `[-3,0]`) y compara gradiente analítico vs numérico.
+
+#### 9) Práctica independiente
+- Define `f(x,y)=x²+10y²` y deriva `∇f`; valida numéricamente.
+
+#### 10) Evaluación
+- ¿Por qué `∇f` es perpendicular a las curvas de nivel?
+
+#### 11) Errores comunes
+- Confundir gradiente (vector) con “derivada” (escalar).
+
+#### 12) Retención
+- (día 2) explica en 2 frases qué te dice la dirección de `-∇f`.
+
+#### 13) Diferenciación
+- Avanzado: conecta `||∇f||` con “qué tan empinada” es la superficie.
+
+#### 14) Recursos
+- GLOSARIO: Gradient.
+
+#### 15) Nota docente
+- Exigir `allclose`/comparación numérica para gradientes nuevos (hábito tipo “grad-check mini”).
+</details>
+
 ### 2.2 Visualización del Gradiente
 
 ```python
@@ -433,6 +658,63 @@ def visualize_gradient():
 
 # visualize_gradient()  # Descomentar para ejecutar
 
+```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 2.2: Visualización del Gradiente</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Campo vectorial y contornos: ver `∇f` en acción
+- **ID (opcional):** `M03-T02_2`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Fundamentos
+- **Dependencias:** 2.1
+
+#### 2) Objetivos
+- Interpretar un campo vectorial del gradiente y relacionarlo con contornos de nivel.
+- Explicar por qué las flechas apuntan hacia máximo ascenso.
+
+#### 3) Relevancia
+- Evita que Gradient Descent se convierta en “receta”: aquí ves el porqué geométrico.
+
+#### 4) Conceptos clave
+- curvas de nivel
+- dirección perpendicular
+- normalización para visualización
+
+#### 5) Fórmulas esenciales
+- Para `f(x,y)=x²+y²`: `∇f=[2x,2y]`.
+
+#### 6) Explicación didáctica
+- Contornos = “misma altura”; gradiente apunta al cambio más rápido → cruza contornos en ángulo recto.
+
+#### 7) Ejemplo modelado
+- Flechas alrededor del origen apuntan hacia afuera (sube); para bajar, irías hacia adentro.
+
+#### 8) Práctica guiada
+- Cambia `Z` a `X**2 + 10*Y**2` y observa cómo cambia el campo.
+
+#### 9) Práctica independiente
+- Prueba una función con “valle” (tipo Rosenbrock) y discute por qué el gradiente puede zigzaguear.
+
+#### 10) Evaluación
+- ¿Por qué normalizar `U,V` ayuda a visualizar pero no cambia la dirección?
+
+#### 11) Errores comunes
+- Interpretar el tamaño de flecha sin considerar la normalización.
+
+#### 12) Retención
+- (día 7) dibuja a mano contornos y gradiente para una función simple.
+
+#### 13) Diferenciación
+- Avanzado: conecta con Hessiano (curvatura) (preview de ejercicios).
+
+#### 14) Recursos
+- `visualizations/viz_gradient_3d.py` (para trayectoria + superficie).
+
+#### 15) Nota docente
+- Pedir una explicación oral: “por qué el gradiente es perpendicular a contornos”.
+</details>
 
 ---
 
@@ -553,6 +835,61 @@ print(f"Mínimo encontrado: {x_final}")
 print(f"f(mínimo) = {f(x_final):.6f}")
 print(f"Iteraciones: {len(history_f)}")
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 3.1: Algoritmo Básico (Gradient Descent)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Gradient Descent como iteración `x ← x - α∇f(x)`
+- **ID (opcional):** `M03-T03_1`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1 (gradiente), 2.2 (intuición geométrica)
+
+#### 2) Objetivos
+- Implementar GD 2D y **explicar** el rol de `α` y el criterio `||∇f|| < tol`.
+- Diagnosticar convergencia/overshooting a partir del historial de `f`.
+
+#### 3) Relevancia
+- Es el núcleo de entrenamiento en ML (con variantes: SGD, Adam).
+
+#### 4) Conceptos clave
+- `learning_rate` (α)
+- criterio de parada
+- trayectoria (historia)
+
+#### 5) Fórmulas
+- `x_{t+1} = x_t - α ∇f(x_t)`.
+
+#### 6) Didáctica
+- Siempre guarda `history_x` y `history_f` para “ver” si aprende.
+
+#### 7) Ejemplo modelado
+- `f(x,y)=x²+y²` converge al origen.
+
+#### 8) Práctica guiada
+- Cambia `α` y observa número de iteraciones.
+
+#### 9) Transferencia
+- Usa el mismo patrón con una función elíptica (mal condicionada).
+
+#### 10) Evaluación
+- ¿Por qué `-∇f` baja localmente la función?
+
+#### 11) Errores comunes
+- `α` grande → diverge; `α` pequeño → lento.
+
+#### 12) Retención
+- (día 2) escribe el update rule y nombra cada término.
+
+#### 13) Diferenciación
+- Avanzado: diferencia entre stopping por `||∇f||` vs cambio en `f`.
+
+#### 14) Recursos
+- `visualizations/viz_gradient_3d.py`.
+
+#### 15) Nota docente
+- Pedir “reporte de diagnóstico”: converge/divege y por qué.
+</details>
 
 ### 3.2 Efecto del Learning Rate
 
@@ -609,6 +946,61 @@ def compare_learning_rates():
 
 # compare_learning_rates()  # Descomentar para ejecutar
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 3.2: Efecto del Learning Rate</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Estabilidad: cómo `α` controla convergencia vs oscilación
+- **ID (opcional):** `M03-T03_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1
+
+#### 2) Objetivos
+- Comparar curvas de `f(x)` para distintos `α` y **clasificar** el comportamiento.
+- Identificar señales de inestabilidad (oscilación, diverge).
+
+#### 3) Relevancia
+- El ajuste de LR es una de las causas #1 de entrenamiento inestable.
+
+#### 4) Conceptos clave
+- escala log en loss
+- overshooting
+- sensibilidad a condiciones
+
+#### 5) Fórmulas
+- GD con `α` fijo: estabilidad depende de curvatura (idea cualitativa).
+
+#### 6) Didáctica
+- “Mira la curva”: suave → ok, serrucho → alto, explode → demasiado alto.
+
+#### 7) Ejemplo modelado
+- Comparación de `α ∈ {0.01,0.1,0.5,0.9}`.
+
+#### 8) Práctica guiada
+- Añade un `α=1.1` y observa.
+
+#### 9) Transferencia
+- Relaciona con entrenamiento de NN (LR schedules / Adam) (preview).
+
+#### 10) Evaluación
+- ¿Por qué usar escala log ayuda a comparar convergencia?
+
+#### 11) Errores comunes
+- Concluir “no aprende” cuando solo falta bajar `α`.
+
+#### 12) Retención
+- (día 7) escribe 3 síntomas y la acción correctiva.
+
+#### 13) Diferenciación
+- Avanzado: conecta `α` con “curvatura” (Hessiano) de forma conceptual.
+
+#### 14) Recursos
+- `study_tools/VISUALIZACION_GRADIENT_DESCENT.md`.
+
+#### 15) Nota docente
+- Exigir evidencia: plot + explicación del caso.
+</details>
 
 ### 3.3 Funciones de Pérdida en ML
 
@@ -650,15 +1042,72 @@ y_pred = np.array([0.1, 0.2, 0.8, 0.9])
 print("MSE Loss:", mse_loss(y_true, y_pred))
 print("BCE Loss:", binary_cross_entropy(y_true, y_pred))
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 3.3: Funciones de Pérdida en ML</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Loss + gradiente: contrato mínimo para entrenar
+- **ID (opcional):** `M03-T03_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.2 (derivadas), 3.1
+
+#### 2) Objetivos
+- Implementar MSE y BCE y **derivar/validar** su gradiente respecto a `y_pred`.
+- Explicar por qué se usa `clip` en BCE (estabilidad numérica).
+
+#### 3) Relevancia
+- Sin `loss` y su gradiente correcto, no hay entrenamiento fiable.
+
+#### 4) Conceptos clave
+- MSE (regresión)
+- BCE (clasificación)
+- estabilidad: `log(0)`
+
+#### 5) Fórmulas esenciales
+- `MSE = mean((y-ŷ)^2)`; `∂MSE/∂ŷ = 2(ŷ-y)/n`.
+
+#### 6) Didáctica
+- Separar: (1) definición de loss (2) gradiente (3) sanity-check numérico.
+
+#### 7) Ejemplo modelado
+- Dataset mini con `y_true` y `y_pred` y prints de losses.
+
+#### 8) Práctica guiada
+- Haz gradient checking de `mse_gradient` con diferencias finitas.
+
+#### 9) Práctica independiente
+- Conecta con `∂L/∂z` en una neurona (preview de Chain Rule).
+
+#### 10) Evaluación
+- ¿Qué problema evita `eps`/`clip` en BCE?
+
+#### 11) Errores comunes
+- confundir gradiente respecto a `ŷ` vs respecto a parámetros.
+
+#### 12) Retención
+- (día 2) escribe MSE y su gradiente sin mirar.
+
+#### 13) Diferenciación
+- Avanzado: discusión conceptual de saturación en sigmoid + BCE.
+
+#### 14) Recursos
+- CS231n: loss functions + numerical gradient check.
+
+#### 15) Nota docente
+- Hacer que el alumno identifique “dónde entra el `clip`” y por qué.
+</details>
 
 ---
-
 ## 💻 Parte 4: Regla de la Cadena (Chain Rule)
+
+### 4.0.0 Introducción
+
+La Regla de la Cadena (Chain Rule) es un concepto fundamental en el cálculo que nos permite encontrar la derivada de una función compuesta. En el contexto del aprendizaje automático, esta regla es crucial para el entrenamiento de modelos, ya que nos permite calcular la derivada de la función de pérdida con respecto a los parámetros del modelo.
 
 ### 4.0 Visualización: Grafo computacional (computational graph)
 
 En Deep Learning, casi todo es una composición de funciones. El truco mental es pensar en un **grafo**:
-
 ```
 x ──► z = w·x + b ──► a = σ(z) ──► L(a, y)
 
@@ -673,6 +1122,66 @@ dL/dw = dL/da · da/dz · dz/dw
 dL/db = dL/da · da/dz · dz/db
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.0: Visualización: Grafo computacional (computational graph)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Grafo computacional: pensar en “nodos” y “rutas” de derivación
+- **ID (opcional):** `M03-T04_0`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.2 (derivadas), 3.3 (loss), 2.1 (gradiente)
+
+#### 2) Objetivos
+- Explicar con tus palabras la diferencia entre **forward** y **backward** en el grafo.
+- Usar la regla de la cadena para obtener `dL/dw` y `dL/db` como producto de factores locales.
+
+#### 3) Relevancia
+- Este patrón mental es el corazón de backpropagation: derivadas locales + composición.
+
+#### 4) Mapa conceptual mínimo
+- **Composición:** `L(a,y)` depende de `a`, que depende de `z`, que depende de `w,b,x`.
+- **Backward:** se propagan derivadas desde `L` hacia los parámetros.
+
+#### 5) Definiciones esenciales
+- **Grafo computacional:** diagrama dirigido donde cada nodo es una operación/función.
+- **Derivada local:** derivada de una operación respecto a su entrada inmediata.
+
+#### 6) Explicación didáctica
+- Regla práctica: para derivar respecto a una variable, multiplica las derivadas locales a lo largo del camino desde `L` hasta esa variable.
+
+#### 7) Ejemplo modelado (micro)
+- Si `z = w·x + b`, entonces:
+  - `dz/dw = x`
+  - `dz/db = 1`
+  - y `dL/dw = dL/da · da/dz · x`
+
+#### 8) Práctica guiada
+- A partir del mismo grafo, deriva `dL/dx` y explica el significado (sensibilidad de la pérdida a la entrada).
+
+#### 9) Práctica independiente
+- Dibuja un grafo para `L = ( (w1·x + b1)² ) + (w2·x)` y deriva `dL/dw1`, `dL/db1`, `dL/dw2`.
+
+#### 10) Autoevaluación
+- ¿Qué factor te faltaría si olvidas el nodo `a = σ(z)`?
+
+#### 11) Errores comunes
+- Omitir un nodo intermedio (un factor) en el producto.
+- Confundir `dL/dw` con `dw/dL` (dirección).
+
+#### 12) Retención
+- (día 2) Reproduce de memoria el grafo y escribe las fórmulas de `dL/dw` y `dL/db`.
+
+#### 13) Diferenciación
+- Avanzado: generaliza el patrón a `z = Wx + b` (vectores/matrices) y discute formas/dimensiones.
+
+#### 14) Recursos
+- Sección “computational graphs” de cursos intro de DL (p.ej., CS231n).
+
+#### 15) Nota docente
+- Pide una “narración” del backward: `L → a → z → (w,b)` y justificación de cada derivada local.
+</details>
+
 ### 4.0.1 Derivación paso a paso: `f(x) = x²`
 
 Si `f(x) = x²`, entonces:
@@ -684,6 +1193,62 @@ f'(x) = lim_{h→0} [(x+h)² - x²] / h
       = lim_{h→0} [2x + h]
       = 2x
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.0.1: Derivación paso a paso: f(x) = x²</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Derivación por definición: intuición del límite
+- **ID (opcional):** `M03-T04_0_1`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Básico–Intermedio
+- **Dependencias:** 1.2 (derivadas)
+
+#### 2) Objetivos
+- Reproducir el cálculo de `f'(x)` desde la definición de derivada.
+- Explicar qué significa “tomar el límite” en términos de aproximación.
+
+#### 3) Relevancia
+- Esta derivación es un “patrón base” que luego se reutiliza en chain rule y gradientes.
+
+#### 4) Mapa conceptual
+- **Definición:** derivada = límite de cociente incremental.
+- **Álgebra:** expandir, simplificar, cancelar, aplicar límite.
+
+#### 5) Definiciones esenciales
+- `f'(x) = lim_{h→0} (f(x+h)-f(x))/h`.
+
+#### 6) Explicación didáctica
+- La cancelación del término `x²` es la pista de que el cociente incremental “aísla” la variación.
+
+#### 7) Ejemplo modelado
+- Validación rápida: si `x=3`, entonces `f'(3)=6`.
+
+#### 8) Práctica guiada
+- Repite el proceso para `f(x)=x³` y compara el resultado con la regla conocida.
+
+#### 9) Práctica independiente
+- Deriva `f(x)=(x+1)²` por definición y simplifica.
+
+#### 10) Autoevaluación
+- ¿En qué paso aparece el requisito de `h→0` y por qué no puedes sustituir `h=0` antes?
+
+#### 11) Errores comunes
+- Sustituir `h=0` demasiado pronto (división por cero).
+- Errores al expandir `(x+h)²`.
+
+#### 12) Retención
+- (día 2) escribe de memoria la expansión de `(x+h)²` y el resultado `2x`.
+
+#### 13) Diferenciación
+- Avanzado: conecta el resultado `2x` con la pendiente de la parábola en el plano.
+
+#### 14) Recursos
+- Sección de derivada por definición en cualquier texto de Cálculo I.
+
+#### 15) Nota docente
+- Pedir al alumno que explique cada cancelación (qué término desaparece y por qué).
+</details>
 
 ### 4.0.2 Derivación paso a paso: sigmoide `σ(z)`
 
@@ -700,6 +1265,62 @@ Resultado clave:
 ```
 
 Consejo práctico: cuando ya tienes `a = σ(z)`, usa `a(1-a)` para derivar, en vez de re-calcular `exp`.
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.0.2: Derivación paso a paso: sigmoide σ(z)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Derivada de la sigmoide: forma útil para backprop
+- **ID (opcional):** `M03-T04_0_2`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.0 (grafo), 1.2 (derivadas)
+
+#### 2) Objetivos
+- Justificar (al menos a nivel algebraico) por qué `σ'(z)=σ(z)(1-σ(z))`.
+- Explicar por qué esta forma es computacionalmente conveniente.
+
+#### 3) Relevancia
+- La identidad `a(1-a)` aparece constantemente en redes con activación sigmoide.
+
+#### 4) Mapa conceptual
+- **Función:** `σ(z) = 1/(1+e^{-z})`
+- **Derivada:** reescritura algebraica para expresar todo en función de `σ(z)`.
+
+#### 5) Definiciones esenciales
+- `σ(z)` y su derivada cerrada.
+
+#### 6) Explicación didáctica
+- Si ya computaste `a=σ(z)` en el forward, en el backward no recalculas exponenciales: usas `a(1-a)`.
+
+#### 7) Ejemplo modelado
+- Si `a=0.8`, entonces `σ'(z)=0.8·0.2=0.16`.
+
+#### 8) Práctica guiada
+- Calcula `σ(z)` y `σ'(z)` para `z ∈ {-2,0,2}` y compara magnitudes.
+
+#### 9) Práctica independiente
+- Explica con una frase por qué la sigmoide “satura” (derivada pequeña) en valores grandes de |z|.
+
+#### 10) Autoevaluación
+- ¿Qué ocurre con `σ'(z)` cuando `a≈0` o `a≈1`?
+
+#### 11) Errores comunes
+- Olvidar la regla de la cadena al derivar `e^{-z}`.
+- Confundir `σ'(z)` con `1-σ(z)`.
+
+#### 12) Retención
+- (día 2) escribe de memoria: `σ'(z)=σ(z)(1-σ(z))`.
+
+#### 13) Diferenciación
+- Avanzado: conectar saturación con vanishing gradients en redes profundas.
+
+#### 14) Recursos
+- Notas de activaciones y derivadas (sigmoid/tanh/ReLU).
+
+#### 15) Nota docente
+- Pedir que el alumno derive la identidad y luego explique su utilidad computacional.
+</details>
 
 ### 4.1 Chain Rule en 1D
 
@@ -755,6 +1376,62 @@ print(f"dy/dx analítica:  {dy_dx_analytical(x)}")
 print(f"dy/dx numérica:   {dy_dx_numerical(x):.6f}")
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.1: Chain Rule en 1D</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Regla de la cadena en 1D: composición y “multiplicar derivadas locales”
+- **ID (opcional):** `M03-T04_1`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.0 (grafo), 1.2 (derivadas)
+
+#### 2) Objetivos
+- Identificar `f` y `g` en una composición `y = f(g(x))`.
+- Calcular `dy/dx` aplicando `dy/dx = f'(g(x))·g'(x)`.
+- Verificar resultados comparando derivada analítica vs numérica.
+
+#### 3) Relevancia
+- Es el patrón exacto que se repite en backprop: derivadas locales encadenadas.
+
+#### 4) Mapa conceptual
+- **Composición:** `x → g(x) → f(g(x))`.
+- **Derivación:** “derivar afuera” evaluado “adentro” y multiplicar por la derivada de adentro.
+
+#### 5) Definiciones esenciales
+- Si `y = f(u)` y `u = g(x)`, entonces `dy/dx = (dy/du)(du/dx)`.
+
+#### 6) Explicación didáctica
+- Técnica: escribe primero el camino `x → u → y`, y luego escribe derivadas a lo largo del camino.
+
+#### 7) Ejemplo modelado
+- `y=(x²+1)³`: identifica `u=x²+1`, `f(u)=u³`, luego `dy/dx=3u²·2x`.
+
+#### 8) Práctica guiada
+- Calcula `dy/dx` para `y = sin(x²)` y valida con diferencia finita.
+
+#### 9) Práctica independiente
+- Resuelve `y = exp( (3x-2)⁴ )` paso a paso, nombrando variables intermedias.
+
+#### 10) Autoevaluación
+- ¿Por qué aparece la evaluación `f'(g(x))` y no solo `f'(x)`?
+
+#### 11) Errores comunes
+- Olvidar el factor `g'(x)`.
+- Derivar el “afuera” pero no evaluar en el “adentro”.
+
+#### 12) Retención
+- (día 2) escribe el patrón `f(g(x))' = f'(g(x))·g'(x)` y crea 2 ejemplos propios.
+
+#### 13) Diferenciación
+- Avanzado: usa notación de diferenciales `dy = f'(u)du`, `du=g'(x)dx`.
+
+#### 14) Recursos
+- Secciones de “funciones compuestas” en Cálculo I y notas de chain rule.
+
+#### 15) Nota docente
+- Pedir que el alumno “etiquete” cada subfunción con un nombre intermedio (u, v, …) antes de derivar.
+</details>
 
 ### 4.2 Chain Rule para Funciones Compuestas (Backprop Preview)
 
@@ -851,6 +1528,63 @@ simple_forward_backward()
 
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.2: Chain Rule para Funciones Compuestas (Backprop Preview)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Backprop como chain rule repetido (con verificación numérica)
+- **ID (opcional):** `M03-T04_2`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.0 (grafo), 4.1 (chain rule), 3.3 (loss), 4.0.2 (sigmoide)
+
+#### 2) Objetivos
+- Calcular `∂L/∂w` y `∂L/∂b` en una neurona: `z=wx+b`, `a=σ(z)`, `L=(a-y)²`.
+- Entender el “pipeline” de derivadas locales: `∂L/∂a`, `∂a/∂z`, `∂z/∂w`, `∂z/∂b`.
+- Validar la derivación con diferencias finitas (sanity check).
+
+#### 3) Relevancia
+- Backprop no es “magia”: es chain rule aplicado de forma sistemática.
+
+#### 4) Mapa conceptual mínimo
+- **Forward:** `x → z → a → L`.
+- **Backward:** `dL/da → da/dz → dz/dw, dz/db`.
+
+#### 5) Definiciones esenciales
+- **Gradiente:** vector de derivadas parciales respecto a parámetros.
+- **Gradient checking:** comparar gradiente analítico vs numérico.
+
+#### 6) Explicación didáctica
+- Regla práctica: en backward, cada paso “empuja” la derivada un nodo hacia atrás multiplicando por la derivada local.
+
+#### 7) Ejemplo modelado
+- Con `dz/dw = x` y `dz/db = 1`, se obtiene `∂L/∂w = ∂L/∂z · x` y `∂L/∂b = ∂L/∂z`.
+
+#### 8) Práctica guiada
+- Cambia la pérdida a `L = -[ y log(a) + (1-y)log(1-a) ]` (BCE) y escribe el nuevo `∂L/∂a`.
+
+#### 9) Práctica independiente
+- Implementa una función `grad_check` genérica que compare gradientes para distintos `h` y reporte error relativo.
+
+#### 10) Autoevaluación
+- ¿Por qué `h` no puede ser demasiado grande ni demasiado pequeño en diferencias finitas?
+
+#### 11) Errores comunes
+- Olvidar `σ'(z)=a(1-a)` y recalcular exponenciales innecesariamente.
+- Implementar mal el gradiente numérico (forward vs central differences).
+
+#### 12) Retención
+- (día 2) escribe el pipeline: `dL/da`, `da/dz`, `dz/dw`, `dz/db` y cómo se combinan.
+
+#### 13) Diferenciación
+- Avanzado: extender de escalar a vector: `z = w·x + b`, `∂z/∂w = x` (vector).
+
+#### 14) Recursos
+- Sección “gradient checking” en cursos de DL (p.ej., CS231n).
+
+#### 15) Nota docente
+- Exigir evidencia: gradiente analítico + numérico + tolerancias (`rtol`, `atol`) y explicación del resultado.
+</details>
 
 ### 4.3 Backpropagation en una Red de 2 Capas
 
@@ -990,12 +1724,71 @@ def demo_xor():
         print(f"Input: {X[:, i]} → Pred: {pred[0]:.3f} (Target: {y[0, i]})")
 
 demo_xor()
-
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.3: Backpropagation en una Red de 2 Capas</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Backprop en 2 capas: cache, gradientes y actualización
+- **ID (opcional):** `M03-T04_3`
+- **Duración estimada:** 120–180 min
+- **Nivel:** Intermedio–Avanzado
+- **Dependencias:** 4.2 (preview), 4.0 (grafo), 3.1–3.2 (GD y LR)
+
+#### 2) Objetivos
+- Entender por qué el **cache** (guardar `x, z1, a1, z2, a2`) es necesario para backprop.
+- Derivar/interpretar `dW2, db2, dW1, db1` y sus dimensiones.
+- Conectar el cálculo de gradientes con el update de Gradient Descent.
+
+#### 3) Relevancia
+- Este patrón (forward → cache → backward → update) es la base de cualquier entrenamiento de NN.
+
+#### 4) Mapa conceptual mínimo
+- **Forward:** `x → (z1,a1) → (z2,a2) → L`
+- **Backward:** `dL/da2 → dL/dz2 → (dW2,db2) → dL/da1 → dL/dz1 → (dW1,db1)`
+
+#### 5) Definiciones esenciales
+- **Backpropagation:** aplicación sistemática de chain rule para obtener derivadas respecto a parámetros.
+- **Outer product:** usado para formar `dW = δ ⊗ activación`.
+
+#### 6) Explicación didáctica
+- Regla práctica de formas:
+  - Si `z = W a + b`, entonces `∂L/∂W = δ ⊗ a` y `∂L/∂b = δ`.
+- Si te equivocas en shapes, casi siempre te falta un transpose.
+
+#### 7) Ejemplo modelado
+- El demo XOR muestra un loop completo: forward, loss, backward, update, y reporte periódico.
+
+#### 8) Práctica guiada
+- Imprime shapes (`W1.shape`, `dW1.shape`, etc.) y verifica coherencia en cada paso.
+
+#### 9) Práctica independiente
+- Cambia `hidden_size` y observa impacto en convergencia.
+- Añade `learning_rate` más pequeño y compara estabilidad.
+
+#### 10) Autoevaluación
+- ¿Por qué `dW2 = outer(dL_dz2, a1)` y no `outer(a1, dL_dz2)`?
+
+#### 11) Errores comunes
+- Olvidar que `sigmoid_derivative` usa `a` (activación) y no `z`.
+- Confundir el vector columna/fila y generar `dW` transpuesto.
+- LR demasiado alto: diverge o se “queda oscilando”.
+
+#### 12) Retención
+- (día 2) Escribe el pipeline de 2 capas: `δ2 → dW2 → δ1 → dW1`.
+
+#### 13) Diferenciación
+- Avanzado: reemplaza MSE por BCE + sigmoid y discute estabilidad.
+
+#### 14) Recursos
+- Capítulos intro de backprop (computational graphs) y notas de “matrix calculus”.
+
+#### 15) Nota docente
+- Pedir evidencia de comprensión: diagrama + shapes + explicación de `outer`.
+</details>
 
 ---
-
 ## 🎯 Ejercicios por tema (progresivos) + Soluciones
 
 Reglas:

@@ -263,6 +263,68 @@ plt.title('Vectores en R²')  # Título del gráfico
 plt.show()  # Renderiza la figura
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 1.1: Definición Geométrica y Algebraica</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Vectores como “flechas” y como arrays: `shape`, notación y visualización
+- **ID (opcional):** `M02-T01_1`
+- **Duración estimada:** 45–75 min
+- **Nivel:** Intro/Intermedio
+- **Dependencias:** M01 (NumPy: `ndarray`, `shape`, `dtype`)
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **representar** un vector en ℝ²/ℝ³/ℝⁿ como `np.ndarray` y **verificar** su `shape`.
+- Al terminar, el estudiante podrá **dibujar** un vector 2D (con `quiver`) y **explicar** qué significa dirección vs magnitud.
+
+#### 3) Relevancia y contexto
+- En ML, casi todo se reduce a vectores: features, pesos, gradientes y embeddings. Dominar “qué es un vector” evita errores de interpretación y de `shape`.
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- Vector (ℝⁿ) ↔ array 1D
+- Componentes ↔ coordenadas
+- Dirección y magnitud
+- `shape` como contrato
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- Vector: `v = (v₁, …, vₙ)`.
+- En NumPy (convención común): `v.shape == (n,)`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** un vector es una instrucción de movimiento: “camina x en X, y en Y”.
+- **Implementación:** en NumPy, un vector suele ser 1D; si lo conviertes a 2D (`(n,1)`), cambian reglas de `@` y broadcasting.
+
+#### 7) Ejemplos modelados
+- `v = np.array([3,4])` representa un vector en ℝ².
+- `image_vector.shape == (784,)` representa un punto en un espacio de 784 dimensiones.
+
+#### 8) Práctica guiada
+- Crea `v2 = np.array([2, -1])`, `v3 = np.array([1,2,3])` y escribe `assert v2.ndim == 1`.
+- Cambia `v2` a `v2_col = v2.reshape(-1,1)` y observa qué cambia al hacer `v2_col.T @ v2_col`.
+
+#### 9) Práctica independiente / transferencia
+- Toma un vector de 784 features y responde: ¿qué significa “una dimensión” en ese caso?
+
+#### 10) Evaluación (formativa)
+- ¿Cuál es la diferencia práctica entre `shape (n,)` y `shape (n,1)`?
+
+#### 11) Errores comunes
+- Confundir vector columna `(n,1)` con vector 1D `(n,)` y obtener resultados inesperados al multiplicar.
+
+#### 12) Retención (spaced)
+- (día 2) define vector en 1 frase y escribe su `shape` típico en NumPy.
+- (día 7) explica por qué una imagen 28×28 se representa como vector de 784.
+
+#### 13) Diferenciación
+- **Avanzado:** explica por qué `v @ v` no es lo mismo que `v[:,None] @ v[None,:]`.
+
+#### 14) Recursos
+- 3Blue1Brown (álgebra lineal) + documentación de NumPy sobre `ndarray`.
+
+#### 15) Nota para el facilitador
+- Refuerza el hábito: antes de operar, pedir el `shape` esperado y escribirlo.
+</details>
+
 ### 1.2 Operaciones con Vectores
 
 #### Formalización: Producto punto como “sombra/proyección”
@@ -318,6 +380,68 @@ dot_sum = np.sum(a * b)  # Multiplicación elemento a elemento y suma manual
 print(f"Verificación: {dot_alt}, {dot_sum}")  # Comprueba que las 3 implementaciones coinciden
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 1.2: Operaciones con Vectores</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Suma, resta, escalado y producto punto (base de `ŷ = Xθ`)
+- **ID (opcional):** `M02-T01_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.1, M01 (`@`, `np.dot`, `shape`)
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **implementar** suma/resta/escalado y **verificar** resultados con `assert`.
+- Al terminar, el estudiante podrá **calcular** `a·b` de 3 formas (`np.dot`, `@`, `np.sum(a*b)`) y **explicar** por qué coinciden.
+
+#### 3) Relevancia y contexto
+- `w·x` es una suma ponderada: es el núcleo de regresión lineal, logística y del forward pass de capas densas.
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- operaciones elemento a elemento vs operación de reducción (dot)
+- suma ponderada
+- contrato de shapes: `(n,)·(n,) → escalar`
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- `a·b = Σᵢ aᵢ bᵢ`.
+- Para `X:(N,D)` y `w:(D,)`, `X@w:(N,)`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** el dot mide alineación (qué tanto `a` “apunta” como `b`).
+- **Implementación:** valida shapes antes de operar; si no coinciden, falla temprano.
+
+#### 7) Ejemplos modelados
+- Reproducir `a=[1,2,3]`, `b=[4,5,6]` y confirmar `a·b = 32`.
+- Mostrar que `a*b` no es dot: produce vector, no escalar.
+
+#### 8) Práctica guiada
+- Escribe `dot_manual(a,b)` con un loop y compáralo con `np.dot`.
+- Agrega `assert a.shape == b.shape` para forzar el contrato.
+
+#### 9) Práctica independiente / transferencia
+- Implementa una neurona: `z = w @ x + b`, con `assert x.shape == w.shape`.
+
+#### 10) Evaluación
+- ¿Qué devuelve `(D,) @ (D,)` vs `(N,D) @ (D,)`?
+
+#### 11) Errores comunes
+- usar `*` cuando se quería `@` (y viceversa).
+- confundir `(n,)` con `(n,1)` y que el resultado cambie por broadcasting.
+
+#### 12) Retención
+- (día 2) predice el shape de 6 operaciones con `@`.
+- (día 7) explica en 3 líneas por qué `w·x` es una suma ponderada.
+
+#### 13) Diferenciación
+- Avanzado: implementa similitud coseno y maneja el caso del vector cero.
+
+#### 14) Recursos
+- Glosario: dot product / matrix multiplication; NumPy docs: `dot`, `matmul`.
+
+#### 15) Nota docente
+- Hábito: “anota shapes” antes de multiplicar; la intuición llega después.
+</details>
+
 ### 1.3 Interpretación Geométrica del Producto Punto
 
 ```python
@@ -352,6 +476,65 @@ print(f"Ángulo entre [1,0] y [-1,0]: {angle_between_vectors(v1, v4):.0f}°") # 
 # - Producto punto negativo → vectores opuestos
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 1.3: Interpretación Geométrica del Producto Punto</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Dot product ↔ ángulo ↔ similitud (con estabilidad numérica)
+- **ID (opcional):** `M02-T01_3`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.2
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **calcular** el ángulo entre dos vectores usando `arccos` y **validarlo** con casos 0°/90°/180°.
+- Al terminar, el estudiante podrá **explicar** por qué `np.clip(cosθ, -1, 1)` previene errores numéricos.
+
+#### 3) Relevancia y contexto
+- Similaridad coseno aparece en embeddings, clustering, recuperación de información y métricas de similitud.
+
+#### 4) Mapa conceptual / conceptos clave
+- `a·b` → coseno → ángulo
+- norma como normalizador
+- estabilidad numérica (clip)
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- `cos(θ) = (a·b) / (||a|| ||b||)`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** el ángulo te dice “qué tan alineados” están.
+- **Implementación:** primero compute dot y normas; luego normaliza; luego `arccos` con `clip`.
+
+#### 7) Ejemplos modelados
+- ortogonales → 90°
+- opuestos → 180°
+
+#### 8) Práctica guiada
+- agrega guardas para vector cero y decide política (raise vs return).
+
+#### 9) Transferencia
+- implementa `cosine_similarity(a,b)` y rankea 10 vectores por similitud a un query.
+
+#### 10) Evaluación
+- ¿Por qué puede salir `cosθ=1.00000002` en float?
+
+#### 11) Errores comunes
+- división por 0 cuando alguna norma es 0.
+
+#### 12) Retención
+- (día 2) define ortogonalidad y da ejemplo.
+- (día 7) explica por qué coseno sirve mejor que dot si magnitudes cambian.
+
+#### 13) Diferenciación
+- avanzado: compara coseno vs euclidiana en 2 datasets simples.
+
+#### 14) Recursos
+- 3Blue1Brown + glosario del proyecto.
+
+#### 15) Nota docente
+- pedir predicción cualitativa del ángulo antes de calcularlo.
+</details>
+
 ### 1.4 Proyección de Vectores
 
 ```python
@@ -377,6 +560,63 @@ print(f"Proyección de {a} sobre {b}: {proyeccion}")  # [3, 0]
 
 # La proyección nos da "cuánto" de a está en la dirección de b
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 1.4: Proyección de Vectores</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Proyección como “sombra” (puente directo a PCA)
+- **ID (opcional):** `M02-T01_4`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.2–1.3
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **implementar** `proj_b(a)` y **verificar** el resultado en un caso controlado.
+- Al terminar, el estudiante podrá **explicar** por qué aparece el término `b·b` en el denominador.
+
+#### 3) Relevancia y contexto
+- PCA y mínimos cuadrados se entienden como proyecciones sobre subespacios.
+
+#### 4) Mapa conceptual / conceptos clave
+- componente paralela
+- dirección `b`
+- escala `(a·b)/(b·b)`
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- `proj_b(a) = ((a·b)/(b·b)) b`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** “cuánta parte de `a` vive en la dirección de `b`”.
+- **Implementación:** calcula escalar → multiplica por `b` → verifica shape.
+
+#### 7) Ejemplos modelados
+- proyección sobre eje X en 2D.
+
+#### 8) Práctica guiada
+- agrega `assert np.dot(b,b) != 0`.
+
+#### 9) Transferencia
+- proyecta un conjunto de puntos sobre un vector unitario y grafica antes/después.
+
+#### 10) Evaluación
+- ¿Qué pasa si `b` no es unitario?
+
+#### 11) Errores comunes
+- proyectar sobre vector cero.
+
+#### 12) Retención
+- (día 2) memoriza la fórmula y explica el denominador.
+
+#### 13) Diferenciación
+- avanzado: proyección sobre una base ortonormal `V` (matriz).
+
+#### 14) Recursos
+- notas de PCA del módulo + 3Blue1Brown.
+
+#### 15) Nota docente
+- insistir en “PCA = proyección” antes de hablar de SVD.
+</details>
 
 ---
 
@@ -416,6 +656,72 @@ print(f"Unitario: {x_unit}")  # [0.6, 0.8]  # Componentes escaladas manteniendo 
 print(f"Norma del unitario: {np.linalg.norm(x_unit)}")  # 1.0  # Verifica que ahora la norma es 1
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 2.1: Norma L2 (Euclidiana)</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Norma L2 como longitud y como regularización (Ridge)
+- **ID (opcional):** `M02-T02_1`
+- **Duración estimada:** 60–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** Parte 1 (vectores + dot), M01 (NumPy, `shape`)
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **calcular** `||x||₂` con una implementación propia y con `np.linalg.norm` y **compararlas** con `assert`.
+- Al terminar, el estudiante podrá **normalizar** un vector y **explicar** qué garantiza `||x_unit||₂ = 1`.
+
+#### 3) Relevancia y contexto
+- La L2 aparece en:
+  - distancias (KNN/K-Means)
+  - normalización (coseno similitud)
+  - regularización L2 (Ridge / weight decay)
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- magnitud (longitud)
+- normalización
+- invariantes numéricos (`np.isfinite`, norma > 0)
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- `||x||₂ = sqrt(Σᵢ xᵢ²)`
+- normalización: `x_unit = x / ||x||₂` (si `||x||₂ != 0`)
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** la norma es “qué tan largo” es el vector.
+- **Operativa:** calcula cuadrados → suma → raíz; valida casos especiales (vector cero).
+
+#### 7) Ejemplos modelados
+- `x=[3,4]` tiene `||x||₂ = 5`.
+- `x_unit = x/5` tiene norma 1.
+
+#### 8) Práctica guiada
+- Implementa `l2_norm` y verifica:
+  - `assert abs(l2_norm(np.array([3,4])) - 5.0) < 1e-9`
+  - `assert abs(np.linalg.norm(x_unit) - 1.0) < 1e-9`
+
+#### 9) Práctica independiente / transferencia
+- Implementa `safe_normalize(x, eps=1e-12)` que evita dividir por 0.
+
+#### 10) Evaluación
+- ¿Qué devuelve `np.linalg.norm(X, axis=1)` si `X.shape==(N,D)`?
+
+#### 11) Errores comunes
+- dividir por 0 al normalizar el vector cero.
+- confundir L2 (raíz) con L2^2 (sin raíz) en fórmulas.
+
+#### 12) Retención
+- (día 2) calcula la norma de 3 vectores a mano.
+- (día 7) explica cuándo usarías L2^2 en lugar de L2 (optimización).
+
+#### 13) Diferenciación
+- avanzado: deriva por qué L2 penaliza más valores grandes que L1.
+
+#### 14) Recursos
+- Glosario: L2 norm; NumPy `linalg.norm`.
+
+#### 15) Nota docente
+- Enfatizar el patrón: **definir contrato → implementar → validar con asserts**.
+</details>
+
 ### 2.2 Norma L1 (Manhattan)
 
 ```python
@@ -442,6 +748,60 @@ print(f"NumPy:  {np.linalg.norm(x, 1)}")         # 12.0  # Validación con NumPy
 # L2 penaliza más los valores grandes (cuadrado)
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 2.2: Norma L1 (Manhattan)</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Norma L1 como suma de magnitudes y puente a Lasso
+- **ID (opcional):** `M02-T02_2`
+- **Duración estimada:** 45–75 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Calcular `||x||₁` con `np.sum(np.abs(x))` y validar con `np.linalg.norm(x, 1)`.
+- Explicar (intuición) por qué L1 se asocia a sparsity frente a L2.
+
+#### 3) Relevancia y contexto
+- Regularización L1 (Lasso), métricas Manhattan y robustez relativa a outliers.
+
+#### 4) Conceptos clave
+- `abs`, suma, sparsity
+
+#### 5) Fórmula esencial
+- `||x||₁ = Σᵢ |xᵢ|`.
+
+#### 6) Didáctica
+- `abs` → `sum` y validar con NumPy.
+
+#### 7) Ejemplo
+- `x=[3,-4,5]` ⇒ `||x||₁=12`.
+
+#### 8) Práctica guiada
+- Añade `assert abs(l1_norm(x) - np.linalg.norm(x, 1)) < 1e-9`.
+
+#### 9) Transferencia
+- Comparar L1 y L2 en un vector con outlier y discutir penalización.
+
+#### 10) Evaluación
+- ¿Qué norma usarías si quieres penalizar menos los valores grandes que L2?
+
+#### 11) Errores comunes
+- Olvidar `abs`.
+
+#### 12) Retención
+- (día 2) calcula L1 de 3 vectores.
+
+#### 13) Diferenciación
+- Avanzado: L1 como distancia Manhattan entre puntos.
+
+#### 14) Recursos
+- Glosario: L1 norm.
+
+#### 15) Nota docente
+- Pedir siempre comparación L1 vs L2 en el mismo ejemplo.
+</details>
+
 ### 2.3 Norma L∞ (Máximo)
 
 ```python
@@ -459,6 +819,60 @@ x = np.array([3, -7, 5])  # Vector donde el valor dominante es -7 (en valor abso
 print(f"||x||∞ = {linf_norm(x)}")            # 7  # max(|3|,|−7|,|5|) = 7
 print(f"NumPy:  {np.linalg.norm(x, np.inf)}") # 7.0  # Validación usando np.inf como orden
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 2.3: Norma L∞ (Máximo)</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Norma infinito como criterio de “peor caso” por componente
+- **ID (opcional):** `M02-T02_3`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Calcular `||x||∞` con `np.max(np.abs(x))` y validar con `np.linalg.norm(x, np.inf)`.
+- Explicar cuándo L∞ es la métrica adecuada (máximo error permitido).
+
+#### 3) Relevancia y contexto
+- Control de tolerancias y errores por componente; debugging numérico.
+
+#### 4) Conceptos clave
+- máximo absoluto, “peor caso”
+
+#### 5) Fórmula esencial
+- `||x||∞ = maxᵢ |xᵢ|`.
+
+#### 6) Didáctica
+- `abs` → `max`.
+
+#### 7) Ejemplo
+- `x=[3,-7,5]` ⇒ `||x||∞=7`.
+
+#### 8) Práctica guiada
+- Añade `assert linf_norm(x) == np.linalg.norm(x, np.inf)`.
+
+#### 9) Transferencia
+- Detecta outliers por feature con `np.max(np.abs(X), axis=0)`.
+
+#### 10) Evaluación
+- ¿Qué norma usarías si solo importa el mayor desvío en cualquier componente?
+
+#### 11) Errores comunes
+- olvidar `abs`.
+
+#### 12) Retención
+- (día 2) da un ejemplo donde L∞ detecta un outlier claro.
+
+#### 13) Diferenciación
+- Avanzado: conectar L∞ con bounds/tolerancias en optimización.
+
+#### 14) Recursos
+- NumPy `linalg.norm`.
+
+#### 15) Nota docente
+- Conectar con “tolerancia máxima” en validación.
+</details>
 
 ### 2.4 Distancia Euclidiana
 
@@ -504,6 +918,63 @@ print("Matriz de distancias:")
 print(D)
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 2.4: Distancia Euclidiana</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Distancias (L2) y matriz de distancias (broadcasting + estabilidad)
+- **ID (opcional):** `M02-T02_4`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1 (norma), 1.2 (dot), M01 (broadcasting)
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Calcular `d(a,b)=||a-b||₂` y **validarlo** con el caso 3-4-5.
+- Construir `D:(N,N)` y **verificar** el `shape` con `assert`.
+
+#### 3) Relevancia y contexto
+- Base para KNN, K-Means (asignación) y clustering.
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- resta → norma
+- identidad `||a-b||² = ||a||² + ||b||² - 2a·b`
+- estabilidad: clamp de valores negativos por redondeo
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- `d(a,b)=||a-b||₂`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** distancia = separación.
+- **Implementación:** para pares masivos, usa identidad + broadcasting.
+
+#### 7) Ejemplos modelados
+- `d([0,0],[3,4])=5`.
+
+#### 8) Práctica guiada
+- Añade `assert D.shape == (X.shape[0], X.shape[0])`.
+
+#### 9) Transferencia
+- KNN trivial: para cada fila, el índice del vecino más cercano (excluyendo diagonal).
+
+#### 10) Evaluación
+- ¿Por qué `distances_sq` puede ser levemente negativo?
+
+#### 11) Errores comunes
+- olvidar `axis` al sumar cuadrados.
+
+#### 12) Retención
+- (día 2) calcula 3 distancias a mano.
+
+#### 13) Diferenciación
+- Avanzado: cuándo NO conviene construir `D` completa.
+
+#### 14) Recursos
+- Glosario: L2 norm, dot product.
+
+#### 15) Nota docente
+- Pedir que el alumno escriba shapes antes de programar.
+</details>
+
 ### 2.5 Similitud Coseno
 
 ```python
@@ -548,6 +1019,63 @@ print(f"Similitud (idénticos):  {cosine_similarity(v1, v2)}")   # 1.0
 print(f"Similitud (ortogonales): {cosine_similarity(v1, v3)}")  # 0.0
 print(f"Similitud (opuestos):    {cosine_similarity(v1, v4)}")  # -1.0
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 2.5: Similitud Coseno</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Similitud por ángulo (normalización + caso vector cero)
+- **ID (opcional):** `M02-T02_5`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.2–1.3, 2.1
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Implementar `cosine_similarity` y **manejar** el caso `||a||=0` o `||b||=0`.
+- Explicar por qué coseno se centra en dirección y no en magnitud.
+
+#### 3) Relevancia y contexto
+- Embeddings (NLP/visión), ranking, recomendadores.
+
+#### 4) Conceptos clave
+- dot + norma
+- normalización
+- política para vector cero
+
+#### 5) Fórmulas
+- `sim(a,b)=(a·b)/(||a|| ||b||)`.
+- `dist=1-sim`.
+
+#### 6) Didáctica
+- dot → normas → división (con guardas).
+
+#### 7) Ejemplos
+- idénticos 1, ortogonales 0, opuestos -1.
+
+#### 8) Práctica guiada
+- Escribe 4 `assert` para los casos base y para vector cero.
+
+#### 9) Transferencia
+- Rankea una lista de vectores por similitud a un query.
+
+#### 10) Evaluación
+- ¿Por qué coseno es preferible al dot para comparar documentos de distinta longitud?
+
+#### 11) Errores comunes
+- no controlar vector cero.
+
+#### 12) Retención
+- (día 2) escribe la fórmula de memoria.
+
+#### 13) Diferenciación
+- Avanzado: vectorizar para `X:(N,D)` vs `q:(D,)`.
+
+#### 14) Recursos
+- Glosario: cosine similarity.
+
+#### 15) Nota docente
+- Conectar con embeddings y métricas de similitud reales.
+</details>
 
 ---
 
@@ -596,6 +1124,63 @@ print(f"A^T =\n{A.T}")  # Transpuesta: intercambia filas por columnas (shape (3,
 #  [3, 6]]
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 3.1: Operaciones Básicas (Matrices)</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** `shape` en matrices: suma, transpose y producto matricial
+- **ID (opcional):** `M02-T03_1`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** M01 (NumPy y `shape`), Parte 1 (vectores)
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Predecir y **verificar** shapes en `A+C`, `2*A`, `A@B` y `A.T`.
+- Identificar incompatibilidades de shapes antes de ejecutar (falla temprana).
+
+#### 3) Relevancia y contexto
+- Las matrices modelan transformaciones lineales y el cómputo central de modelos (`XW`, `W@x`).
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- `A.shape=(m,n)`
+- elemento-a-elemento vs `@`
+- transpuesta
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- `(m×n) @ (n×p) = (m×p)`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** `@` combina filas con columnas.
+- **Operativa:** escribe shapes de entrada → calcula shape de salida → valida con `assert`.
+
+#### 7) Ejemplos modelados
+- `A(2,3) @ B(3,2) → (2,2)`.
+
+#### 8) Práctica guiada
+- Añade `assert A.shape == (2,3)` y `assert (A@B).shape == (2,2)`.
+
+#### 9) Práctica independiente / transferencia
+- Dado `X:(N,D)` y `W:(D,K)`, implementa `Y = X@W` y verifica `Y:(N,K)`.
+
+#### 10) Evaluación
+- ¿Por qué `A+C` requiere mismo `shape` pero `A@B` no?
+
+#### 11) Errores comunes
+- Confundir `*` con `@`.
+
+#### 12) Retención
+- (día 2) predice shapes de 10 productos.
+
+#### 13) Diferenciación
+- Avanzado: `X@W` vs `W@X` y cuándo conviene transponer.
+
+#### 14) Recursos
+- Glosario: Matrix Multiplication.
+
+#### 15) Nota docente
+- Exigir “contrato de shapes” escrito antes de correr el código.
+</details>
+
 ### 3.2 Matriz por Vector (Transformación Lineal)
 
 ```python
@@ -623,6 +1208,61 @@ x = np.random.randn(784)        # Input (imagen aplanada)
 y = W @ x + b  # Output de la capa: (10,784) @ (784,) + (10,) => (10,)
 print(f"Shape de y: {y.shape}")  # (10,)  # 10 activaciones de salida
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 3.2: Matriz por Vector (Transformación Lineal)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Transformaciones lineales y el patrón `W@x + b`
+- **ID (opcional):** `M02-T03_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1, 1.2
+
+#### 2) Objetivos
+- Razonar shapes en `(K,D)@(D,)` y en batch `(N,D)@(D,K)`.
+- Conectar `W@x + b` con una capa densa.
+
+#### 3) Relevancia
+- Es el “forward” más común en ML (proyección + sesgo).
+
+#### 4) Conceptos clave
+- matriz como función
+- broadcasting del bias
+
+#### 5) Fórmulas
+- `y = Wx + b`.
+
+#### 6) Didáctica
+- Tabla: entrada `x` → `W` → salida `y` (con shapes).
+
+#### 7) Ejemplos
+- Rotación 2D con `R`.
+
+#### 8) Práctica guiada
+- Añade `assert W.shape == (10,784)` y `assert x.shape == (784,)`.
+
+#### 9) Transferencia
+- Implementa `Y = X@W + b` para `X:(N,D)`.
+
+#### 10) Evaluación
+- ¿Por qué `b:(K,)` se suma sin loop?
+
+#### 11) Errores comunes
+- mezclar `x@W` con `W@x`.
+
+#### 12) Retención
+- (día 2) predice shapes para 5 capas.
+
+#### 13) Diferenciación
+- Avanzado: vectorizar el forward para batch.
+
+#### 14) Recursos
+- M01 (broadcasting) + glosario.
+
+#### 15) Nota docente
+- Exigir “shapes escritos” en cada ejercicio.
+</details>
 
 ### 3.3 Matriz Inversa
 
@@ -661,6 +1301,62 @@ print(f"A @ A⁻¹ ≈ I:\n{np.round(identity, 10)}")  # Redondea para ver la id
 # Usa np.linalg.solve() en su lugar (más estable numéricamente)
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 3.3: Matriz Inversa</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Inversa, singularidad y por qué preferimos `solve`
+- **ID (opcional):** `M02-T03_3`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1
+
+#### 2) Objetivos
+- Entender cuándo existe inversa y cómo validar `A@A⁻¹ ≈ I`.
+- Explicar por qué `inv` suele ser peor que `solve`.
+
+#### 3) Relevancia
+- Se conecta con soluciones cerradas (regresión) y estabilidad numérica.
+
+#### 4) Conceptos clave
+- matriz singular
+- `LinAlgError`
+- `allclose`/redondeo
+
+#### 5) Fórmula
+- `A A^{-1} = I`.
+
+#### 6) Didáctica
+- Verifica siempre (no confiar en “que salió”).
+
+#### 7) Ejemplos
+- `np.round(A @ A_inv, 10)` para ver `I`.
+
+#### 8) Práctica guiada
+- Prueba una matriz singular y observa el error.
+
+#### 9) Transferencia
+- Reescribe una solución `inv(A)@b` como `solve(A,b)`.
+
+#### 10) Evaluación
+- ¿Qué significa “singular” geométricamente?
+
+#### 11) Errores comunes
+- comparar floats con igualdad exacta.
+
+#### 12) Retención
+- (día 7) explica “singular” en una frase.
+
+#### 13) Diferenciación
+- Avanzado: noción de condición numérica (conceptual).
+
+#### 14) Recursos
+- NumPy: `linalg.solve`.
+
+#### 15) Nota docente
+- Regla: “`solve` antes que `inv`”.
+</details>
+
 ### 3.4 Solución de Sistemas Lineales
 
 ```python
@@ -686,6 +1382,61 @@ print(f"Solución: x = {x_solve}")  # [2, 3]
 # Verificar
 print(f"A @ x = {A @ x_solve}")    # [9, 8] ✓  # Comprueba que Ax reproduce b
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 3.4: Sistemas Lineales (`solve`)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Resolver `Ax=b` de forma estable y verificar `A@x ≈ b`
+- **ID (opcional):** `M02-T03_4`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.3
+
+#### 2) Objetivos
+- Usar `np.linalg.solve` y validar con `np.allclose`.
+- Diferenciar “resolver” vs “invertir”.
+
+#### 3) Relevancia
+- Base de mínimos cuadrados y muchas piezas de ML clásico.
+
+#### 4) Conceptos clave
+- sistema lineal
+- verificación numérica
+
+#### 5) Fórmula
+- `Ax=b`.
+
+#### 6) Didáctica
+- Paso 1: resolver. Paso 2: verificar.
+
+#### 7) Ejemplo
+- `A@x_solve` reproduce `b`.
+
+#### 8) Práctica guiada
+- Añade `assert np.allclose(A @ x_solve, b)`.
+
+#### 9) Transferencia
+- Resolver múltiples RHS: `A:(D,D)` y `B:(D,K)`.
+
+#### 10) Evaluación
+- ¿Qué pasa si `A` es singular?
+
+#### 11) Errores comunes
+- igualdad exacta con floats.
+
+#### 12) Retención
+- (día 2) explica por qué verificar es obligatorio.
+
+#### 13) Diferenciación
+- Avanzado: conectar con `linalg.lstsq` (conceptual).
+
+#### 14) Recursos
+- NumPy: `linalg.solve`, `linalg.lstsq`.
+
+#### 15) Nota docente
+- Insistir en `allclose` como estándar.
+</details>
 
 ---
 
@@ -803,6 +1554,62 @@ print(f"λv     = {lambda_v}")  # Resultado de escalar el eigenvector por su eig
 print(f"¿Iguales? {np.allclose(Av, lambda_v)}")  # allclose tolera pequeños errores numéricos (float)
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 4.1: Eigenvalues y Eigenvectors (Concepto)</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Direcciones invariantes: `Av = λv` y su lectura geométrica
+- **ID (opcional):** `M02-T04_1`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** Parte 3 (matrices), Parte 1 (vectores)
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Verificar computacionalmente `Av ≈ λv` y **explicar** qué significa “misma dirección”.
+- Distinguir eigenvector (dirección) vs eigenvalue (escala).
+
+#### 3) Relevancia y contexto
+- PCA, estabilidad de sistemas, PageRank, y “ejes” naturales de una transformación.
+
+#### 4) Conceptos clave
+- transformación lineal
+- dirección invariante
+- verificación numérica con `allclose`
+
+#### 5) Definiciones y fórmulas
+- `Av = λv`.
+
+#### 6) Didáctica
+- Siempre: (1) calcular (2) verificar (3) interpretar.
+
+#### 7) Ejemplos
+- matriz simétrica 2×2 con eigenvalues {3,1}.
+
+#### 8) Práctica guiada
+- Cambia `A` y observa si hay eigenvectors reales.
+
+#### 9) Transferencia
+- Conecta con PCA: eigenvectors de covarianza.
+
+#### 10) Evaluación
+- ¿Por qué el signo de un eigenvector puede cambiar (`v` vs `-v`)?
+
+#### 11) Errores comunes
+- esperar igualdad exacta en floats.
+
+#### 12) Retención
+- (día 2) escribe `Av=λv` de memoria y define cada símbolo.
+
+#### 13) Diferenciación
+- Avanzado: matrices no simétricas (eigenvalues complejos) (conceptual).
+
+#### 14) Recursos
+- 3Blue1Brown: eigenvectors.
+
+#### 15) Nota docente
+- Pide interpretación geométrica antes de “correr eig”.
+</details>
+
 ### 4.2 Eigenvalues para PCA
 
 #### Conexión Línea 2: Covarianza como esperanza (estadística)
@@ -877,6 +1684,62 @@ print(f"Varianza explicada: {var_explained}")  # Proporción por componente (sum
 print(f"Varianza total explicada: {np.sum(var_explained):.2%}")  # Porcentaje total capturado por las componentes
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 4.2: Eigenvalues para PCA</strong></summary>
+
+#### 1) Metadatos
+- **Título:** PCA como eigen de la covarianza (shapes + varianza explicada)
+- **ID (opcional):** `M02-T04_2`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.1, 3.1–3.4
+
+#### 2) Objetivos
+- Implementar PCA via eig y **verificar** shapes en proyección `(n_samples,n_components)`.
+- Interpretar eigenvalues como varianza explicada.
+
+#### 3) Relevancia
+- Base conceptual de reducción dimensional y preparación para M06.
+
+#### 4) Conceptos clave
+- centrado
+- covarianza
+- ordenamiento por varianza
+
+#### 5) Fórmulas
+- `Σ ≈ (1/(n-1)) Xc^T Xc`.
+
+#### 6) Didáctica
+- pipeline: centrar → covarianza → eig → ordenar → proyectar.
+
+#### 7) Ejemplos
+- dataset sintético 100×5, reduce a 2.
+
+#### 8) Práctica guiada
+- añade `assert X_transformed.shape == (n_samples, n_components)`.
+
+#### 9) Transferencia
+- compara con SVD (adelanto 5.2).
+
+#### 10) Evaluación
+- ¿por qué se centra `X` antes de PCA?
+
+#### 11) Errores comunes
+- no centrar → PCA incorrecto.
+
+#### 12) Retención
+- (día 7) describe PCA en 3 pasos.
+
+#### 13) Diferenciación
+- Avanzado: explicar por qué `eig` puede dar complejos y por qué se usa `.real`.
+
+#### 14) Recursos
+- Glosario: PCA, covariance.
+
+#### 15) Nota docente
+- Enfatizar shapes como contrato.
+</details>
+
 ---
 
 ## 💻 Parte 5: SVD (Singular Value Decomposition)
@@ -925,6 +1788,62 @@ A_reconstructed = U @ np.diag(S) @ Vt  # U·Σ·V^T (Σ se construye con diag(S)
 print(f"\n¿A ≈ U Σ V^T? {np.allclose(A, A_reconstructed)}")  # Comprueba reconstrucción (debe ser True)
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 5.1: SVD (Concepto)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** `A = UΣVᵀ` y por qué SVD es “la navaja suiza”
+- **ID (opcional):** `M02-T05_1`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1–3.4
+
+#### 2) Objetivos
+- Interpretar shapes de `U`, `S`, `Vt` y **reconstruir** `A`.
+- Explicar por qué SVD aplica a matrices no cuadradas.
+
+#### 3) Relevancia
+- PCA estable, compresión, factorization y regularización.
+
+#### 4) Conceptos clave
+- valores singulares no negativos
+- truncation
+- reconstrucción
+
+#### 5) Fórmulas
+- `A = UΣVᵀ`.
+
+#### 6) Didáctica
+- “descomponer → interpretar shapes → reconstruir y validar”.
+
+#### 7) Ejemplos
+- matriz 3×2 con economy SVD.
+
+#### 8) Práctica guiada
+- añade `assert np.allclose(A, U@np.diag(S)@Vt)`.
+
+#### 9) Transferencia
+- conecta `S` con energía/varianza.
+
+#### 10) Evaluación
+- ¿Qué significa `full_matrices=False`?
+
+#### 11) Errores comunes
+- confundir `V` con `Vᵀ`.
+
+#### 12) Retención
+- (día 2) escribe `A=UΣVᵀ` de memoria.
+
+#### 13) Diferenciación
+- Avanzado: relación con eigen de `AᵀA` (conceptual).
+
+#### 14) Recursos
+- 3Blue1Brown: SVD.
+
+#### 15) Nota docente
+- Insistir en validar con reconstrucción.
+</details>
+
 ### 5.2 PCA via SVD (Método Preferido)
 
 ```python
@@ -965,6 +1884,62 @@ X_pca, components, var_ratio = pca_via_svd(X, n_components=3)  # Reduce a 3 comp
 print(f"Varianza explicada por componente: {var_ratio}")  # Vector con proporciones por componente
 print(f"Varianza total explicada: {np.sum(var_ratio):.2%}")  # Suma de proporciones (qué tanto se conserva)
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 5.2: PCA via SVD</strong></summary>
+
+#### 1) Metadatos
+- **Título:** PCA estable: SVD sobre datos centrados
+- **ID (opcional):** `M02-T05_2`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 5.1, 4.2
+
+#### 2) Objetivos
+- Implementar PCA via SVD y **verificar** shapes de proyección.
+- Explicar la relación `S^2/(n-1)` con varianzas.
+
+#### 3) Relevancia
+- Es la forma recomendada de PCA por estabilidad numérica.
+
+#### 4) Conceptos clave
+- centrado
+- `Vt` como componentes
+- varianza explicada
+
+#### 5) Fórmulas
+- `variance = S^2/(n-1)`.
+
+#### 6) Didáctica
+- centrar → SVD → componentes → proyectar → varianza.
+
+#### 7) Ejemplos
+- dataset 100×10 reducido a 3.
+
+#### 8) Práctica guiada
+- añade `assert X_transformed.shape == (100,3)`.
+
+#### 9) Transferencia
+- compara con eig (4.2) y discute estabilidad.
+
+#### 10) Evaluación
+- ¿por qué SVD puede ser más estable que eig?
+
+#### 11) Errores comunes
+- olvidar centrar.
+
+#### 12) Retención
+- (día 7) explica PCA via SVD en 4 pasos.
+
+#### 13) Diferenciación
+- Avanzado: elegir `n_components` por varianza acumulada.
+
+#### 14) Recursos
+- Docs NumPy `linalg.svd`.
+
+#### 15) Nota docente
+- Enfatizar validación por `shape` y varianza.
+</details>
 
 ### 5.3 Compresión de Imágenes con SVD
 
@@ -1010,6 +1985,62 @@ for k in [5, 10, 20, 50]:
     ratio = compression_ratio(image.shape, k)  # Estima cuánto se reduce el número de parámetros
     print(f"k={k}: ratio={ratio:.2%}")  # Muestra el ratio (más bajo => más compresión)
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 5.3: Compresión con SVD</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Truncated SVD: trade-off compresión vs error
+- **ID (opcional):** `M02-T05_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 5.1
+
+#### 2) Objetivos
+- Implementar compresión con `k` valores singulares y **explicar** el trade-off.
+- Interpretar el ratio como “parámetros guardados”.
+
+#### 3) Relevancia
+- Compresión, denoising, aproximaciones de baja-rango.
+
+#### 4) Conceptos clave
+- rango efectivo
+- truncation
+- clipping y dtype
+
+#### 5) Fórmulas
+- aproximación: `U_k Σ_k V_kᵀ`.
+
+#### 6) Didáctica
+- variar `k` y observar ratio.
+
+#### 7) Ejemplos
+- `k` pequeño = más compresión, más error.
+
+#### 8) Práctica guiada
+- mide error `||A-A_k||` (si aplica) y relación con `k`.
+
+#### 9) Transferencia
+- conecta con embeddings/matrix factorization.
+
+#### 10) Evaluación
+- ¿por qué casteamos a `uint8` y hacemos `clip`?
+
+#### 11) Errores comunes
+- olvidar `clip` y producir overflow.
+
+#### 12) Retención
+- (día 7) explica en 3 líneas qué hace truncated SVD.
+
+#### 13) Diferenciación
+- Avanzado: aplicar a imagen RGB por canal.
+
+#### 14) Recursos
+- Lectura: low-rank approximation.
+
+#### 15) Nota docente
+- Pedir reporte de ratio + ejemplo de salida.
+</details>
 
 ---
 

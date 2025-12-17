@@ -100,7 +100,7 @@ Visualización sugerida:
 ### 1.1 La Neurona Artificial
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para operaciones eficientes con arrays
 
 """
 NEURONA ARTIFICIAL (Perceptrón)
@@ -133,14 +133,14 @@ def perceptron(x: np.ndarray, w: np.ndarray, b: float) -> float:
     Returns:
         salida activada
     """
-    z = np.dot(w, x) + b
-    return 1 if z > 0 else 0  # Función escalón
+    z = np.dot(w, x) + b  # Calcula combinación lineal de entradas y pesos
+    return 1 if z > 0 else 0  # Función escalón: 1 si z>0, 0 si z≤0
 ```
 
 ### 1.2 Funciones de Activación
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para operaciones matemáticas
 
 class Activations:
     """Funciones de activación y sus derivadas."""
@@ -154,13 +154,13 @@ class Activations:
         Uso: Capa de salida para clasificación binaria
         Problema: Vanishing gradient para |z| grande
         """
-        z = np.clip(z, -500, 500)
-        return 1 / (1 + np.exp(-z))
+        z = np.clip(z, -500, 500)  # Previene overflow en exp() con valores extremos
+        return 1 / (1 + np.exp(-z))  # Fórmula matemática de la sigmoide
 
     @staticmethod
     def sigmoid_derivative(a: np.ndarray) -> np.ndarray:
         """σ'(z) = σ(z) · (1 - σ(z)) = a · (1 - a)"""
-        return a * (1 - a)
+        return a * (1 - a)  # Derivada simplificada usando salida ya calculada
 
     @staticmethod
     def relu(z: np.ndarray) -> np.ndarray:
@@ -172,12 +172,12 @@ class Activations:
         Ventaja: No vanishing gradient para z > 0
         Problema: "Dying ReLU" si z < 0 siempre
         """
-        return np.maximum(0, z)
+        return np.maximum(0, z)  # Implementación directa de ReLU
 
     @staticmethod
     def relu_derivative(z: np.ndarray) -> np.ndarray:
         """ReLU'(z) = 1 si z > 0, 0 si z ≤ 0"""
-        return (z > 0).astype(float)
+        return (z > 0).astype(float)  # Convierte booleano a float (1.0 o 0.0)
 
     @staticmethod
     def tanh(z: np.ndarray) -> np.ndarray:
@@ -187,12 +187,12 @@ class Activations:
         Rango: (-1, 1)
         Uso: Alternativa a sigmoid (centrado en 0)
         """
-        return np.tanh(z)
+        return np.tanh(z)  # Usa implementación NumPy optimizada
 
     @staticmethod
     def tanh_derivative(a: np.ndarray) -> np.ndarray:
         """tanh'(z) = 1 - tanh²(z) = 1 - a²"""
-        return 1 - a ** 2
+        return 1 - a ** 2  # Derivada usando identidad matemática
 
     @staticmethod
     def softmax(z: np.ndarray) -> np.ndarray:
@@ -203,21 +203,21 @@ class Activations:
         Uso: Capa de salida para clasificación multiclase
         Output: probabilidades de cada clase
         """
-        # Restar máximo para estabilidad numérica
+        # Restar máximo para estabilidad numérica (previene overflow en exp)
         z_shifted = z - np.max(z, axis=-1, keepdims=True)
-        exp_z = np.exp(z_shifted)
-        return exp_z / np.sum(exp_z, axis=-1, keepdims=True)
+        exp_z = np.exp(z_shifted)  # Calcula exponenciales de valores estabilizados
+        return exp_z / np.sum(exp_z, axis=-1, keepdims=True)  # Normaliza para que suma = 1
 
 
-# Demo
-z = np.array([-2, -1, 0, 1, 2])
-act = Activations()
+# Demo de funciones de activación
+z = np.array([-2, -1, 0, 1, 2])  # Valores de prueba
+act = Activations()  # Instancia clase de activaciones
 
-print("z:", z)
-print("sigmoid:", act.sigmoid(z))
-print("relu:", act.relu(z))
-print("tanh:", act.tanh(z))
-print("softmax:", act.softmax(z))
+print("z:", z)  # Muestra valores originales
+print("sigmoid:", act.sigmoid(z))  # Muestra sigmoid aplicada
+print("relu:", act.relu(z))  # Muestra ReLU aplicada
+print("tanh:", act.tanh(z))  # Muestra tanh aplicada
+print("softmax:", act.softmax(z))  # Muestra softmax aplicada
 ```
 
 ### 1.3 El Problema XOR
@@ -242,9 +242,9 @@ Solución: Red multicapa (MLP)
 - Combinación de features no lineales resuelve XOR
 """
 
-# Datos XOR
-X_xor = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-y_xor = np.array([0, 1, 1, 0])
+# Datos XOR - problema clásico no linealmente separable
+X_xor = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])  # Entradas binarias
+y_xor = np.array([0, 1, 1, 0])  # Salidas XOR
 
 # Un perceptrón simple no puede aprender esto
 # Necesitamos una red con al menos una capa oculta
@@ -1730,7 +1730,7 @@ print(edges)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  VOCABULARIO CNN                                                 │
+│  VOCABULARIO CNN                                                │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  KERNEL (FILTRO)                                                │
@@ -1794,7 +1794,7 @@ print(f"24x24, pooling 2x2 stride 2: output = {out}x{out}")  # 12x12
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  ARQUITECTURA LENET-5 (Clásica para MNIST)                       │
+│  ARQUITECTURA LENET-5 (Clásica para MNIST)                      │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  Input: 28x28x1 (imagen grayscale)                              │

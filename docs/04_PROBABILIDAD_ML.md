@@ -91,6 +91,65 @@ Propiedades:
 - P(∅) = 0 (evento imposible)
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 1.1: Probabilidad Básica</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Probabilidad como “regla de conteo” + axiomas mínimos
+- **ID (opcional):** `M04-T01_1`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Básico
+- **Dependencias:** M01 (manejo básico de notación y números)
+
+#### 2) Objetivos
+- Calcular `P(A)` en ejemplos discretos simples y verificar que `0 ≤ P(A) ≤ 1`.
+- Explicar qué son `Ω`, `∅` y por qué `P(Ω)=1`.
+
+#### 3) Relevancia
+- En ML casi todo termina siendo “probabilidad” o “log-probabilidad” (pérdidas como NLL).
+
+#### 4) Mapa conceptual mínimo
+- **Espacio muestral (`Ω`)** → posibles resultados.
+- **Evento (`A`)** ⊆ `Ω` → subconjunto de resultados.
+- **Probabilidad** → número en [0,1] que cuantifica qué tan “frecuente” es el evento.
+
+#### 5) Definiciones esenciales
+- `Ω`: conjunto de resultados posibles.
+- `A`: evento.
+- `P(A)`: probabilidad del evento.
+
+#### 6) Explicación didáctica
+- Regla de sanidad: si te da `P(A)>1` o negativa, tu modelado está mal.
+
+#### 7) Ejemplo modelado
+- Dado un dado justo: `P(A=“sale par”) = 3/6 = 0.5`.
+
+#### 8) Práctica guiada
+- Escribe 3 eventos distintos en un dado (por ejemplo `{1}`, `{1,2,3}`, `{2,4,6}`) y calcula `P`.
+
+#### 9) Práctica independiente
+- Baraja estándar: calcula `P(A=“carta roja”)` y `P(B=“corazón”)`.
+
+#### 10) Autoevaluación
+- ¿Por qué `P(∅)=0` es consistente con la idea de “casos favorables/casos totales”?
+
+#### 11) Errores comunes
+- Confundir “probabilidad” con “conteo” sin normalizar por el total.
+- Olvidar definir el espacio muestral antes de calcular probabilidades.
+
+#### 12) Retención
+- (día 2) define `Ω`, `A` y escribe las 3 propiedades básicas (rango, `P(Ω)`, `P(∅)`).
+
+#### 13) Diferenciación
+- Avanzado: interpreta probabilidad como frecuencia relativa límite (intuición frequentista).
+
+#### 14) Recursos
+- StatQuest (intro de probabilidad) / cualquier texto de probabilidad básica.
+
+#### 15) Nota docente
+- Exigir siempre: “¿Cuál es `Ω`?” antes de aceptar un `P(A)`.
+</details>
+
 #### 1.2 Probabilidad Condicional
 
 ```text
@@ -102,6 +161,63 @@ P(A|B) = P(A ∩ B) / P(B)
 **Ejemplo en ML:**
 - P(spam | contiene "gratis") = ¿Qué tan probable es spam si el email dice "gratis"?
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 1.2: Probabilidad Condicional</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Condicionar = restringir el universo a “B ocurrió”
+- **ID (opcional):** `M04-T01_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Básico–Intermedio
+- **Dependencias:** 1.1
+
+#### 2) Objetivos
+- Interpretar `P(A|B)` en lenguaje natural (“probabilidad de A dado B”).
+- Usar `P(A|B)=P(A∩B)/P(B)` y reconocer cuándo aplica (si `P(B)>0`).
+
+#### 3) Relevancia
+- Clasificación probabilística en ML se formula como `P(clase|datos)`.
+
+#### 4) Mapa conceptual mínimo
+- **Intersección** `A∩B`: ambos ocurren.
+- **Condición** `|B`: nos quedamos solo con los casos donde B ocurre.
+
+#### 5) Definiciones esenciales
+- `P(A∩B)`: probabilidad conjunta.
+- `P(A|B)`: probabilidad condicional.
+
+#### 6) Explicación didáctica
+- Intuición: al condicionar, el denominador cambia; ya no divides entre “todo”, sino entre “los casos con B”.
+
+#### 7) Ejemplo modelado
+- Si en un dataset el 10% son spam, pero si contiene “gratis” el 80% son spam, entonces `P(spam|gratis)=0.8`.
+
+#### 8) Práctica guiada
+- Construye una tabla 2×2 (spam/ham vs contiene gratis/no) y calcula `P(spam|gratis)`.
+
+#### 9) Práctica independiente
+- Da un ejemplo donde `P(A|B) > P(A)` y explica por qué no es contradictorio.
+
+#### 10) Autoevaluación
+- ¿Qué ocurre si `P(B)=0`? ¿Por qué la definición falla?
+
+#### 11) Errores comunes
+- Confundir `P(A|B)` con `P(B|A)`.
+- Olvidar que `P(A∩B)` no es `P(A)P(B)` a menos que haya independencia.
+
+#### 12) Retención
+- (día 2) escribe la fórmula de `P(A|B)` y un ejemplo en una frase.
+
+#### 13) Diferenciación
+- Avanzado: conecta con “actualización de creencias” (preview a Bayes).
+
+#### 14) Recursos
+- Sección de probabilidad condicional en cualquier material de probabilidad.
+
+#### 15) Nota docente
+- Pedir al alumno que primero responda verbalmente (“¿qué significa dado B?”) antes de calcular.
+</details>
+
 #### 1.3 Independencia
 
 ```text
@@ -111,6 +227,62 @@ P(A ∩ B) = P(A) · P(B)
 Equivalente a:
 P(A|B) = P(A)
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 1.3: Independencia</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Independencia: “saber B no cambia A”
+- **ID (opcional):** `M04-T01_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.1, 1.2
+
+#### 2) Objetivos
+- Reconocer equivalencias: `P(A∩B)=P(A)P(B)` y `P(A|B)=P(A)`.
+- Evaluar con ejemplos si una suposición de independencia es razonable.
+
+#### 3) Relevancia
+- Naive Bayes se sostiene sobre una suposición fuerte de independencia condicional.
+
+#### 4) Mapa conceptual mínimo
+- **Dependencia**: información sobre B cambia tu probabilidad de A.
+- **Independencia**: no cambia.
+
+#### 5) Definiciones esenciales
+- A y B independientes si `P(A|B)=P(A)` (cuando `P(B)>0`).
+
+#### 6) Explicación didáctica
+- La independencia casi nunca es exacta en datos reales; se usa como aproximación útil.
+
+#### 7) Ejemplo modelado
+- En una moneda justa: eventos “sale cara” y “sale cruz” en el mismo tiro no aplican (mutuamente excluyentes), ojo: no es independencia.
+
+#### 8) Práctica guiada
+- Da un ejemplo de eventos independientes (dos tiros de moneda) y uno claramente dependiente.
+
+#### 9) Práctica independiente
+- Explica por qué “mutuamente excluyente” no implica “independiente”.
+
+#### 10) Autoevaluación
+- ¿Qué valor debería tener `P(A∩B)` si A y B son independientes?
+
+#### 11) Errores comunes
+- Confundir independencia con exclusión mutua.
+- Asumir independencia sin justificar (y luego sorprenderse por resultados malos en Naive Bayes).
+
+#### 12) Retención
+- (día 2) memoriza una equivalencia: `P(A∩B)=P(A)P(B)`.
+
+#### 13) Diferenciación
+- Avanzado: independencia condicional `P(A,B|C)=P(A|C)P(B|C)` (preview a Naive Bayes).
+
+#### 14) Recursos
+- Lecturas de independencia y diagramas de Venn.
+
+#### 15) Nota docente
+- Pedir al alumno que traduzca a lenguaje natural: “saber B no me da info sobre A”.
+</details>
 
 ---
 
@@ -130,6 +302,64 @@ Donde:
 - P(B)   = Evidence (normalizador)
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 2.1: Teorema de Bayes (la fórmula)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Bayes = reordenar condicionales (posterior = likelihood·prior / evidence)
+- **ID (opcional):** `M04-T02_1`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.2 (condicional), 1.3 (independencia como contraste)
+
+#### 2) Objetivos
+- Identificar los 4 términos: posterior, likelihood, prior, evidence.
+- Aplicar Bayes en un ejemplo tipo clasificación y explicar qué significa cada término.
+
+#### 3) Relevancia
+- Mucho ML supervisado puede verse como inferencia: estimar `P(clase|datos)`.
+
+#### 4) Mapa conceptual mínimo
+- **Prior**: lo que creías antes.
+- **Likelihood**: qué tan compatibles son los datos con la clase.
+- **Posterior**: lo que crees después de ver datos.
+- **Evidence**: normalizador para que sume 1.
+
+#### 5) Definiciones esenciales
+- `P(A|B) = P(B|A)P(A) / P(B)`.
+
+#### 6) Explicación didáctica
+- Para comparar clases, muchas veces basta el numerador `P(datos|clase)P(clase)` (posterior sin normalizar).
+
+#### 7) Ejemplo modelado
+- Spam: `P(spam|palabras) ∝ P(palabras|spam)·P(spam)`.
+
+#### 8) Práctica guiada
+- Define un prior `P(spam)` y dos likelihoods y calcula qué clase gana (sin normalizar).
+
+#### 9) Práctica independiente
+- Crea un ejemplo con una enfermedad rara: prior pequeño, likelihood grande; discute el resultado.
+
+#### 10) Autoevaluación
+- ¿Qué rol cumple `P(B)`? ¿Por qué no depende de A?
+
+#### 11) Errores comunes
+- Confundir posterior con likelihood.
+- Mezclar `P(A|B)` con `P(B|A)`.
+
+#### 12) Retención
+- (día 2) escribe de memoria: posterior = likelihood × prior / evidence.
+
+#### 13) Diferenciación
+- Avanzado: conecta con Naive Bayes (producto de likelihoods por feature en log).
+
+#### 14) Recursos
+- 3Blue1Brown Bayes (visual), StatQuest Bayes (intuición).
+
+#### 15) Nota docente
+- Pedir “traducción verbal” de cada término antes de hacer números.
+</details>
+
 #### 2.2 Interpretación para ML
 
 ```text
@@ -140,6 +370,63 @@ P(clase|datos) = ─────────────────────
 Ejemplo: Clasificación de spam
 - P(spam|palabras) = P(palabras|spam) · P(spam) / P(palabras)
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 2.2: Interpretación de Bayes para ML</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Bayes como clasificador: comparar posteriors (a veces sin normalizar)
+- **ID (opcional):** `M04-T02_2`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1, 1.2
+
+#### 2) Objetivos
+- Reescribir un problema de clasificación como `argmax_c P(c|x)`.
+- Explicar por qué `P(x)` puede omitirse al comparar clases (misma evidencia).
+
+#### 3) Relevancia
+- Este marco conecta directamente con Logistic Regression/Softmax: “salidas como probabilidades”.
+
+#### 4) Mapa conceptual mínimo
+- **Modelo generativo (tipo Bayes/Naive Bayes):** modela `P(x|c)` y `P(c)`.
+- **Inferencia:** obtiene `P(c|x)`.
+
+#### 5) Definiciones esenciales
+- **Posterior sin normalizar:** `score(c) = P(x|c)·P(c)`.
+- **Decisión MAP:** elegir la clase con mayor posterior.
+
+#### 6) Explicación didáctica
+- Si solo quieres la clase, no necesitas `P(x)`; si quieres probabilidades calibradas, sí.
+
+#### 7) Ejemplo modelado
+- Spam vs ham: compara `P(palabras|spam)P(spam)` contra `P(palabras|ham)P(ham)`.
+
+#### 8) Práctica guiada
+- Usa dos priors distintos (spam raro vs frecuente) y observa cómo cambia la decisión.
+
+#### 9) Práctica independiente
+- Explica un caso donde el likelihood gana pero el prior lo revierte (o viceversa).
+
+#### 10) Autoevaluación
+- ¿Cuándo te importa `P(x)`? (pista: cuando quieres una probabilidad real, no solo ranking)
+
+#### 11) Errores comunes
+- Confundir “likelihood” con “posterior”.
+- Creer que omitir `P(x)` es “incorrecto” en clasificación (no lo es para argmax).
+
+#### 12) Retención
+- (día 2) memoriza: `P(c|x) ∝ P(x|c)P(c)`.
+
+#### 13) Diferenciación
+- Avanzado: en vez de multiplicar, usa logs: `log P(x|c) + log P(c)`.
+
+#### 14) Recursos
+- StatQuest: Bayes classifier / Naive Bayes.
+
+#### 15) Nota docente
+- Pedir al alumno que señale qué término es “modelo” (`P(x|c)`) y cuál es “creencia previa” (`P(c)`).
+</details>
 
 #### 2.3 Implementación en Python
 
@@ -182,6 +469,63 @@ result = bayes_classifier(
 print(f"Clasificación: {result}")  # spam
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 2.3: Implementación de Bayes en Python</strong></summary>
+
+#### 1) Metadatos
+- **Título:** De la fórmula a código: calcular scores y decidir
+- **ID (opcional):** `M04-T02_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1, 2.2
+
+#### 2) Objetivos
+- Implementar un clasificador Bayesiano mínimo y explicar cada variable.
+- Separar “cálculo de score” de “decisión final” (`argmax`).
+
+#### 3) Relevancia
+- Te entrena a convertir fórmulas en implementaciones legibles (habilidad clave para ML desde cero).
+
+#### 4) Mapa conceptual mínimo
+- **Inputs:** likelihoods + priors.
+- **Procesamiento:** score por clase.
+- **Output:** clase ganadora.
+
+#### 5) Definiciones esenciales
+- `posterior_spam ∝ likelihood_spam * prior_spam`.
+
+#### 6) Explicación didáctica
+- En problemas reales, multiplicar muchas probabilidades causa underflow → usar log-sum (preview).
+
+#### 7) Ejemplo modelado
+- El ejemplo usa “posterior sin normalizar” para comparar clases.
+
+#### 8) Práctica guiada
+- Extiende el código para que devuelva también el score de ambas clases.
+
+#### 9) Práctica independiente
+- Cambia priors y likelihoods y escribe 3 casos donde el resultado cambie.
+
+#### 10) Autoevaluación
+- ¿Por qué no aparece `P(datos)` en el código?
+
+#### 11) Errores comunes
+- Tratar `x` como si se usara cuando el ejemplo lo deja simplificado.
+- Mezclar probabilidades con porcentajes (0.8 vs 80).
+
+#### 12) Retención
+- (día 2) escribe una función que compare 2 clases usando `score = likelihood*prior`.
+
+#### 13) Diferenciación
+- Avanzado: reescribe el clasificador en log-espacio: `log_score = log_likelihood + log_prior`.
+
+#### 14) Recursos
+- Numpy docs: `np.log`, manejo de underflow/overflow.
+
+#### 15) Nota docente
+- Pedir que el alumno comente (en voz) qué representa cada parámetro: prior vs likelihood.
+</details>
+
 #### 2.4 Naive Bayes (Conexión con Supervised Learning)
 
 ```python
@@ -207,6 +551,62 @@ def naive_bayes_predict(X: np.ndarray,
 
     return np.argmax(log_posteriors, axis=1)
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 2.4: Naive Bayes</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Naive Bayes: independencia condicional para escalar a muchas features
+- **ID (opcional):** `M04-T02_4`
+- **Duración estimada:** 60–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.3 (independencia), 2.1 (Bayes)
+
+#### 2) Objetivos
+- Explicar la suposición: `P(x1,…,xn|c) = Π_i P(xi|c)`.
+- Entender por qué se usa log: `log Π = Σ log` (evitar underflow).
+
+#### 3) Relevancia
+- Es un baseline fuerte en texto y problemas discretos; enseña buenas prácticas numéricas.
+
+#### 4) Mapa conceptual mínimo
+- **Modelo:** aprende `P(xi|c)` por feature y `P(c)`.
+- **Predicción:** suma log-likelihoods + log-prior.
+
+#### 5) Definiciones esenciales
+- `log_posterior(c|x) = log P(c) + Σ_i log P(x_i|c)`.
+
+#### 6) Explicación didáctica
+- “Naive” no significa inútil: significa *suposición simplificadora* para poder multiplicar muchos términos.
+
+#### 7) Ejemplo modelado
+- En texto (bag-of-words): cada palabra aporta un término de log-likelihood.
+
+#### 8) Práctica guiada
+- Implementa una versión binaria con 2 clases y 3 features discretas y verifica con un mini dataset.
+
+#### 9) Práctica independiente
+- Discute un caso donde la independencia condicional es claramente falsa (features redundantes) y qué esperas que pase.
+
+#### 10) Autoevaluación
+- ¿Por qué `np.log` transforma multiplicaciones en sumas y por qué eso ayuda en cómputo?
+
+#### 11) Errores comunes
+- No suavizar probabilidades → `log(0)`.
+- Confundir `P(x|c)` con `P(c|x)`.
+
+#### 12) Retención
+- (día 2) memoriza el score: `log_prior + sum(log_likelihoods)`.
+
+#### 13) Diferenciación
+- Avanzado: introduce Laplace smoothing (α) para evitar ceros.
+
+#### 14) Recursos
+- StatQuest Naive Bayes; notas de smoothing.
+
+#### 15) Nota docente
+- Pedir una demostración de underflow: multiplicar 100 probabilidades ~0.01 y ver que colapsa sin log.
+</details>
 
 ---
 
@@ -329,6 +729,66 @@ En términos de la descomposición:
 
 Si el total baja, mejora el `MSE` esperado fuera de muestra.
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Micro-Capítulo: Maximum Likelihood Estimation (MLE)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** MLE como filosofía unificadora: de “ajustar perillas” a pérdidas en ML
+- **ID (opcional):** `M04-MICRO-MLE`
+- **Duración estimada:** 120–180 min
+- **Nivel:** Intermedio–Avanzado
+- **Dependencias:** 1.1–2.4 (probabilidad + Bayes), M03 (gradiente/chain rule como preview)
+
+#### 2) Objetivos
+- Explicar qué maximiza MLE (verosimilitud de datos observados) y por qué se usa log-likelihood.
+- Conectar MLE con pérdidas: MSE ↔ Gaussiana, BCE/CCE ↔ Bernoulli/Categorical.
+- Interpretar sesgo/varianza/MSE como puente a regularización.
+
+#### 3) Relevancia
+- Te da el “por qué” de cross-entropy: no es un truco, es NLL.
+
+#### 4) Mapa conceptual mínimo
+- **Modelo** `P(D|θ)` → define cómo “genera” datos.
+- **Likelihood** `L(θ|D)` → probabilidad de D dado θ.
+- **Log-likelihood** `ℓ(θ)` → suma (estable) en vez de producto.
+- **Entrenamiento** → minimizar `-ℓ(θ)`.
+
+#### 5) Definiciones esenciales
+- `θ_MLE = argmax_θ P(D|θ)`.
+- `ℓ(θ)=Σ log P(x_i|θ)`.
+
+#### 6) Explicación didáctica
+- “MLE elige la perilla que hace que tus datos se vean menos sorprendentes bajo el modelo”.
+
+#### 7) Ejemplo modelado
+- Moneda Bernoulli: `p_MLE` = proporción de caras.
+
+#### 8) Práctica guiada
+- Repite el worked example cambiando la secuencia de datos y verifica que `p_MLE` cambia como frecuencia.
+
+#### 9) Práctica independiente
+- Explica por qué maximizar log-likelihood y maximizar likelihood dan el mismo argmax.
+
+#### 10) Autoevaluación
+- ¿Qué diferencia hay entre “parámetro más probable” (Bayes) y “parámetro que hace los datos más probables” (MLE)?
+
+#### 11) Errores comunes
+- Confundir `P(θ|D)` con `P(D|θ)`.
+- Olvidar que log convierte producto en suma (y por qué ayuda numéricamente).
+
+#### 12) Retención
+- (día 2) escribe: `θ_MLE = argmax_θ Σ log p(x_i|θ)`.
+
+#### 13) Diferenciación
+- Avanzado: conectar con MAP (regularización como prior) (preview).
+
+#### 14) Recursos
+- StatQuest: Maximum Likelihood.
+
+#### 15) Nota docente
+- Pedir al alumno que diga “qué asume el modelo” antes de escribir `P(D|θ)`.
+</details>
+
 ## 🧩 Micro-Capítulo Maestro: Introducción a Markov Chains — Nivel: Intermedio
 
 ### 1) Concepto
@@ -359,6 +819,66 @@ Si repites multiplicaciones, muchas cadenas convergen a una distribución estaci
 
 Eso significa (en la perspectiva correcta) que `π*` es un **eigenvector** asociado al **eigenvalue 1**.
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Micro-Capítulo: Introducción a Markov Chains</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Markov Chains como dinámica lineal sobre distribuciones (π_{t+1}=π_t P)
+- **ID (opcional):** `M04-MICRO-MARKOV`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** M02 (multiplicación de matrices, eigenvectors), probabilidad básica (distribuciones)
+
+#### 2) Objetivos
+- Interpretar `P(S_{t+1}|S_t)` como “memoria de 1 paso”.
+- Usar `π_{t+1}=π_t P` y verificar que `π_t` sigue sumando 1.
+- Explicar la condición de estacionariedad `π*=π*P`.
+
+#### 3) Relevancia
+- Conecta probabilidad con álgebra lineal; reaparece en modelos secuenciales y Monte Carlo (Línea 2).
+
+#### 4) Mapa conceptual mínimo
+- **Estados** → categorías discretas.
+- **Matriz P** → transiciones (filas suman 1).
+- **Distribución π** → vector de probabilidades.
+- **Evolución temporal** → multiplicaciones repetidas.
+
+#### 5) Definiciones esenciales
+- Matriz estocástica por filas: cada fila suma 1.
+- Distribución estacionaria: `π* = π*P`.
+
+#### 6) Explicación didáctica
+- Piensa en `π` como “mezcla” de estados; multiplicar por P redistribuye masa.
+
+#### 7) Ejemplo modelado
+- 2 estados con `P=[[0.9,0.1],[0.2,0.8]]`: interpreta cada fila como “desde dónde vienes”.
+
+#### 8) Práctica guiada
+- Elige un `π_0` y calcula `π_1`, `π_2` a mano.
+
+#### 9) Práctica independiente
+- Encuentra (conceptualmente) `π*` resolviendo `π*=π*P` + suma=1.
+
+#### 10) Autoevaluación
+- ¿Por qué el eigenvalue asociado a `π*` es 1?
+
+#### 11) Errores comunes
+- Confundir si `π` es vector fila o columna (y dónde multiplicar P).
+- Usar una P donde filas no suman 1.
+
+#### 12) Retención
+- (día 7) escribe `π_{t+1}=π_tP` y explica en una frase qué hace.
+
+#### 13) Diferenciación
+- Avanzado: discutir condiciones de convergencia (ergodicidad) (solo conceptual).
+
+#### 14) Recursos
+- Material introductorio de Markov Chains + conexión con eigenvectors.
+
+#### 15) Nota docente
+- Obligar “sanity check”: después de multiplicar, verificar suma=1.
+</details>
+
 ---
 
 ### Día 5: Distribución Gaussiana (Normal)
@@ -376,12 +896,127 @@ Parámetros:
 - σ² (sigma²): Varianza
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 3.1: Distribución Gaussiana (definición)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** PDF Gaussiana: forma, parámetros y lectura correcta
+- **ID (opcional):** `M04-T03_1`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 1.1 (probabilidad), noción de función exponencial/log
+
+#### 2) Objetivos
+- Identificar qué controla `μ` (desplazamiento) y `σ`/`σ²` (dispersión).
+- Distinguir “densidad” `f(x)` de “probabilidad” (área bajo la curva).
+
+#### 3) Relevancia
+- La Gaussiana es el átomo de modelos generativos (GMM) y del supuesto de ruido que conecta con MSE.
+
+#### 4) Mapa conceptual mínimo
+- **PDF** `f(x)` describe densidad.
+- **Parámetros**: `μ` centra, `σ` escala.
+- **Probabilidad**: integral de `f(x)` sobre un intervalo.
+
+#### 5) Definiciones esenciales
+- `X ~ N(μ, σ²)`.
+- `f(x)` es densidad (puede ser >1), pero el área total integra a 1.
+
+#### 6) Explicación didáctica
+- Error clásico: interpretar `f(0.5)=0.3` como “30% de probabilidad en x=0.5” (en continuas eso es falso).
+
+#### 7) Ejemplo modelado
+- “Campana” estándar: `N(0,1)`.
+
+#### 8) Práctica guiada
+- Describe qué pasa si duplicas `σ`: el pico baja y la curva se ensancha.
+
+#### 9) Práctica independiente
+- Explica qué significa “2 desviaciones estándar” alrededor de la media en términos cualitativos.
+
+#### 10) Autoevaluación
+- ¿Por qué `P(X = x) = 0` en una variable continua aunque `f(x)` sea positiva?
+
+#### 11) Errores comunes
+- Confundir `σ` con `σ²`.
+- Confundir densidad con probabilidad.
+
+#### 12) Retención
+- (día 2) escribe la forma general de la PDF y nombra sus parámetros.
+
+#### 13) Diferenciación
+- Avanzado: conecta con log-likelihood de una Gaussiana (preview a MLE).
+
+#### 14) Recursos
+- Sección “Normal distribution” (cualquier referencia de probabilidad).
+
+#### 15) Nota docente
+- Exigir que el alumno diga: “densidad ≠ probabilidad; probabilidad = área”.
+</details>
+
 #### 3.2 Por Qué es Importante
 
 1. **Muchos fenómenos naturales** siguen esta distribución
 2. **Teorema del Límite Central:** promedios de cualquier distribución → Normal
 3. **GMM usa Gaussianas** para modelar clusters
 4. **Inicialización de pesos** en redes neuronales
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 3.2: Por qué la Gaussiana importa en ML</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Normal como “default” estadístico: TLC, ruido y modelos
+- **ID (opcional):** `M04-T03_2`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1
+
+#### 2) Objetivos
+- Explicar 3 usos típicos: ruido Gaussiano ↔ MSE, GMM, inicialización.
+- Conectar el TLC con “promedios tienden a normal”.
+
+#### 3) Relevancia
+- Entender esto evita que la Normal se sienta como “fórmula que memorizas” sin uso.
+
+#### 4) Mapa conceptual mínimo
+- **TLC** → por qué aparece en promedios.
+- **Ruido** `ε~N(0,σ²)` → por qué MSE es natural.
+- **GMM** → mezcla de gaussianas para clustering.
+
+#### 5) Definiciones esenciales
+- TLC (enunciado informal): suma/promedio de muchas variables → aproximadamente normal.
+
+#### 6) Explicación didáctica
+- Muchos modelos lineales asumen ruido Gaussiano: no porque sea “verdad absoluta”, sino porque da un modelo tractable.
+
+#### 7) Ejemplo modelado
+- Regresión lineal con ruido: minimizas SSE/MSE como MLE Gaussiano (puente a Día 6).
+
+#### 8) Práctica guiada
+- Da un ejemplo cotidiano donde “muchas fuentes pequeñas de variación” sugiere normalidad.
+
+#### 9) Práctica independiente
+- Explica por qué en pesos de NN se usan gaussianas pequeñas (inicialización) y qué pasa si son muy grandes.
+
+#### 10) Autoevaluación
+- ¿Qué aspecto de la normal explica que valores extremos sean raros (colas)?
+
+#### 11) Errores comunes
+- Creer que “todo es normal” sin validar.
+- Confundir “distribución de datos” con “distribución de ruido”.
+
+#### 12) Retención
+- (día 2) enumera 3 conexiones: MSE, GMM, inicialización.
+
+#### 13) Diferenciación
+- Avanzado: discusión de heavy tails y por qué a veces Laplace/Student-t es mejor.
+
+#### 14) Recursos
+- StatQuest: Normal distribution / Central Limit Theorem.
+
+#### 15) Nota docente
+- Pedir una justificación: “¿qué hipótesis hace que MSE tenga sentido?”.
+</details>
 
 #### 3.3 Implementación
 
@@ -422,6 +1057,63 @@ plt.ylabel('f(x)')  # Etiqueta del eje y (densidad)
 plt.grid(True)  # Rejilla para lectura más fácil
 plt.savefig('gaussian_distributions.png')  # Guarda imagen (útil para reportes)
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 3.3: Implementación de la PDF Gaussiana (univariada)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Implementar PDF: normalización, vectorización y sanity checks
+- **ID (opcional):** `M04-T03_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1
+
+#### 2) Objetivos
+- Implementar `gaussian_pdf` sin errores de forma y con vectorización.
+- Identificar el rol del coeficiente y del exponente.
+
+#### 3) Relevancia
+- Te entrena para implementar funciones de densidad y luego reutilizarlas en log-likelihood/EM.
+
+#### 4) Mapa conceptual mínimo
+- **Coeficiente** `1/(σ√(2π))` normaliza.
+- **Exponente** penaliza distancia al centro.
+- **Vectorización**: evaluar muchos x de una vez.
+
+#### 5) Definiciones esenciales
+- `σ>0` (si `σ<=0` el modelo no tiene sentido).
+
+#### 6) Explicación didáctica
+- Sanity check numérico: la curva debe ser no negativa y “parecer campana”.
+
+#### 7) Ejemplo modelado
+- Comparación de distintas `μ` y `σ` para construir intuición visual.
+
+#### 8) Práctica guiada
+- Añade una verificación: `assert np.all(gaussian_pdf(x,mu,sigma) >= 0)`.
+
+#### 9) Práctica independiente
+- (conceptual) ¿Qué debería pasar con el pico cuando `σ` se hace muy pequeño?
+
+#### 10) Autoevaluación
+- ¿Qué parte del código cambia si reemplazas `σ` por `σ²` como parámetro?
+
+#### 11) Errores comunes
+- Overflow/underflow en `exp` cuando `σ` es muy pequeño o `|x-μ|` grande.
+- Olvidar que `sigma` es desviación estándar (no varianza).
+
+#### 12) Retención
+- (día 2) escribe la función en pseudo-código: coef × exp(exponente).
+
+#### 13) Diferenciación
+- Avanzado: implementar `log_gaussian_pdf` estable y comparar.
+
+#### 14) Recursos
+- Numpy `np.exp`, estabilidad numérica.
+
+#### 15) Nota docente
+- Pedir al alumno que explique qué controla `μ` y qué controla `σ` viendo los plots.
+</details>
 
 #### 3.4 Gaussiana Multivariada (Para GMM)
 
@@ -466,6 +1158,63 @@ prob = multivariate_gaussian_pdf(x, mu, cov)  # Escalar: densidad en ese punto
 print(f"P(x=[0.5, 0.5]) = {prob:.4f}")  # Imprime densidad (ojo: no es probabilidad discreta)
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 3.4: Gaussiana Multivariada</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Multivariada: covarianza, elipses y Mahalanobis
+- **ID (opcional):** `M04-T03_4`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio–Avanzado
+- **Dependencias:** M02 (det/inv, formas cuadráticas), 3.1
+
+#### 2) Objetivos
+- Interpretar el rol de `Σ` (covarianza) como escala + correlación.
+- Reconocer la forma cuadrática `(x-μ)^T Σ^{-1} (x-μ)` como “distancia elíptica”.
+
+#### 3) Relevancia
+- Es el núcleo matemático de GMM y de muchas técnicas estadísticas.
+
+#### 4) Mapa conceptual mínimo
+- `μ` fija el centro.
+- `Σ` fija la elipse (forma/orientación).
+- `|Σ|` controla volumen.
+
+#### 5) Definiciones esenciales
+- Covarianza válida: simétrica y PSD (idealmente PD para invertir).
+
+#### 6) Explicación didáctica
+- Si `Σ` tiene covarianzas fuera de la diagonal, la elipse rota.
+
+#### 7) Ejemplo modelado
+- Caso 2D con correlación positiva (`0.5`) para ver rotación.
+
+#### 8) Práctica guiada
+- Cambia `cov` a diagonal y compara con el caso correlacionado.
+
+#### 9) Práctica independiente
+- Explica qué pasa si `det_cov` es casi 0 (covarianza casi singular).
+
+#### 10) Autoevaluación
+- ¿Por qué aparece `Σ^{-1}` en lugar de `Σ` en el exponente?
+
+#### 11) Errores comunes
+- Invertir `Σ` singular (numéricamente inestable).
+- Confundir densidad con probabilidad.
+
+#### 12) Retención
+- (día 7) escribe la forma: coeficiente × exp(-0.5 * Mahalanobis).
+
+#### 13) Diferenciación
+- Avanzado: usar Cholesky para estabilidad en lugar de `inv`/`det` directos.
+
+#### 14) Recursos
+- Material de GMM / multivariate normal.
+
+#### 15) Nota docente
+- Pedir al alumno que dibuje cómo cambia la elipse al variar covarianza.
+</details>
+
 ---
 
 ### Día 6: Maximum Likelihood Estimation (MLE)
@@ -494,6 +1243,68 @@ Ese término es exactamente la **cross-entropy** que usas en:
 - **MLE:** maximizar likelihood
 - **Entrenamiento:** minimizar negative log-likelihood
 - **En clasificación:** eso se llama cross-entropy
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.0: MLE → Cross-Entropy (la conexión que te piden en exámenes)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** De maximizar likelihood a minimizar cross-entropy (NLL)
+- **ID (opcional):** `M04-T04_0`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 2.1–2.3 (probabilidad condicional/Bayes), noción de logaritmo
+
+#### 2) Objetivos
+- Conectar el producto de probabilidades con suma de log-probabilidades.
+- Explicar por qué optimizamos **NLL** (negative log-likelihood) en vez de maximizar likelihood.
+- Reconocer que en clasificación la NLL se escribe como **cross-entropy**.
+
+#### 3) Relevancia
+- Esta equivalencia es el “puente” entre probabilidad y entrenamiento: explica por qué la loss típica en clasificación es cross-entropy.
+
+#### 4) Mapa conceptual mínimo
+- **Likelihood** `P(D|θ)` (producto)
+- **Log-likelihood** `log P(D|θ)` (suma)
+- **NLL** `-log P(D|θ)` (minimización)
+- **Cross-entropy** (forma estándar de la NLL en clasificación)
+
+#### 5) Definiciones esenciales
+- **Likelihood:** probabilidad de observar los datos si el modelo tuviera parámetros `θ`.
+- **NLL:** `-Σ log P(yᵢ|xᵢ,θ)`; es una loss no negativa (en promedio) que penaliza probabilidades pequeñas asignadas a la etiqueta correcta.
+
+#### 6) Explicación didáctica
+- El producto `Π P(yᵢ|xᵢ,θ)` se vuelve numéricamente pequeño; el log lo transforma en suma y evita underflow.
+- Cambiar de “maximizar” a “minimizar” es solo conveniencia (los optimizadores típicos minimizan).
+
+#### 7) Ejemplo modelado
+- Si el modelo asigna `P(y=correcto|x)=0.01`, entonces `-log(0.01)` es grande: el entrenamiento “siente” fuerte ese error.
+
+#### 8) Práctica guiada
+- Reescribe el objetivo para un dataset de 3 muestras y verifica el paso:
+  - `max Π pᵢ` → `max Σ log pᵢ` → `min -Σ log pᵢ`.
+
+#### 9) Práctica independiente
+- Describe qué pasa con la NLL si duplicas el dataset (mismas muestras dos veces). ¿Por qué se suele usar promedio `1/m`?
+
+#### 10) Autoevaluación
+- ¿Por qué `log` convierte productos en sumas y por qué eso ayuda a optimizar?
+
+#### 11) Errores comunes
+- Confundir **cross-entropy** con accuracy: una es función suave optimizable, la otra no.
+- Olvidar el signo: minimizar `-log(p)` equivale a maximizar `log(p)`.
+
+#### 12) Retención
+- Regla mnemónica: **MLE ⇒ max log-likelihood ⇒ min NLL ⇒ cross-entropy (clasificación)**.
+
+#### 13) Diferenciación
+- Avanzado: compara NLL con label smoothing (cómo cambia la penalización cuando `y` no es one-hot perfecto).
+
+#### 14) Recursos
+- Función `log` y propiedades: `log(ab)=log(a)+log(b)`.
+
+#### 15) Nota docente
+- Pedir al alumno que explique “por qué el log es un truco numérico y algebraico a la vez”.
+</details>
 
 ---
 
@@ -567,11 +1378,130 @@ MLE: Encontrar los parámetros θ que maximizan la probabilidad
             θ
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.1: La Idea Central</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Qué significa “ajustar θ para explicar los datos”
+- **ID (opcional):** `M04-T04_1`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Básico–Intermedio
+- **Dependencias:** 4.0
+
+#### 2) Objetivos
+- Interpretar `argmax_θ P(datos|θ)` como “buscar el θ que hace los datos más probables”.
+- Identificar qué es **dato**, qué es **parámetro** y qué es **modelo**.
+
+#### 3) Relevancia
+- Esta idea aparece en regresión logística, Naive Bayes, gaussianas, GMM y en general en modelos probabilísticos.
+
+#### 4) Mapa conceptual mínimo
+- **Modelo** `P(x|θ)` / `P(y|x,θ)`
+- **Datos** `D={xᵢ,yᵢ}`
+- **Parámetros** `θ`
+- **Objetivo** `argmax` (o `argmin` NLL)
+
+#### 5) Definiciones esenciales
+- `argmax`: devuelve el valor del parámetro que maximiza una función.
+- i.i.d. (supuesto típico): cada muestra aporta un factor multiplicativo a la likelihood.
+
+#### 6) Explicación didáctica
+- Piensa en `θ` como “perillas” del generador de datos: MLE elige las perillas que hacen “creíble” el dataset observado.
+
+#### 7) Ejemplo modelado
+- Moneda: `θ=p`; si observas muchas caras, el `p` que mejor explica el dato es alto.
+
+#### 8) Práctica guiada
+- Identifica `θ` en:
+  - Bernoulli (`p`),
+  - Gaussiana (`μ,σ`),
+  - Softmax (`W`).
+
+#### 9) Práctica independiente
+- Escribe en una línea qué maximiza MLE para un modelo `P(y|x,θ)`.
+
+#### 10) Autoevaluación
+- ¿Qué cambia si los datos no fueran independientes?
+
+#### 11) Errores comunes
+- Mezclar `P(θ|datos)` (Bayes) con `P(datos|θ)` (MLE).
+
+#### 12) Retención
+- Frase clave: **MLE mira datos→θ (qué θ explica mejor lo observado)**.
+
+#### 13) Diferenciación
+- Avanzado: contrasta MLE con MAP (`argmax P(θ|D)`), aunque ambos suelen acabar en minimizar una loss.
+
+#### 14) Recursos
+- Repasar diferencia entre prior, likelihood y posterior.
+
+#### 15) Nota docente
+- Verbalización obligatoria: “¿qué estoy maximizando exactamente y respecto a qué variable?”
+</details>
+
 #### 4.2 Por Qué es Fundamental
 
 - **Logistic Regression** usa MLE para encontrar los pesos
 - **Cross-Entropy Loss** viene de maximizar likelihood
 - **GMM** usa MLE (via EM algorithm)
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.2: Por Qué es Fundamental</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Por qué MLE está “debajo” de pérdidas y modelos comunes
+- **ID (opcional):** `M04-T04_2`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.0–4.1
+
+#### 2) Objetivos
+- Identificar al menos 3 lugares del stack ML donde MLE aparece implícitamente.
+- Conectar *modelado probabilístico* con *función de pérdida*.
+
+#### 3) Relevancia
+- Te permite “leer” una loss como una suposición probabilística (qué distribución estás asumiendo).
+
+#### 4) Mapa conceptual mínimo
+- **Modelo probabilístico** → **log-likelihood** → **NLL** → **gradiente/optimización**
+
+#### 5) Definiciones esenciales
+- **Estimador:** regla que produce un parámetro `\hat{θ}` desde datos.
+- **Loss probabilística:** una loss que puede interpretarse como NLL bajo un modelo.
+
+#### 6) Explicación didáctica
+- Cuando eliges cross-entropy, eliges implícitamente “el dato `y` sigue una distribución categórica parametrizada por el modelo”.
+
+#### 7) Ejemplo modelado
+- Regresión:
+  - Si asumes ruido Gaussiano, la NLL se parece a MSE.
+  - Si asumes Bernoulli/categórica, la NLL se vuelve BCE/CCE.
+
+#### 8) Práctica guiada
+- Para cada bullet del tema (LogReg, Cross-Entropy, GMM), completa la frase:
+  - “La loss es la NLL de una distribución ____”.
+
+#### 9) Práctica independiente
+- ¿Qué suposición probabilística hay detrás de usar MSE como loss?
+
+#### 10) Autoevaluación
+- ¿Por qué “maximizar likelihood” y “minimizar NLL” son el mismo objetivo?
+
+#### 11) Errores comunes
+- Creer que MLE “solo” es una técnica estadística: en ML moderno es una forma estándar de derivar losses.
+
+#### 12) Retención
+- Fórmula mental: **modelar `P(y|x)` ⇒ entrenar = maximizar `P(y|x,θ)`**.
+
+#### 13) Diferenciación
+- Avanzado: discute cuándo preferir MAP/regularización como “prior” implícito.
+
+#### 14) Recursos
+- Lectura corta: interpretación probabilística de MSE/BCE/CCE.
+
+#### 15) Nota docente
+- Mini-debate: “¿una loss define un modelo o un modelo define una loss?”
+</details>
 
 #### 4.3 MLE para Gaussiana
 
@@ -612,7 +1542,123 @@ print(f"Parámetros reales: μ={true_mu}, σ={true_sigma}")
 print(f"MLE estimados:     μ={estimated_mu:.3f}, σ={estimated_sigma:.3f}")
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.3: MLE para Gaussiana</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Media muestral y varianza con `n` (no `n-1`) como MLE
+- **ID (opcional):** `M04-T04_3`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 3.1–3.3 (Gaussiana univariada) + 4.1
+
+#### 2) Objetivos
+- Diferenciar varianza MLE (`/n`) de varianza insesgada (`/(n-1)`).
+- Implementar estimadores MLE para `μ` y `σ` y validar con datos simulados.
+
+#### 3) Relevancia
+- Esta derivación aparece en EM/GMM y en cualquier modelo que use gaussianas (ruido, priors, etc.).
+
+#### 4) Mapa conceptual mínimo
+- **Asunción:** `xᵢ ~ N(μ,σ²)`
+- **Objetivo:** `argmax log P(D|μ,σ)`
+- **Resultado:** `μ=mean(x)` y `σ²=mean((x-μ)²)`
+
+#### 5) Definiciones esenciales
+- `σ²_MLE = (1/n) Σ (xᵢ-μ)²`.
+- Estimador insesgado: usa `1/(n-1)` (otra propiedad, objetivo distinto).
+
+#### 6) Explicación didáctica
+- MLE optimiza “qué parámetros hacen más probable el dataset”, no “que el estimador sea insesgado”.
+
+#### 7) Ejemplo modelado
+- Con `n=1000`, `\hat{μ}` y `\hat{σ}` deberían acercarse a los parámetros reales por ley de los grandes números.
+
+#### 8) Práctica guiada
+- Agrega checks:
+  - `assert estimated_sigma > 0`.
+  - `assert abs(estimated_mu-true_mu) < 0.2` (con `n` grande).
+
+#### 9) Práctica independiente
+- Repite con `n=10` y observa la variabilidad de `\hat{σ}`.
+
+#### 10) Autoevaluación
+- ¿Por qué `/(n-1)` no sale de MLE cuando maximizas likelihood?
+
+#### 11) Errores comunes
+- Usar `np.std(data, ddof=1)` y decir que es MLE (eso es insesgado, no MLE).
+- Confundir `σ` con `σ²` en el retorno.
+
+#### 12) Retención
+- Regla: **MLE de media = promedio; MLE de varianza = promedio de cuadrados centrados**.
+
+#### 13) Diferenciación
+- Avanzado: deriva la log-likelihood de la Gaussiana y ubica dónde aparece el término `log σ`.
+
+#### 14) Recursos
+- Numpy: `np.mean`, `np.sum`, `np.sqrt`.
+
+#### 15) Nota docente
+- Pregunta guiadora: “¿qué propiedad estás optimizando: likelihood o sesgo?”
+</details>
+
 #### 4.4 Conexión con Cross-Entropy Loss
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.4: Conexión con Cross-Entropy Loss</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Cross-entropy como NLL: la forma “estándar” de escribir MLE en clasificación
+- **ID (opcional):** `M04-T04_4`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.0 + 2.1 (probabilidades condicionadas)
+
+#### 2) Objetivos
+- Escribir explícitamente la NLL en binario y multiclase.
+- Identificar la “clase correcta” como el término que se queda en la suma cuando `y` es one-hot.
+
+#### 3) Relevancia
+- Esta conexión explica por qué la loss tiene logs y por qué penaliza con fuerza probabilidades pequeñas.
+
+#### 4) Mapa conceptual mínimo
+- `P(y|x,θ)` → `log P(y|x,θ)` → `-log P(y|x,θ)`
+- One-hot `y` “selecciona” la clase correcta en `Σ y_k log(p_k)`
+
+#### 5) Definiciones esenciales
+- **Cross-entropy (multiclase):** `H(y,p)= -Σ_k y_k log(p_k)`.
+- Si `y` es one-hot, entonces `H(y,p) = -log(p_clase_correcta)`.
+
+#### 6) Explicación didáctica
+- No hay “magia”: el log aparece por MLE y por estabilidad numérica.
+
+#### 7) Ejemplo modelado
+- Si `p_correcta=0.9`, pérdida ≈ `0.105`; si `p_correcta=0.01`, pérdida ≈ `4.605`.
+
+#### 8) Práctica guiada
+- Calcula `-log(p_correcta)` para `p∈{0.9,0.5,0.1,0.01}` y ordénalos.
+
+#### 9) Práctica independiente
+- Explica por qué una predicción “muy segura y equivocada” recibe mucha penalización.
+
+#### 10) Autoevaluación
+- ¿Qué pasa con la loss si el modelo siempre predice `p_correcta=1/K`?
+
+#### 11) Errores comunes
+- Calcular `np.log(softmax(z))` de forma ingenua y sufrir underflow/NaN (ver día 7).
+
+#### 12) Retención
+- Frase: **cross-entropy = costo de sorprenderte al ver la etiqueta verdadera**.
+
+#### 13) Diferenciación
+- Avanzado: conecta con KL: `H(y,p)=H(y)+KL(y||p)` (cuando `y` es distribución).
+
+#### 14) Recursos
+- Revisión: propiedades de `log` y estabilidad numérica.
+
+#### 15) Nota docente
+- Pedir que el alumno derive la forma one-hot → `-log(p_correcta)` en 3 líneas.
+</details>
 
 #### 4.5 MLE para multiclase (Softmax + Categorical Cross-Entropy)
 
@@ -667,7 +1713,64 @@ def cross_entropy_from_mle():
 cross_entropy_from_mle()
 ```
 
----
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 4.5: MLE para multiclase (Softmax + Categorical Cross-Entropy)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** De `Π p_k^{y_k}` a `-Σ y_k log(p_k)` (y por qué eso es entrenable)
+- **ID (opcional):** `M04-T04_5`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.0 + noción de one-hot + softmax (día 7)
+
+#### 2) Objetivos
+- Derivar la log-likelihood multiclase usando one-hot.
+- Interpretar la CCE como “castigo” a la probabilidad asignada a la clase correcta.
+- Reconocer el rol de `epsilon` como protección de `log(0)`.
+
+#### 3) Relevancia
+- Esta es la base de entrenamiento para redes neuronales multiclase y modelos lineales con softmax.
+
+#### 4) Mapa conceptual mínimo
+- **Logits** `z` → **Softmax** `p` → **Log-prob** `log(p)` → **CCE/NLL**
+
+#### 5) Definiciones esenciales
+- One-hot: `y_k∈{0,1}`, `Σ_k y_k = 1`.
+- CCE por muestra: `L = -Σ_k y_k log(p_k)`.
+
+#### 6) Explicación didáctica
+- El producto `Π_k p_k^{y_k}` “selecciona” exactamente la probabilidad de la clase verdadera.
+- El log convierte ese producto en suma (y vuelve diferenciable y más estable el entrenamiento).
+
+#### 7) Ejemplo modelado
+- Para `K=3`, si la clase verdadera es 2, la loss es `-log(p_2)`.
+
+#### 8) Práctica guiada
+- Construye un `y` one-hot y un vector `p` y verifica a mano que:
+  - `-Σ y_k log(p_k)` coincide con `-log(p_clase_correcta)`.
+
+#### 9) Práctica independiente
+- Explica por qué se promedia en batch (`1/m`) y no se usa suma sin normalizar.
+
+#### 10) Autoevaluación
+- ¿Qué problema numérico aparece si `p_k` llega a 0 exacto?
+
+#### 11) Errores comunes
+- Usar softmax + log de manera ingenua y obtener `-inf/NaN`.
+- Confundir `logits` (sin normalizar) con probabilidades.
+
+#### 12) Retención
+- Regla: **CCE = NLL de una categórica parametrizada por softmax**.
+
+#### 13) Diferenciación
+- Avanzado: describe por qué en práctica se prefiere “CE desde logits” con `log_softmax`.
+
+#### 14) Recursos
+- Estabilidad numérica: Log-Sum-Exp trick (día 7).
+
+#### 15) Nota docente
+- Pedir que el alumno identifique, en una implementación, dónde se aplica `max(z)` para estabilizar.
+</details>
 
 ## 🌱 Extensión Estratégica (Línea 2): Markov Chains (intro conceptual)
 
@@ -727,15 +1830,73 @@ En otras palabras: es un **autovector** (eigenvector) asociado al eigenvalue `1`
 #### 5.1 De Logits a Probabilidades
 
 ```text
-                    exp(zᵢ)
+                     exp(zᵢ)
 softmax(z)ᵢ = ─────────────────
-              Σⱼ exp(zⱼ)
+               Σⱼ exp(zⱼ)
 
 Propiedades:
 - Cada salida ∈ (0, 1)
 - Suma de salidas = 1 (distribución válida)
 - Preserva el orden (mayor logit → mayor probabilidad)
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 5.1: De Logits a Probabilidades</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Softmax como distribución: de scores a probabilidades comparables
+- **ID (opcional):** `M04-T05_1`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.5 (CCE desde MLE), álgebra básica de exponentes
+
+#### 2) Objetivos
+- Explicar qué son **logits** y por qué no son probabilidades.
+- Interpretar softmax como una normalización positiva que suma 1.
+- Reconocer invariancia por desplazamiento: `softmax(z)=softmax(z+c)`.
+
+#### 3) Relevancia
+- Softmax es la salida estándar en clasificación multiclase y conecta directamente con la CCE.
+
+#### 4) Mapa conceptual mínimo
+- **Logits** `z` → `exp(z)` → **normalización** `Σ exp(z)` → **probabilidades**
+
+#### 5) Definiciones esenciales
+- **Logit:** score sin normalizar (puede ser cualquier real).
+- **Distribución válida:** entradas en `(0,1)` y suma 1.
+
+#### 6) Explicación didáctica
+- `exp` asegura positividad; dividir por la suma fuerza “competencia” entre clases.
+
+#### 7) Ejemplo modelado
+- Si una clase sube su logit, su probabilidad sube y las demás bajan para mantener suma 1.
+
+#### 8) Práctica guiada
+- Verifica (a mano) que `softmax([0,0]) = [0.5,0.5]`.
+
+#### 9) Práctica independiente
+- Demuestra en 2 líneas la invariancia: `softmax(z)=softmax(z-c)` para cualquier constante `c`.
+
+#### 10) Autoevaluación
+- ¿Qué sucede si sumas 100 a todos los logits? ¿Cambia el resultado?
+
+#### 11) Errores comunes
+- Interpretar logits como probabilidades.
+- Olvidar que softmax depende de las diferencias relativas entre logits.
+
+#### 12) Retención
+- Regla: **softmax convierte scores relativos en probabilidades que compiten**.
+
+#### 13) Diferenciación
+- Avanzado: explora el efecto de la temperatura `softmax(z/T)`.
+
+#### 14) Recursos
+- Relación con CCE: `L = -log p(clase correcta)`.
+
+#### 15) Nota docente
+- Pregunta rápida: “si una probabilidad sube, ¿qué debe pasar con las otras y por qué?”
+
+</details>
 
 #### 5.2 El Problema de Estabilidad Numérica (v3.3)
 
@@ -751,6 +1912,65 @@ Ejemplo underflow:
     exp(z) = [0, 0, 0]  → 0/0 = NaN!
 ```
 
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 5.2: El Problema de Estabilidad Numérica</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Por qué `exp` rompe y cómo reconocer overflow/underflow
+- **ID (opcional):** `M04-T05_2`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+- **Dependencias:** 5.1
+
+#### 2) Objetivos
+- Identificar síntomas: `inf`, `0`, `NaN` en softmax.
+- Explicar por qué `inf/inf` y `0/0` aparecen.
+- Justificar la necesidad de un truco algebraico (no “parche”).
+
+#### 3) Relevancia
+- Este error es común en entrenamiento real y puede arruinar gradients (loss NaN).
+
+#### 4) Mapa conceptual mínimo
+- logits grandes → `exp(z)` overflow → `inf` → `inf/inf` → `NaN`
+- logits muy negativos → `exp(z)` underflow → `0` → `0/0` → `NaN`
+
+#### 5) Definiciones esenciales
+- **Overflow:** número demasiado grande para representarse (→ `inf`).
+- **Underflow:** número tan pequeño que se aproxima a 0.
+
+#### 6) Explicación didáctica
+- Softmax es sensible al rango numérico por el `exp`. El objetivo es mantener exponentes en un rango seguro.
+
+#### 7) Ejemplo modelado
+- `z=[1000,1001,1002]` es un caso “conceptualmente fácil” (debería ganar la última clase) pero numéricamente peligroso.
+
+#### 8) Práctica guiada
+- ¿Cuál de estos casos produce `inf` y cuál produce `0`?
+  - `exp(1000)`, `exp(-1000)`.
+
+#### 9) Práctica independiente
+- Explica por qué aunque el resultado final de softmax esté en `(0,1)`, el cálculo intermedio puede romper.
+
+#### 10) Autoevaluación
+- ¿Qué dos operaciones generan `NaN` típicamente en este contexto?
+
+#### 11) Errores comunes
+- “Solucionar” con `epsilon` dentro de `exp` (no resuelve overflow).
+
+#### 12) Retención
+- Señal roja: **si ves logits con magnitud ~1e3, softmax naive es sospechoso**.
+
+#### 13) Diferenciación
+- Avanzado: discute por qué el problema empeora con batch grande y/o modelos profundos.
+
+#### 14) Recursos
+- IEEE-754, límites de `float64/float32` (intuitivo: `exp(88)` ya es enorme en `float32`).
+
+#### 15) Nota docente
+- Pide al alumno que describa el fallo como “operación indefinida” (`inf/inf`, `0/0`).
+
+</details>
+
 #### 5.3 Log-Sum-Exp Trick (Estabilidad Numérica)
 
 ```text
@@ -765,9 +1985,64 @@ Demostración:
 Al restar max(z), todos los exponentes son ≤ 0, evitando overflow.
 ```
 
-#### 5.4 Implementación Numéricamente Estable
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 5.3: Log-Sum-Exp Trick</strong></summary>
 
-> Regla práctica: si vas a calcular cross-entropy, prefiere **log-softmax** estable en vez de `np.log(softmax(z))`.
+#### 1) Metadatos
+- **Título:** Shift por `max(z)` para hacer `exp` seguro sin cambiar softmax
+- **ID (opcional):** `M04-T05_3`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 5.2
+
+#### 2) Objetivos
+- Probar que restar una constante no cambia softmax.
+- Entender por qué usar `max(z)` es una elección óptima simple.
+- Reconocer el patrón “log-sum-exp” como herramienta general.
+
+#### 3) Relevancia
+- Es la base de implementaciones estables de softmax/log-softmax y cross-entropy desde logits.
+
+#### 4) Mapa conceptual mínimo
+- invariancia por shift → elegir `c=max(z)` → exponentes ≤ 0 → sin overflow
+
+#### 5) Definiciones esenciales
+- **Shift/centrado:** `z' = z - c`.
+- **log-sum-exp:** `log(Σ exp(z))` computado de forma estable.
+
+#### 6) Explicación didáctica
+- Restar `max(z)` hace que el mayor exponente sea `exp(0)=1` y el resto `≤1`.
+
+#### 7) Ejemplo modelado
+- Si `z=[1000,1001,1002]`, entonces `z'=[-2,-1,0]` (seguro) y softmax no cambia.
+
+#### 8) Práctica guiada
+- Repite la demostración de invariancia para `softmax(z-c)` con símbolos.
+
+#### 9) Práctica independiente
+- ¿Por qué no basta con restar un número fijo como 100? ¿Qué hace especial a `max(z)`?
+
+#### 10) Autoevaluación
+- ¿Qué garantiza que `exp(z')` no overflow si `max(z')=0`?
+
+#### 11) Errores comunes
+- Restar el `max` sin `keepdims=True` y romper shapes en batch.
+
+#### 12) Retención
+- Mantra: **softmax es invariante a shift; usa `max` para estabilidad**.
+
+#### 13) Diferenciación
+- Avanzado: conecta con `log_softmax(z)=z-logsumexp(z)`.
+
+#### 14) Recursos
+- Búsqueda: “logsumexp trick” (patrón general en modelos probabilísticos).
+
+#### 15) Nota docente
+- Pide al alumno que identifique dónde aparece la misma idea en `log_softmax`.
+
+</details>
+
+#### 5.4 Implementación Numéricamente Estable
 
 ```python
 import numpy as np  # NumPy: necesario para exp/log/max/sum en softmax estable
@@ -788,7 +2063,7 @@ def softmax(z: np.ndarray) -> np.ndarray:
     # Log-Sum-Exp trick: restar el máximo
     z_stable = z - np.max(z, axis=-1, keepdims=True)  # Shift: ancla numérica por fila (mantiene invariancia)
 
-    exp_z = np.exp(z_stable)  # exp() seguro: valores <= 0 evitan overflow
+    exp_z = np.exp(z_stable)  # exp() seguro: valores ≤ 0 evitan overflow
     return exp_z / np.sum(exp_z, axis=-1, keepdims=True)  # Normaliza para que sumen 1 (distribución)
 
 
@@ -833,7 +2108,7 @@ def demo_numerical_stability():
     # Con el trick (CORRECTO)
     def softmax_stable(z):
         z_stable = z - np.max(z)  # Restar max: invariancia de softmax pero con estabilidad
-        exp_z = np.exp(z_stable)  # Ahora exp() es seguro (valores <= 0)
+        exp_z = np.exp(z_stable)  # Ahora exp() es seguro (valores ≤ 0)
         return exp_z / np.sum(exp_z)  # Normaliza a suma 1
 
     print("Logits peligrosos:", z_dangerous)
@@ -864,9 +2139,70 @@ for i, (l, p) in enumerate(zip(logits, probs)):
     print(f"  Clase {i}: logit={l:+.1f} → prob={p:.3f}")
 print(f"\nSuma de probabilidades: {np.sum(probs):.6f}")
 print(f"Clase predicha: {np.argmax(probs)}")
+
 ```
 
-#### 5.3 Categorical Cross-Entropy (Multiclase)
+<details open>
+<summary><strong>📌 Complemento pedagógico — Tema 5.4: Implementación Numéricamente Estable</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Implementar `softmax`/`log_softmax` sin NaN (y por qué funciona)
+- **ID (opcional):** `M04-T05_4`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** 5.2–5.3
+
+#### 2) Objetivos
+- Implementar softmax estable con `z - max(z)`.
+- Entender por qué `log_softmax` es preferible a `np.log(softmax(z))`.
+- Verificar propiedades: probabilidades finitas y suma 1.
+
+#### 3) Relevancia
+- Esta es una de las fuentes más comunes de `loss=NaN` en entrenamiento real (overflow/underflow en `exp`).
+
+#### 4) Mapa conceptual mínimo
+- logits `z` → shift `z-max(z)` → `exp` seguro → normalizar → softmax
+- logits `z` → `log_softmax(z)=z-logsumexp(z)` → CE estable
+
+#### 5) Definiciones esenciales
+- **Shift invariante:** restar una constante a todos los logits no cambia softmax.
+- **log-softmax:** log-probabilidades computadas sin pasar por probabilidades intermedias inestables.
+
+#### 6) Explicación didáctica
+- Restar `max(z)` “centra” la fila para que el mayor exponente sea `exp(0)=1` y el resto `≤1`.
+
+#### 7) Ejemplo modelado
+- El demo con logits grandes muestra que la versión naive puede producir `inf/inf → NaN`, mientras que la estable no.
+
+#### 8) Práctica guiada
+- Añade checks:
+  - `assert np.all(np.isfinite(softmax(z)))`
+  - `assert np.allclose(np.sum(softmax(z)), 1.0)` (vector) o por fila (batch).
+
+#### 9) Práctica independiente
+- Implementa soporte batch `(n_samples, n_classes)` y verifica que `axis=-1` es el correcto.
+
+#### 10) Autoevaluación
+- ¿Por qué `argmax(softmax(z)) == argmax(z)` aunque cambien los valores?
+
+#### 11) Errores comunes
+- Olvidar `keepdims=True` y romper broadcasting.
+- Normalizar sobre el eje incorrecto.
+
+#### 12) Retención
+- Regla: **si ves `exp`, piensa en estabilidad y en restar `max`**.
+
+#### 13) Diferenciación
+- Avanzado: compara el comportamiento en `float32` vs `float64`.
+
+#### 14) Recursos
+- Patrón: “log-sum-exp trick” (idea general en modelos probabilísticos).
+
+#### 15) Nota docente
+- Pide al alumno explicar el fallo del naive como “operación indefinida” (`inf/inf`, `0/0`).
+</details>
+
+#### 5.5 Categorical Cross-Entropy (Multiclase)
 
 ```python
 def categorical_cross_entropy(y_true: np.ndarray,
@@ -899,9 +2235,65 @@ y_pred = np.array([
 
 loss = categorical_cross_entropy(y_true, y_pred)
 print(f"Categorical Cross-Entropy: {loss:.4f}")
+
 ```
 
----
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 5.5: Categorical Cross-Entropy (Multiclase)</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Implementar CCE con one-hot y entender qué suma realmente
+- **ID (opcional):** `M04-T05_5`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** 4.5 + 5.4
+
+#### 2) Objetivos
+- Implementar CCE con protección numérica (`epsilon`).
+- Entender por qué, con one-hot, la loss selecciona la probabilidad de la clase correcta.
+- Conectar CCE con NLL/MLE: minimizar CCE ≡ maximizar likelihood categórica.
+
+#### 3) Relevancia
+- CCE es la función de pérdida estándar en clasificación multiclase con softmax.
+
+#### 4) Mapa conceptual mínimo
+- one-hot `y` → selecciona clase correcta → `-log(p_correcta)` → promedio en batch
+
+#### 5) Definiciones esenciales
+- **One-hot:** vector con un 1 en la clase correcta y 0 en las demás.
+- **`epsilon`:** evita `log(0)` cuando `p` llega a 0 por redondeo.
+
+#### 6) Explicación didáctica
+- El término `np.sum(y_true * log(p), axis=1)` actúa como “selector” de la clase correcta.
+
+#### 7) Ejemplo modelado
+- Si `p_correcta` pasa de `0.9` a `0.1`, la loss sube fuertemente (penaliza confianza equivocada).
+
+#### 8) Práctica guiada
+- Calcula a mano una muestra: `L=-log(p_correcta)` y valida con el print del código.
+
+#### 9) Práctica independiente
+- Implementa la versión con índices (`y_true` como clase entera) y compara resultados.
+
+#### 10) Autoevaluación
+- ¿Por qué `epsilon` arregla `log(0)` pero no corrige overflow que ocurre antes en softmax naive?
+
+#### 11) Errores comunes
+- Pasar logits a una CE que espera probabilidades.
+- No verificar que `y_pred` suma 1 por fila.
+
+#### 12) Retención
+- Fórmula: **CCE = -promedio(log(probabilidad de la clase correcta))**.
+
+#### 13) Diferenciación
+- Avanzado: discute label smoothing y cómo cambia la suma `Σ y_k log(p_k)`.
+
+#### 14) Recursos
+- Conexión directa con el tema 4.5 (NLL y MLE).
+
+#### 15) Nota docente
+- Pregunta de control: “¿qué línea hace que solo cuente la clase correcta?”
+</details>
 
 ## 🎯 Ejercicios por tema (progresivos) + Soluciones
 

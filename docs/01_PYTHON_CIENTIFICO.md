@@ -250,6 +250,113 @@ print(f"Tipo y: {type(y)}")  # <class 'numpy.ndarray'>
 # Ahora X e y están listos para algoritmos de ML
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 0: Pandas Esencial (Días 1–3)</strong></summary>
+
+#### 1) Metadatos (organización)
+- **Título:** Pandas esencial para preparar datasets reales
+- **ID (opcional):** `M01-T00`
+- **Duración estimada:** 2–4 horas
+- **Nivel:** Intro
+- **Dependencias:** Python básico, lectura de CSV, listas/diccionarios
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **cargar** un CSV en un `DataFrame`, **inspeccionar** su esquema (`info/describe`) y **detectar** valores faltantes **en ≤ 10 min**.
+- Al terminar, el estudiante podrá **limpiar** valores faltantes con `dropna/fillna` y **justificar** la elección (media/mediana/categoría) **en un caso dado**.
+- Al terminar, el estudiante podrá **construir** `X` y `y` como `np.ndarray` con shapes correctos (`X.shape=(n,d)`, `y.shape=(n,)`) y **verificar** `dtype`.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** En ML real, el 80% del trabajo inicial es preparar datos: si `dtype/NaN/shape` están mal, el modelo “falla” o (peor) aprende basura.
+- **Dónde encaja:** Esto es el “puente” a todos los módulos (regresión/logística/PCA/redes). Antes: Python básico. Después: NumPy vectorizado y álgebra lineal.
+
+#### 4) Mapa conceptual / conceptos clave
+- **Archivo (CSV/Parquet)**
+  - **→ `DataFrame`** (tabla con columnas tipadas)
+    - **→ EDA rápido** (`head/info/describe`)
+      - **→ Limpieza** (NaN, dtypes, outliers básicos)
+        - **→ `X` (features) y `y` (target)**
+          - **→ `to_numpy()` + validación de shapes**
+
+#### 5) Definiciones, notación y “fórmulas” esenciales
+- **`DataFrame`:** estructura tabular (filas/columnas) con columnas tipadas y operaciones vectorizadas.
+- **Notación (la usaremos toda la guía):**
+  - `n` = número de muestras (filas)
+  - `d` = número de features (columnas)
+  - `X` = matriz de features, `X.shape == (n, d)`
+  - `y` = target, típicamente `y.shape == (n,)`
+- **Imputación (idea):**
+  - Numéricas: media/mediana (según outliers)
+  - Categóricas: categoría “Desconocido” o moda
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición (2–3 frases):** Pandas es una “mesa de trabajo” para convertir datos sucios en una matriz `X` limpia. El objetivo no es memorizar métodos, sino ejecutar un pipeline estable: cargar → revisar → limpiar → separar → convertir.
+- **Paso a paso (pipeline mínimo):**
+  - 1. `read_csv` (cargar)
+  - 2. `head/info/describe` (entender esquema)
+  - 3. `isnull().sum()` (medir faltantes)
+  - 4. imputar/eliminar (decisión explícita)
+  - 5. separar `y` primero y luego construir `X`
+  - 6. `to_numpy()` + checks de `dtype/shape`
+- **Visual recomendado:**
+  - tabla de `df.info()` + heatmap de faltantes (seaborn) + histograma por columna numérica
+
+#### 7) Ejemplos modelados (worked examples)
+- **Ejemplo 1 (sencillo):** Iris → `X` con 4 columnas numéricas, `y` codificada a {0,1,2}.
+- **Ejemplo 2 (realista):** dataset con columna de fecha + categorías:
+  - parsear fechas con `pd.to_datetime`
+  - `get_dummies` para categorías (si aplica)
+  - verificar que `X.dtype` sea numérico antes de convertir.
+- **Contraejemplo (qué NO hacer):** convertir todo el `DataFrame` a NumPy sin filtrar columnas y terminar con `dtype=object`.
+
+#### 8) Práctica guiada (scaffolded)
+- **Ejercicio A (con pista):** carga un CSV y lista columnas por tipo (`df.select_dtypes`).
+  - Pista: `df.select_dtypes(include=["number"])`
+- **Ejercicio B (con pista):** calcula porcentaje de NaN por columna y decide estrategia.
+  - Pista: `df.isnull().mean().sort_values(ascending=False)`
+- **Ejercicio C (con pista):** crea `X,y` y verifica shapes.
+  - Pista: `assert X.ndim == 2` y `assert y.ndim == 1`
+
+#### 9) Práctica independiente / transferencia
+- **Mini-proyecto:** toma un dataset tabular (Titanic / Wine / Housing), define target, limpia faltantes, y entrega `X,y` listos.
+- **Entrega:** notebook o script con:
+  - impresión de `df.info()`
+  - estrategia de limpieza (explicada en 5–10 líneas)
+  - `assert` de shapes/dtypes
+- **Rúbrica (3 criterios):** precisión (shapes/dtypes), aplicación (pipeline completo), comunicación (justificación breve)
+
+#### 10) Evaluación formativa (rápida)
+- **Mini-quiz (5):**
+  - 1. ¿Qué diferencia práctica hay entre `df.values` y `df.to_numpy()`?
+  - 2. ¿Qué te dice `df.info()` que `df.head()` no te dice?
+  - 3. ¿Cuándo usarías mediana en lugar de media para imputar?
+  - 4. ¿Qué shapes esperas para `X` y `y` en un problema supervisado?
+  - 5. ¿Por qué `dtype=object` es una señal de alerta para ML?
+
+#### 11) Errores comunes y corrección
+- **Error:** “`X` contiene strings” → **Corrección:** filtra/convierte columnas y valida `select_dtypes`.
+- **Error:** leakage por incluir el target en `X` → **Corrección:** separar `y` primero y luego construir `X`.
+- **Error:** imputar sin medir NaN → **Corrección:** reportar `isnull().sum()` / proporción.
+- **Error:** `SettingWithCopyWarning` → **Corrección:** usar `.loc[...]` y/o `.copy()`.
+- **Error:** no validar shapes → **Corrección:** `assert X.shape[0] == y.shape[0]`.
+
+#### 12) Retención (spaced retrieval)
+- **Preguntas (día 2):** ¿Qué hace `axis=0` en medias por columna? ¿Qué shape devuelve?
+- **Preguntas (día 7):** ¿Cómo detectas `dtype=object` y qué harías?
+- **Checklist rápido:** `info → nulls → split → to_numpy → asserts`.
+
+#### 13) Diferenciación
+- **Principiante:** repetir el pipeline en 2 datasets distintos (uno “limpio”, uno “sucio”).
+- **Avanzado:** diseñar una función `prepare_xy(df, feature_cols, target_col)` con asserts y tests mínimos.
+
+#### 14) Recursos y materiales
+- Pandas: Getting Started (oficial)
+- Cheatsheet corta: `df.head/info/describe/isnull/dropna/fillna/loc/iloc/to_numpy`
+
+#### 15) Notas para el docente
+- **Tiempo sugerido:** 15 min (carga + schema) + 30 min (limpieza) + 20 min (X/y) + 15 min (debug de errores).
+- **Preguntas socráticas:** “¿Qué evidencia tienes de que `X` es numérico?” “¿Qué asumiste al imputar con media?”
+</details>
+
 ---
 
 ### 1. Arrays vs Listas
@@ -288,6 +395,83 @@ array = np.array([1, 2, 3, 4, 5])
 # 4. Almacenamiento contiguo en memoria
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 1: Arrays vs Listas</strong></summary>
+
+#### 1) Metadatos (organización)
+- **Título:** Por qué `ndarray` existe (memoria, dtype y vectorización)
+- **ID (opcional):** `M01-T01`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intro
+- **Dependencias:** listas de Python, loops, tipos numéricos
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **explicar** (sin jerga) por qué NumPy es más rápido que listas para operaciones numéricas **en ≤ 2 min**.
+- Al terminar, el estudiante podrá **predecir** el `dtype` resultante al crear un `np.array(...)` a partir de distintos inputs (ints/floats/mezcla) **en 5 casos**.
+- Al terminar, el estudiante podrá **elegir** entre lista vs `ndarray` dado un problema (cómputo numérico vs estructuras heterogéneas) y **justificar** la elección.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** Tus modelos (regresión/logística/redes) son multiplicaciones y sumas masivas: hacerlo con listas te hace lento y propenso a errores.
+- **Dónde encaja:** fundamento del “por qué” de vectorización, broadcasting, y producto matricial.
+
+#### 4) Mapa conceptual / conceptos clave
+- **Lista (Python):** referencias a objetos → heterogénea → overhead por elemento
+- **`ndarray` (NumPy):** buffer contiguo + `dtype` homogéneo → operaciones en C/BLAS
+- **Consecuencia:** speedup + menos bugs al operar por bloques
+
+#### 5) Definiciones y notación
+- **`dtype`:** tipo numérico almacenado en el buffer (p.ej. `float64`, `int64`).
+- **`shape`:** tupla con dimensiones (p.ej. `(n,)`, `(n, d)`).
+- **“Vectorización”:** operar sobre arrays completos evitando loops en Python.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** una lista guarda “punteros”; un `ndarray` guarda números contiguos. Leer memoria contigua y aplicar rutinas en C/BLAS suele ser 10x–100x más rápido.
+- **Paso a paso:**
+  - 1. lista: `for` + operación por elemento
+  - 2. NumPy: operación sobre el array completo
+  - 3. validación: comparar tiempos y verificar que el resultado coincide
+- **Visual recomendado:** gráfico de tiempo (ms) vs tamaño del vector (log-scale).
+
+#### 7) Ejemplos modelados
+- **Ejemplo 1:** sumar un escalar a 1e6 números (lista vs array).
+- **Ejemplo 2:** producto punto (lista vs `np.dot`).
+- **Contraejemplo:** crear un array con mezcla de números y strings → `dtype=object` → pierdes vectorización.
+
+#### 8) Práctica guiada
+- **Ejercicio A:** crea `np.array([1,2,3])` y `np.array([1,2,3.0])`. ¿Qué `dtype` obtienes?
+  - Pista: imprime `arr.dtype`.
+- **Ejercicio B:** mide tiempo de `sum([..])` vs `np.sum(np.array(..))` para `n=10^5`.
+  - Pista: usa `time.time()` o `time.perf_counter()`.
+- **Ejercicio C:** explica por escrito (5 líneas) cuándo una lista sigue siendo mejor opción.
+
+#### 9) Transferencia
+- **Actividad:** dado un “dataset” en lista de diccionarios, conviértelo a `DataFrame` y luego a `ndarray` numérico.
+- **Criterio:** no debe quedar `dtype=object` en `X`.
+
+#### 10) Evaluación formativa
+- 1. ¿Qué significa que NumPy sea “homogéneo”?
+- 2. ¿Qué desventaja tiene `dtype=object`?
+- 3. ¿Por qué el loop en Python es costoso?
+
+#### 11) Errores comunes
+- **Error:** asumir que `np.array(lista)` siempre crea floats → **Corrección:** inspeccionar `dtype`.
+- **Error:** mezclar tipos → **Corrección:** normalizar/convertir antes.
+
+#### 12) Retención
+- **Pregunta (día 2):** define `dtype` y por qué importa.
+- **Pregunta (día 7):** da un ejemplo donde lista > NumPy.
+
+#### 13) Diferenciación
+- **Principiante:** repetir el benchmark con 3 tamaños (1e3, 1e5, 1e6).
+- **Avanzado:** explicar (alto nivel) el rol de BLAS y por qué `np.dot` suele estar optimizado.
+
+#### 14) Recursos
+- NumPy “absolute beginners” (oficial)
+
+#### 15) Notas para el docente
+- **Check for understanding:** pedir que predigan `dtype` antes de imprimirlo.
+</details>
+
 ### 2. Creación de Arrays
 
 ```python
@@ -309,6 +493,75 @@ linspace = np.linspace(0, 1, 5) # [0, 0.25, 0.5, 0.75, 1]
 print(f"Shape de zeros: {zeros.shape}")  # (3, 4)
 print(f"Dtype de zeros: {zeros.dtype}")  # float64
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 2: Creación de Arrays</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Crear `ndarray` correctamente (shape, dtype, inicialización)
+- **ID (opcional):** `M01-T02`
+- **Duración estimada:** 30–45 min
+- **Nivel:** Intro
+- **Dependencias:** Tema 1 (Arrays vs Listas), noción de `shape` y `dtype`
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **crear** arrays 1D/2D con `np.array/zeros/ones/eye` y **verificar** `shape` y `dtype` **en ≤ 5 min**.
+- Al terminar, el estudiante podrá **elegir** entre `arange` y `linspace` dado un objetivo (paso fijo vs #puntos) y **justificar** la elección.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** En ML, crear tensores de parámetros (`W`, `b`) y datos sintéticos es rutina; si creas mal shapes/dtypes, los bugs aparecen tarde.
+- **Dónde encaja:** base para broadcasting, producto matricial y generación de datos.
+
+#### 4) Mapa conceptual / conceptos clave
+- `shape` → `dtype` → constructor (`zeros/ones/eye/array`) → verificación (`assert`)
+
+#### 5) Definiciones
+- **Inicializadores:** `zeros/ones/eye` crean arrays con estructuras útiles para álgebra lineal y debugging.
+- **Generadores:** `arange/linspace` construyen secuencias controladas (ojo con floats).
+
+#### 6) Explicación didáctica (2 niveles)
+- **Resumen:** decide primero la forma y el tipo; luego el constructor.
+- **Paso a paso:**
+  - 1. define el `shape`
+  - 2. define `dtype` (en ML, casi siempre float)
+  - 3. crea
+  - 4. valida `shape/dtype`
+
+#### 7) Ejemplos modelados
+- **Ejemplo 1:** `np.zeros((n, d), dtype=float)` como “placeholder” de datos.
+- **Ejemplo 2:** `np.eye(k)` para confirmar identidad.
+- **Contraejemplo:** usar `np.arange(0, 1, 0.1)` esperando incluir exactamente 1.0.
+
+#### 8) Práctica guiada
+- **Ejercicio A:** crea una matriz `(3,4)` de unos con dtype float.
+- **Ejercicio B:** crea 11 puntos entre 0 y 1 (incluyendo extremos).
+- **Ejercicio C:** crea `w` de shape `(d,)` y `b` escalar y verifica tipos.
+
+#### 9) Transferencia
+- **Actividad:** genera un dataset sintético `X` con shape `(200, 2)` y verifica `X.ndim == 2`.
+
+#### 10) Evaluación formativa
+- ¿Cuándo prefieres `linspace` sobre `arange`?
+- ¿Por qué conviene fijar `dtype=float`?
+
+#### 11) Errores comunes
+- confundir `(n,)` vs `(n,1)` al crear vectores
+- terminar con ints por no fijar dtype
+
+#### 12) Retención
+- (día 2) ¿qué shape devuelve `np.eye(3)`?
+- (día 7) diferencia práctica `arange` vs `linspace`.
+
+#### 13) Diferenciación
+- **Principiante:** escribir `shape/dtype` esperado antes de ejecutar 5 creaciones.
+- **Avanzado:** explicar el problema de floats con `arange`.
+
+#### 14) Recursos
+- NumPy “absolute beginners” (oficial)
+
+#### 15) Nota para el docente
+- Pedir predicción de `shape/dtype` antes de imprimir.
+</details>
 
 ### 3. Indexing y Slicing
 
@@ -334,6 +587,73 @@ print(matrix[0:2, 1:3])  # [[2, 3], [5, 6]] (submatriz)
 # Indexing booleano
 print(matrix[matrix > 5])  # [6, 7, 8, 9]
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 3: Indexing y Slicing</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Extraer submatrices sin loops (y sin errores de vistas/copias)
+- **ID (opcional):** `M01-T03`
+- **Duración estimada:** 45–60 min
+- **Nivel:** Intro
+- **Dependencias:** Tema 2 (creación de arrays) + noción de `shape`
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **extraer** filas, columnas y submatrices y **predecir** el `shape` resultante **en ≥ 8 de 10 casos**.
+- Al terminar, el estudiante podrá **usar** indexing booleano para filtrar valores y **explicar** por qué el resultado suele ser 1D.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** Selección de features, minibatches y splits train/val depende de indexar bien; fallar aquí produce bugs silenciosos.
+
+#### 4) Mapa conceptual / conceptos clave
+- indexado por enteros → slicing → masks booleanas → vistas/copias
+
+#### 5) Definiciones
+- **Slice:** rango semiabierto `[inicio:fin)`.
+- **Mask booleana:** array de `True/False` que filtra elementos.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Resumen:** primero predice el shape, luego indexa y valida.
+- **Paso a paso:**
+  - 1. escribe el shape esperado
+  - 2. aplica el slicing/indexing
+  - 3. valida con `assert`
+
+#### 7) Ejemplos modelados
+- **Ejemplo 1:** `X[0]` vs `X[0:1]` (diferencia de shapes).
+- **Ejemplo 2:** `X[:, j]` (columna) y por qué queda `(n,)`.
+- **Contraejemplo:** modificar un slice pensando que es copia (conecta con la sección de debugging del módulo).
+
+#### 8) Práctica guiada
+- **Ejercicio A:** toma un minibatch `X[:32]`.
+- **Ejercicio B:** filtra valores en un vector `v` que estén en `[a,b]`.
+- **Ejercicio C:** extrae una submatriz y predice su shape antes.
+
+#### 9) Transferencia
+- **Actividad:** implementa split 80/20 por slicing y valida shapes de `X_train/X_val`.
+
+#### 10) Evaluación formativa
+- ¿Por qué `X[X>0]` suele ser 1D?
+- Diferencia entre `X[0]` y `X[0:1]`.
+
+#### 11) Errores comunes
+- olvidar paréntesis al usar `&` en masks
+- asumir que slices son copias
+
+#### 12) Retención
+- (día 2) define “slice semiabierto”.
+- (día 7) ¿cuándo usar `.copy()`?
+
+#### 13) Diferenciación
+- **Principiante:** 10 predicciones de shape.
+- **Avanzado:** verificar vistas/copias con `np.shares_memory`.
+
+#### 14) Recursos
+- NumPy indexing (oficial)
+
+#### 15) Nota para el docente
+- Pedir “shape antes de ejecutar” + asserts.
+</details>
 
 ### 4. Broadcasting
 
@@ -391,6 +711,73 @@ print(matrix + vector)
 # Las dimensiones deben ser iguales O una de ellas debe ser 1
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 4: Broadcasting</strong></summary>
+
+#### 1) Metadatos
+- **Título:** Reglas de broadcasting (sumas/restas por columna/fila)
+- **ID (opcional):** `M01-T04`
+- **Duración estimada:** 60–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** Tema 2 (shape) y Tema 3 (indexing)
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **predecir** el shape resultante de operaciones típicas (`(n,d)+(d,)`, `(n,1)+(1,d)`) **en ≥ 8 de 10 casos**.
+- Al terminar, el estudiante podrá **normalizar** por columna `X_norm = (X - mean) / (std + eps)` conservando shape `(n,d)`.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** Broadcasting es base de normalización, bias en redes (`+b`) y fórmulas vectorizadas; también es fuente #1 de bugs silenciosos.
+
+#### 4) Mapa conceptual / conceptos clave
+- compatibilidad de shapes (alineación por el final) → dimensión 1 “estirable” → `keepdims=True` para control
+
+#### 5) Definición
+- **Broadcasting:** regla que permite operar arrays de distinto shape expandiendo virtualmente dimensiones de tamaño 1 sin copiar datos.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Resumen:** compara dimensiones desde el final; si son iguales o alguna es 1, son compatibles.
+- **Paso a paso:**
+  - 1. alinea shapes por la derecha
+  - 2. valida compatibilidad por eje
+  - 3. el resultado toma el máximo por eje
+
+#### 7) Ejemplos modelados
+- **Ejemplo 1:** `(3,1)+(1,3) -> (3,3)`.
+- **Ejemplo 2:** `X (n,d) - mean (d,)` para centrar.
+- **Contraejemplo:** usar `np.mean(X)` (escalar) cuando querías `axis=0` (vector de size d).
+
+#### 8) Práctica guiada
+- **Ejercicio A:** suma un vector `(d,)` a cada fila de `X (n,d)`.
+- **Ejercicio B:** calcula `mu = X.mean(axis=0, keepdims=True)` y resta `X - mu`.
+- **Ejercicio C:** implementa z-score por columna con `eps`.
+
+#### 9) Transferencia
+- **Actividad:** implementa `predict_linear(X,w,b)` que soporte batch: `(n,d)@(d,) + b`.
+- **Criterio:** salida con shape `(n,)`.
+
+#### 10) Evaluación formativa
+- ¿Qué significa “alineación por la derecha”?
+- ¿Qué hace `keepdims=True` y por qué ayuda?
+
+#### 11) Errores comunes
+- olvidar `axis=` en agregaciones
+- broadcasting “funciona” pero está mal (promedio global)
+
+#### 12) Retención
+- (día 2) predice shapes de 5 operaciones.
+- (día 7) describe un bug de broadcasting y cómo lo detectarías.
+
+#### 13) Diferenciación
+- **Principiante:** practicar `(n,d)+(d,)` y `(n,d)-(d,)`.
+- **Avanzado:** justificar por qué `X - X.mean(axis=0)` funciona.
+
+#### 14) Recursos
+- NumPy broadcasting rules (oficial)
+
+#### 15) Nota para el docente
+- Repetir la regla: “shape antes de ejecutar” + asserts.
+</details>
+
 ### 5. Agregaciones y Ejes
 
 #### Visualización: ¿qué “colapsa” cada eje?
@@ -438,6 +825,92 @@ print(np.sum(matrix, axis=1))  # [6, 15]
 # └─────────────┘
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 5: Agregaciones y Ejes</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Agregaciones con `axis` (sum/mean/std) y control de shapes
+- **ID (opcional):** `M01-T05`
+- **Duración estimada:** 60–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** Tema 4 (Broadcasting), noción de `shape` y batch `(n,d)`
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **calcular** agregaciones globales y por eje (`axis=0/1`) y **predecir** el shape resultante **en ≥ 8 de 10 casos**.
+- Al terminar, el estudiante podrá **usar** `keepdims=True` para conservar dimensiones y **justificar** cuándo conviene (para broadcasting explícito) **en un ejemplo**.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** Normalización por columna, cálculo de métricas y centrado de datos dependen de agregaciones correctas; un `axis` mal puesto produce errores silenciosos.
+- **Dónde encaja:** Después de broadcasting, antes de producto matricial y entrenamiento (donde normalizas features y evalúas resultados).
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- `X.shape=(n,d)`
+  - agregación global → escalar
+  - `axis=0` → salida por columna (`(d,)` o `(1,d)`)
+  - `axis=1` → salida por fila (`(n,)` o `(n,1)`)
+  - `keepdims=True` → habilita broadcasting controlado
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- **`axis`:** dimensión que se reduce/colapsa.
+- **`keepdims=True`:** conserva la dimensión reducida con tamaño 1 (facilita broadcasting).
+- **Notación:** `X∈R^{n×d}`, `μ = mean(X, axis=0)`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición (2–3 frases):** `axis` te dice “qué dirección colapsas”. Si colapsas filas (`axis=0`), te queda una salida por columna. Si colapsas columnas (`axis=1`), te queda una salida por fila.
+- **Paso a paso:**
+  - 1. escribe el shape de entrada
+  - 2. decide si quieres resultado “por columna” o “por fila”
+  - 3. elige `axis`
+  - 4. si vas a restar/dividir a `X`, evalúa `keepdims=True`
+- **Visual recomendado:** matriz dibujada con flechas `axis=0` (↓) y `axis=1` (→).
+
+#### 7) Ejemplos modelados (worked examples)
+- **Ejemplo 1 — sencillo:** `X.sum(axis=0)` y `X.sum(axis=1)` y verificación de shapes.
+- **Ejemplo 2 — realista:** estandarización por columna con `mu = X.mean(axis=0, keepdims=True)`.
+- **Contraejemplo:** usar `X.mean()` (global) cuando se quería media por feature.
+
+#### 8) Práctica guiada (scaffolded)
+- **Ejercicio 1:** dado `X (4,3)`, calcula `X.mean(axis=0)` y predice shape.
+- **Ejercicio 2:** usa `keepdims=True` y comprueba que `X - mu` conserva shape.
+- **Ejercicio 3:** calcula `std` por columna, agrega `eps` y normaliza.
+- **Ejercicio 4:** verifica con `assert` que la media por columna de `X_norm` es ~0.
+
+#### 9) Práctica independiente / transferencia
+- **Mini-proyecto:** implementa `standardize_columns(X, eps=1e-8)` que retorne `X_norm, mu, std`.
+- **Entrega:** función + asserts de shape + breve explicación del uso de `axis`.
+- **Rúbrica corta:** precisión (axis/shapes), aplicación (normaliza bien), comunicación (explica keepdims).
+
+#### 10) Evaluación formativa (rápida)
+- **Mini-quiz (5):**
+  - 1. ¿Qué devuelve `X.mean(axis=0)` si `X` es `(n,d)`?
+  - 2. ¿Qué hace `keepdims=True`?
+  - 3. Diferencia entre `axis=0` y `axis=1`.
+  - 4. ¿Por qué `X.mean()` puede ser un bug?
+  - 5. ¿Qué shape debe tener `mu` para restarse a `X` sin ambigüedad?
+
+#### 11) Errores comunes y estrategias correctivas
+- **Error:** confundir `axis=0`/`axis=1` → **Corrección:** “axis=0 reduce filas; axis=1 reduce columnas”.
+- **Error:** usar agregación global → **Corrección:** forzar `axis=` y revisar shape.
+- **Error:** broadcasting accidental → **Corrección:** usar `keepdims=True` + asserts.
+- **Error:** normalizar sin `eps` → **Corrección:** sumar `eps` a `std`.
+- **Error:** no validar resultado → **Corrección:** `assert np.allclose(X_norm.mean(axis=0), 0, atol=...)`.
+
+#### 12) Apoyos cognitivos y retención
+- **Recuperación (día 2):** define `axis` con un ejemplo de `(2,3)`.
+- **Recuperación (día 7):** ¿cuándo usarías `keepdims=True`?
+- **Checklist:** “shape → axis → keepdims → assert”.
+
+#### 13) Diferenciación
+- **Principiante:** practicar solo sum/mean con shapes pequeñas (2x3, 3x2).
+- **Avanzado:** derivar por qué `keepdims` evita bugs en pipelines vectorizados.
+
+#### 14) Recursos y materiales
+- Documentación NumPy sobre reducciones (`sum`, `mean`, `std`) y `axis`.
+
+#### 15) Notas para el docente / facilitador
+- Pide predicción de shape antes de ejecutar; usa 5 casos rápidos en pizarra.
+</details>
+
 ### 6. Operaciones Matriciales
 
 ```python
@@ -466,6 +939,86 @@ print(A.T)
 #  [2, 4]]
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 6: Operaciones Matriciales</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Operaciones elemento a elemento vs producto matricial (`@`)
+- **ID (opcional):** `M01-T06`
+- **Duración estimada:** 60–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** Tema 2 (shape), Tema 4 (broadcasting), Tema 5 (axis)
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **distinguir** `A * B` (Hadamard) de `A @ B` (matmul) y **predecir** el shape de salida **en ≥ 8 de 10 casos**.
+- Al terminar, el estudiante podrá **implementar** una predicción lineal `y_hat = X @ w + b` y **verificar** shapes correctos con `assert`.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** El corazón del ML clásico es álgebra lineal: regresión, logística y redes neuronales dependen de productos matriciales.
+- **Dónde encaja:** puente directo a Módulo 02 (Álgebra lineal) y Módulo 05 (regresión/logística).
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- `A * B` (element-wise) → requiere mismo shape o broadcasting
+- `A @ B` (matmul) → requiere compatibilidad de dimensiones internas
+- transpuesta `A.T` → cambia ejes
+- caso ML: `(n,d) @ (d,) -> (n,)`
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- **Hadamard:** `(A * B)_{ij} = A_{ij}·B_{ij}`
+- **Matmul:** si `A∈R^{n×d}` y `B∈R^{d×k}`, entonces `A@B ∈ R^{n×k}`.
+- **Transpuesta:** si `A∈R^{n×d}`, entonces `A^T ∈ R^{d×n}`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Intuición:** `@` combina features (columnas) para producir nuevas representaciones; `*` solo “escala” elemento por elemento.
+- **Paso a paso:**
+  - 1. escribe shapes
+  - 2. para `@`, verifica que las dimensiones internas coinciden
+  - 3. predice shape de salida
+  - 4. valida con asserts
+- **Visual recomendado:** diagrama de dimensiones: `(n,d)@(d,k)->(n,k)`.
+
+#### 7) Ejemplos modelados (worked examples)
+- **Ejemplo 1 — sencillo:** `A (2,2) @ B (2,2)` y contraste con `A * B`.
+- **Ejemplo 2 — realista:** `y_hat = X @ w + b` (regresión lineal) con `X (n,d)`.
+- **Contraejemplo:** intentar `A @ B` con shapes incompatibles y “arreglar” a ciegas sin revisar dimensiones.
+
+#### 8) Práctica guiada (scaffolded)
+- **Ejercicio 1:** predice shapes de 6 productos (incluye 1D vs 2D).
+- **Ejercicio 2:** implementa `y_hat = X @ w + b` y valida `y_hat.shape == (n,)`.
+- **Ejercicio 3:** crea `W (d,k)` y calcula `Z = X @ W` y valida `Z.shape == (n,k)`.
+
+#### 9) Práctica independiente / transferencia
+- **Mini-proyecto:** implementa `linear_layer(X, W, b)` con asserts de shapes.
+- **Entrega:** función + tests mínimos (3 asserts) + explicación breve.
+
+#### 10) Evaluación formativa
+- ¿Qué condición de shapes exige `A @ B`?
+- ¿Qué operación usarías para aplicar pesos por feature a una matriz: `*` o `@`?
+- ¿Qué devuelve `A.T`?
+
+#### 11) Errores comunes y estrategias correctivas
+- **Error:** confundir `*` con `@` → **Corrección:** “`@` mezcla columnas; `*` no”.
+- **Error:** `X @ w` devuelve `(n,)` pero esperabas `(n,1)` → **Corrección:** decide convención y usa `reshape(-1,1)` si hace falta.
+- **Error:** `np.dot` con 1D cambia semántica → **Corrección:** preferir `@` y controlar dims.
+- **Error:** shapes incompatibles → **Corrección:** escribir `(n,d)@(d,k)` en papel antes.
+- **Error:** broadcasting accidental con `b` → **Corrección:** asegurar `b.shape == (k,)` o `(1,k)`.
+
+#### 12) Apoyos cognitivos y retención
+- (día 2) predice shape de `(50,3)@(3,)` y `(50,3)@(3,2)`.
+- (día 7) explica diferencia `Hadamard` vs `matmul` en 3 líneas.
+- checklist: “internas coinciden → salida externa”.
+
+#### 13) Diferenciación
+- **Principiante:** solo 2D×2D con ejemplos pequeños.
+- **Avanzado:** discutir cómo BLAS acelera `matmul`.
+
+#### 14) Recursos y materiales
+- NumPy `matmul` / operador `@` (docs) + introducción a álgebra lineal (M02).
+
+#### 15) Notas para el docente / facilitador
+- Hacer que el estudiante diga en voz alta: “(n,d)@(d,k)->(n,k)” antes de ejecutar.
+</details>
+
 ### 7. Vectorización: Eliminar Loops
 
 ```python
@@ -489,6 +1042,85 @@ data = np.random.randn(1000000)
 # La versión vectorizada es ~100x más rápida
 normalized = normalize_vectorized(data)
 ```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 7: Vectorización (Eliminar Loops)</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Vectorización en NumPy: pensar en batches, no en iteraciones
+- **ID (opcional):** `M01-T07`
+- **Duración estimada:** 60–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** Tema 1 (ndarray), Tema 5 (axis)
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **reescribir** una operación con loops en una versión vectorizada y **verificar** igualdad numérica con `np.allclose`.
+- Al terminar, el estudiante podrá **explicar** por qué la versión vectorizada suele ser más rápida (loops en C/BLAS) **en ≤ 2 min**.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** Todos los algoritmos del Pathway se vuelven impracticables si operas en Python puro elemento a elemento.
+- **Dónde encaja:** base para backprop, gradiente, métricas y entrenamiento batch.
+
+#### 4) Mapa conceptual / conceptos clave
+- loop Python → overhead
+- ufuncs/BLAS → loops internos en C
+- vectorización → operar por bloques
+- validación → `allclose` + asserts de shape
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- **Vectorización:** expresar el cálculo como operaciones sobre arrays completos.
+- **Normalización (z-score):** `x_norm = (x - mean) / std`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Resumen:** “piensa en el batch” (`(n,d)`), no en `for i in range(n)`.
+- **Paso a paso:**
+  - 1. define entrada como `np.ndarray`
+  - 2. escribe el cálculo con operaciones sobre arrays
+  - 3. valida con asserts y un test de equivalencia
+- **Visual recomendado:** gráfica de tiempo vs tamaño (log) comparando loop vs vectorizado.
+
+#### 7) Ejemplos modelados
+- **Ejemplo 1 — sencillo:** normalización 1D con `np.mean/np.std`.
+- **Ejemplo 2 — realista:** normalización por columnas de `X (n,d)` con `axis=0`.
+- **Contraejemplo:** vectorizar sin controlar `axis`, obteniendo estadísticas globales por accidente.
+
+#### 8) Práctica guiada
+- **Ejercicio 1:** implementa suma de dos vectores (loop vs vectorizado) y compara.
+- **Ejercicio 2:** implementa distancia L2 (loop vs vectorizado) y compara.
+- **Ejercicio 3:** normaliza por columna una matriz y valida `mean≈0`, `std≈1`.
+- **Pista:** usa `axis=0` y `keepdims=True` si vas a restar/dividir a `X`.
+
+#### 9) Transferencia
+- **Actividad:** implementa `minibatch_mean(X, batch_size)` sin loops sobre features (solo batch slicing permitido).
+- **Entrega:** función + asserts de shape + breve explicación.
+
+#### 10) Evaluación formativa
+- ¿Qué parte del cómputo se ejecuta en C cuando usas NumPy?
+- ¿Qué diferencia hay entre `np.mean(X)` y `np.mean(X, axis=0)`?
+- ¿Qué valida `np.allclose`?
+
+#### 11) Errores comunes
+- **Error:** “vectoricé pero está mal” → **Corrección:** tests de equivalencia y asserts de shape.
+- **Error:** olvido de `axis` → **Corrección:** imprimir shapes de estadísticas.
+- **Error:** overflow/underflow en operaciones → **Corrección:** técnicas de estabilidad (p.ej. softmax estable en Tema 8).
+- **Error:** mezclar listas con arrays → **Corrección:** normalizar inputs a `np.asarray`.
+- **Error:** medir tiempos con ruido → **Corrección:** repetir y promediar.
+
+#### 12) Retención
+- (día 2) explica “batch vs iteración” en 3 líneas.
+- (día 7) reescribe un loop típico a vectorizado.
+- checklist: “shape → axis → vectorizar → validar”.
+
+#### 13) Diferenciación
+- **Principiante:** solo 1D (vectores).
+- **Avanzado:** vectorizar parte de un algoritmo (p.ej. predicción lineal sobre batch).
+
+#### 14) Recursos
+- NumPy ufuncs y broadcasting (docs).
+
+#### 15) Nota docente
+- Insistir en: “primero correctness, luego performance”.
+</details>
 
 ### 8. Funciones Universales (ufuncs)
 
@@ -516,11 +1148,84 @@ print(sigmoid(np.array([-2, -1, 0, 1, 2])))
 # [0.119, 0.269, 0.5, 0.731, 0.881]
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 8: Funciones Universales (ufuncs)</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** ufuncs: matemáticas elemento a elemento (base de activaciones y pérdidas)
+- **ID (opcional):** `M01-T08`
+- **Duración estimada:** 60–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** Tema 7 (vectorización), noción de `dtype`
+
+#### 2) Objetivos de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **identificar** cuándo una función es “element-wise” y **predecir** que preserva el `shape`.
+- Al terminar, el estudiante podrá **implementar** `sigmoid` y `relu` vectorizadas y **verificar** propiedades básicas con `assert`.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** Activaciones, transformaciones y parte de las pérdidas son ufuncs: sin esto, redes neuronales no se entienden.
+- **Dónde encaja:** M07 (Deep Learning) y M05 (logística usa sigmoid).
+
+#### 4) Mapa conceptual / conceptos clave
+- ufunc (`exp/log/sqrt/max`) → opera por elemento
+- estabilidad numérica → evitar overflow
+- activaciones → `sigmoid`, `relu`, `softmax`
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- **Sigmoid:** `σ(x)=1/(1+e^{-x})`.
+- **ReLU:** `max(0,x)`.
+- **Softmax (idea):** `exp(x)/sum(exp(x))` (con shift por estabilidad).
+
+#### 6) Explicación didáctica (2 niveles)
+- **Resumen:** una ufunc toma un array y devuelve otro array del mismo shape (salvo agregaciones).
+- **Paso a paso:**
+  - 1. convierte input con `np.asarray`
+  - 2. aplica ufuncs
+  - 3. valida rango/propiedades (p.ej. sigmoid en (0,1))
+- **Visual recomendado:** curva sigmoid y ReLU (gráfica 2D) y un histograma antes/después.
+
+#### 7) Ejemplos modelados
+- **Ejemplo 1:** aplicar `np.exp` a un vector y ver saturación.
+- **Ejemplo 2:** softmax estable con `x - x.max()`.
+- **Contraejemplo:** softmax sin estabilización con valores grandes.
+
+#### 8) Práctica guiada
+- **Ejercicio 1:** implementa `softplus = log(1+exp(x))` con estabilidad.
+- **Ejercicio 2:** aplica ReLU a un batch `(n,d)` y valida que no cambia shape.
+- **Ejercicio 3:** verifica que `sigmoid(0)=0.5`.
+
+#### 9) Transferencia
+- **Actividad:** implementa “capa” `y = relu(X @ W + b)` con asserts de shapes.
+
+#### 10) Evaluación formativa
+- ¿Qué parte del cómputo se ejecuta en C cuando usas NumPy?
+- ¿Qué propiedad del sigmoid ayuda en clasificación?
+- ¿Qué pasa con `dtype=int` si haces operaciones in-place?
+
+#### 11) Errores comunes
+- overflow en `exp`
+- asumir que ufuncs cambian shape
+- usar `sum` sin `axis`
+
+#### 12) Retención
+- (día 2) define sigmoid y su rango.
+- (día 7) explica softmax estable.
+
+#### 13) Diferenciación
+- **Principiante:** graficar ReLU y sigmoid.
+- **Avanzado:** derivar qué pasa con gradientes en saturación (intuición).
+
+#### 14) Recursos
+- NumPy ufuncs + notas de estabilidad numérica.
+
+#### 15) Nota docente
+- Enfatiza “estabilidad primero”: shift en softmax, eps en divisiones.
+</details>
+
 ### 9. Reshape y Manipulación de Forma
 
 ```python
 import numpy as np  # Importa NumPy para crear arrays y cambiar su forma (reshape/flatten)
-
 # Crear array 1D
 a = np.arange(12)  # Crea un vector 1D con 12 enteros consecutivos (0..11)
 
@@ -542,7 +1247,74 @@ print(flat.shape)  # Comprueba que vuelve a tener 12 elementos en 1D: shape (12,
 # -1 para inferir dimensión automáticamente
 auto = a.reshape(4, -1)  # Usa -1 para que NumPy infiera la dimensión faltante: (4, 3)
 auto = a.reshape(-1, 6)  # Infiera la primera dimensión para que el total sea 12: (2, 6)
-```
+
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 9: Reshape y Manipulación de Forma</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** Control de `shape`: `reshape`, `flatten`, `transpose` y contratos
+- **ID (opcional):** `M01-T09`
+- **Duración estimada:** 60–120 min
+- **Nivel:** Intermedio
+- **Dependencias:** Temas 2, 4, 6
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **transformar** shapes entre 1D/2D/3D con `reshape` sin cambiar `size` y **verificarlo** con `assert`.
+- Al terminar, el estudiante podrá **corregir** `(n,)` vs `(n,1)` usando `reshape` o `np.newaxis` en un caso dado.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** La mayoría de bugs en ML desde cero son bugs de `shape`. Si controlas shapes, controlas el pipeline.
+- **Dónde encaja:** preparación para capas lineales, batches y tensores multi-eje.
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- `size` (invariante)
+- `reshape` (misma cantidad de elementos)
+- `-1` (inferencia)
+- `flatten` (copia)
+- `transpose` (reordena ejes)
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- **Invariante:** `a.size` se conserva al hacer `reshape`.
+- **Notación:** batches típicos en ML: `X.shape=(n,d)`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Resumen corto:** `reshape` cambia la interpretación del buffer, no el contenido.
+- **Paso a paso:** `size → shape objetivo → reshape → assert`.
+- **Visual recomendado:** diagrama “vector → matriz → tensor”.
+
+#### 7) Ejemplos modelados
+- **Ejemplo 1:** `(12,) → (3,4)`.
+- **Ejemplo 2:** `X_flat (n,784) ↔ X_img (n,28,28)`.
+- **Contraejemplo:** “aplanar” para evitar un error sin entender el contrato.
+
+#### 8) Práctica guiada
+- 3 ejercicios de predicción de shape + 3 ejercicios de corrección con `assert`.
+
+#### 9) Transferencia
+- Implementa `ensure_2d(X)` con casos `(n,)` y `(n,d)`.
+
+#### 10) Evaluación
+- ¿Qué garantiza el invariante `size`?
+- ¿Qué hace `-1`?
+
+#### 11) Errores comunes
+- producto de dimensiones incorrecto
+- confundir vector columna vs fila
+
+#### 12) Retención
+- (día 2) predice shapes de 5 reshapes.
+- (día 7) explica el invariante `size`.
+
+#### 13) Diferenciación
+- Principiante: 1D↔2D.
+- Avanzado: tensores tipo imagen.
+
+#### 14) Recursos
+- NumPy docs: `reshape/transpose/flatten/ravel`.
+
+#### 15) Nota docente
+- “Entrada shape → salida shape” antes de ejecutar.
+</details>
 
 ### 9.1 OOP para ML (v5.1): mini-framework `Tensor`
 
@@ -623,6 +1395,77 @@ except ValueError:  # NumPy lanza ValueError ante incompatibilidad de shapes
 
 ```
 
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 9.1: OOP para ML (mini-framework `Tensor`)</strong></summary>
+
+#### 1) Metadatos (1–2 líneas)
+- **Título:** OOP aplicada a tensores: estado, operadores y contratos
+- **ID (opcional):** `M01-T09_1`
+- **Duración estimada:** 3–6 horas
+- **Nivel:** Intermedio
+- **Dependencias:** Temas 2, 6 y 9
+
+#### 2) Objetivo(s) de aprendizaje (medibles)
+- Al terminar, el estudiante podrá **implementar** una clase `Tensor` con estado mínimo (`data`, `shape`) y **verificar** invariantes con `assert`.
+- Al terminar, el estudiante podrá **explicar** cómo Python resuelve `a + b` y `A @ x` mediante `__add__` y `__matmul__`.
+
+#### 3) Relevancia y contexto
+- **¿Por qué importa?** Es el puente entre NumPy “suelo” y los patrones reales de frameworks (módulos con estado + operadores + debugging).
+- **Dónde encaja:** prepara para capas (`Linear`), composición y validación temprana de shapes.
+
+#### 4) Mapa conceptual / lista de conceptos clave
+- clase vs instancia
+- `self` y estado (`self.data`, `self.shape`)
+- dunder methods: `__init__`, `__add__`, `__matmul__`, `__repr__`
+- `NotImplemented` (protocolo de operadores)
+- contrato de shapes (fallar temprano)
+
+#### 5) Definiciones, notación y fórmulas esenciales
+- **Estado:** datos guardados en el objeto (persisten entre llamadas).
+- **Operador `@`:** producto matricial (matmul). Para `A.shape=(m,n)` y `x.shape=(n,)`, salida `y.shape=(m,)`.
+
+#### 6) Explicación didáctica (2 niveles)
+- **Resumen corto:** un “tensor” mínimo es un contenedor con *datos + shape* y métodos que implementan operaciones seguras.
+- **Paso a paso:** normaliza entrada → guarda `shape` → implementa operadores → valida con `assert` → mejora `__repr__`.
+
+#### 7) Ejemplos modelados
+- `Tensor([1,2,3]) + Tensor([10,20,30])` (element-wise)
+- `Tensor([[1,2],[3,4]]) @ Tensor([1,1])` (matmul)
+- **Contraejemplo:** permitir `@` sin validar dimensiones y “debuggear” el error tarde.
+
+#### 8) Práctica guiada
+- Agrega `assert self.data.ndim in {1,2}` y prueba casos válidos/invalidos.
+- Extiende `__repr__` para mostrar `dtype` y `ndim`.
+
+#### 9) Práctica independiente / transferencia
+- Implementa `__mul__` (element-wise) y prueba broadcasting controlado.
+- Implementa `sum(axis=None)` para conectar con agregaciones del Tema 5.
+
+#### 10) Evaluación (formativa y sumativa)
+- **Formativa:** dado un snippet, predice qué método dunder se ejecuta.
+- **Sumativa:** implementa `Tensor` + tests con 8–10 `assert` incluyendo 2 casos de error.
+
+#### 11) Errores comunes
+- confundir “matmul” con multiplicación elemento a elemento
+- no devolver `NotImplemented` y romper compatibilidad con otros tipos
+- mutar `self.data` sin intención (efectos colaterales)
+
+#### 12) Apoyos cognitivos / retención
+- regla mental: **estado = lo que necesito para debuggear** (shape, dtype).
+- checklist: *entrada → shape → operación → salida*.
+
+#### 13) Diferenciación
+- **Principiante:** solo `__init__` + `__add__`.
+- **Avanzado:** mensajes de error con shapes; soporte para `other` array-like.
+
+#### 14) Recursos
+- Data model de Python (dunder methods) y referencia de `operator`.
+- NumPy: guía de `matmul` y broadcasting.
+
+#### 15) Nota para el facilitador
+- Pide que el alumno escriba primero el “contrato” (shapes esperados) antes de tocar el código.
+</details>
+
 ### 9.2 OOP para Científicos (ML-first): `__call__`, `__repr__`, `dataclasses`, y debugging
 
 La meta aquí NO es “aprender clases por aprender clases”, sino entrenar los mismos reflejos que usarás en PyTorch/Keras:
@@ -636,19 +1479,13 @@ La meta aquí NO es “aprender clases por aprender clases”, sino entrenar los
 
 ```python
 from dataclasses import dataclass  # dataclass: clase “contenedor” para configs, con menos boilerplate
-
+import numpy as np
 
 @dataclass(frozen=True)  # frozen=True: hace la config inmutable (evita cambiar hiperparámetros por accidente)
-class LinearConfig:  # Config mínima para una capa lineal (entrada/salida)
-    in_features: int  # Dimensión D de entrada (features)
-    out_features: int  # Dimensión K de salida (unidades)
-    seed: int = 0  # Semilla para inicialización reproducible de pesos
-```
-
-#### 9.2.2 `__call__`: capas como funciones (estilo PyTorch)
-
-```python
-import numpy as np  # NumPy: base para tensores y álgebra lineal
+class LinearConfig:  # Config de una capa lineal
+    in_features: int  # D: número de features de entrada
+    out_features: int  # K: número de unidades de salida
+    seed: int = 0  # Semilla para inicialización reproducible
 
 
 class Linear:  # “Capa” lineal: implementa y = xW + b
@@ -704,158 +1541,59 @@ Y = layer(X)  # Llamamos como función (gracias a __call__)
 assert Y.shape == (5, 3)  # Verificamos el contrato de salida (N,K)
 ```
 
-#### 9.2.3 Debugging con VS Code (inspección de NumPy en vivo)
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 9.2: OOP ML-first</strong></summary>
 
-Flujo recomendado (sin adivinar):
+#### 1) Metadatos
+- **Título:** `__call__`, `__repr__`, configs y debugging por invariantes
+- **ID (opcional):** `M01-T09_2`
+- **Duración estimada:** 3–6 horas
+- **Nivel:** Intermedio
+- **Dependencias:** 9.1, 6
 
-- **Poner breakpoint:** dentro de `__call__` justo antes/después de `y = x @ self.W`.
-- **Inspeccionar variables:** `x.shape`, `x.dtype`, `W.shape`, `y.shape`.
-- **Revisar broadcasting:** confirmar que `b.shape == (K,)`.
-- **Validar invariantes:** si una `assert` falla, ES una señal de bug real (no la “apagues”).
+#### 2) Objetivos
+- construir módulos invocables y validar shapes/dtypes.
+- usar `dataclass(frozen=True)` para reproducibilidad.
 
-Si no quieres usar UI todavía, puedes forzar una pausa con `breakpoint()`:
+#### 3) Relevancia
+- replica el patrón de frameworks (PyTorch/Keras).
 
-```python
-import numpy as np  # NumPy para crear arrays de prueba
+#### 4) Conceptos clave
+- config → estado → contrato (`__call__`) → cómputo (`forward`).
 
+#### 5) Definiciones
+- objeto invocable.
 
-X = np.random.randn(2, 4).astype(float)  # Creamos un batch pequeño para inspección manual
-breakpoint()  # Pausa aquí en modo debug para inspeccionar X y sus propiedades
-```
+#### 6) Didáctica
+- separar responsabilidades y fallar temprano.
 
-#### 9.2.4 OOP “real” estilo PyTorch: `Module` + `forward()` (por qué existe `__call__`)
+#### 7) Ejemplos
+- `Linear` + `Sequential`.
 
-En PyTorch, tú implementas `forward()`, pero el framework invoca `__call__()` y te da:
+#### 8) Práctica guiada
+- forzar error de shape y mejorar mensajes.
 
-- validaciones
-- hooks
-- tracing
-- consistencia
+#### 9) Transferencia
+- MLP mínimo forward-only.
 
-Aquí construimos un mini-esqueleto para internalizar esa idea.
+#### 10) Evaluación
+- ¿Qué valida `__call__`?
 
-```python
-from dataclasses import dataclass  # dataclass: define configs explícitas sin escribir boilerplate
-from typing import List  # List: anotar listas de capas (composición)
+#### 11) Errores comunes
+- no validar invariantes.
 
-import numpy as np  # NumPy: tensores y operaciones vectorizadas
+#### 12) Retención
+- (día 2) lista 3 invariantes.
 
+#### 13) Diferenciación
+- avanzado: hooks/logs.
 
-@dataclass(frozen=True)  # frozen=True: evita mutar hiperparámetros en caliente (debug más confiable)
-class LinearConfig:  # Config de una capa lineal
-    in_features: int  # D: número de features de entrada
-    out_features: int  # K: número de unidades de salida
-    seed: int = 0  # Semilla para inicialización reproducible
+#### 14) Recursos
+- dataclasses + lectura conceptual `nn.Module`.
 
-
-class Module:  # Base de “módulo” (similar a nn.Module en espíritu)
-    def __call__(self, x: np.ndarray) -> np.ndarray:  # Permite usar módulos como funciones: y = m(x)
-        # Precondición 1: en este mini-framework, todo lo que pasa son ndarrays
-        assert isinstance(x, np.ndarray), f"x debe ser np.ndarray, recibido {type(x)}"  # Falla temprano
-
-        # Precondición 2: por convención en ML trabajamos con batch: al menos 1 dimensión
-        assert x.ndim >= 1, f"x.ndim debe ser >=1, recibido ndim={x.ndim}"  # Sanidad básica
-
-        # Delegamos la computación real a forward() (tu lógica)
-        y = self.forward(x)  # forward define el “cálculo” del módulo
-
-        # Postcondición: forward siempre debe devolver np.ndarray
-        assert isinstance(y, np.ndarray), f"forward() debe devolver np.ndarray, recibido {type(y)}"  # Contrato
-
-        return y  # El resultado se devuelve al caller
-
-    def forward(self, x: np.ndarray) -> np.ndarray:  # Método a implementar en subclases
-        raise NotImplementedError("Implementa forward() en la subclase")  # Obligatorio: cada capa define su forward
-
-    def __repr__(self) -> str:  # Debug minimal: nombre de clase
-        return f"{self.__class__.__name__}()"  # Representación corta y consistente
-
-
-class Linear(Module):  # Capa lineal: y = xW + b
-    def __init__(self, cfg: LinearConfig):  # Constructor con config explícita
-        self.cfg = cfg  # Guardamos config como estado (para logs y debugging)
-
-        rng = np.random.default_rng(cfg.seed)  # RNG moderno controlado por semilla
-
-        # W: (D, K) donde D=entrada y K=salida
-        self.W = rng.standard_normal((cfg.in_features, cfg.out_features)).astype(float)  # Pesos iniciales
-
-        # b: (K,) para que se sume por broadcasting a cada fila de (N,K)
-        self.b = np.zeros((cfg.out_features,), dtype=float)  # Bias en 0
-
-    def forward(self, x: np.ndarray) -> np.ndarray:  # Forward real de la capa lineal
-        # Assert shape: x debe ser (N, D)
-        assert x.ndim == 2, f"Linear espera x 2D (N,D). Recibido shape={x.shape}"  # Disciplina de batch
-
-        # Assert D: la segunda dimensión debe ser D
-        assert x.shape[1] == self.cfg.in_features, (
-            f"D mismatch: x.shape[1]={x.shape[1]} pero in_features={self.cfg.in_features}"
-        )  # Evita multiplicación inválida
-
-        # Matmul: (N,D) @ (D,K) = (N,K)
-        y = x @ self.W  # Proyección lineal
-
-        # Bias: (N,K) + (K,) -> (N,K) por broadcasting (b se repite N veces)
-        y = y + self.b  # Traslación por unidad
-
-        # Assert salida: (N,K)
-        assert y.shape == (x.shape[0], self.cfg.out_features), (
-            f"Salida mal shapeada: y.shape={y.shape}, esperado={(x.shape[0], self.cfg.out_features)}"
-        )  # Contrato explícito
-
-        return y  # Retorna activaciones lineales
-
-    def __repr__(self) -> str:  # Debug rico: muestra shapes y dtypes
-        return (
-            "Linear("  # Nombre de clase
-            f"in={self.cfg.in_features}, out={self.cfg.out_features}, "  # Hiperparámetros
-            f"W.shape={self.W.shape}, b.shape={self.b.shape}, "  # Estado
-            f"W.dtype={self.W.dtype}, b.dtype={self.b.dtype}"  # Dtypes
-            ")"
-        )  # String único para inspección
-
-
-class ReLU(Module):  # Activación ReLU: max(0, x)
-    def forward(self, x: np.ndarray) -> np.ndarray:  # ReLU no cambia shape, solo valores
-        # Assert: x debe ser array numérico
-        assert np.issubdtype(x.dtype, np.number), f"ReLU espera dtype numérico, recibido {x.dtype}"  # Sanidad
-
-        # np.maximum opera elemento a elemento (vectorizado)
-        return np.maximum(0.0, x).astype(float)  # Devuelve array con negativos recortados a 0
-
-
-class Sequential(Module):  # Composición: aplica capas una tras otra
-    def __init__(self, layers: List[Module]):  # Constructor recibe lista de módulos
-        self.layers = layers  # Guardamos la lista como estado
-
-        # Assert: todas las capas deben ser Module para garantizar que son invocables
-        assert all(isinstance(layer, Module) for layer in layers), "Todas las capas deben heredar de Module"  # Contrato
-
-    def forward(self, x: np.ndarray) -> np.ndarray:  # Forward: pipeline de capas
-        out = x  # out va acumulando la activación
-
-        for layer in self.layers:  # Iteramos por pocas capas (esto NO es el cuello de botella)
-            out = layer(out)  # Cada capa valida shapes internamente y transforma out
-
-        return out  # Devuelve la activación final
-
-    def __repr__(self) -> str:  # Debug: lista las capas en orden
-        inner = ", ".join(repr(layer) for layer in self.layers)  # Representación de cada subcapa
-        return f"Sequential({inner})"  # String de diagnóstico
-
-
-# Demo: red de 2 capas (Linear + ReLU)
-cfg = LinearConfig(in_features=4, out_features=3, seed=42)  # Definimos hiperparámetros
-net = Sequential([Linear(cfg), ReLU()])  # Componemos módulos (como nn.Sequential)
-
-X = np.random.randn(5, 4).astype(float)  # Batch (N=5, D=4)
-assert X.shape == (5, 4)  # Regla: afirma shapes al construir tensores
-
-Y = net(X)  # Forward completo: aplica Linear y luego ReLU
-assert Y.shape == (5, 3)  # La salida debe tener K=3
-
-print(net)  # __repr__ permite ver arquitectura y shapes sin abrir el objeto
-```
+#### 15) Nota docente
+- contrato de shapes antes de correr.
+</details>
 
 ### 10. Generación de Datos Aleatorios
 
@@ -885,7 +1623,70 @@ np.random.shuffle(data)  # Mezcla el array *in-place* (modifica data directament
 sample = np.random.choice(data, size=5, replace=False)  # Elige 5 elementos distintos de data (sin repetir)
 ```
 
----
+<details>
+<summary><strong>📌 Complemento pedagógico — Tema 10: Generación de Datos Aleatorios</strong></summary>
+
+#### 1) Metadatos
+- **Título:** RNG reproducible: semillas, distribuciones, muestreo
+- **ID (opcional):** `M01-T10`
+- **Duración estimada:** 60–90 min
+- **Nivel:** Intermedio
+- **Dependencias:** Tema 7 (vectorización), Tema 5 (agregaciones)
+
+#### 2) Objetivos (medibles)
+- Al terminar, el estudiante podrá **generar** datos sintéticos reproducibles (seed) y **explicar** por qué importa.
+- Al terminar, el estudiante podrá **seleccionar** una distribución adecuada (`rand`, `randn`, `normal`, `randint`) para un caso.
+
+#### 3) Relevancia
+- **¿Por qué importa?** Reproducibilidad y experimentos controlados: inicialización, splits y pruebas dependen del RNG.
+
+#### 4) Conceptos clave
+- seed → reproducibilidad
+- distribución → forma de datos
+- `shuffle` in-place → efectos colaterales
+- `choice` → muestreo
+
+#### 5) Definiciones
+- **In-place:** modifica el objeto original.
+
+#### 6) Didáctica
+- fija seed → genera → valida shape → documenta distribución.
+
+#### 7) Ejemplos
+- `randn(n,d)` para features gaussianas; `choice` para índices.
+- **Contraejemplo:** usar `shuffle` y luego asumir que el array original no cambió.
+
+#### 8) Práctica guiada
+- generar `X (200,2)` y `y = X@w + noise`.
+- split reproducible usando `choice`.
+
+#### 9) Transferencia
+- construir dataset sintético linealmente separable.
+
+#### 10) Evaluación
+- diferencia `rand` vs `randn`.
+- qué resuelve la seed.
+
+#### 11) Errores comunes
+- no fijar seed
+- mezclar RNG global sin control
+
+#### 12) Retención
+- (día 2) por qué reproducibilidad.
+- (día 7) cómo hacer split reproducible.
+
+#### 13) Diferenciación
+- **Principiante:** solo shapes.
+- **Avanzado:** `default_rng` (conceptual).
+
+#### 14) Recursos
+- NumPy Random (docs).
+
+#### 15) Nota docente
+- pedir reporte de seed + shape + distribución.
+</details>
+
+ ---
 
 ## 📊 Type Hints con NumPy
 
@@ -964,65 +1765,65 @@ Reglas de uso:
 
  ---
 
- ### Ejercicio 1.1: Pandas - DataFrame y Series
+  ### Ejercicio 1.1: Pandas - DataFrame y Series
 
- #### Enunciado
+  #### Enunciado
 
- 1) **Básico**
+  1) **Básico**
 
- - Crea un `DataFrame` llamado `df` con columnas `edad`, `salario`, `ciudad` (5 filas).
- - Extrae la columna `salario` como `Series` y calcula su media.
+  - Crea un `DataFrame` llamado `df` con columnas `edad`, `salario`, `ciudad` (5 filas).
+  - Extrae la columna `salario` como `Series` y calcula su media.
 
- 2) **Intermedio**
+  2) **Intermedio**
 
- - Crea una nueva columna `salario_k` con `salario / 1000`.
- - Ordena el `DataFrame` por `salario` de mayor a menor.
+  - Crea una nueva columna `salario_k` con `salario / 1000`.
+  - Ordena el `DataFrame` por `salario` de mayor a menor.
 
- 3) **Avanzado**
+  3) **Avanzado**
 
- - Calcula, por ciudad, la media de `salario` y el conteo de filas (en una sola tabla).
+  - Calcula, por ciudad, la media de `salario` y el conteo de filas (en una sola tabla).
 
- #### Solución
+  #### Solución
 
- ```python
- import pandas as pd  # Importa Pandas: librería estándar para manipulación de datos tabulares
+```python
+import pandas as pd
 
- df = pd.DataFrame(  # Construye un DataFrame (tabla) desde un diccionario de columnas
-     {  # Cada clave del diccionario será el nombre de una columna
-         "edad": [25, 30, 30, 45, 50],  # Columna numérica: lista de edades (5 filas)
-         "salario": [50000, 60000, 61000, 80000, 90000],  # Columna numérica: salarios (valores enteros)
-         "ciudad": ["Madrid", "Barcelona", "Madrid", "Sevilla", "Madrid"],  # Columna categórica: ciudad por fila
-     }  # Cierra el diccionario
- )  # Cierra el constructor del DataFrame
+df = pd.DataFrame(
+    {
+        "edad": [25, 30, 30, 45, 50],
+        "salario": [50000, 60000, 61000, 80000, 90000],
+        "ciudad": ["Madrid", "Barcelona", "Madrid", "Sevilla", "Madrid"],
+    }
+)
 
- salario = df["salario"]  # Selecciona una columna: devuelve una Series (vector 1D con índice)
- media_salario = salario.mean()  # Calcula la media aritmética de la Series (promedio)
+salario = df["salario"]
+media_salario = float(salario.mean())
 
- df["salario_k"] = df["salario"] / 1000  # Crea columna nueva: vectoriza la operación (sin bucles)
- df_sorted = df.sort_values("salario", ascending=False)  # Ordena el DataFrame por salario (descendente)
+df["salario_k"] = df["salario"] / 1000
+df_sorted = df.sort_values("salario", ascending=False)
 
- resumen = (  # Crea un resumen agregado por ciudad usando un pipeline encadenado
-     df.groupby("ciudad", as_index=False)  # Agrupa por ciudad; as_index=False mantiene 'ciudad' como columna
-     .agg(  # Aplica múltiples agregaciones y asigna nombres a las columnas de salida
-         salario_mean=("salario", "mean"),  # Media del salario por ciudad
-         n=("salario", "size"),  # Conteo de registros por ciudad (tamaño del grupo)
-     )  # Cierra la agregación
-     .sort_values("salario_mean", ascending=False)  # Ordena el resumen por salario medio (de mayor a menor)
- )  # Cierra la expresión multi-línea
+resumen = (
+    df.groupby("ciudad", as_index=False)
+    .agg(
+        salario_mean=("salario", "mean"),
+        n=("salario", "size"),
+    )
+    .sort_values("salario_mean", ascending=False)
+)
 
- assert isinstance(media_salario, float)  # Verifica tipo: la media debe ser un float
- assert "salario_k" in df.columns  # Verifica que la columna derivada exista
- assert df_sorted.iloc[0]["salario"] == df["salario"].max()  # La primera fila ordenada debe ser el salario máximo
- assert set(resumen.columns) == {"ciudad", "salario_mean", "n"}  # Verifica el esquema (columnas) del resumen
- ```
+assert isinstance(media_salario, float)
+assert "salario_k" in df.columns
+assert df_sorted.iloc[0]["salario"] == df["salario"].max()
+assert set(resumen.columns) == {"ciudad", "salario_mean", "n"}
+```
 
- ---
+  ---
 
- ### Ejercicio 1.2: Pandas - Limpieza (missing values, dtypes, duplicados)
+  ### Ejercicio 1.2: Pandas - Limpieza (missing values, dtypes, duplicados)
 
- #### Enunciado
+  #### Enunciado
 
- 1) **Básico**
+  1) **Básico**
 
  - Crea un `DataFrame` con valores faltantes en `edad` y `salario`.
  - Cuenta cuántos nulos hay por columna.
@@ -1040,151 +1841,151 @@ Reglas de uso:
 
  #### Solución
 
- ```python
- import pandas as pd  # Pandas para limpieza: nulos, duplicados, casting de tipos
- import numpy as np  # NumPy para utilidades numéricas y verificación robusta de dtype
+```python
+import pandas as pd  # Pandas para limpieza: nulos, duplicados, casting de tipos
+import numpy as np  # NumPy para utilidades numéricas y verificación robusta de dtype
 
- df = pd.DataFrame(  # Crea un DataFrame con missing values (None) para simular datos reales “sucios”
-     {  # Diccionario: columnas -> listas
-         "edad": [25, None, 30, 45, None],  # 'None' se interpretará como NaN (faltante) en una columna numérica
-         "salario": [50000, 60000, None, 80000, 90000],  # Otro faltante en 'salario'
-         "ciudad": ["Madrid", "Barcelona", "Madrid", "Sevilla", "Madrid"],  # Columna categórica sin nulos
-     }  # Cierra diccionario
- )  # Cierra DataFrame
+df = pd.DataFrame(  # Crea un DataFrame con missing values (None) para simular datos reales “sucios”
+    {  # Diccionario: columnas -> listas
+        "edad": [25, None, 30, 45, None],  # 'None' se interpretará como NaN (faltante) en una columna numérica
+        "salario": [50000, 60000, None, 80000, 90000],  # Otro faltante en 'salario'
+        "ciudad": ["Madrid", "Barcelona", "Madrid", "Sevilla", "Madrid"],  # Columna categórica sin nulos
+    }  # Cierra el diccionario
+)  # Cierra el constructor del DataFrame
 
- nulls = df.isnull().sum()  # isnull() marca NaN/None; sum() por columna cuenta True => número de nulos
+nulls = df.isnull().sum()  # isnull() marca NaN/None; sum() por columna cuenta True => número de nulos
 
- df2 = df.copy()  # Copia explícita: evita mutar df (importante si df se reutiliza en otros pasos)
- df2["edad"] = df2["edad"].fillna(df2["edad"].mean())  # Imputa edad con media (supone distribución “razonable”)
- df2["salario"] = df2["salario"].fillna(df2["salario"].median())  # Imputa salario con mediana (robusta a outliers)
+df2 = df.copy()  # Copia explícita: evita mutar df (importante si df se reutiliza en otros pasos)
+df2["edad"] = df2["edad"].fillna(df2["edad"].mean())  # Imputa edad con media (supone distribución “razonable”)
+df2["salario"] = df2["salario"].fillna(df2["salario"].median())  # Imputa salario con mediana (robusta a outliers)
 
- df3 = pd.concat([df2, df2.iloc[[0]]], ignore_index=True)  # Añade una fila duplicada (la primera) para probar drop_duplicates
- df3 = df3.drop_duplicates()  # Elimina filas duplicadas exactas (misma combinación de valores)
- df3["edad"] = df3["edad"].round().astype(int)  # Convierte a int al final: redondea y castea (sin NaN ya)
+df3 = pd.concat([df2, df2.iloc[[0]]], ignore_index=True)  # Añade una fila duplicada (la primera) para probar drop_duplicates
+df3 = df3.drop_duplicates()  # Elimina filas duplicadas exactas (misma combinación de valores)
+df3["edad"] = df3["edad"].round().astype(int)  # Convierte a int al final: redondea y castea (sin NaN ya)
 
- assert nulls["edad"] == 2  # Debe haber 2 nulos originales en edad
- assert nulls["salario"] == 1  # Debe haber 1 nulo original en salario
- assert df2.isnull().sum().sum() == 0  # Tras imputación, no deben quedar nulos
- assert len(df3) == len(df2)  # Agregar un duplicado y luego quitarlo deja el mismo tamaño
- assert df3["edad"].dtype == np.int64 or str(df3["edad"].dtype).startswith("int")  # Verifica tipo entero
- ```
+assert nulls["edad"] == 2  # Debe haber 2 nulos originales en edad
+assert nulls["salario"] == 1  # Debe haber 1 nulo original en salario
+assert df2.isnull().sum().sum() == 0  # Tras imputación, no deben quedar nulos
+assert len(df3) == len(df2)  # Agregar un duplicado y luego quitarlo deja el mismo tamaño
+assert df3["edad"].dtype == np.int64 or str(df3["edad"].dtype).startswith("int")  # Verifica tipo entero
+```
 
  ---
 
- ### Ejercicio 1.3: Pandas - Selección y filtrado (`loc`, `iloc`, boolean masks)
+### Ejercicio 1.3: Pandas - Selección y filtrado (`loc`, `iloc`, boolean masks)
 
- #### Enunciado
+#### Enunciado
 
  Usa este `DataFrame`:
 
- ```python
- import pandas as pd  # Importa Pandas para construir el DataFrame de ejemplo
+```python
+import pandas as pd  # Importa Pandas para construir el DataFrame de ejemplo
 
- df = pd.DataFrame(  # DataFrame pequeño (similar a Iris) para practicar selección/filtrado
-     {  # Diccionario columna -> valores
-         "sepal_length": [5.1, 4.9, 5.8, 6.0, 5.4],  # Feature numérica: longitud del sépalo
-         "sepal_width": [3.5, 3.0, 2.7, 2.2, 3.9],  # Feature numérica: ancho del sépalo
-         "species": ["setosa", "setosa", "versicolor", "virginica", "setosa"],  # Variable categórica: especie
-     }  # Cierra diccionario
- )  # Cierra DataFrame
- ```
+df = pd.DataFrame(  # DataFrame pequeño (similar a Iris) para practicar selección/filtrado
+    {  # Diccionario columna -> valores
+        "sepal_length": [5.1, 4.9, 5.8, 6.0, 5.4],  # Feature numérica: longitud del sépalo
+        "sepal_width": [3.5, 3.0, 2.7, 2.2, 3.9],  # Feature numérica: ancho del sépalo
+        "species": ["setosa", "setosa", "versicolor", "virginica", "setosa"],  # Variable categórica: especie
+    }  # Cierra diccionario
+)  # Cierra DataFrame
+```
 
- 1) **Básico**
+1) **Básico**
 
- - Extrae las columnas `sepal_length` y `species`.
+- Extrae las columnas `sepal_length` y `species`.
 
- 2) **Intermedio**
+2) **Intermedio**
 
- - Filtra solo las filas donde `species == "setosa"` y `sepal_length > 5.0`.
+- Filtra solo las filas donde `species == "setosa"` y `sepal_length > 5.0`.
 
- 3) **Avanzado**
+3) **Avanzado**
 
- - Calcula el promedio de `sepal_length` por `species`.
- - Devuelve el resultado ordenado de mayor a menor.
+- Calcula el promedio de `sepal_length` por `species`.
+- Devuelve el resultado ordenado de mayor a menor.
 
- #### Solución
+#### Solución
 
- ```python
- import pandas as pd  # Pandas para DataFrames, máscaras booleanas y groupby
+```python
+import pandas as pd  # Pandas para DataFrames, máscaras booleanas y groupby
 
- df = pd.DataFrame(  # Re-crea el DataFrame del enunciado (datos en memoria)
-     {  # Columnas definidas con listas de igual longitud
-         "sepal_length": [5.1, 4.9, 5.8, 6.0, 5.4],  # Longitud del sépalo
-         "sepal_width": [3.5, 3.0, 2.7, 2.2, 3.9],  # Ancho del sépalo
-         "species": ["setosa", "setosa", "versicolor", "virginica", "setosa"],  # Clase (string)
-     }  # Cierra diccionario
- )  # Cierra DataFrame
+df = pd.DataFrame(  # Re-crea el DataFrame del enunciado (datos en memoria)
+    {  # Columnas definidas con listas de igual longitud
+        "sepal_length": [5.1, 4.9, 5.8, 6.0, 5.4],  # Longitud del sépalo
+        "sepal_width": [3.5, 3.0, 2.7, 2.2, 3.9],  # Ancho del sépalo
+        "species": ["setosa", "setosa", "versicolor", "virginica", "setosa"],  # Clase (string)
+    }  # Cierra diccionario
+)  # Cierra DataFrame
 
- subset = df[["sepal_length", "species"]]  # Selección de múltiples columnas: devuelve DataFrame con 2 columnas
+subset = df[["sepal_length", "species"]]  # Selección de múltiples columnas: devuelve DataFrame con 2 columnas
 
- filtered = df[(df["species"] == "setosa") & (df["sepal_length"] > 5.0)]  # Máscara booleana: combina condiciones con &
+filtered = df[(df["species"] == "setosa") & (df["sepal_length"] > 5.0)]  # Máscara booleana: combina condiciones con &
 
- means = (  # Agregación por especie para obtener promedios
-     df.groupby("species", as_index=False)  # Agrupa por 'species' y conserva 'species' como columna
-     .agg(sepal_length_mean=("sepal_length", "mean"))  # Media por grupo: una fila por especie
-     .sort_values("sepal_length_mean", ascending=False)  # Ordena para tener ranking de especies por media
- )  # Cierra pipeline
+means = (  # Agregación por especie para obtener promedios
+    df.groupby("species", as_index=False)  # Agrupa por 'species' y conserva 'species' como columna
+    .agg(sepal_length_mean=("sepal_length", "mean"))  # Media por grupo: una fila por especie
+    .sort_values("sepal_length_mean", ascending=False)  # Ordena para tener ranking de especies por media
+)  # Cierra pipeline
 
- assert list(subset.columns) == ["sepal_length", "species"]  # Confirma columnas seleccionadas
- assert (filtered["species"] == "setosa").all()  # Todas las filas filtradas deben ser setosa
- assert (filtered["sepal_length"] > 5.0).all()  # Todas las filas filtradas deben cumplir sepal_length > 5
- assert means.iloc[0]["sepal_length_mean"] >= means.iloc[-1]["sepal_length_mean"]  # Verifica el orden descendente
- ```
+assert list(subset.columns) == ["sepal_length", "species"]  # Confirma columnas seleccionadas
+assert (filtered["species"] == "setosa").all()  # Todas las filas filtradas deben ser setosa
+assert (filtered["sepal_length"] > 5.0).all()  # Todas las filas filtradas deben cumplir sepal_length > 5
+assert means.iloc[0]["sepal_length_mean"] >= means.iloc[-1]["sepal_length_mean"]  # Verifica el orden descendente
+```
 
- ---
+---
 
- ### Ejercicio 1.4: NumPy - Arrays y `dtype`
+### Ejercicio 1.4: NumPy - Arrays y `dtype`
 
- #### Enunciado
+#### Enunciado
 
- 1) **Básico**
+1) **Básico**
 
- - Crea:
-   - un vector de 10 ceros
-   - una matriz `3x3` de unos
-   - una identidad `4x4`
+- Crea:
+  - un vector de 10 ceros
+  - una matriz `3x3` de unos
+  - una identidad `4x4`
 
- 2) **Intermedio**
+2) **Intermedio**
 
- - Crea un vector `v = np.array([1, 2, 3])`.
- - Convierte `v` a `float64`.
- - Verifica que `v / 2` produce floats.
+- Crea un vector `v = np.array([1, 2, 3])`.
+- Convierte `v` a `float64`.
+- Verifica que `v / 2` produce floats.
 
- 3) **Avanzado**
+3) **Avanzado**
 
- - Reproduce el caso típico de bug por `dtype` usando división in-place:
-   - crea `a = np.array([1, 2, 3])`
-   - aplica `a /= 2`
-   - explica el resultado con un `assert` esperado
+- Reproduce el caso típico de bug por `dtype` usando división in-place:
+  - crea `a = np.array([1, 2, 3])`
+  - aplica `a /= 2`
+  - explica el resultado con un `assert` esperado
 
- #### Solución
+#### Solución
 
- ```python
- import numpy as np  # NumPy: base del cómputo numérico y estructuras tipo array
+```python
+import numpy as np  # NumPy: base del cómputo numérico y estructuras tipo array
 
- z = np.zeros(10)  # Crea un vector 1D de longitud 10 con ceros (dtype float por defecto)
- ones = np.ones((3, 3))  # Crea una matriz 3x3 llena de unos (shape: (3, 3))
- I = np.eye(4)  # Crea una matriz identidad 4x4 (1 en diagonal, 0 fuera)
+z = np.zeros(10)  # Crea un vector 1D de longitud 10 con ceros (dtype float por defecto)
+ones = np.ones((3, 3))  # Crea una matriz 3x3 llena de unos (shape: (3, 3))
+I = np.eye(4)  # Crea una matriz identidad 4x4 (1 en diagonal, 0 fuera)
 
- v = np.array([1, 2, 3])  # Crea un array a partir de enteros (dtype típico: int)
- v_f = v.astype(np.float64)  # Convierte a float64: evita problemas de división/overflow y habilita decimales
+v = np.array([1, 2, 3])  # Crea un array a partir de enteros (dtype típico: int)
+v_f = v.astype(np.float64)  # Convierte a float64: evita problemas de división/overflow y habilita decimales
 
- half = v_f / 2  # División “normal”: al ser float, el resultado preserva decimales
+half = v_f / 2  # División “normal”: al ser float, el resultado preserva decimales
 
- a = np.array([1, 2, 3])  # Array entero: aquí preparamos el caso de bug
- a /= 2  # División IN-PLACE: si el dtype es int, NumPy trunca/convierte (pierde decimales) para mantener dtype
+a = np.array([1, 2, 3])  # Array entero: aquí preparamos el caso de bug
+a /= 2  # División IN-PLACE: si el dtype es int, NumPy trunca/convierte (pierde decimales) para mantener dtype
 
- assert z.shape == (10,)  # Confirma forma del vector
- assert ones.shape == (3, 3)  # Confirma forma de la matriz
- assert I.shape == (4, 4)  # Confirma forma de la identidad
- assert v_f.dtype == np.float64  # Confirma que la conversión a float64 ocurrió
- assert half.dtype == np.float64  # Confirma que la división produce floats
- assert np.array_equal(a, np.array([0, 1, 1]))  # 1/2->0, 2/2->1, 3/2->1 (truncado por dtype entero)
- ```
+assert z.shape == (10,)  # Confirma forma del vector
+assert ones.shape == (3, 3)  # Confirma forma de la matriz
+assert I.shape == (4, 4)  # Confirma forma de la identidad
+assert v_f.dtype == np.float64  # Confirma que la conversión a float64 ocurrió
+assert half.dtype == np.float64  # Confirma que la división produce floats
+assert np.array_equal(a, np.array([0, 1, 1]))  # 1/2->0, 2/2->1, 3/2->1 (truncado por dtype entero)
+```
 
- ---
+---
 
- ### Ejercicio 1.5: NumPy - Indexing y Slicing
+### Ejercicio 1.5: NumPy - Indexing y Slicing
 
 #### Enunciado
 

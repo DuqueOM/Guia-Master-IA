@@ -94,131 +94,173 @@ mnist-analyst/
 ### 1.1 Data Loader
 
 ```python
-"""
-MNIST Dataset Loader
-
+"""MNIST Dataset Loader
 MNIST contiene:
 - 60,000 imágenes de entrenamiento
 - 10,000 imágenes de test
 - Cada imagen: 28x28 píxeles grayscale (0-255)
 - 10 clases: dígitos 0-9
-
 Formato aplanado: cada imagen es un vector de 784 dimensiones
-"""
+"""  # Delimitador de cierre del docstring del bloque; si faltara, todo lo siguiente quedaría dentro del string
+import numpy as np  # Importa NumPy para operar con arrays y álgebra lineal de forma eficiente
+import struct  # Importa struct para desempaquetar headers binarios en formato IDX
+import gzip  # Importa gzip para leer directamente archivos comprimidos .gz en modo binario
+from pathlib import Path  # Importa Path para composición robusta de rutas (operador /)
+from typing import Tuple  # Importa Tuple para anotar retornos múltiples (no cambia el runtime)
 
-import numpy as np
-import struct
-import gzip
-from pathlib import Path
-from typing import Tuple
+def load_mnist_images(filepath: str) -> np.ndarray:  # Función: lee imágenes MNIST (IDX) y devuelve matriz (n, 784)
+    """Carga imágenes MNIST desde archivo IDX.
 
+     Formato IDX:
+     - 4 bytes: magic number
+     - 4 bytes: número de imágenes
+     - 4 bytes: número de filas
+     - 4 bytes: número de columnas
+     - resto: píxeles (unsigned bytes)
+     """  # Delimitador de cierre del docstring de la función; a partir de aquí se ejecutan lecturas/reshape
+    with gzip.open(filepath, 'rb') as f:  # Abre el .gz en binario; el context manager cierra automáticamente
+        magic, num_images, rows, cols = struct.unpack('>IIII', f.read(16))  # Lee 4 enteros big-endian del header
+        images = np.frombuffer(f.read(), dtype=np.uint8)  # Interpreta el resto del archivo como bytes (sin copia)
+        images = images.reshape(num_images, rows * cols)  # Reorganiza a (n_images, 784) para modelos lineales/MLP
+    return images  # Retorna las imágenes aplanadas; no normaliza (se hace en un paso separado)
 
-def load_mnist_images(filepath: str) -> np.ndarray:
-    """
-    Carga imágenes MNIST desde archivo IDX.
+def load_mnist_labels(filepath: str) -> np.ndarray:  # Función: lee labels MNIST (IDX) y devuelve vector (n,)
+    """Carga etiquetas MNIST."""  # Docstring corto: describe propósito sin afectar la ejecución
+    with gzip.open(filepath, 'rb') as f:  # Abre el .gz; el archivo de labels tiene header + bytes de etiquetas
+        magic, num_labels = struct.unpack('>II', f.read(8))  # Lee magic number y cantidad de etiquetas
+        labels = np.frombuffer(f.read(), dtype=np.uint8)  # Lee el payload como uint8 (0-9)
+    return labels  # Retorna vector 1D; el orden corresponde al de las imágenes
 
-    Formato IDX:
-    - 4 bytes: magic number
-    - 4 bytes: número de imágenes
-    - 4 bytes: número de filas
-    - 4 bytes: número de columnas
-    - resto: píxeles (unsigned bytes)
-    """
-    with gzip.open(filepath, 'rb') as f:
-        magic, num_images, rows, cols = struct.unpack('>IIII', f.read(16))
-        images = np.frombuffer(f.read(), dtype=np.uint8)
-        images = images.reshape(num_images, rows * cols)
-    return images
+def load_mnist(data_dir: str = 'data/mnist') -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:  # Loader train/test
+    """Carga dataset MNIST completo.
 
+     Returns:
+         X_train: (60000, 784)
+         y_train: (60000,)
+         X_test: (10000, 784)
+         y_test: (10000,)
+     """  # Delimitador de cierre del docstring del loader; si faltara, el cuerpo quedaría como texto y no se ejecutaría
+    data_dir = Path(data_dir)  # Convierte a Path para componer rutas de forma segura (OS-agnóstico)
 
-def load_mnist_labels(filepath: str) -> np.ndarray:
-    """Carga etiquetas MNIST."""
-    with gzip.open(filepath, 'rb') as f:
-        magic, num_labels = struct.unpack('>II', f.read(8))
-        labels = np.frombuffer(f.read(), dtype=np.uint8)
-    return labels
+    X_train = load_mnist_images(data_dir / 'train-images-idx3-ubyte.gz')  # Carga imágenes de entrenamiento
+    y_train = load_mnist_labels(data_dir / 'train-labels-idx1-ubyte.gz')  # Carga etiquetas de entrenamiento
+    X_test = load_mnist_images(data_dir / 't10k-images-idx3-ubyte.gz')  # Carga imágenes de prueba
+    y_test = load_mnist_labels(data_dir / 't10k-labels-idx1-ubyte.gz')  # Carga etiquetas de prueba
 
+    return X_train, y_train, X_test, y_test  # Retorna splits estándar para entrenamiento y evaluación
 
-def load_mnist(data_dir: str = 'data/mnist') -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Carga dataset MNIST completo.
+def normalize_data(X: np.ndarray) -> np.ndarray:  # Normaliza píxeles a [0,1] para estabilizar el entrenamiento
+    """Normaliza píxeles a rango [0, 1]."""  # Docstring: contrato de normalización
+    return X.astype(np.float64) / 255.0  # Convierte a float y escala; evita overflow y facilita gradientes
 
-    Returns:
-        X_train: (60000, 784)
-        y_train: (60000,)
-        X_test: (10000, 784)
-        y_test: (10000,)
-    """
-    data_dir = Path(data_dir)
+def one_hot_encode(y: np.ndarray, num_classes: int = 10) -> np.ndarray:  # Convierte labels a matriz one-hot (n_samples, n_classes)
+    """Convierte etiquetas a one-hot encoding."""  # Docstring: documenta que se devuelve una matriz one-hot
+    one_hot = np.zeros((len(y), num_classes))  # Inicializa matriz de ceros; se muta marcando 1 en la clase correcta
+    one_hot[np.arange(len(y)), y] = 1  # Indexación avanzada: fila i, columna y[i] -> 1 (asume y en [0,num_classes))
+    return one_hot  # Retorna la matriz para usar con softmax/cross-entropy u otros clasificadores
 
-    X_train = load_mnist_images(data_dir / 'train-images-idx3-ubyte.gz')
-    y_train = load_mnist_labels(data_dir / 'train-labels-idx1-ubyte.gz')
-    X_test = load_mnist_images(data_dir / 't10k-images-idx3-ubyte.gz')
-    y_test = load_mnist_labels(data_dir / 't10k-labels-idx1-ubyte.gz')
+def generate_synthetic_mnist(n_samples: int = 1000, seed: int = 42) -> Tuple:  # Genera dataset sintético con shapes tipo-MNIST
+    """Genera datos sintéticos similares a MNIST para pruebas."""  # Docstring: alternativa cuando no hay archivos MNIST
+    np.random.seed(seed)  # Fija semilla del RNG global para reproducibilidad de X/y sintéticos
+    X = np.random.rand(n_samples, 784)  # Features aleatorias en [0,1] con forma de MNIST aplanado (28*28)
+    y = np.random.randint(0, 10, n_samples)  # Etiquetas enteras aleatorias en 0..9 (10 clases)
+    split = int(0.8 * n_samples)  # Define split 80/20 (train/test) redondeando hacia abajo
+    return X[:split], y[:split], X[split:], y[split:]  # Retorna X_train,y_train,X_test,y_test en ese orden
 
-    return X_train, y_train, X_test, y_test
+def visualize_digits(X: np.ndarray, y: np.ndarray, n_samples: int = 25):  # Dibuja una grilla de imágenes + labels
+    """Visualiza una cuadrícula de dígitos."""  # Docstring: describe el propósito de la función
+    n_cols = 5  # Número fijo de columnas para visualización
+    n_rows = (n_samples + n_cols - 1) // n_cols  # Filas necesarias (ceil(n_samples/n_cols))
 
+    # Crea figura con subplots organizados en cuadrícula
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(10, 2*n_rows))  # Crea subplots; axes es array 2D
+    axes = axes.flatten()  # Convierte matriz 2D de axes a 1D para iteración fácil
 
-def normalize_data(X: np.ndarray) -> np.ndarray:
-    """Normaliza píxeles a rango [0, 1]."""
-    return X.astype(np.float64) / 255.0
+    # Itera sobre todos los axes disponibles
+    for i, ax in enumerate(axes):  # Itera sobre cada subplot y su índice
+        if i < n_samples:  # Evita acceder fuera de rango si hay más axes que muestras
+            # Reestructura vector 784 a matriz 28x28 para visualización
+            img = X[i].reshape(28, 28)  # Reconstruye imagen 28x28 desde vector aplanado
+            # Muestra imagen en escala de grises
+            ax.imshow(img, cmap='gray')  # Renderiza la imagen
+            # Añade título con etiqueta correspondiente
+            ax.set_title(f'Label: {y[i]}')  # Título con la clase real
+        # Oculta ejes para limpieza visual
+        ax.axis('off')  # Oculta ticks y borde del subplot
 
+    plt.tight_layout()  # Ajusta espaciado para evitar solapamiento
+    plt.show()  # Side effect: muestra la figura
 
-def one_hot_encode(y: np.ndarray, num_classes: int = 10) -> np.ndarray:
-    """Convierte etiquetas a one-hot encoding."""
-    one_hot = np.zeros((len(y), num_classes))
-    one_hot[np.arange(len(y)), y] = 1
-    return one_hot
-
-
-# Alternativa: generar datos sintéticos si no tienes MNIST
-def generate_synthetic_mnist(n_samples: int = 1000, seed: int = 42) -> Tuple:
-    """
-    Genera datos sintéticos similares a MNIST para pruebas.
-    """
-    np.random.seed(seed)
-
-    X = np.random.rand(n_samples, 784)  # Imágenes aleatorias
-    y = np.random.randint(0, 10, n_samples)  # Etiquetas aleatorias
-
-    # Split 80/20
-    split = int(0.8 * n_samples)
-    return X[:split], y[:split], X[split:], y[split:]
+def visualize_digit_single(x: np.ndarray, title: str = ''):  # Dibuja una sola imagen (vector 784) como 28x28
+    """Visualiza un solo dígito."""  # Docstring: visualización individual
+    plt.figure(figsize=(4, 4))  # Crea una figura nueva de 4x4 pulgadas
+    plt.imshow(x.reshape(28, 28), cmap='gray')  # Reconvierte vector 784 a imagen 28x28 y la renderiza en gris
+    plt.title(title)  # Título opcional para contextualizar la imagen
+    plt.axis('off')  # Oculta ejes/ticks para una visualización limpia
+    plt.show()  # Side effect: muestra la figura (depende del backend; puede bloquear)
 ```
 
-### 1.2 Visualización
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 1.1: Data Loader (MNIST)</strong></summary>
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
+#### 1) Metadatos
+- **Título:** Data loader robusto: leer IDX, normalizar, one-hot, y sanity checks
+- **ID (opcional):** `M08-P01_1`
+- **Duración estimada:** 90–150 min
+- **Nivel:** Intermedio
+- **Dependencias:** Numpy básico, archivos/rutas, lectura binaria
 
-def visualize_digits(X: np.ndarray, y: np.ndarray, n_samples: int = 25):
-    """Visualiza una cuadrícula de dígitos."""
-    n_cols = 5
-    n_rows = (n_samples + n_cols - 1) // n_cols
+#### 2) Objetivos
+- Cargar correctamente `X_train`, `y_train`, `X_test`, `y_test` con las shapes esperadas.
+- Normalizar y validar rangos (`[0,1]`) sin romper dtype/shape.
+- Generar etiquetas one-hot y entender cuándo usar one-hot vs enteros.
 
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(10, 2*n_rows))
-    axes = axes.flatten()
+#### 3) Relevancia
+- Si el loader falla, todo el pipeline falla silenciosamente (shapes incorrectas, labels desalineadas, leaks).
+- Te obliga a practicar “contratos de datos”: invariantes que luego requieren PCA/LR/MLP.
 
-    for i, ax in enumerate(axes):
-        if i < n_samples:
-            img = X[i].reshape(28, 28)
-            ax.imshow(img, cmap='gray')
-            ax.set_title(f'Label: {y[i]}')
-        ax.axis('off')
+#### 4) Mapa conceptual mínimo
+- **Archivo IDX/GZ** → bytes → `np.frombuffer` → reshape a `(n, 784)`.
+- **Normalización** → `uint8` → `float64` (o `float32`) → divide por 255.
+- **Labels** → enteros `0..9` → (opcional) one-hot `(n, 10)`.
 
-    plt.tight_layout()
-    plt.show()
+#### 5) Definiciones esenciales
+- **Shape**: estructura `(n_samples, n_features)`.
+- **Split**: train/test (no mezclar).
+- **One-hot**: representación categórica para pérdidas tipo cross-entropy.
 
+#### 6) Explicación didáctica
+- Define invariantes y “asserts” mentales: `X.ndim==2`, `y.ndim==1`, `len(X)==len(y)`, `X.min()>=0`, `X.max()<=1` tras normalizar.
 
-def visualize_digit_single(x: np.ndarray, title: str = ''):
-    """Visualiza un solo dígito."""
-    plt.figure(figsize=(4, 4))
-    plt.imshow(x.reshape(28, 28), cmap='gray')
-    plt.title(title)
-    plt.axis('off')
-    plt.show()
-```
+#### 7) Ejemplo modelado
+- Si `X_train` no es `(60000, 784)` (o el dataset alternativo), revisa: `reshape(num_images, rows*cols)` y rutas.
+
+#### 8) Práctica guiada
+- Imprime: shapes, dtype, min/max y 5 pares `(imagen,label)` para verificar alineación.
+
+#### 9) Práctica independiente
+- Agrega un “modo debug” que muestre histograma de intensidades y detecte outliers/NaNs.
+
+#### 10) Autoevaluación
+- ¿Qué bugs aparecen si normalizas con `X/255` sin castear a float primero?
+
+#### 11) Errores comunes
+- Labels desalineadas por leer un archivo equivocado.
+- Olvidar que `np.frombuffer` no copia: si mutas, entiende de dónde viene el buffer.
+- Confundir densidad de pixeles con “features” ya listas (falta estandarizar o PCA según modelo).
+
+#### 12) Retención
+- Checklist fijo antes de entrenar: `shape`, `dtype`, `range`, `align`, `class_counts`.
+
+#### 13) Diferenciación
+- Avanzado: soportar Fashion-MNIST/MNIST intercambiables y parametrizar paths/descarga.
+
+#### 14) Recursos
+- IDX file format (MNIST) + docs de `gzip`/`struct`/`numpy.frombuffer`.
+
+#### 15) Nota docente
+- Evalúa por contrato: el alumno “aprueba” esta sección si puede demostrar invariantes y detectar 2 fallos típicos.
+</details>
 
 ---
 
@@ -227,8 +269,7 @@ def visualize_digit_single(x: np.ndarray, title: str = ''):
 ### 2.1 PCA para Visualización
 
 ```python
-"""
-SEMANA 21: PCA en MNIST
+"""SEMANA 21: PCA en MNIST
 
 Objetivo: Reducir de 784 dimensiones a 2-3 para visualización.
 
@@ -236,97 +277,159 @@ Preguntas a responder:
 1. ¿Cuánta varianza se retiene con pocos componentes?
 2. ¿Se separan visualmente las clases en 2D?
 3. ¿Qué "aprenden" las componentes principales?
-"""
+"""  # Cierra la cabecera multi-línea del bloque; si faltara, todo lo siguiente quedaría dentro del string
 
-import numpy as np
-from typing import Tuple
+import numpy as np  # Importa NumPy para álgebra lineal (SVD) y manipulación de arrays
+from typing import Tuple  # Importa Tuple para anotar retornos múltiples (no cambia el runtime)
 
-class PCA:
-    """PCA implementado desde cero (del Módulo 05)."""
+# Nota: este bloque usa `plt` para graficar; requiere `import matplotlib.pyplot as plt` en el entorno.
 
-    def __init__(self, n_components: int):
-        self.n_components = n_components
-        self.components_ = None
-        self.mean_ = None
-        self.explained_variance_ratio_ = None
+class PCA:  # Clase PCA: aprende componentes principales y permite proyectar/reconstruir
+    """PCA implementado desde cero (del Módulo 05)."""  # Docstring: referencia a implementación del módulo previo
+    def __init__(self, n_components: int):  # Inicializa PCA con número de componentes deseado
+        self.n_components = n_components  # Número de componentes principales a retener
+        self.components_ = None  # Matriz (n_features, n_components) con ejes principales (se llena en fit)
+        self.mean_ = None  # Vector (n_features,) con la media de entrenamiento para centrar
+        self.explained_variance_ratio_ = None  # Vector (n_components,) con proporción de varianza explicada
 
-    def fit(self, X: np.ndarray) -> 'PCA':
-        self.mean_ = np.mean(X, axis=0)
-        X_centered = X - self.mean_
+    def fit(self, X: np.ndarray) -> 'PCA':  # Ajusta PCA a X (calcula media, SVD, varianza explicada)
+        self.mean_ = np.mean(X, axis=0)  # Calcula media por feature (centrado requerido por PCA)
+        X_centered = X - self.mean_  # Centra los datos (no muta X; crea array nuevo)
 
         # SVD (más estable que eigendecomposition)
-        U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)
+        U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)  # SVD: Xc = U diag(S) Vt
 
-        self.components_ = Vt[:self.n_components].T
-        variance = (S ** 2) / (len(X) - 1)
-        self.explained_variance_ratio_ = variance[:self.n_components] / np.sum(variance)
+        self.components_ = Vt[:self.n_components].T  # Toma las primeras PCs (filas de Vt) y transpone a columnas
+        variance = (S ** 2) / (len(X) - 1)  # Eigenvalues de covarianza (varianza por componente)
+        self.explained_variance_ratio_ = variance[:self.n_components] / np.sum(variance)  # Proporción relativa
 
-        return self
+        return self  # Permite chaining (pca.fit(X).transform(X))
 
-    def transform(self, X: np.ndarray) -> np.ndarray:
-        return (X - self.mean_) @ self.components_
+    def transform(self, X: np.ndarray) -> np.ndarray:  # Proyecta X al subespacio PCA
+        return (X - self.mean_) @ self.components_  # Proyecta datos centrados a espacio reducido (scores)
 
-    def fit_transform(self, X: np.ndarray) -> np.ndarray:
-        self.fit(X)
-        return self.transform(X)
+    def fit_transform(self, X: np.ndarray) -> np.ndarray:  # Ajusta y transforma en un paso
+        self.fit(X)  # Ajusta PCA (calcula media y componentes)
+        return self.transform(X)  # Devuelve proyección
 
-    def inverse_transform(self, X_pca: np.ndarray) -> np.ndarray:
-        return X_pca @ self.components_.T + self.mean_
+    def inverse_transform(self, X_pca: np.ndarray) -> np.ndarray:  # Reconstruye aproximación desde espacio reducido
+        return X_pca @ self.components_.T + self.mean_  # Reconstruye aproximación en espacio original
 
 
-def analyze_pca_mnist(X: np.ndarray, y: np.ndarray):
-    """Análisis PCA completo de MNIST."""
+def analyze_pca_mnist(X: np.ndarray, y: np.ndarray):  # Función utilitaria de análisis PCA para MNIST
+    """Análisis PCA completo de MNIST."""  # Docstring: grafica varianza explicada, proyección 2D y PCs como imágenes
 
-    # 1. PCA con diferentes números de componentes
-    print("=== Análisis de Varianza Explicada ===")
-    pca_full = PCA(n_components=min(50, X.shape[1]))
-    pca_full.fit(X)
+    print("=== Análisis de Varianza Explicada ===")  # Header de sección
+    pca_full = PCA(n_components=min(50, X.shape[1]))  # Ajusta PCA hasta 50 PCs o n_features (lo que sea menor)
+    pca_full.fit(X)  # Entrena PCA (calcula componentes y varianza explicada)
 
-    cumulative_var = np.cumsum(pca_full.explained_variance_ratio_)
+    cumulative_var = np.cumsum(pca_full.explained_variance_ratio_)  # Varianza acumulada para elegir k
 
-    for n in [2, 10, 50]:
-        if n <= len(cumulative_var):
-            print(f"  {n} componentes: {cumulative_var[n-1]:.2%} varianza")
+    for n in [2, 10, 50]:  # Valores de k a reportar (heurísticos)
+        if n <= len(cumulative_var):  # Guarda contra pedir más componentes de las que existen
+            print(f"  {n} componentes: {cumulative_var[n-1]:.2%} varianza")  # Reporta varianza acumulada
 
     # 2. Visualización 2D
-    print("\n=== Proyección 2D ===")
-    pca_2d = PCA(n_components=2)
-    X_2d = pca_2d.fit_transform(X)
+    print("\n=== Proyección 2D ===")  # Header para sección de scatter 2D
+    pca_2d = PCA(n_components=2)  # PCA a 2D para graficar
+    X_2d = pca_2d.fit_transform(X)  # Proyección (n_samples, 2)
 
-    plt.figure(figsize=(10, 8))
-    for digit in range(10):
-        mask = y == digit
-        plt.scatter(X_2d[mask, 0], X_2d[mask, 1],
-                   alpha=0.5, label=str(digit), s=10)
-    plt.legend()
-    plt.xlabel(f'PC1 ({pca_2d.explained_variance_ratio_[0]:.1%})')
-    plt.ylabel(f'PC2 ({pca_2d.explained_variance_ratio_[1]:.1%})')
-    plt.title('MNIST en 2D (PCA)')
-    plt.show()
+    plt.figure(figsize=(10, 8))  # Crea figura para el scatter 2D (ancho x alto en pulgadas)
+    for digit in range(10):  # Itera por clase para colorear cada dígito
+        mask = y == digit  # Máscara booleana de muestras pertenecientes al dígito
+        plt.scatter(X_2d[mask, 0], X_2d[mask, 1],  # Dibuja puntos de la clase seleccionada en el plano PCA
+                   alpha=0.5, label=str(digit), s=10)  # Scatter de puntos del dígito en el plano PCA
+    plt.legend()  # Muestra leyenda con los dígitos (0-9)
+    plt.xlabel(f'PC1 ({pca_2d.explained_variance_ratio_[0]:.1%})')  # Etiqueta PC1 con varianza explicada
+    plt.ylabel(f'PC2 ({pca_2d.explained_variance_ratio_[1]:.1%})')  # Etiqueta PC2 con varianza explicada
+    plt.title('MNIST en 2D (PCA)')  # Título descriptivo
+    plt.show()  # Side effect: renderiza figura
 
     # 3. Visualizar componentes principales
-    print("\n=== Componentes Principales como Imágenes ===")
-    fig, axes = plt.subplots(2, 5, figsize=(12, 5))
-    pca_10 = PCA(n_components=10)
-    pca_10.fit(X)
+    print("\n=== Componentes Principales como Imágenes ===")  # Header para PCs visualizadas como imágenes
+    fig, axes = plt.subplots(2, 5, figsize=(12, 5))  # Cuadrícula 2x5 para mostrar 10 componentes
+    pca_10 = PCA(n_components=10)  # PCA con 10 componentes
+    pca_10.fit(X)  # Ajusta PCA para extraer componentes (vectores en R^784)
 
-    for i, ax in enumerate(axes.flatten()):
-        component = pca_10.components_[:, i].reshape(28, 28)
-        ax.imshow(component, cmap='RdBu')
-        ax.set_title(f'PC{i+1}')
-        ax.axis('off')
-    plt.suptitle('Top 10 Componentes Principales')
-    plt.tight_layout()
-    plt.show()
+    for i, ax in enumerate(axes.flatten()):  # Itera sobre los 10 subplots
+        component = pca_10.components_[:, i].reshape(28, 28)  # Reinterpreta PC_i como imagen 28x28
+        ax.imshow(component, cmap='RdBu')  # Visualiza pesos positivos/negativos con colormap divergente
+        ax.set_title(f'PC{i+1}')  # Título: índice de componente (1-index)
+        ax.axis('off')  # Oculta ejes
+    plt.suptitle('Top 10 Componentes Principales')  # Título general de la figura de PCs
+    plt.tight_layout()  # Ajusta layout para evitar solapamientos
+    plt.show()  # Side effect: renderiza figura
 
-    return pca_2d, X_2d
+    return pca_2d, X_2d  # Retorna PCA entrenado a 2D y su proyección para reutilizar
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 2.1: PCA para Visualización</strong></summary>
+
+#### 1) Metadatos
+- **Título:** PCA como herramienta de diagnóstico: varianza, separabilidad y “qué aprende” el dataset
+- **ID (opcional):** `M08-P02_1`
+- **Duración estimada:** 120–180 min
+- **Nivel:** Intermedio
+- **Dependencias:** Álgebra lineal (SVD), centrado, interpretación de proyecciones
+
+#### 2) Objetivos
+- Implementar `fit/transform/inverse_transform` con shapes correctas.
+- Interpretar `explained_variance_ratio_` y elegir `k` basado en varianza acumulada.
+- Usar la proyección 2D como diagnóstico (no como “modelo final”).
+
+#### 3) Relevancia
+- PCA te muestra si la estructura del dataset es “amigable” para modelos lineales o si necesitas no linealidad.
+- PCA conecta EDA con diseño del pipeline (qué modelos compiten bien y por qué).
+
+#### 4) Mapa conceptual mínimo
+- **Centrado** `X - mean`.
+- **SVD** → direcciones principales.
+- **Transform** → coordenadas en el subespacio.
+- **Inverse** → reconstrucción aproximada.
+
+#### 5) Definiciones esenciales
+- **Componente principal**: dirección que maximiza varianza.
+- **Varianza explicada**: proporción de “información” capturada.
+- **Reconstrucción**: aproximación en el espacio original.
+
+#### 6) Explicación didáctica
+- La nube 2D puede “engañar”: si en 2D no se separa, aún podría separarse con más PCs.
+
+#### 7) Ejemplo modelado
+- Reporta varianza acumulada con `k=2,10,50` y decide un `k` para K-Means/LR.
+
+#### 8) Práctica guiada
+- Verifica que `inverse_transform(transform(X))` devuelve algo con la misma shape que `X`.
+
+#### 9) Práctica independiente
+- Mide el error de reconstrucción al variar `k` y grafica “k vs error”.
+
+#### 10) Autoevaluación
+- ¿Por qué es obligatorio centrar antes de PCA? ¿Qué se rompe si no centras?
+
+#### 11) Errores comunes
+- Confundir `components_` shape (cuidado con transponer Vt).
+- Interpretar PCs como “features reales” (son combinaciones lineales).
+- Mezclar `fit_transform` de train con test sin usar la misma `mean_`/`components_`.
+
+#### 12) Retención
+- Regla: PCA se ajusta en train y se aplica igual a test (misma media y componentes).
+
+#### 13) Diferenciación
+- Avanzado: whitening, o comparar PCA con t-SNE/UMAP (solo como diagnóstico, no core).
+
+#### 14) Recursos
+- Notas de SVD y PCA; documentación de estabilidad numérica.
+
+#### 15) Nota docente
+- Pide una “lectura narrativa” del scatter: ¿qué dígitos se confunden y por qué (similaridad visual)?
+</details>
 
 ### 2.2 K-Means Clustering
 
 ```python
-"""
-SEMANA 22: K-Means en MNIST
+"""SEMANA 22: K-Means en MNIST
 
 Objetivo: Agrupar dígitos SIN usar etiquetas.
 
@@ -334,103 +437,167 @@ Preguntas a responder:
 1. ¿K-Means encuentra los 10 dígitos?
 2. ¿Qué tan puros son los clusters?
 3. ¿Cómo se ven los centroides?
-"""
+"""  # Cierra la introducción del bloque; evita que imports/clases queden accidentalmente dentro del string
 
-import numpy as np
+import numpy as np  # Importa NumPy para distancias, inicialización aleatoria y operaciones vectoriales
 
-class KMeans:
-    """K-Means implementado desde cero (del Módulo 05)."""
+class KMeans:  # Clase K-Means: clustering no supervisado con inicialización K-Means++
+    """K-Means implementado desde cero (del Módulo 05)."""  # Docstring: algoritmo Lloyd + K-Means++
 
-    def __init__(self, n_clusters: int = 10, max_iter: int = 100, seed: int = None):
-        self.n_clusters = n_clusters
-        self.max_iter = max_iter
-        self.seed = seed
-        self.centroids = None
-        self.labels_ = None
-        self.inertia_ = None
+    def __init__(self, n_clusters: int = 10, max_iter: int = 100, seed: int = None):  # Configura hiperparámetros
+        self.n_clusters = n_clusters  # k: número de clusters
+        self.max_iter = max_iter  # Máximo de iteraciones de Lloyd
+        self.seed = seed  # Semilla opcional para reproducibilidad
+        self.centroids = None  # Centroides (k, n_features)
+        self.labels_ = None  # Labels asignados (n_samples,)
+        self.inertia_ = None  # Inercia final (suma de distancias cuadradas intra-cluster)
 
-    def _init_centroids_plusplus(self, X: np.ndarray) -> np.ndarray:
-        """K-Means++ initialization."""
-        if self.seed:
-            np.random.seed(self.seed)
+    def _init_centroids_plusplus(self, X: np.ndarray) -> np.ndarray:  # Inicialización K-Means++
+        """K-Means++ initialization."""  # Docstring: elige centroides iniciales separados
+        if self.seed:  # Solo fija semilla si el usuario la proporcionó
+            np.random.seed(self.seed)  # Fija RNG global (legacy) para reproducibilidad de la inicialización
 
-        n_samples = len(X)
-        centroids = [X[np.random.randint(n_samples)]]
+        n_samples = len(X)  # Número de puntos
+        centroids = [X[np.random.randint(n_samples)]]  # Primer centroide: punto aleatorio del dataset
 
-        for _ in range(1, self.n_clusters):
-            distances = np.array([min(np.sum((x - c)**2) for c in centroids) for x in X])
-            probs = distances / distances.sum()
-            centroids.append(X[np.random.choice(n_samples, p=probs)])
+        for _ in range(1, self.n_clusters):  # Elige los k-1 centroides restantes
+            distances = np.array([min(np.sum((x - c)**2) for c in centroids) for x in X])  # d^2 al centroide más cercano
+            probs = distances / distances.sum()  # Distribución de probabilidad proporcional a d^2
+            centroids.append(X[np.random.choice(n_samples, p=probs)])  # Samplea nuevo centroide con esas probabilidades
 
-        return np.array(centroids)
+        return np.array(centroids)  # Devuelve centroides iniciales como ndarray (k, n_features)
 
-    def fit(self, X: np.ndarray) -> 'KMeans':
-        self.centroids = self._init_centroids_plusplus(X)
+    def fit(self, X: np.ndarray) -> 'KMeans':  # Entrena K-Means (Lloyd) y guarda estado en self
+        self.centroids = self._init_centroids_plusplus(X)  # Inicializa centroides (K-Means++)
 
-        for _ in range(self.max_iter):
+        for _ in range(self.max_iter):  # Iteraciones de Lloyd (asignar -> actualizar)
             # Asignar
-            distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])
-            self.labels_ = np.argmin(distances, axis=1)
+            distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])  # Matriz (n_samples,k) de distancias^2
+            self.labels_ = np.argmin(distances, axis=1)  # Asigna cada punto al centroide más cercano
 
             # Actualizar
-            new_centroids = np.array([X[self.labels_ == k].mean(axis=0)
-                                      if np.sum(self.labels_ == k) > 0
-                                      else self.centroids[k]
-                                      for k in range(self.n_clusters)])
+            new_centroids = np.array([X[self.labels_ == k].mean(axis=0)  # Centroide = media de puntos del cluster
+                                      if np.sum(self.labels_ == k) > 0  # Si el cluster tiene puntos, usa la media
+                                      else self.centroids[k]  # Si cluster vacío, conserva el centroide anterior
+                                      for k in range(self.n_clusters)])  # Itera por cada id de cluster
+            # Nota: si un cluster queda vacío, se conserva el centroide anterior para evitar NaN
 
-            if np.allclose(self.centroids, new_centroids):
-                break
-            self.centroids = new_centroids
+            if np.allclose(self.centroids, new_centroids):  # Convergencia: centroides no cambian significativamente
+                break  # Detiene iteración si convergió
+            self.centroids = new_centroids  # Actualiza centroides (mutación del estado)
 
-        self.inertia_ = sum(np.sum((X[self.labels_ == k] - self.centroids[k])**2)
-                           for k in range(self.n_clusters))
-        return self
+        self.inertia_ = sum(  # Calcula inercia final (SSE intra-cluster)
+            np.sum((X[self.labels_ == k] - self.centroids[k])**2)  # SSE intra-cluster para cluster k
+            for k in range(self.n_clusters)  # Itera por cluster para acumular SSE
+        )  # Cierra la suma (reduce) de SSE sobre todos los clusters
+        return self  # Retorna self para chaining
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])
-        return np.argmin(distances, axis=1)
+    def predict(self, X: np.ndarray) -> np.ndarray:  # Asigna clusters a nuevos puntos dado self.centroids
+        distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])  # Distancias^2 a centroides
+        return np.argmin(distances, axis=1)  # Devuelve labels predichos
 
 
-def analyze_kmeans_mnist(X: np.ndarray, y: np.ndarray):
-    """Análisis K-Means de MNIST."""
+def analyze_kmeans_mnist(X: np.ndarray, y: np.ndarray):  # Análisis y visualización de clustering (usa y solo para evaluación)
+    """Análisis K-Means de MNIST."""  # Docstring: grafica centroides y calcula pureza
 
-    print("=== K-Means Clustering ===")
-    kmeans = KMeans(n_clusters=10, seed=42)
-    kmeans.fit(X)
+    print("=== K-Means Clustering ===")  # Header de la sección
+    print("=== Centroides (promedio de cada cluster) ===")  # Muestra sección de centroides
+    fig, axes = plt.subplots(2, 5, figsize=(12, 5))  # Cuadrícula 2x5 para mostrar 10 centroides
+    kmeans = KMeans(n_clusters=10, seed=42)  # Instancia modelo con k=10 (MNIST tiene 10 dígitos)
+    kmeans.fit(X)  # Entrena K-Means
 
-    # 1. Visualizar centroides
-    print("\n=== Centroides (promedio de cada cluster) ===")
-    fig, axes = plt.subplots(2, 5, figsize=(12, 5))
-    for i, ax in enumerate(axes.flatten()):
-        centroid = kmeans.centroids[i].reshape(28, 28)
-        ax.imshow(centroid, cmap='gray')
-        ax.set_title(f'Cluster {i}')
-        ax.axis('off')
-    plt.suptitle('Centroides K-Means')
-    plt.tight_layout()
-    plt.show()
+    for i, ax in enumerate(axes.flatten()):  # Itera sobre 10 subplots
+        centroid = kmeans.centroids[i].reshape(28, 28)  # Reinterpreta centroide (784,) como imagen 28x28
+        ax.imshow(centroid, cmap='gray')  # Visualiza centroide como imagen
+        ax.set_title(f'Cluster {i}')  # Título con id del cluster
+        ax.axis('off')  # Oculta ejes
+    plt.suptitle('Centroides K-Means')  # Título general
+    plt.tight_layout()  # Ajusta layout
+    plt.show()  # Side effect: renderiza figura
 
     # 2. Analizar pureza de clusters
-    print("\n=== Pureza de Clusters ===")
-    print("Cluster | Dígito Dominante | Pureza")
-    print("-" * 40)
+    print("\n=== Pureza de Clusters ===")  # Sección de evaluación de pureza usando y (solo para análisis)
+    print("Cluster | Dígito Dominante | Pureza")  # Encabezado de tabla
+    print("-" * 40)  # Separador visual
 
-    total_correct = 0
-    for cluster in range(10):
-        cluster_mask = kmeans.labels_ == cluster
-        cluster_labels = y[cluster_mask]
+    total_correct = 0  # Acumulador de ejemplos que caen en el dígito dominante por cluster
+    for cluster in range(10):  # Itera sobre los 10 clusters
+        cluster_mask = kmeans.labels_ == cluster  # Máscara booleana de puntos asignados al cluster
+        cluster_labels = y[cluster_mask]  # Etiquetas verdaderas de esos puntos (solo para evaluación)
 
-        if len(cluster_labels) > 0:
-            dominant_digit = np.bincount(cluster_labels).argmax()
-            purity = np.sum(cluster_labels == dominant_digit) / len(cluster_labels)
-            total_correct += np.sum(cluster_labels == dominant_digit)
-            print(f"   {cluster}    |        {dominant_digit}         | {purity:.2%}")
+        if len(cluster_labels) > 0:  # Evita operar sobre cluster vacío
+            dominant_digit = np.bincount(cluster_labels).argmax()  # Dígito más frecuente en el cluster
+            purity = np.sum(cluster_labels == dominant_digit) / len(cluster_labels)  # Pureza = fracción dominante
+            total_correct += np.sum(cluster_labels == dominant_digit)  # Suma aciertos dominantes
+            print(f"   {cluster}    |        {dominant_digit}         | {purity:.2%}")  # Imprime fila de tabla
 
-    overall_purity = total_correct / len(y)
-    print(f"\nPureza Global: {overall_purity:.2%}")
+    overall_purity = total_correct / len(y)  # Pureza global ponderada por tamaño de clusters
+    print(f"\nPureza Global: {overall_purity:.2%}")  # Resumen global
 
-    return kmeans
+    return kmeans  # Devuelve el modelo entrenado
 ```
+
+<details open>
+<summary><strong>📌 Complemento pedagógico — Sección 2.2: K-Means Clustering</strong></summary>
+
+#### 1) Metadatos
+- **Título:** K-Means en MNIST: qué significa un centroide y cómo evaluar clusters sin “hacer trampa”
+- **ID (opcional):** `M08-P02_2`
+- **Duración estimada:** 120–180 min
+- **Nivel:** Intermedio
+- **Dependencias:** Distancias, promedios, intuición geométrica en alta dimensión
+
+#### 2) Objetivos
+- Implementar K-Means y entender el ciclo asignación → actualización.
+- Interpretar `inertia_` y por qué decrece con iteraciones.
+- Evaluar clusters con pureza usando labels solo para auditoría.
+
+#### 3) Relevancia
+- Entrena tu intuición de “representaciones”: en alta dimensión, K-Means puede fallar si la métrica no corresponde a la semántica.
+- Es un baseline útil para detectar estructura y outliers antes de clasificación.
+
+#### 4) Mapa conceptual mínimo
+- **k** clusters → **centroides**.
+- **Asignación** por mínima distancia.
+- **Update**: centroides = media del cluster.
+- **Evaluación**: inercia + pureza (si tienes y).
+
+#### 5) Definiciones esenciales
+- **Inercia (SSE)**: suma de distancias cuadradas intra-cluster.
+- **Pureza**: fracción de la clase dominante por cluster.
+
+#### 6) Explicación didáctica
+- En MNIST, los centroides se pueden visualizar como “dígitos borrosos”: si salen irreconocibles, tu representación o k puede no estar bien.
+
+#### 7) Ejemplo modelado
+- Ejecuta K-Means con `k=10` y compara centroides vs dígitos reales.
+
+#### 8) Práctica guiada
+- Corre K-Means sobre PCA reducido (por ejemplo 50 PCs) y compara pureza/inercia con el espacio original.
+
+#### 9) Práctica independiente
+- Implementa “elbow method”: grafica `k` vs `inertia_` para `k ∈ {5,8,10,12,15}`.
+
+#### 10) Autoevaluación
+- ¿Por qué K-Means++ ayuda frente a centroides aleatorios?
+
+#### 11) Errores comunes
+- No manejar clusters vacíos (centroide NaN).
+- Olvidar fijar seed y no poder reproducir resultados.
+- Interpretar pureza alta como “modelo supervisado” (no lo es).
+
+#### 12) Retención
+- Mantra: “entrena sin labels; usa labels solo para auditar, no para optimizar”.
+
+#### 13) Diferenciación
+- Avanzado: comparar con GMM (soft clustering) y discutir cuándo es preferible.
+
+#### 14) Recursos
+- K-Means++ intuition; artículos sobre high-dimensional clustering.
+
+#### 15) Nota docente
+- Pide que el alumno explique por qué un cluster puede mezclar ‘4’ y ‘9’ (rasgos similares) y qué haría para mejorar.
+</details>
 
 ---
 
@@ -439,132 +606,129 @@ def analyze_kmeans_mnist(X: np.ndarray, y: np.ndarray):
 ### 3.1 Logistic Regression One-vs-All
 
 ```python
-"""
-SEMANAS 23-24: Logistic Regression Multiclase
+"""SEMANAS 23-24: Logistic Regression Multiclase
 
 Estrategia One-vs-All (OvA):
 - Entrenar 10 clasificadores binarios
 - Cada uno: "¿Es este dígito X o no?"
 - Predicción: elegir la clase con mayor probabilidad
-"""
+"""  # Cierra la cabecera multi-línea del bloque; si faltara, todo lo siguiente quedaría dentro del string
 
-import numpy as np
-from typing import List
+import numpy as np  # Importa NumPy para álgebra lineal, métricas y procesamiento de arrays
+from typing import List  # Importa List para anotaciones (no afecta runtime)
 
-def sigmoid(z):
-    return 1 / (1 + np.exp(-np.clip(z, -500, 500)))
+def sigmoid(z):  # Sigmoid: mapea logits a probabilidad en (0,1)
+    return 1 / (1 + np.exp(-np.clip(z, -500, 500)))  # Sigmoid estable: clip evita overflow en exp
+
+class LogisticRegressionBinary:  # Clasificador binario para OvA
+    """Logistic Regression binario."""  # Docstring: modelo lineal + sigmoid
+
+    def __init__(self, lr: float = 0.1, n_iter: int = 100, reg: float = 0.01):  # Hiperparámetros GD/L2
+        self.lr = lr  # Learning rate para gradient descent
+        self.n_iter = n_iter  # Número de iteraciones de entrenamiento
+        self.reg = reg  # L2 regularization (fuerza del término ||theta||^2)
+        self.theta = None  # Parámetros (n_features,)
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> 'LogisticRegressionBinary':  # Entrena por GD
+        n_samples, n_features = X.shape  # Extrae dimensiones; X debe ser 2D
+        self.theta = np.zeros(n_features)  # Inicializa theta en 0 (convexo; converge)
+
+        for _ in range(self.n_iter):  # Loop de optimización (permitido iterar sobre iteraciones)
+            h = sigmoid(X @ self.theta)  # Probabilidades predichas (n_samples,)
+            grad = (1/n_samples) * X.T @ (h - y) + (self.reg/n_samples) * self.theta  # Gradiente BCE + L2
+            self.theta -= self.lr * grad  # Update GD (mutación de theta)
+
+        return self  # Permite chaining (pca.fit(X).transform(X))
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:  # Probabilidades para clase positiva
+        return sigmoid(X @ self.theta)  # Devuelve probabilidad P(y=1|x)
 
 
-class LogisticRegressionBinary:
-    """Logistic Regression binario."""
+class LogisticRegressionOvA:  # Meta-clasificador: 1 modelo binario por clase
+    """Logistic Regression One-vs-All para clasificación multiclase."""  # Docstring: estrategia OvA
 
-    def __init__(self, lr: float = 0.1, n_iter: int = 100, reg: float = 0.01):
-        self.lr = lr
-        self.n_iter = n_iter
-        self.reg = reg  # L2 regularization
-        self.theta = None
+    def __init__(self, n_classes: int = 10, lr: float = 0.1, n_iter: int = 100):  # Configuración de OvA
+        self.n_classes = n_classes  # Número de clases (10 en MNIST)
+        self.lr = lr  # Learning rate para cada clasificador binario
+        self.n_iter = n_iter  # Iteraciones para cada clasificador binario
+        self.classifiers: List[LogisticRegressionBinary] = []  # Lista de modelos binarios entrenados
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> 'LogisticRegressionBinary':
-        n_samples, n_features = X.shape
-        self.theta = np.zeros(n_features)
-
-        for _ in range(self.n_iter):
-            h = sigmoid(X @ self.theta)
-            grad = (1/n_samples) * X.T @ (h - y) + (self.reg/n_samples) * self.theta
-            self.theta -= self.lr * grad
-
-        return self
-
-    def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        return sigmoid(X @ self.theta)
-
-
-class LogisticRegressionOvA:
-    """Logistic Regression One-vs-All para clasificación multiclase."""
-
-    def __init__(self, n_classes: int = 10, lr: float = 0.1, n_iter: int = 100):
-        self.n_classes = n_classes
-        self.lr = lr
-        self.n_iter = n_iter
-        self.classifiers: List[LogisticRegressionBinary] = []
-
-    def fit(self, X: np.ndarray, y: np.ndarray) -> 'LogisticRegressionOvA':
-        """Entrena un clasificador por clase."""
+    def fit(self, X: np.ndarray, y: np.ndarray) -> 'LogisticRegressionOvA':  # Entrena todos los clasificadores
+        """Entrena un clasificador por clase."""  # Docstring: entrena un binario por cada clase
         # Añadir bias
-        X_b = np.column_stack([np.ones(len(X)), X])
+        X_b = np.column_stack([np.ones(len(X)), X])  # Agrega columna 1s para término independiente
 
-        self.classifiers = []
-        for c in range(self.n_classes):
-            print(f"  Entrenando clasificador para clase {c}...", end='\r')
-            y_binary = (y == c).astype(int)
-            clf = LogisticRegressionBinary(self.lr, self.n_iter)
-            clf.fit(X_b, y_binary)
-            self.classifiers.append(clf)
+        self.classifiers = []  # Reinicia lista de clasificadores (mutación)
+        for c in range(self.n_classes):  # Itera por clase para estrategia OvA
+            print(f"  Entrenando clasificador para clase {c}...", end='\r')  # Side effect: imprime progreso
+            y_binary = (y == c).astype(int)  # Labels binarios: 1 si es clase c, 0 si no
+            clf = LogisticRegressionBinary(self.lr, self.n_iter)  # Inicializa clasificador binario
+            clf.fit(X_b, y_binary)  # Entrena sobre el problema binario
+            self.classifiers.append(clf)  # Guarda clasificador entrenado
 
-        print("  Entrenamiento completado.                ")
-        return self
+        print("  Entrenamiento completado.                ")  # Limpia la línea y deja mensaje final
+        return self  # Devuelve la instancia con `self.classifiers` entrenados
 
-    def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        """Retorna probabilidades para cada clase."""
-        X_b = np.column_stack([np.ones(len(X)), X])
-        probs = np.column_stack([clf.predict_proba(X_b) for clf in self.classifiers])
-        return probs
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:  # Devuelve scores/probabilidades por clase
+        """Retorna probabilidades para cada clase."""  # Docstring
+        X_b = np.column_stack([np.ones(len(X)), X])  # Añade bias
+        probs = np.column_stack([clf.predict_proba(X_b) for clf in self.classifiers])  # (n_samples,n_classes)
+        return probs  # Probabilidades por clase (no necesariamente suman 1; son scores OvA)
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        """Predice la clase con mayor probabilidad."""
-        probs = self.predict_proba(X)
-        return np.argmax(probs, axis=1)
+    def predict(self, X: np.ndarray) -> np.ndarray:  # Predice clase final vía argmax
+        """Predice la clase con mayor probabilidad."""  # Docstring
+        probs = self.predict_proba(X)  # Scores/probabilidades por clase
+        return np.argmax(probs, axis=1)  # Elige la clase con score máximo
 
-    def score(self, X: np.ndarray, y: np.ndarray) -> float:
-        """Accuracy."""
-        return np.mean(self.predict(X) == y)
+    def score(self, X: np.ndarray, y: np.ndarray) -> float:  # Accuracy
+        """Accuracy."""  # Docstring
+        return np.mean(self.predict(X) == y)  # Accuracy promedio (0..1)
 
 
-def train_logistic_mnist(X_train, y_train, X_test, y_test):
-    """Entrena y evalúa Logistic Regression en MNIST."""
+def train_logistic_mnist(X_train, y_train, X_test, y_test):  # Entrena y reporta métricas
+    """Entrena y evalúa Logistic Regression en MNIST."""  # Docstring: describe objetivo (entrenar/evaluar) sin afectar el comportamiento
 
-    print("=== Logistic Regression One-vs-All ===")
-
+    print("=== Logistic Regression One-vs-All ===")  # Header de la sección
     # Entrenar
-    lr_model = LogisticRegressionOvA(n_classes=10, lr=0.1, n_iter=200)
-    lr_model.fit(X_train, y_train)
+    lr_model = LogisticRegressionOvA(n_classes=10, lr=0.1, n_iter=200)  # Configura OvA
+    lr_model.fit(X_train, y_train)  # Entrena 10 clasificadores (side effects: ajusta parámetros)
 
     # Evaluar
-    train_acc = lr_model.score(X_train, y_train)
-    test_acc = lr_model.score(X_test, y_test)
+    train_acc = lr_model.score(X_train, y_train)  # Accuracy en entrenamiento
+    test_acc = lr_model.score(X_test, y_test)  # Accuracy en test
 
-    print(f"\nTrain Accuracy: {train_acc:.2%}")
-    print(f"Test Accuracy:  {test_acc:.2%}")
+    print(f"\nTrain Accuracy: {train_acc:.2%}")  # Reporta accuracy de train
+    print(f"Test Accuracy:  {test_acc:.2%}")  # Reporta accuracy de test
 
     # Métricas detalladas
-    y_pred = lr_model.predict(X_test)
+    y_pred = lr_model.predict(X_test)  # Predicciones finales multiclase en test
 
-    print("\n=== Métricas por Clase ===")
-    print("Dígito | Precision | Recall | F1-Score")
-    print("-" * 45)
+    print("\n=== Métricas por Clase ===")  # Header de métricas por clase
+    print("Dígito | Precision | Recall | F1-Score")  # Encabezado de tabla
+    print("-" * 45)  # Separador
 
-    for digit in range(10):
-        tp = np.sum((y_test == digit) & (y_pred == digit))
-        fp = np.sum((y_test != digit) & (y_pred == digit))
-        fn = np.sum((y_test == digit) & (y_pred != digit))
+    for digit in range(10):  # Métricas one-vs-rest por clase
+        tp = np.sum((y_test == digit) & (y_pred == digit))  # True positives para clase digit
+        fp = np.sum((y_test != digit) & (y_pred == digit))  # False positives para clase digit
+        fn = np.sum((y_test == digit) & (y_pred != digit))  # False negatives para clase digit
 
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0  # Precision con guardas contra división por cero
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0  # Recall con guardas
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0  # F1 con guardas
 
-        print(f"   {digit}   |   {precision:.3f}   |  {recall:.3f}  |   {f1:.3f}")
+        print(f"   {digit}   |   {precision:.3f}   |  {recall:.3f}  |   {f1:.3f}")  # Fila por clase
 
     # Matriz de confusión
-    print("\n=== Matriz de Confusión ===")
-    cm = np.zeros((10, 10), dtype=int)
-    for true, pred in zip(y_test, y_pred):
-        cm[true, pred] += 1
+    print("\n=== Matriz de Confusión ===")  # Header de matriz de confusión
+    cm = np.zeros((10, 10), dtype=int)  # Matriz de confusión (true x pred)
+    for true, pred in zip(y_test, y_pred):  # Itera sobre pares (y_true, y_pred)
+        cm[true, pred] += 1  # Incrementa celda correspondiente
 
-    print("    " + "  ".join(str(i) for i in range(10)))
-    for i in range(10):
-        print(f"{i}: " + " ".join(f"{cm[i,j]:3d}" for j in range(10)))
+    print("    " + "  ".join(str(i) for i in range(10)))  # Header con índices de clase predicha
+    for i in range(10):  # Itera por clase verdadera
+        print(f"{i}: " + " ".join(f"{cm[i,j]:3d}" for j in range(10)))  # Imprime fila de la matriz
 
-    return lr_model
+    return lr_model  # Devuelve el modelo entrenado
 ```
 
 ---
@@ -574,8 +738,7 @@ def train_logistic_mnist(X_train, y_train, X_test, y_test):
 ### 4.1 MLP para MNIST
 
 ```python
-"""
-SEMANAS 25-26: Neural Network para MNIST
+"""SEMANAS 25-26: Neural Network para MNIST
 
 Arquitectura:
 - Input: 784 (28x28 píxeles aplanados)
@@ -584,291 +747,286 @@ Arquitectura:
 - Output: 10 neuronas, Softmax
 
 Objetivo: Superar a Logistic Regression
-"""
+"""  # Cierra la introducción del bloque; el código siguiente define funciones/clases del MLP
 
-import numpy as np
-from typing import List, Tuple
+import numpy as np  # Importa NumPy para álgebra lineal, inicialización de pesos y operaciones vectoriales
+from typing import List, Tuple  # Importa tipos para anotaciones (no afecta runtime)
 
 # Funciones de activación
-def relu(z):
-    return np.maximum(0, z)
+def relu(z):  # ReLU: activación no lineal usada en capas ocultas
+    return np.maximum(0, z)  # max(0,z) elemento a elemento
 
-def relu_deriv(z):
-    return (z > 0).astype(float)
+def relu_deriv(z):  # Derivada de ReLU respecto a z
+    return (z > 0).astype(float)  # 1.0 si z>0, 0.0 si z<=0
 
-def softmax(z):
-    exp_z = np.exp(z - np.max(z))
-    return exp_z / np.sum(exp_z)
+def softmax(z):  # Softmax: convierte logits en probabilidades
+    exp_z = np.exp(z - np.max(z))  # Estabiliza restando max(z) para evitar overflow en exp
+    return exp_z / np.sum(exp_z)  # Normaliza para que la suma sea 1
 
+class NeuralNetworkMNIST:  # Clase que encapsula el MLP (parámetros y estado) y provee entrenamiento/predicción
+    """Red Neuronal optimizada para MNIST."""  # Docstring de clase: describe el propósito general sin ejecutar lógica
 
-class NeuralNetworkMNIST:
-    """Red Neuronal optimizada para MNIST."""
-
-    def __init__(self, layer_sizes: List[int] = [784, 128, 64, 10], seed: int = 42):
-        """
+    def __init__(self, layer_sizes: List[int] = [784, 128, 64, 10], seed: int = 42):  # Configura arquitectura e inicializa pesos/bias
+        """  # Cierra docstring del constructor; separa documentación del código de inicialización
         Args:
             layer_sizes: [input, hidden1, hidden2, ..., output]
-        """
-        np.random.seed(seed)
+        """  # Cierra docstring del constructor; separa documentación del código de inicialización
+        np.random.seed(seed)  # Fija semilla global para reproducibilidad de inicialización
 
-        self.layer_sizes = layer_sizes
-        self.n_layers = len(layer_sizes)
+        self.layer_sizes = layer_sizes  # Lista de tamaños por capa (input -> hidden(s) -> output)
+        self.n_layers = len(layer_sizes)  # Número total de capas (incluye input y output)
 
         # Inicializar pesos (He initialization para ReLU)
-        self.weights = []
-        self.biases = []
+        self.weights = []  # Lista de matrices W por capa (out_dim, in_dim)
+        self.biases = []  # Lista de vectores b por capa (out_dim,)
 
-        for i in range(self.n_layers - 1):
-            w = np.random.randn(layer_sizes[i+1], layer_sizes[i]) * np.sqrt(2.0 / layer_sizes[i])
-            b = np.zeros(layer_sizes[i+1])
-            self.weights.append(w)
-            self.biases.append(b)
+        for i in range(self.n_layers - 1):  # Crea parámetros para cada transición capa_i -> capa_{i+1}
+            w = np.random.randn(layer_sizes[i+1], layer_sizes[i]) * np.sqrt(2.0 / layer_sizes[i])  # He init para ReLU
+            b = np.zeros(layer_sizes[i+1])  # Bias inicial en 0
+            self.weights.append(w)  # Guarda pesos de la capa i
+            self.biases.append(b)  # Guarda bias de la capa i
 
-        self.cache = {}
-        self.loss_history = []
+        self.cache = {}  # Cache de activaciones/preactivaciones para backward (estado mutable)
+        self.loss_history = []  # Historial del loss promedio por época
 
-    def forward(self, x: np.ndarray) -> np.ndarray:
-        """Forward pass."""
-        self.cache['a0'] = x
-        a = x
+    def forward(self, x: np.ndarray) -> np.ndarray:  # Forward: computa activaciones/probabilidades y guarda cache para backprop
+        """Forward pass."""  # Docstring: aclara que aquí se computan activaciones
+        self.cache['a0'] = x  # Guarda entrada como activación de capa 0
+        a = x  # Activación actual (se va actualizando capa por capa)
 
-        for i in range(self.n_layers - 2):
-            z = self.weights[i] @ a + self.biases[i]
-            a = relu(z)
-            self.cache[f'z{i+1}'] = z
-            self.cache[f'a{i+1}'] = a
+        for i in range(self.n_layers - 2):  # Itera solo capas ocultas (la última capa se calcula con softmax aparte)
+            z = self.weights[i] @ a + self.biases[i]  # Pre-activación: z = W a + b
+            a = relu(z)  # Activación ReLU
+            self.cache[f'z{i+1}'] = z  # Guarda z para derivada de ReLU
+            self.cache[f'a{i+1}'] = a  # Guarda a para gradientes de W
 
         # Última capa: softmax
-        z = self.weights[-1] @ a + self.biases[-1]
-        a = softmax(z)
-        self.cache[f'z{self.n_layers-1}'] = z
-        self.cache[f'a{self.n_layers-1}'] = a
+        z = self.weights[-1] @ a + self.biases[-1]  # Logits de salida
+        a = softmax(z)  # Probabilidades por clase
+        self.cache[f'z{self.n_layers-1}'] = z  # Guarda logits
+        self.cache[f'a{self.n_layers-1}'] = a  # Guarda probabilidades
 
-        return a
+        return a  # Devuelve probabilidades finales
 
-    def backward(self, y_true: np.ndarray) -> Tuple[List, List]:
-        """Backward pass."""
-        y_pred = self.cache[f'a{self.n_layers-1}']
+    def backward(self, y_true: np.ndarray) -> Tuple[List, List]:  # Backprop: calcula gradientes de pesos/bias usando y_true en one-hot
+        """Backward pass."""  # Docstring: aclara que aquí se computan derivadas
+        y_pred = self.cache[f'a{self.n_layers-1}']  # Recupera predicción del forward
 
         # Gradiente de softmax + cross-entropy
-        dz = y_pred - y_true
+        dz = y_pred - y_true  # Para softmax+CE: dL/dz = (p - y_onehot)
 
-        dW_list = []
-        db_list = []
+        dW_list = []  # Gradientes de pesos (misma estructura que self.weights)
+        db_list = []  # Gradientes de bias (misma estructura que self.biases)
 
-        for i in range(self.n_layers - 2, -1, -1):
-            a_prev = self.cache[f'a{i}']
+        for i in range(self.n_layers - 2, -1, -1):  # Itera capas en reversa para propagar el gradiente hacia la entrada
+            a_prev = self.cache[f'a{i}']  # Activación de la capa anterior
 
-            dW = np.outer(dz, a_prev)
-            db = dz
+            dW = np.outer(dz, a_prev)  # dW = dz[:,None] * a_prev[None,:] (outer)
+            db = dz  # db = dz (para un solo ejemplo)
 
-            dW_list.insert(0, dW)
-            db_list.insert(0, db)
+            dW_list.insert(0, dW)  # Inserta al inicio para mantener orden de capas
+            db_list.insert(0, db)  # Inserta al inicio para mantener orden de capas
 
-            if i > 0:
-                da_prev = self.weights[i].T @ dz
-                z_prev = self.cache[f'z{i}']
-                dz = da_prev * relu_deriv(z_prev)
+            if i > 0:  # Evita computar derivada sobre una capa inexistente (no hay z0)
+                da_prev = self.weights[i].T @ dz  # Propaga gradiente hacia activación previa
+                z_prev = self.cache[f'z{i}']  # Pre-activación previa para derivada de ReLU
+                dz = da_prev * relu_deriv(z_prev)  # Aplica derivada de ReLU
 
-        return dW_list, db_list
+        return dW_list, db_list  # Devuelve gradientes por capa
 
-    def fit(
-        self,
-        X: np.ndarray,
-        y: np.ndarray,
-        epochs: int = 10,
-        batch_size: int = 32,
-        learning_rate: float = 0.01,
-        verbose: bool = True
-    ):
-        """Entrena la red con mini-batch SGD."""
-        n_samples = len(X)
+    def fit(  # Entrena con mini-batch SGD (actualiza self.weights/self.biases en cada batch)
+        self,  # Referencia al modelo; aquí se muta el estado entrenable de la instancia
+        X: np.ndarray,  # Matriz de entrada (n_samples, n_features)
+        y: np.ndarray,  # Vector de etiquetas enteras (n_samples,)
+        epochs: int = 10,  # Cantidad de épocas (pasadas completas por el dataset)
+        batch_size: int = 32,  # Tamaño del batch (trade-off: estabilidad del gradiente vs coste)
+        learning_rate: float = 0.01,  # Paso del update en descenso de gradiente
+        verbose: bool = True  # Controla prints de progreso (side effect: stdout)
+    ):  # Cierra firma; el cuerpo implementa shuffle, batching, acumulación de gradientes y updates
+        """Entrena la red con mini-batch SGD."""  # Docstring: describe objetivo (entrenar) sin afectar el comportamiento
+        n_samples = len(X)  # Número total de muestras
 
-        for epoch in range(epochs):
+        for epoch in range(epochs):  # Loop principal de entrenamiento por época
             # Shuffle
-            indices = np.random.permutation(n_samples)
-            X_shuffled = X[indices]
-            y_shuffled = y[indices]
+            indices = np.random.permutation(n_samples)  # Permutación aleatoria de índices (mutabilidad local)
+            X_shuffled = X[indices]  # Reordena X
+            y_shuffled = y[indices]  # Reordena y en el mismo orden
 
-            total_loss = 0
+            total_loss = 0  # Acumulador de loss para promediar al final de la época
 
-            for i in range(0, n_samples, batch_size):
-                X_batch = X_shuffled[i:i+batch_size]
-                y_batch = y_shuffled[i:i+batch_size]
+            for i in range(0, n_samples, batch_size):  # Recorre el dataset en ventanas para formar mini-batches
+                X_batch = X_shuffled[i:i+batch_size]  # Slice del mini-batch
+                y_batch = y_shuffled[i:i+batch_size]  # Labels del mini-batch
 
                 # Acumular gradientes del batch
-                dW_accum = [np.zeros_like(w) for w in self.weights]
-                db_accum = [np.zeros_like(b) for b in self.biases]
+                dW_accum = [np.zeros_like(w) for w in self.weights]  # Acumulador de gradientes de W
+                db_accum = [np.zeros_like(b) for b in self.biases]  # Acumulador de gradientes de b
 
-                for x, y_true_label in zip(X_batch, y_batch):
+                for x, y_true_label in zip(X_batch, y_batch):  # Itera ejemplos del batch para acumular gradientes
                     # One-hot encode
-                    y_one_hot = np.zeros(10)
-                    y_one_hot[y_true_label] = 1
+                    y_one_hot = np.zeros(10)  # Vector one-hot (10 clases)
+                    y_one_hot[y_true_label] = 1  # Activa la clase verdadera
 
                     # Forward
-                    y_pred = self.forward(x)
+                    y_pred = self.forward(x)  # Probabilidades predichas para este ejemplo
 
                     # Loss
-                    loss = -np.sum(y_one_hot * np.log(np.clip(y_pred, 1e-15, 1)))
-                    total_loss += loss
+                    loss = -np.sum(y_one_hot * np.log(np.clip(y_pred, 1e-15, 1)))  # CE con clipping para log(0)
+                    total_loss += loss  # Acumula loss (suma)
 
                     # Backward
-                    dW_list, db_list = self.backward(y_one_hot)
+                    dW_list, db_list = self.backward(y_one_hot)  # Gradientes para un ejemplo
 
-                    for j in range(len(self.weights)):
-                        dW_accum[j] += dW_list[j]
-                        db_accum[j] += db_list[j]
+                    for j in range(len(self.weights)):  # Acumula gradientes por capa antes de actualizar (promedio de batch)
+                        dW_accum[j] += dW_list[j]  # Suma gradiente de pesos
+                        db_accum[j] += db_list[j]  # Suma gradiente de bias
 
                 # Update
-                batch_len = len(X_batch)
-                for j in range(len(self.weights)):
-                    self.weights[j] -= learning_rate * dW_accum[j] / batch_len
-                    self.biases[j] -= learning_rate * db_accum[j] / batch_len
+                batch_len = len(X_batch)  # Tamaño real del batch (último batch puede ser menor)
+                for j in range(len(self.weights)):  # Aplica update SGD por capa usando gradiente promedio del batch
+                    self.weights[j] -= learning_rate * dW_accum[j] / batch_len  # Update GD promedio en batch
+                    self.biases[j] -= learning_rate * db_accum[j] / batch_len  # Update GD promedio en batch
 
-            avg_loss = total_loss / n_samples
-            self.loss_history.append(avg_loss)
+            avg_loss = total_loss / n_samples  # Loss promedio por muestra (aprox)
+            self.loss_history.append(avg_loss)  # Guarda loss para curvas
 
-            if verbose:
-                train_acc = self.score(X[:1000], y[:1000])
-                print(f"Epoch {epoch+1}/{epochs} - Loss: {avg_loss:.4f} - Acc: {train_acc:.2%}")
+            if verbose:  # Logging condicional del progreso (no afecta cálculos si está desactivado)
+                train_acc = self.score(X[:1000], y[:1000])  # Accuracy en un subset para feedback rápido
+                print(f"Epoch {epoch+1}/{epochs} - Loss: {avg_loss:.4f} - Acc: {train_acc:.2%}")  # Log de entrenamiento
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        """Predice clases."""
-        return np.array([np.argmax(self.forward(x)) for x in X])
+    def predict(self, X: np.ndarray) -> np.ndarray:  # Predice labels haciendo argmax de las probabilidades del forward
+        """Predice clases."""  # Docstring: aclara que retorna labels (no probabilidades)
+        return np.array([np.argmax(self.forward(x)) for x in X])  # Argmax de probabilidades por muestra
 
-    def score(self, X: np.ndarray, y: np.ndarray) -> float:
-        """Accuracy."""
-        return np.mean(self.predict(X) == y)
+    def score(self, X: np.ndarray, y: np.ndarray) -> float:  # Calcula accuracy comparando predict(X) contra y
+        """Accuracy."""  # Docstring: documenta la métrica retornada
+        return np.mean(self.predict(X) == y)  # Promedio de aciertos
 
 
-def train_neural_network_mnist(X_train, y_train, X_test, y_test):
-    """Entrena y evalúa Neural Network en MNIST."""
+def train_neural_network_mnist(X_train, y_train, X_test, y_test):  # Wrapper que ejecuta fit/score y reporta; si se elimina, el pipeline pierde el paso de NN de forma encapsulada
+    """Entrena y evalúa Neural Network en MNIST."""  # Docstring: describe objetivo (entrenar/evaluar) sin afectar el comportamiento
 
-    print("=== Neural Network (MLP) ===")
-    print("Arquitectura: 784 → 128 → 64 → 10")
+    print("=== Neural Network (MLP) ===")  # Header de la sección
+    print("Arquitectura: 784 → 128 → 64 → 10")  # Describe arquitectura usada
 
-    nn = NeuralNetworkMNIST([784, 128, 64, 10])
-    nn.fit(X_train, y_train, epochs=10, batch_size=32, learning_rate=0.01)
+    nn = NeuralNetworkMNIST([784, 128, 64, 10])  # Instancia MLP
+    nn.fit(X_train, y_train, epochs=10, batch_size=32, learning_rate=0.01)  # Entrena (side effects: ajusta pesos internos del modelo)
 
-    train_acc = nn.score(X_train, y_train)
-    test_acc = nn.score(X_test, y_test)
+    train_acc = nn.score(X_train, y_train)  # Accuracy en train
+    test_acc = nn.score(X_test, y_test)  # Accuracy en test
 
-    print(f"\nTrain Accuracy: {train_acc:.2%}")
-    print(f"Test Accuracy:  {test_acc:.2%}")
+    print(f"\nTrain Accuracy: {train_acc:.2%}")  # Reporta accuracy de train
+    print(f"Test Accuracy:  {test_acc:.2%}")  # Reporta accuracy de test
 
-    return nn
-```
+    return nn  # Devuelve el modelo entrenado
 
----
 
-## 💻 Parte 5: Benchmark y Comparación
+# === Parte 5: Benchmark y Comparación ===
 
-### 5.1 Pipeline Completo
 
-```python
-"""
-Pipeline completo que ejecuta todos los análisis
+# === 5.1 Pipeline Completo ===
+
+"""Pipeline completo que ejecuta todos los análisis
 y compara los modelos.
-"""
+"""  # Cierra la cabecera multi-línea; evita que imports/funciones queden dentro del string
 
-import numpy as np
-import time
+import numpy as np  # Importa NumPy para normalización, slicing y operaciones básicas
+import time  # Importa time para medir duración (benchmark) con time.time()
 
-def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True):
-    """
-    Ejecuta el pipeline completo de MNIST.
+def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True):  # Orquesta el pipeline completo (PCA/KMeans/LR/MLP) y devuelve métricas
+    """Ejecuta el pipeline completo de MNIST.
 
     Args:
         use_subset: Si True, usa solo 10k samples para rapidez
-    """
-    if use_subset:
-        X_train = X_train[:10000]
-        y_train = y_train[:10000]
-        X_test = X_test[:2000]
-        y_test = y_test[:2000]
+    """  # Cierra el docstring de la función; el bloque siguiente es lógica ejecutable del pipeline
+    if use_subset:  # Permite acelerar el pipeline usando un subconjunto (trade-off: métrica menos estable)
+        X_train = X_train[:10000]  # Reduce train para rapidez
+        y_train = y_train[:10000]  # Reduce labels train
+        X_test = X_test[:2000]  # Reduce test para rapidez
+        y_test = y_test[:2000]  # Reduce labels test
 
     # Normalizar
-    X_train = X_train / 255.0
-    X_test = X_test / 255.0
+    X_train = X_train / 255.0  # Normaliza train de [0,255] a [0,1]
+    X_test = X_test / 255.0  # Normaliza test de [0,255] a [0,1]
 
-    print("=" * 60)
-    print("MNIST ANALYST PIPELINE")
-    print("=" * 60)
-    print(f"Train samples: {len(X_train)}")
-    print(f"Test samples: {len(X_test)}")
-    print(f"Features: {X_train.shape[1]}")
-    print("=" * 60)
+    print("=" * 60)  # Imprime separador para delimitar la cabecera del pipeline en consola
+    print("MNIST ANALYST PIPELINE")  # Título principal del pipeline (logging informativo)
+    print("=" * 60)  # Repite separador para reforzar la separación visual
+    print(f"Train samples: {len(X_train)}")  # Tamaño de train
+    print(f"Test samples: {len(X_test)}")  # Tamaño de test
+    print(f"Features: {X_train.shape[1]}")  # Número de features (784)
+    print("=" * 60)  # Cierra la cabecera; a partir de aquí comienzan las fases del pipeline
 
-    results = {}
+    results = {}  # Dict para almacenar accuracy por modelo
 
     # === FASE 1: Unsupervised ===
-    print("\n" + "=" * 60)
-    print("FASE 1: EXPLORACIÓN NO SUPERVISADA")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Imprime separador y salto de línea para delimitar visualmente la fase 1
+    print("FASE 1: EXPLORACIÓN NO SUPERVISADA")  # Título de la fase 1 (logging informativo)
+    print("=" * 60)  # Imprime línea separadora para mejorar legibilidad en consola
 
     # PCA
-    print("\n[PCA]")
-    pca = PCA(n_components=50)
-    pca.fit(X_train)
-    print(f"Varianza explicada (50 PCs): {sum(pca.explained_variance_ratio_):.2%}")
+    print("\n[PCA]")  # Header de la subsección PCA dentro del pipeline
+    pca = PCA(n_components=50)  # Inicializa PCA con 50 componentes
+    pca.fit(X_train)  # Ajusta PCA en train
+    print(f"Varianza explicada (50 PCs): {sum(pca.explained_variance_ratio_):.2%}")  # Varianza acumulada
 
     # K-Means
-    print("\n[K-Means]")
-    start = time.time()
-    kmeans = KMeans(n_clusters=10, seed=42)
-    kmeans.fit(X_train)
-    kmeans_time = time.time() - start
-    print(f"Inercia: {kmeans.inertia_:.2f}")
-    print(f"Tiempo: {kmeans_time:.2f}s")
+    print("\n[K-Means]")  # Header de la subsección K-Means dentro del pipeline
+    start = time.time()  # Marca tiempo inicial
+    kmeans = KMeans(n_clusters=10, seed=42)  # Inicializa K-Means
+    kmeans.fit(X_train)  # Entrena K-Means
+    kmeans_time = time.time() - start  # Duración del entrenamiento
+    print(f"Inercia: {kmeans.inertia_:.2f}")  # Inercia final
+    print(f"Tiempo: {kmeans_time:.2f}s")  # Tiempo transcurrido
 
     # === FASE 2: Supervised ===
-    print("\n" + "=" * 60)
-    print("FASE 2: CLASIFICACIÓN SUPERVISADA")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Separador visual para iniciar fase 2
+    print("FASE 2: CLASIFICACIÓN SUPERVISADA")  # Título de fase 2 (modelos supervisados)
+    print("=" * 60)  # Línea separadora de la sección
 
     # Logistic Regression
-    print("\n[Logistic Regression One-vs-All]")
-    start = time.time()
-    lr_model = LogisticRegressionOvA(n_classes=10, lr=0.1, n_iter=100)
-    lr_model.fit(X_train, y_train)
-    lr_time = time.time() - start
-    lr_acc = lr_model.score(X_test, y_test)
-    print(f"Test Accuracy: {lr_acc:.2%}")
-    print(f"Tiempo: {lr_time:.2f}s")
-    results['Logistic Regression'] = lr_acc
+    print("\n[Logistic Regression One-vs-All]")  # Header para el entrenamiento/evaluación de Logistic Regression OvA
+    start = time.time()  # Marca tiempo inicial
+    lr_model = LogisticRegressionOvA(n_classes=10, lr=0.1, n_iter=100)  # Inicializa Logistic OvA
+    lr_model.fit(X_train, y_train)  # Entrena
+    lr_time = time.time() - start  # Duración
+    lr_acc = lr_model.score(X_test, y_test)  # Accuracy en test
+    print(f"Test Accuracy: {lr_acc:.2%}")  # Reporta accuracy
+    print(f"Tiempo: {lr_time:.2f}s")  # Reporta tiempo
+    results['Logistic Regression'] = lr_acc  # Guarda baseline
 
     # === FASE 3: Deep Learning ===
-    print("\n" + "=" * 60)
-    print("FASE 3: DEEP LEARNING")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Separador visual para iniciar fase 3
+    print("FASE 3: DEEP LEARNING")  # Título de fase 3 (modelos de red neuronal)
+    print("=" * 60)  # Línea separadora de la sección
 
     # Neural Network
-    print("\n[Neural Network MLP]")
-    start = time.time()
-    nn = NeuralNetworkMNIST([784, 128, 64, 10])
-    nn.fit(X_train, y_train, epochs=5, batch_size=32, learning_rate=0.01, verbose=False)
-    nn_time = time.time() - start
-    nn_acc = nn.score(X_test, y_test)
-    print(f"Test Accuracy: {nn_acc:.2%}")
-    print(f"Tiempo: {nn_time:.2f}s")
-    results['Neural Network'] = nn_acc
+    print("\n[Neural Network MLP]")  # Header para el entrenamiento/evaluación del MLP
+    start = time.time()  # Marca tiempo inicial
+    nn = NeuralNetworkMNIST([784, 128, 64, 10])  # Inicializa MLP
+    nn.fit(X_train, y_train, epochs=5, batch_size=32, learning_rate=0.01, verbose=False)  # Entrena rápido
+    nn_time = time.time() - start  # Duración
+    nn_acc = nn.score(X_test, y_test)  # Accuracy en test
+    print(f"Test Accuracy: {nn_acc:.2%}")  # Reporta accuracy
+    print(f"Tiempo: {nn_time:.2f}s")  # Reporta tiempo
+    results['Neural Network'] = nn_acc  # Guarda resultado
 
     # === COMPARACIÓN ===
-    print("\n" + "=" * 60)
-    print("COMPARACIÓN DE MODELOS")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Separador visual previo a la tabla comparativa
+    print("COMPARACIÓN DE MODELOS")  # Título de la sección donde se comparan accuracies
+    print("=" * 60)  # Línea separadora para legibilidad
 
-    print("\nModelo               | Accuracy | Mejora vs LR")
-    print("-" * 50)
-    baseline = results['Logistic Regression']
-    for name, acc in results.items():
-        improvement = ((acc - baseline) / baseline) * 100 if name != 'Logistic Regression' else 0
-        print(f"{name:<20} | {acc:.2%}    | {improvement:+.1f}%")
+    print("\nModelo               | Accuracy | Mejora vs LR")  # Encabezado de la tabla de comparación
+    print("-" * 50)  # Separador bajo el encabezado (formato tipo tabla)
+    baseline = results['Logistic Regression']  # Baseline para comparar mejoras relativas
+    for name, acc in results.items():  # Recorre resultados para imprimir cada fila (modelo -> métricas)
+        improvement = ((acc - baseline) / baseline) * 100 if name != 'Logistic Regression' else 0  # Mejora porcentual
+        print(f"{name:<20} | {acc:.2%}    | {improvement:+.1f}%")  # Imprime tabla de comparación
 
     # === ANÁLISIS ===
-    print("\n" + "=" * 60)
-    print("ANÁLISIS: ¿Por qué NN es mejor?")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Separador visual previo al bloque explicativo
+    print("ANÁLISIS: ¿Por qué NN es mejor?")  # Título del análisis cualitativo (texto informativo)
+    print("=" * 60)  # Línea separadora
     print("""
 1. NO-LINEALIDAD: ReLU permite aprender fronteras no lineales.
    Logistic Regression solo puede aprender fronteras lineales.
@@ -883,21 +1041,9 @@ def run_mnist_pipeline(X_train, y_train, X_test, y_test, use_subset: bool = True
    para aproximar funciones complejas.
 """)
 
-    return results
+    return results  # Devuelve el diccionario de accuracies para uso posterior (p.ej. reporte/benchmark)
+
 ```
-
----
-
-## 🎯 Ejercicios por fase (progresivos) + Soluciones
-
-Reglas:
-
-- **Intenta primero** sin mirar la solución.
-- **Timebox sugerido:** 30–90 min por ejercicio.
-- **Éxito mínimo:** tu solución debe pasar los `assert`.
-
-Nota: los ejercicios usan **datos sintéticos** para que sean reproducibles sin descargar MNIST. La idea es validar *invariantes* del pipeline (shapes, estabilidad numérica, métricas, convergencia, reproducibilidad).
-
 ---
 
 ### Ejercicio 8.1: Reproducibilidad (seed) y split determinista
@@ -919,35 +1065,35 @@ Nota: los ejercicios usan **datos sintéticos** para que sean reproducibles sin 
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para generar datos sintéticos y operar con arrays
 
-def train_test_split(X: np.ndarray, y: np.ndarray, test_size: float = 0.2, seed: int = 0):
-    X = np.asarray(X)
-    y = np.asarray(y)
-    n = X.shape[0]
-    rng = np.random.default_rng(seed)
-    idx = np.arange(n)
-    rng.shuffle(idx)
-    n_test = int(round(n * test_size))
-    test_idx = idx[:n_test]
-    train_idx = idx[n_test:]
-    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
+def train_test_split(X: np.ndarray, y: np.ndarray, test_size: float = 0.2, seed: int = 0):  # Define split reproducible con RNG local
+    X = np.asarray(X)  # Normaliza entrada a ndarray (evita listas y asegura slicing consistente)
+    y = np.asarray(y)  # Normaliza labels a ndarray para indexación coherente con X
+    n = X.shape[0]  # Número de muestras (se usa para construir índices)
+    rng = np.random.default_rng(seed)  # RNG moderno aislado; misma seed => mismo shuffle
+    idx = np.arange(n)  # Índices 0..n-1 (referencias a filas)
+    rng.shuffle(idx)  # Baraja índices in-place (no modifica X/y directamente)
+    n_test = int(round(n * test_size))  # Calcula tamaño de test (redondeo para cubrir casos fraccionales)
+    test_idx = idx[:n_test]  # Toma los primeros índices como test
+    train_idx = idx[n_test:]  # Toma el resto como train
+    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]  # Retorna splits (X_train, X_test, y_train, y_test)
 
 
-np.random.seed(0)
-X = np.random.randn(100, 784)
-y = np.random.randint(0, 10, size=(100,))
+np.random.seed(0)  # Fija semilla global legacy para que la generación sintética sea reproducible
+X = np.random.randn(100, 784)  # Genera features sintéticas con la misma forma que MNIST (100, 784)
+y = np.random.randint(0, 10, size=(100,))  # Genera etiquetas sintéticas enteras en rango [0,9]
 
-Xtr1, Xte1, ytr1, yte1 = train_test_split(X, y, test_size=0.25, seed=123)
-Xtr2, Xte2, ytr2, yte2 = train_test_split(X, y, test_size=0.25, seed=123)
+Xtr1, Xte1, ytr1, yte1 = train_test_split(X, y, test_size=0.25, seed=123)  # Primer split con seed fija
+Xtr2, Xte2, ytr2, yte2 = train_test_split(X, y, test_size=0.25, seed=123)  # Segundo split con misma seed (debe coincidir)
 
-assert np.allclose(Xtr1, Xtr2)
-assert np.allclose(Xte1, Xte2)
-assert np.all(ytr1 == ytr2)
-assert np.all(yte1 == yte2)
+assert np.allclose(Xtr1, Xtr2)  # Verifica reproducibilidad: train features idénticas
+assert np.allclose(Xte1, Xte2)  # Verifica reproducibilidad: test features idénticas
+assert np.all(ytr1 == ytr2)  # Verifica reproducibilidad: train labels idénticas
+assert np.all(yte1 == yte2)  # Verifica reproducibilidad: test labels idénticas
 
-assert Xtr1.shape[0] + Xte1.shape[0] == X.shape[0]
-assert len(np.intersect1d(Xtr1[:, 0], Xte1[:, 0])) <= X.shape[0]
+assert Xtr1.shape[0] + Xte1.shape[0] == X.shape[0]  # Invariante: no se pierden muestras al partir
+assert len(np.intersect1d(Xtr1[:, 0], Xte1[:, 0])) <= X.shape[0]  # Check simple de solapamiento (aprox; columna 0)
 ```
 
 ---

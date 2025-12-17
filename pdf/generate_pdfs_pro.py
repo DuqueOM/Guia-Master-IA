@@ -383,6 +383,33 @@ blockquote {
     color: #075985;
 }
 
+details {
+    display: block;
+    margin: 8px 0;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #94a3b8;
+    background: #f8fafc;
+    color: #0f172a;
+    border-radius: 6px;
+    break-inside: auto;
+}
+
+details > summary {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    list-style: none;
+    break-after: avoid-page;
+}
+
+details > summary::-webkit-details-marker { display: none; }
+
+details:not([open]) > :not(summary) { display: block; }
+
+details > summary + * { break-before: avoid-page; }
+
 /* Links - IMPORTANTE para PDF */
 a {
     color: #2563eb;

@@ -1094,7 +1094,29 @@ assert np.all(yte1 == yte2)  # Verifica reproducibilidad: test labels idénticas
 
 assert Xtr1.shape[0] + Xte1.shape[0] == X.shape[0]  # Invariante: no se pierden muestras al partir
 assert len(np.intersect1d(Xtr1[:, 0], Xte1[:, 0])) <= X.shape[0]  # Check simple de solapamiento (aprox; columna 0)
+
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.1: Reproducibilidad (seed) y split determinista</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_1`
+- **Duración estimada:** 20–35 min
+- **Nivel:** Básico → Intermedio
+
+#### 2) Idea clave
+- La reproducibilidad es un *invariante del pipeline*: con la misma semilla debes obtener el mismo split.
+- Un split determinista es la base para comparar modelos de forma justa en la Semana 24.
+
+#### 3) Errores comunes
+- Barajar `X` y `y` por separado (rompe la alineación filas↔labels).
+- Usar RNG global implícito y luego modificarlo en otra parte del notebook/script.
+- Olvidar verificar que `n_train + n_test == n`.
+
+#### 4) Nota docente
+- Pide al alumno imprimir los primeros 5 índices de `train_idx` y mostrar que se repiten entre ejecuciones.
+</details>
 
 ---
 
@@ -1119,7 +1141,7 @@ assert len(np.intersect1d(Xtr1[:, 0], Xte1[:, 0])) <= X.shape[0]  # Check simple
 ```python
 import numpy as np
 
-rng = np.random.default_rng(0)
+rng = np.random.default_rng(1)
 n = 256
 X_uint8 = rng.integers(0, 256, size=(n, 784), dtype=np.uint8)
 
@@ -1130,7 +1152,33 @@ assert X.dtype in (np.float32, np.float64)
 assert np.isfinite(X).all()
 assert X.min() >= 0.0
 assert X.max() <= 1.0
+
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.2: Invariantes de datos (shape, dtype, rango)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_2`
+- **Duración estimada:** 15–30 min
+- **Nivel:** Básico
+
+#### 2) Idea clave
+- Muchos “bugs de entrenamiento” son realmente *bugs de datos*.
+- Fija estos invariantes temprano:
+  - `X.shape == (n, 784)`
+  - `X.dtype` es float
+  - valores en `[0,1]`
+  - sin `NaN/inf` (`isfinite`) en todo el dataset
+
+#### 3) Errores comunes
+- Normalizar con división entera (cast inesperado).
+- Olvidar castear a float antes de dividir.
+- Asumir min/max sin validarlo con asserts.
+
+#### 4) Nota docente
+- Pide al alumno inyectar un `NaN` a propósito y confirmar que el `assert` lo detecta.
+</details>
 
 ---
 
@@ -1168,7 +1216,29 @@ Y = one_hot(y, num_classes=10)
 assert Y.shape == (y.size, 10)
 assert np.allclose(np.sum(Y, axis=1), 1.0)
 assert np.all(np.argmax(Y, axis=1) == y)
+
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.3: One-hot encoding (multiclase)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_3`
+- **Duración estimada:** 15–25 min
+- **Nivel:** Básico
+
+#### 2) Idea clave
+- One-hot transforma `y:(n,)` en `Y:(n,k)` para poder expresar cross-entropy de forma vectorizada.
+- Invariante: `argmax(Y[i]) == y[i]`.
+
+#### 3) Errores comunes
+- No castear labels a `int` (rompe la indexación).
+- Labels fuera de rango `[0, k-1]`.
+- Mezclar shapes `(n,1)` y `(n,)` sin ser explícito.
+
+#### 4) Nota docente
+- Pide al alumno probar labels que incluyan `0` y `k-1` para cubrir bordes.
+</details>
 
 ---
 
@@ -1208,7 +1278,7 @@ def pca_reconstruct(Z: np.ndarray, Vk: np.ndarray, mu: np.ndarray) -> np.ndarray
     return Z @ Vk.T + mu
 
 
-rng = np.random.default_rng(1)
+rng = np.random.default_rng(2)
 X = rng.normal(size=(300, 784)).astype(np.float64)
 
 Z10, V10, mu, ratio = pca_svd_fit_transform(X, k=10)
@@ -1225,7 +1295,30 @@ err10 = np.linalg.norm(X - X10)
 err50 = np.linalg.norm(X - X50)
 
 assert err50 <= err10 + 1e-12
+
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.4: PCA (SVD) y varianza explicada</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_4`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- PCA requiere centrar: `Xc = X - mean(X)`.
+- En SVD, las direcciones principales salen de `Vt`; las primeras `k` filas definen el subespacio.
+- El error de reconstrucción debe bajar cuando `k` aumenta.
+
+#### 3) Errores comunes
+- Olvidar centrar y luego malinterpretar componentes.
+- Confundir los roles de `U` y `V` en SVD.
+- Calcular ratios de varianza sin dividir por la varianza total.
+
+#### 4) Nota docente
+- Pide al alumno explicar por qué `k=784` reconstruye “perfecto” (salvo error numérico).
+</details>
 
 ---
 
@@ -1269,7 +1362,7 @@ def inertia(X: np.ndarray, C: np.ndarray, labels: np.ndarray) -> float:
     return float(np.sum(diffs ** 2))
 
 
-rng = np.random.default_rng(2)
+rng = np.random.default_rng(3)
 X = np.vstack([
     rng.normal(loc=-1.0, scale=0.5, size=(100, 2)),
     rng.normal(loc=+1.0, scale=0.5, size=(100, 2)),
@@ -1284,7 +1377,31 @@ labels1 = assign_labels(X, C1)
 J1 = inertia(X, C1, labels1)
 
 assert J1 <= J0 + 1e-12
+
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.5: Monotonía de la inercia en K-Means</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_5`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- El algoritmo de Lloyd alterna:
+  - asignación (centroide más cercano)
+  - update (centroide = promedio de puntos asignados)
+- Con las definiciones estándar, cada paso no debería aumentar la inercia `J`.
+
+#### 3) Errores comunes
+- No manejar clusters vacíos (promedio de conjunto vacío).
+- Calcular distancias mal por broadcasting.
+- Medir `J` con labels que no corresponden al set de centroides.
+
+#### 4) Nota docente
+- Pide al alumno forzar un cluster vacío y justificar la estrategia de fallback.
+</details>
 
 ---
 
@@ -1325,7 +1442,7 @@ def grad_w(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:
     return (X.T @ (p - y)) / X.shape[0]
 
 
-rng = np.random.default_rng(3)
+rng = np.random.default_rng(4)
 n, d = 120, 50
 X = rng.normal(size=(n, d))
 y = (rng.random(size=(n, 1)) < 0.4).astype(float)
@@ -1344,7 +1461,29 @@ L_minus = bce_from_logits(X, y, w - h * E, b)
 g_num = (L_plus - L_minus) / (2.0 * h)
 
 assert np.isclose(g[idx, 0], g_num, rtol=1e-4, atol=1e-6)
+
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.6: Gradient check en Logistic Regression (OvA)</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_6`
+- **Duración estimada:** 40–80 min
+- **Nivel:** Avanzado
+
+#### 2) Idea clave
+- Gradient checking valida tu gradiente analítico contra una aproximación numérica en pocas coordenadas.
+- En OvA puedes validar primero un clasificador (una clase) antes de escalar a 10.
+
+#### 3) Errores comunes
+- Mezclar `y:(n,)` con `p:(n,1)` y caer en broadcasting silencioso.
+- Olvidar la normalización por `n`.
+- Elegir `h` demasiado grande (sesgo) o demasiado pequeño (ruido numérico).
+
+#### 4) Nota docente
+- Pide al alumno chequear 2 coordenadas aleatorias y comparar el error relativo.
+</details>
 
 ---
 
@@ -1391,7 +1530,7 @@ def cross_entropy(y_onehot: np.ndarray, p: np.ndarray, eps: float = 1e-15) -> fl
     return float(-np.mean(np.sum(y_onehot * np.log(p), axis=1)))
 
 
-rng = np.random.default_rng(4)
+rng = np.random.default_rng(5)
 n, d_in, d_h, d_out = 64, 784, 32, 10
 X = rng.normal(size=(n, d_in))
 y = rng.integers(0, d_out, size=(n,))
@@ -1433,7 +1572,29 @@ acc = float(np.mean(pred == y))
 
 assert loss_end <= loss0
 assert acc > 0.6
+
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.7: Overfit sanity check en MLP</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_7`
+- **Duración estimada:** 45–90 min
+- **Nivel:** Avanzado
+
+#### 2) Idea clave
+- Overfit en un mini-batch es un protocolo *obligatorio* de depuración: si no ajusta 64 ejemplos, asume bug.
+- Para estabilidad, softmax debe implementarse con `logsumexp`.
+
+#### 3) Errores comunes
+- Inicialización demasiado pequeña o learning rate muy bajo → no progresa.
+- Softmax inestable (overflow) → `NaN` en loss.
+- Errores de shape en gradientes (en especial biases con broadcasting).
+
+#### 4) Nota docente
+- Pide al alumno registrar `loss` cada 20 pasos y explicar la tendencia.
+</details>
 
 ---
 
@@ -1492,7 +1653,29 @@ f1_macro = float(np.mean(f1))
 
 assert cm.shape == (3, 3)
 assert 0.0 <= f1_macro <= 1.0
+
 ```
+
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.8: Confusion matrix y F1 macro</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_8`
+- **Duración estimada:** 30–60 min
+- **Nivel:** Intermedio
+
+#### 2) Idea clave
+- Accuracy puede ocultar desbalance de clases.
+- Macro-F1 promedia el F1 por clase, ponderando todas las clases por igual.
+
+#### 3) Errores comunes
+- Dividir por cero cuando una clase no tiene predicciones / no tiene verdaderos (usa `eps`).
+- Usar micro-F1 cuando el objetivo es macro-F1.
+- Construir `cm` con índices invertidos (`cm[p,t]` vs `cm[t,p]`).
+
+#### 4) Nota docente
+- Pide al alumno crear un caso donde una clase nunca se predice e interpretar las métricas.
+</details>
 
 ---
 
@@ -1530,14 +1713,28 @@ for _, acc in items:
     assert 0.0 <= acc <= 1.0
 ```
 
+<details open>
+<summary><strong>Complemento pedagógico — Ejercicio 8.9: Consistencia en comparación de modelos</strong></summary>
+
+#### 1) Metadatos
+- **ID (opcional):** `M08-E08_9`
+- **Duración estimada:** 15–25 min
+- **Nivel:** Básico
+
+#### 2) Idea clave
+- Comparar modelos requiere consistencia: misma métrica y el mismo split.
+- Ordenar es simple, pero importan los *invariantes*: valores en `[0,1]`, mejor primero, naming estable.
+
+#### 3) Errores comunes
+- Mezclar accuracy de train para un modelo y test para otro.
+- Comparar modelos entrenados con seeds/splits distintos.
+- No validar el rango de la métrica.
+
+#### 4) Nota docente
+- Pide al alumno extender el dict con un modelo nuevo y confirmar que pasan los checks.
+</details>
+
 ---
-
-## 📦 Entregable Final
-
-### `MODEL_COMPARISON.md`
-
-```markdown
-# Model Comparison Report - Fashion-MNIST Analyst
 
 ## Executive Summary
 

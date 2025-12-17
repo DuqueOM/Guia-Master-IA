@@ -115,6 +115,27 @@ assert np.all(yte1 == yte2)
 assert Xtr1.shape[0] + Xte1.shape[0] == X.shape[0]
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.1: Reproducibility + deterministic split</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_1`
+- **Estimated duration:** 20–35 min
+- **Level:** Basic → Intermediate
+
+#### 2) Key idea
+- Reproducibility is a *pipeline invariant*: with the same seed, you must get the same split.
+- A deterministic split is the foundation for fair model comparison in Week 24.
+
+#### 3) Common mistakes
+- Shuffling `X` and `y` independently (breaks alignment).
+- Using a global RNG implicitly and then changing it elsewhere.
+- Forgetting to check that `n_train + n_test == n`.
+
+#### 4) Teaching note
+- Ask the student to print the first 5 indices of `train_idx` and show they repeat across runs.
+</details>
+
 ---
 
 ### Exercise 8.2: MNIST-like data invariants (shapes + ranges)
@@ -138,7 +159,7 @@ assert Xtr1.shape[0] + Xte1.shape[0] == X.shape[0]
 ```python
 import numpy as np
 
-rng = np.random.default_rng(0)
+rng = np.random.default_rng(1)
 n = 256
 X_uint8 = rng.integers(0, 256, size=(n, 784), dtype=np.uint8)
 
@@ -150,6 +171,31 @@ assert np.isfinite(X).all()
 assert X.min() >= 0.0
 assert X.max() <= 1.0
 ```
+
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.2: Data invariants (shape, dtype, range)</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_2`
+- **Estimated duration:** 15–30 min
+- **Level:** Basic
+
+#### 2) Key idea
+- Many “training bugs” are actually *data bugs*.
+- Lock these invariants early:
+  - `X.shape == (n, 784)`
+  - `X.dtype` is float
+  - values are in `[0,1]`
+  - finite (`isfinite`) everywhere
+
+#### 3) Common mistakes
+- Normalizing with integer division (old Python or accidental casting).
+- Forgetting to cast to float before dividing.
+- Assuming min/max without checking.
+
+#### 4) Teaching note
+- Ask the student to deliberately inject a `NaN` and confirm the assert catches it.
+</details>
 
 ---
 
@@ -188,6 +234,27 @@ assert Y.shape == (y.size, 10)
 assert np.allclose(np.sum(Y, axis=1), 1.0)
 assert np.all(np.argmax(Y, axis=1) == y)
 ```
+
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.3: One-hot encoding</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_3`
+- **Estimated duration:** 15–25 min
+- **Level:** Basic
+
+#### 2) Key idea
+- One-hot converts `y:(n,)` into `Y:(n,k)` so that cross-entropy can be expressed with vectorized operations.
+- The invariant is: `argmax(Y[i]) == y[i]`.
+
+#### 3) Common mistakes
+- Forgetting to cast labels to `int` (breaks indexing).
+- Passing labels out of range `[0, k-1]`.
+- Using shape `(n,1)` labels and mixing it with `(n,)` without being explicit.
+
+#### 4) Teaching note
+- Ask the student to test a label set that includes `0` and `k-1` to cover boundaries.
+</details>
 
 ---
 
@@ -244,6 +311,28 @@ err10 = np.linalg.norm(X - X10)
 err50 = np.linalg.norm(X - X50)
 assert err50 <= err10 + 1e-12
 ```
+
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.4: PCA (SVD) and explained variance</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_4`
+- **Estimated duration:** 30–60 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- PCA requires centering: `Xc = X - mean(X)`.
+- SVD gives principal directions via `Vt`; the top-`k` rows of `Vt` define the subspace.
+- Reconstruction error should decrease as `k` increases.
+
+#### 3) Common mistakes
+- Forgetting to center, then misinterpreting components.
+- Confusing `U` and `V` roles in SVD.
+- Computing explained variance ratios without dividing by total variance.
+
+#### 4) Teaching note
+- Ask the student to explain why `k=784` reconstructs perfectly (up to numerical error).
+</details>
 
 ---
 
@@ -304,6 +393,29 @@ J1 = inertia(X, C1, labels1)
 assert J1 <= J0 + 1e-12
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.5: K-Means inertia monotonicity</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_5`
+- **Estimated duration:** 30–60 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- Lloyd’s algorithm alternates:
+  - assignment (closest centroid)
+  - update (centroid = mean of assigned points)
+- Each step should not increase inertia `J` (with the usual definitions).
+
+#### 3) Common mistakes
+- Not handling empty clusters (mean of empty set).
+- Computing distances incorrectly due to broadcasting mistakes.
+- Measuring `J` with mismatched labels/centroids.
+
+#### 4) Teaching note
+- Ask the student to force an empty cluster and explain the chosen fallback strategy.
+</details>
+
 ---
 
 ### Exercise 8.6: Logistic Regression OvA - gradient check (single class)
@@ -363,6 +475,27 @@ g_num = (L_plus - L_minus) / (2.0 * h)
 
 assert np.isclose(g[idx, 0], g_num, rtol=1e-4, atol=1e-6)
 ```
+
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.6: Logistic Regression gradient check</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_6`
+- **Estimated duration:** 40–80 min
+- **Level:** Advanced
+
+#### 2) Key idea
+- Gradient checking validates your analytic gradient against a numerical approximation on a few coordinates.
+- For OvA, you can validate one classifier (one class) before scaling to 10.
+
+#### 3) Common mistakes
+- Mixing `y:(n,)` with `p:(n,1)` and getting silent broadcasting bugs.
+- Forgetting normalization by `n`.
+- Using `h` too large (bias) or too small (floating point noise).
+
+#### 4) Teaching note
+- Ask the student to check 2 random coordinates and compare the relative error.
+</details>
 
 ---
 
@@ -453,6 +586,27 @@ assert loss_end <= loss0
 assert acc > 0.6
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.7: MLP overfit sanity check</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_7`
+- **Estimated duration:** 45–90 min
+- **Level:** Advanced
+
+#### 2) Key idea
+- Overfitting a tiny batch is a *mandatory* debug protocol: if it cannot fit 64 samples, assume a bug.
+- For stability, softmax should be implemented with `logsumexp`.
+
+#### 3) Common mistakes
+- Too small initialization or too small learning rate → no progress.
+- Unstable softmax (overflow) → `NaN` losses.
+- Shape mismatches in gradients (especially biases with broadcasting).
+
+#### 4) Teaching note
+- Ask the student to log `loss` every 20 steps and explain the trend.
+</details>
+
 ---
 
 ### Exercise 8.8: Metrics (confusion matrix + macro F1)
@@ -511,6 +665,27 @@ assert cm.shape == (3, 3)
 assert 0.0 <= f1_macro <= 1.0
 ```
 
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.8: Confusion matrix and macro F1</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_8`
+- **Estimated duration:** 30–60 min
+- **Level:** Intermediate
+
+#### 2) Key idea
+- Accuracy can hide class imbalance.
+- Macro-F1 averages per-class F1, weighting all classes equally.
+
+#### 3) Common mistakes
+- Dividing by zero when a class has no predictions / no true samples (use `eps`).
+- Using micro-F1 when the goal is macro-F1.
+- Building `cm` with swapped indices (`cm[p,t]` vs `cm[t,p]`).
+
+#### 4) Teaching note
+- Ask the student to create a case where one class is never predicted and interpret the metrics.
+</details>
+
 ---
 
 ### Exercise 8.9: Model comparison table (consistency checks)
@@ -543,6 +718,27 @@ assert items[0][1] == max(results.values())
 for _, acc in items:
     assert 0.0 <= acc <= 1.0
 ```
+
+<details open>
+<summary><strong>Pedagogical add-on — Exercise 8.9: Model comparison consistency</strong></summary>
+
+#### 1) Metadata
+- **ID (optional):** `M08-E08_9`
+- **Estimated duration:** 15–25 min
+- **Level:** Basic
+
+#### 2) Key idea
+- Comparisons must use a consistent metric and the same data split.
+- Sorting is trivial, but the *invariants* matter: values in `[0,1]`, best-first order, stable naming.
+
+#### 3) Common mistakes
+- Mixing train accuracy for one model and test accuracy for another.
+- Comparing models trained with different seeds/splits.
+- Forgetting to validate the range of metrics.
+
+#### 4) Teaching note
+- Ask the student to extend the dict with a new model and confirm all checks still pass.
+</details>
 
 ---
 

@@ -1160,52 +1160,45 @@ assert len(np.intersect1d(Xtr1[:, 0], Xte1[:, 0])) <= X.shape[0]  # Check simple
 
 - Normaliza a `float` en `[0,1]`.
 
-3) **Avanzado**
-
-- Verifica que no aparecen `NaN/inf` y que `dtype` es float.
-
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para RNG, casting de dtype y validaciones numéricas con asserts
 
-rng = np.random.default_rng(1)
-n = 256
-X_uint8 = rng.integers(0, 256, size=(n, 784), dtype=np.uint8)
+rng = np.random.default_rng(0)  # Crea un generador pseudoaleatorio reproducible (misma seed => mismos datos sintéticos)
+n = 256  # Número de muestras sintéticas a generar para comprobar invariantes de dataset tipo-MNIST
+X_uint8 = rng.integers(0, 256, size=(n, 784), dtype=np.uint8)  # Simula pixeles uint8 en [0,255] con shape (n, 784)
 
-X = X_uint8.astype(np.float32) / 255.0
+X = X_uint8.astype(np.float32) / 255.0  # Convierte a float y normaliza a [0,1] (evita división entera y mejora estabilidad)
 
-assert X.shape == (n, 784)
-assert X.dtype in (np.float32, np.float64)
-assert np.isfinite(X).all()
-assert X.min() >= 0.0
-assert X.max() <= 1.0
-
+assert X.shape == (n, 784)  # Invariante de forma: una imagen MNIST aplanada tiene 784 features (28*28)
+assert X.dtype in (np.float32, np.float64)  # Invariante de dtype: tras normalizar debe ser float (apto para álgebra/gradientes)
+assert np.isfinite(X).all()  # Invariante numérica: no debe haber NaN/Inf que rompan pérdidas, métricas o backprop
+assert X.min() >= 0.0  # Invariante de rango: la normalización no debe producir valores negativos
+assert X.max() <= 1.0  # Invariante de rango: la normalización por 255 debe acotar el máximo a 1
 ```
 
-<details open>
-<summary><strong>Complemento pedagógico — Ejercicio 8.2: Invariantes de datos (shape, dtype, rango)</strong></summary>
+ - **Duración estimada:** 15–30 min
+ - **Nivel:** Básico
 
-#### 1) Metadatos
-- **ID (opcional):** `M08-E08_2`
-- **Duración estimada:** 15–30 min
-- **Nivel:** Básico
+ <details open>
+ <summary><strong>Complemento pedagógico — Ejercicio 8.2: Invariantes de datos tipo MNIST (shapes + rangos)</strong></summary>
 
-#### 2) Idea clave
-- Muchos “bugs de entrenamiento” son realmente *bugs de datos*.
-- Fija estos invariantes temprano:
+ #### 2) Idea clave
+ - Muchos “bugs de entrenamiento” son realmente *bugs de datos*.
+ - Fija estos invariantes temprano:
   - `X.shape == (n, 784)`
   - `X.dtype` es float
   - valores en `[0,1]`
   - sin `NaN/inf` (`isfinite`) en todo el dataset
 
 #### 3) Errores comunes
-- Normalizar con división entera (cast inesperado).
-- Olvidar castear a float antes de dividir.
-- Asumir min/max sin validarlo con asserts.
+- No castear a float antes de dividir (rompe la normalización).
+- Olvidar verificar que `X` no contenga NaN/Inf.
+- Asumir que la normalización no modifica el dtype.
 
 #### 4) Nota docente
-- Pide al alumno inyectar un `NaN` a propósito y confirmar que el `assert` lo detecta.
+- Pide al alumno probar con diferentes valores de `n` y verificar que los invariantes se mantienen.
 </details>
 
 ---
@@ -1229,25 +1222,25 @@ assert X.max() <= 1.0
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para indexación avanzada, creación de arrays y validaciones (sum/argmax/asserts)
 
-def one_hot(y: np.ndarray, num_classes: int) -> np.ndarray:
-    y = np.asarray(y).astype(int)
-    Y = np.zeros((y.size, num_classes), dtype=float)
-    Y[np.arange(y.size), y] = 1.0
-    return Y
+def one_hot(y: np.ndarray, num_classes: int) -> np.ndarray:  # Convierte etiquetas enteras (0..K-1) a matriz one-hot (n, K)
+    y = np.asarray(y).astype(int)  # Normaliza a ndarray de enteros (necesario para indexación por clase)
+    Y = np.zeros((y.size, num_classes), dtype=float)  # Inicializa matriz de salida con ceros (todas las clases “apagadas”)
+    Y[np.arange(y.size), y] = 1.0  # Indexación avanzada: activa la columna y[i] en la fila i (exactamente un 1 por fila)
+    return Y  # Devuelve el one-hot para usar con softmax/cross-entropy u otros métodos multiclase
 
 
-y = np.array([0, 2, 9, 2, 1])
-Y = one_hot(y, num_classes=10)
+y = np.array([0, 2, 9, 2, 1])  # Etiquetas de prueba (incluye extremos 0 y 9 y una clase repetida)
+Y = one_hot(y, num_classes=10)  # Aplica one-hot para 10 clases (caso típico MNIST)
 
-assert Y.shape == (y.size, 10)
-assert np.allclose(np.sum(Y, axis=1), 1.0)
-assert np.all(np.argmax(Y, axis=1) == y)
+assert Y.shape == (y.size, 10)  # Verifica shape: n filas (muestras) y 10 columnas (clases)
+assert np.allclose(np.sum(Y, axis=1), 1.0)  # Verifica invariante: cada fila suma 1 (una y solo una clase activa)
+assert np.all(np.argmax(Y, axis=1) == y)  # Verifica invariante inverso: argmax recupera las etiquetas originales
 
 ```
 
-<details open>
+ <details open>
 <summary><strong>Complemento pedagógico — Ejercicio 8.3: One-hot encoding (multiclase)</strong></summary>
 
 #### 1) Metadatos
@@ -1289,41 +1282,43 @@ assert np.all(np.argmax(Y, axis=1) == y)
 #### Solución
 
 ```python
-import numpy as np
-
-def pca_svd_fit_transform(X: np.ndarray, k: int):
-    mu = X.mean(axis=0)
-    Xc = X - mu
-    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
-    Vk = Vt[:k].T
-    Z = Xc @ Vk
-    var = (S ** 2) / (Xc.shape[0] - 1)
-    ratio = var / np.sum(var)
-    return Z, Vk, mu, ratio
+import numpy as np  # Importa NumPy: necesario para SVD, operaciones vectorizadas y normas usadas en el error de reconstrucción
 
 
-def pca_reconstruct(Z: np.ndarray, Vk: np.ndarray, mu: np.ndarray) -> np.ndarray:
-    return Z @ Vk.T + mu
+def pca_svd_fit_transform(X: np.ndarray, k: int):  # Ajusta PCA vía SVD y devuelve proyección, componentes, media y ratios de varianza
+    mu = X.mean(axis=0)  # Calcula media por feature: se usa para centrar; sin centrar, PCA se sesga por el offset (media)
+    Xc = X - mu  # Centrado: PCA estándar trabaja sobre datos con media 0 para capturar varianza alrededor del origen
+    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)  # SVD estable: Xc = U diag(S) Vt; Vt contiene direcciones principales
+    Vk = Vt[:k].T  # Selecciona las k componentes principales (máxima varianza) y forma la base (d,k) del subespacio
+    Z = Xc @ Vk  # Proyecta al subespacio: produce coordenadas latentes (n,k) para reducción/compresión
+    var = (S ** 2) / (Xc.shape[0] - 1)  # Varianza por componente (eigenvalues de covarianza) derivada de valores singulares
+    ratio = var / np.sum(var)  # Explained variance ratio: fracción de varianza total capturada por cada componente
+    return Z, Vk, mu, ratio  # Retorna lo necesario para reconstrucción y validación de invariantes (orden y mejora con k)
 
 
-rng = np.random.default_rng(2)
-X = rng.normal(size=(300, 784)).astype(np.float64)
 
-Z10, V10, mu, ratio = pca_svd_fit_transform(X, k=10)
-Z50, V50, mu2, ratio2 = pca_svd_fit_transform(X, k=50)
+def pca_reconstruct(Z: np.ndarray, Vk: np.ndarray, mu: np.ndarray) -> np.ndarray:  # Reconstruye aproximación en el espacio original desde coordenadas PCA
+    return Z @ Vk.T + mu  # Proyección inversa (Z*Vk^T) + des-centrado (sumar mu): obtiene X_hat comparable con X
 
-assert np.allclose(mu, mu2)
-assert ratio[0] >= ratio[1]
-assert ratio2[0] >= ratio2[1]
 
-X10 = pca_reconstruct(Z10, V10, mu)
-X50 = pca_reconstruct(Z50, V50, mu)
 
-err10 = np.linalg.norm(X - X10)
-err50 = np.linalg.norm(X - X50)
+rng = np.random.default_rng(2)  # RNG reproducible: garantiza que el ejemplo y los asserts sean deterministas
+X = rng.normal(size=(300, 784)).astype(np.float64)  # Datos sintéticos (n=300,d=784) en float64 para reducir error numérico
 
-assert err50 <= err10 + 1e-12
+Z10, V10, mu, ratio = pca_svd_fit_transform(X, k=10)  # Ajusta/proyecta con k=10: compresión fuerte, mayor pérdida esperada
+Z50, V50, mu2, ratio2 = pca_svd_fit_transform(X, k=50)  # Ajusta/proyecta con k=50: compresión menor, menor pérdida esperada
 
+assert np.allclose(mu, mu2)  # Invariante: la media depende solo de X; debe coincidir aunque se cambie k
+assert ratio[0] >= ratio[1]  # Invariante: las componentes principales salen ordenadas por varianza no-incrementante
+assert ratio2[0] >= ratio2[1]  # Repite verificación para el ajuste con k=50 (mismo criterio de ordenación)
+
+X10 = pca_reconstruct(Z10, V10, mu)  # Reconstrucción con k=10: subespacio pequeño -> mayor error esperado
+X50 = pca_reconstruct(Z50, V50, mu)  # Reconstrucción con k=50: subespacio mayor -> menor error esperado
+
+err10 = np.linalg.norm(X - X10)  # Error global de reconstrucción (norma Frobenius) para k=10
+err50 = np.linalg.norm(X - X50)  # Error global de reconstrucción (norma Frobenius) para k=50
+
+assert err50 <= err10 + 1e-12  # Invariante: al aumentar k, la reconstrucción no debería empeorar (tolerancia numérica)
 ```
 
 <details open>
@@ -1369,43 +1364,46 @@ assert err50 <= err10 + 1e-12
 #### Solución
 
 ```python
-import numpy as np
-
-def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:
-    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)
-    return np.argmin(D2, axis=1)
+import numpy as np  # Importa NumPy: necesario para broadcasting de distancias, medias por cluster y suma de cuadrados (inercia)
 
 
-def update_centroids(X: np.ndarray, labels: np.ndarray, C: np.ndarray) -> np.ndarray:
-    C_new = C.copy()
-    for j in range(C.shape[0]):
-        mask = labels == j
-        if np.any(mask):
-            C_new[j] = np.mean(X[mask], axis=0)
-    return C_new
+def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:  # Asigna a cada punto el centroide más cercano (distancia euclidiana)
+    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)  # Distancias cuadradas (n,k) vía broadcasting (sin loops)
+    return np.argmin(D2, axis=1)  # Label por punto: índice del centroide con mínima distancia
 
 
-def inertia(X: np.ndarray, C: np.ndarray, labels: np.ndarray) -> float:
-    diffs = X - C[labels]
-    return float(np.sum(diffs ** 2))
+
+def update_centroids(X: np.ndarray, labels: np.ndarray, C: np.ndarray) -> np.ndarray:  # Recalcula centroides como media de puntos asignados
+    C_new = C.copy()  # Copia defensiva: evita mutar C y facilita comparar iteraciones
+    for j in range(C.shape[0]):  # Itera por cada cluster/centroide (k centroides)
+        mask = labels == j  # Máscara booleana: selecciona los puntos asignados al cluster j
+        if np.any(mask):  # Manejo de cluster vacío: si no hay puntos, se conserva el centroide anterior
+            C_new[j] = np.mean(X[mask], axis=0)  # Centroide = media: minimiza SSE con asignaciones fijas
+    return C_new  # Devuelve centroides actualizados para la siguiente fase de asignación
 
 
-rng = np.random.default_rng(3)
-X = np.vstack([
-    rng.normal(loc=-1.0, scale=0.5, size=(100, 2)),
-    rng.normal(loc=+1.0, scale=0.5, size=(100, 2)),
-])
-C0 = np.array([[-1.0, 1.0], [1.0, -1.0]])
 
-labels0 = assign_labels(X, C0)
-J0 = inertia(X, C0, labels0)
+def inertia(X: np.ndarray, C: np.ndarray, labels: np.ndarray) -> float:  # Calcula inercia J: suma de distancias cuadradas intra-cluster
+    diffs = X - C[labels]  # Vectoriza: resta a cada punto su centroide asignado usando labels como índice
+    return float(np.sum(diffs ** 2))  # SSE total: escalar objetivo que K-Means (Lloyd) no debería aumentar por iteración
 
-C1 = update_centroids(X, labels0, C0)
-labels1 = assign_labels(X, C1)
-J1 = inertia(X, C1, labels1)
 
-assert J1 <= J0 + 1e-12
 
+rng = np.random.default_rng(3)  # RNG reproducible para generar un dataset 2D sintético con dos nubes
+X = np.vstack([  # Apila dos grupos gaussianos para simular 2 clusters en 2D
+    rng.normal(loc=-1.0, scale=0.5, size=(100, 2)),  # Nube 1: alrededor de (-1,-1) aprox. con dispersión 0.5
+    rng.normal(loc=+1.0, scale=0.5, size=(100, 2)),  # Nube 2: alrededor de (+1,+1) aprox. con dispersión 0.5
+])  # Resultado: matriz (200,2)
+C0 = np.array([[-1.0, 1.0], [1.0, -1.0]])  # Centroides iniciales (no óptimos) para probar la monotonía de J
+
+labels0 = assign_labels(X, C0)  # Asignación inicial según centroides C0
+J0 = inertia(X, C0, labels0)  # Inercia inicial: baseline antes de actualizar centroides
+
+C1 = update_centroids(X, labels0, C0)  # Actualiza centroides usando labels0
+labels1 = assign_labels(X, C1)  # Re-asigna puntos con los centroides actualizados
+J1 = inertia(X, C1, labels1)  # Inercia tras una iteración completa (assign+update)
+
+assert J1 <= J0 + 1e-12  # Invariante: una iteración de Lloyd no debería aumentar J (tolerancia numérica)
 ```
 
 <details open>
@@ -1452,44 +1450,47 @@ assert J1 <= J0 + 1e-12
 #### Solución
 
 ```python
-import numpy as np
-
-def sigmoid(z: np.ndarray) -> np.ndarray:
-    z = np.clip(z, -500, 500)
-    return 1.0 / (1.0 + np.exp(-z))
+import numpy as np  # Importa NumPy: necesario para sigmoid estable, BCE, gradientes y diferencias finitas para gradient check
 
 
-def bce_from_logits(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float, eps: float = 1e-15) -> float:
-    p = sigmoid(X @ w + b)
-    p = np.clip(p, eps, 1.0 - eps)
-    return float(-np.mean(y * np.log(p) + (1.0 - y) * np.log(1.0 - p)))
+def sigmoid(z: np.ndarray) -> np.ndarray:  # Sigmoid: transforma logits (reales) en probabilidades (0,1)
+    z = np.clip(z, -500, 500)  # Clipping: evita overflow/underflow en exp cuando |z| es grande (estabilidad numérica)
+    return 1.0 / (1.0 + np.exp(-z))  # σ(z)=1/(1+e^{-z}) evaluada elemento a elemento
 
 
-def grad_w(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:
-    p = sigmoid(X @ w + b)
-    return (X.T @ (p - y)) / X.shape[0]
+
+def bce_from_logits(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float, eps: float = 1e-15) -> float:  # BCE desde logits lineales (Xw+b)
+    p = sigmoid(X @ w + b)  # Probabilidad predicha: p = σ(Xw + b)
+    p = np.clip(p, eps, 1.0 - eps)  # Evita log(0): sin esto aparecen inf/-inf y el chequeo numérico se rompe
+    return float(-np.mean(y * np.log(p) + (1.0 - y) * np.log(1.0 - p)))  # BCE promedio: escalar objetivo a derivar
 
 
-rng = np.random.default_rng(4)
-n, d = 120, 50
-X = rng.normal(size=(n, d))
-y = (rng.random(size=(n, 1)) < 0.4).astype(float)
 
-w = rng.normal(size=(d, 1)) * 0.1
-b = 0.0
+def grad_w(X: np.ndarray, y: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:  # Gradiente analítico de BCE respecto a w
+    p = sigmoid(X @ w + b)  # Recalcula p para el gradiente (coherente con la definición de la loss)
+    return (X.T @ (p - y)) / X.shape[0]  # ∇w=(1/n)X^T(p-y): normaliza por n para escala estable
 
-g = grad_w(X, y, w, b)
 
-idx = 7
-h = 1e-6
-E = np.zeros_like(w)
-E[idx, 0] = 1.0
-L_plus = bce_from_logits(X, y, w + h * E, b)
-L_minus = bce_from_logits(X, y, w - h * E, b)
-g_num = (L_plus - L_minus) / (2.0 * h)
 
-assert np.isclose(g[idx, 0], g_num, rtol=1e-4, atol=1e-6)
+rng = np.random.default_rng(4)  # RNG reproducible: hace que el gradient check sea determinista
+n, d = 120, 50  # Define tamaño del dataset (n) y dimensionalidad de features (d)
+X = rng.normal(size=(n, d))  # Features aleatorias: caso de prueba controlado para validar gradiente
+y = (rng.random(size=(n, 1)) < 0.4).astype(float)  # Labels binarios (n,1) con probabilidad ~0.4 de clase positiva
 
+w = rng.normal(size=(d, 1)) * 0.1  # Inicializa pesos pequeños para evitar saturación extrema de sigmoid
+b = 0.0  # Bias inicial en 0: simplifica el experimento sin afectar el chequeo
+
+g = grad_w(X, y, w, b)  # Gradiente analítico (referencia) que se comparará con gradiente numérico
+
+idx = 7  # Coordenada específica de w a comprobar (una sola dimensión para abaratar el test)
+h = 1e-6  # Paso para diferencias finitas centrales: balancea sesgo (h grande) y ruido numérico (h pequeño)
+E = np.zeros_like(w)  # Vector base para perturbar únicamente una coordenada de w
+E[idx, 0] = 1.0  # Selecciona la coordenada idx: w ± hE modifica solo w[idx]
+L_plus = bce_from_logits(X, y, w + h * E, b)  # Loss con perturbación positiva en w[idx]
+L_minus = bce_from_logits(X, y, w - h * E, b)  # Loss con perturbación negativa en w[idx]
+g_num = (L_plus - L_minus) / (2.0 * h)  # Diferencia central: aproxima ∂L/∂w[idx] con error O(h^2)
+
+assert np.isclose(g[idx, 0], g_num, rtol=1e-4, atol=1e-6)  # Verifica que gradiente analítico y numérico coinciden
 ```
 
 <details open>
@@ -1534,73 +1535,72 @@ assert np.isclose(g[idx, 0], g_num, rtol=1e-4, atol=1e-6)
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para RNG reproducible, álgebra matricial (X@W) y operaciones vectorizadas
 
-def relu(z: np.ndarray) -> np.ndarray:
-    return np.maximum(0.0, z)
-
-
-def relu_deriv(z: np.ndarray) -> np.ndarray:
-    return (z > 0.0).astype(float)
+def relu(z: np.ndarray) -> np.ndarray:  # ReLU: activación no lineal para la capa oculta; permite fronteras no lineales
+    return np.maximum(0.0, z)  # Aplica max(0,z) elemento a elemento: mantiene positivos y anula negativos
 
 
-def logsumexp(z: np.ndarray, axis: int = -1, keepdims: bool = True) -> np.ndarray:
-    m = np.max(z, axis=axis, keepdims=True)
-    return m + np.log(np.sum(np.exp(z - m), axis=axis, keepdims=True))
+def relu_deriv(z: np.ndarray) -> np.ndarray:  # Derivada de ReLU: necesaria para backprop (gradiente a través de la activación)
+    return (z > 0.0).astype(float)  # Gradiente 1 si z>0 y 0 si z<=0; cast a float para multiplicaciones posteriores
 
 
-def softmax(z: np.ndarray) -> np.ndarray:
-    return np.exp(z - logsumexp(z))
+def logsumexp(z: np.ndarray, axis: int = -1, keepdims: bool = True) -> np.ndarray:  # LogSumExp estable: base de softmax sin overflow
+    m = np.max(z, axis=axis, keepdims=True)  # Restar el máximo estabiliza exp (evita overflow cuando logits son grandes)
+    return m + np.log(np.sum(np.exp(z - m), axis=axis, keepdims=True))  # log(sum(exp(z))) reintroduciendo m tras la corrección
 
 
-def cross_entropy(y_onehot: np.ndarray, p: np.ndarray, eps: float = 1e-15) -> float:
-    p = np.clip(p, eps, 1.0)
-    return float(-np.mean(np.sum(y_onehot * np.log(p), axis=1)))
+def softmax(z: np.ndarray) -> np.ndarray:  # Softmax: convierte logits (n,k) en probabilidades (n,k) normalizadas por fila
+    return np.exp(z - logsumexp(z))  # Implementación estable: exp(z)/sum(exp(z)) usando logsumexp para normalizar
 
 
-rng = np.random.default_rng(5)
-n, d_in, d_h, d_out = 64, 784, 32, 10
-X = rng.normal(size=(n, d_in))
-y = rng.integers(0, d_out, size=(n,))
-Y = np.zeros((n, d_out), dtype=float)
-Y[np.arange(n), y] = 1.0
+def cross_entropy(y_onehot: np.ndarray, p: np.ndarray, eps: float = 1e-15) -> float:  # Cross-entropy multiclase (one-hot vs probabilidades)
+    p = np.clip(p, eps, 1.0)  # Evita log(0): sin clipping puede dar -inf y romper el sanity check
+    return float(-np.mean(np.sum(y_onehot * np.log(p), axis=1)))  # CE promedio: suma por clase y promedia por muestra
 
-W1 = rng.normal(size=(d_in, d_h)) * 0.01
-b1 = np.zeros(d_h)
-W2 = rng.normal(size=(d_h, d_out)) * 0.01
-b2 = np.zeros(d_out)
 
-lr = 1.0
-loss0 = None
-for _ in range(200):
-    Z1 = X @ W1 + b1
-    A1 = relu(Z1)
-    Z2 = A1 @ W2 + b2
-    P = softmax(Z2)
-    loss = cross_entropy(Y, P)
-    if loss0 is None:
-        loss0 = loss
+rng = np.random.default_rng(5)  # RNG reproducible: el objetivo es depurar, no tener resultados aleatorios
+n, d_in, d_h, d_out = 64, 784, 32, 10  # Define batch tiny (64) y arquitectura 784→32→10 (entrada, hidden, salida)
+X = rng.normal(size=(n, d_in))  # Features sintéticas: basta para validar que gradientes/loss están bien implementados
+y = rng.integers(0, d_out, size=(n,))  # Labels enteros 0..9: objetivo multiclase
+Y = np.zeros((n, d_out), dtype=float)  # Matriz one-hot inicializada en 0 con shape (n,10)
+Y[np.arange(n), y] = 1.0  # Activa la clase correcta por muestra (exactamente un 1 por fila)
 
-    dZ2 = (P - Y) / n
-    dW2 = A1.T @ dZ2
-    db2 = np.sum(dZ2, axis=0)
-    dA1 = dZ2 @ W2.T
-    dZ1 = dA1 * relu_deriv(Z1)
-    dW1 = X.T @ dZ1
-    db1 = np.sum(dZ1, axis=0)
+W1 = rng.normal(size=(d_in, d_h)) * 0.01  # Pesos capa 1: init pequeña para evitar activaciones enormes al inicio
+b1 = np.zeros(d_h)  # Bias capa 1: vector (32,) inicializado en 0
+W2 = rng.normal(size=(d_h, d_out)) * 0.01  # Pesos capa 2: init pequeña para estabilidad numérica
+b2 = np.zeros(d_out)  # Bias capa 2: vector (10,) inicializado en 0
 
-    W1 -= lr * dW1
-    b1 -= lr * db1
-    W2 -= lr * dW2
-    b2 -= lr * db2
+lr = 1.0  # Learning rate alto a propósito: en batch tiny debe permitir bajar la loss rápidamente (sanity)
+loss0 = None  # Guardará la primera loss como baseline para verificar aprendizaje al final
+for _ in range(200):  # Entrena 200 pasos: debería ser suficiente para sobreajustar si el backprop es correcto
+    Z1 = X @ W1 + b1  # Forward capa 1 (pre-activación): (n,784)@(784,32)+(32,) => (n,32)
+    A1 = relu(Z1)  # Activación capa 1: aplica ReLU para introducir no linealidad
+    Z2 = A1 @ W2 + b2  # Forward capa 2 (logits): (n,32)@(32,10)+(10,) => (n,10)
+    P = softmax(Z2)  # Probabilidades por clase: softmax estable sobre logits
+    loss = cross_entropy(Y, P)  # Loss actual: cross-entropy multiclase
+    if loss0 is None:  # Detecta primera iteración para fijar baseline
+        loss0 = loss  # Guarda la loss inicial (antes de aprender) para comparar contra la final
 
-loss_end = cross_entropy(Y, softmax(relu(X @ W1 + b1) @ W2 + b2))
-pred = np.argmax(softmax(relu(X @ W1 + b1) @ W2 + b2), axis=1)
-acc = float(np.mean(pred == y))
+    dZ2 = (P - Y) / n  # Gradiente CE+softmax respecto a logits: (P-Y)/n
+    dW2 = A1.T @ dZ2  # Gradiente W2: (32,n)@(n,10) => (32,10)
+    db2 = np.sum(dZ2, axis=0)  # Gradiente b2: suma sobre batch => (10,)
+    dA1 = dZ2 @ W2.T  # Propaga gradiente a activaciones ocultas: (n,10)@(10,32) => (n,32)
+    dZ1 = dA1 * relu_deriv(Z1)  # Aplica derivada de ReLU para obtener gradiente en pre-activación
+    dW1 = X.T @ dZ1  # Gradiente W1: (784,n)@(n,32) => (784,32)
+    db1 = np.sum(dZ1, axis=0)  # Gradiente b1: suma sobre batch => (32,)
 
-assert loss_end <= loss0
-assert acc > 0.6
+    W1 -= lr * dW1  # Actualiza W1 con descenso por gradiente
+    b1 -= lr * db1  # Actualiza b1 con descenso por gradiente
+    W2 -= lr * dW2  # Actualiza W2 con descenso por gradiente
+    b2 -= lr * db2  # Actualiza b2 con descenso por gradiente
 
+loss_end = cross_entropy(Y, softmax(relu(X @ W1 + b1) @ W2 + b2))  # Loss final tras entrenar: debe ser <= loss0 si aprende
+pred = np.argmax(softmax(relu(X @ W1 + b1) @ W2 + b2), axis=1)  # Predicción final: argmax por fila da la clase estimada
+acc = float(np.mean(pred == y))  # Accuracy en train (batch tiny): debe subir si el modelo sobreajusta
+
+assert loss_end <= loss0  # Invariante: la loss final no debe ser mayor que la inicial en un sanity check de overfit
+assert acc > 0.6  # Invariante: debe superar un umbral razonable de accuracy si el entrenamiento funciona
 ```
 
 <details open>
@@ -1645,43 +1645,43 @@ assert acc > 0.6
 #### Solución
 
 ```python
-import numpy as np
-
-def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray, k: int) -> np.ndarray:
-    y_true = np.asarray(y_true).astype(int)
-    y_pred = np.asarray(y_pred).astype(int)
-    cm = np.zeros((k, k), dtype=int)
-    for t, p in zip(y_true, y_pred):
-        cm[t, p] += 1
-    return cm
+import numpy as np  # Importa NumPy: se usa para construir arrays, sumar por ejes y calcular promedios (macro-F1)
 
 
-def prf_from_cm(cm: np.ndarray):
-    k = cm.shape[0]
-    eps = 1e-12
-    precision = np.zeros(k)
-    recall = np.zeros(k)
-    f1 = np.zeros(k)
-    for c in range(k):
-        tp = cm[c, c]
-        fp = np.sum(cm[:, c]) - tp
-        fn = np.sum(cm[c, :]) - tp
-        precision[c] = tp / (tp + fp + eps)
-        recall[c] = tp / (tp + fn + eps)
-        f1[c] = 2 * precision[c] * recall[c] / (precision[c] + recall[c] + eps)
-    return precision, recall, f1
+def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray, k: int) -> np.ndarray:  # Construye cm (k×k): filas=verdadero, columnas=predicho
+    y_true = np.asarray(y_true).astype(int)  # Normaliza etiquetas verdaderas a int para indexación segura
+    y_pred = np.asarray(y_pred).astype(int)  # Normaliza etiquetas predichas a int para indexación segura
+    cm = np.zeros((k, k), dtype=int)  # Inicializa matriz de conteos: cm[t,p] cuenta ocurrencias (t→p)
+    for t, p in zip(y_true, y_pred):  # Recorre pares (verdadero,predicho) para acumular conteos
+        cm[t, p] += 1  # Incrementa la celda correspondiente en la matriz de confusión
+    return cm  # Devuelve cm para análisis y para derivar precision/recall/F1
 
 
-y_true = np.array([0, 1, 2, 2, 2, 1])
-y_pred = np.array([0, 2, 2, 2, 1, 1])
-cm = confusion_matrix(y_true, y_pred, k=3)
+def prf_from_cm(cm: np.ndarray):  # Calcula precision/recall/F1 por clase a partir de una matriz de confusión
+    k = cm.shape[0]  # Número de clases: se asume matriz cuadrada (k,k)
+    eps = 1e-12  # Epsilon: evita división por cero cuando una clase no tiene predicciones o no tiene verdaderos
+    precision = np.zeros(k)  # Precision por clase: TP/(TP+FP)
+    recall = np.zeros(k)  # Recall por clase: TP/(TP+FN)
+    f1 = np.zeros(k)  # F1 por clase: media armónica de precision y recall
+    for c in range(k):  # Itera por clase c para computar métricas one-vs-rest
+        tp = cm[c, c]  # True positives: predijo c y el verdadero era c
+        fp = np.sum(cm[:, c]) - tp  # False positives: predijo c cuando el verdadero era otra clase
+        fn = np.sum(cm[c, :]) - tp  # False negatives: verdadero c pero predijo otra clase
+        precision[c] = tp / (tp + fp + eps)  # Precision_c (con eps para estabilidad)
+        recall[c] = tp / (tp + fn + eps)  # Recall_c (con eps para estabilidad)
+        f1[c] = 2 * precision[c] * recall[c] / (precision[c] + recall[c] + eps)  # F1_c = 2PR/(P+R) (con eps)
+    return precision, recall, f1  # Devuelve vectores por clase (útil para macro-promedios)
 
-prec, rec, f1 = prf_from_cm(cm)
-f1_macro = float(np.mean(f1))
 
-assert cm.shape == (3, 3)
-assert 0.0 <= f1_macro <= 1.0
+y_true = np.array([0, 1, 2, 2, 2, 1])  # Etiquetas verdaderas de ejemplo (3 clases) para testear la implementación
+y_pred = np.array([0, 2, 2, 2, 1, 1])  # Predicciones de ejemplo: incluye confusiones para que cm no sea diagonal
+cm = confusion_matrix(y_true, y_pred, k=3)  # Construye cm (3×3) a partir del ejemplo
 
+prec, rec, f1 = prf_from_cm(cm)  # Calcula precision/recall/F1 por clase desde la cm
+f1_macro = float(np.mean(f1))  # Macro-F1: promedio simple de F1 por clase (todas las clases pesan igual)
+
+assert cm.shape == (3, 3)  # Invariante: cm debe ser cuadrada y del tamaño k
+assert 0.0 <= f1_macro <= 1.0  # Invariante: macro-F1 debe estar acotado en [0,1]
 ```
 
 <details open>
@@ -1726,19 +1726,22 @@ assert 0.0 <= f1_macro <= 1.0
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se mantiene como dependencia estándar (aunque este snippet no lo requiere estrictamente)
 
-results = {
-    "K-Means": 0.00,
-    "Logistic Regression": 0.88,
-    "MLP": 0.94,
-}
 
-items = sorted(results.items(), key=lambda kv: kv[1], reverse=True)
+results = {  # Diccionario {modelo: accuracy}: base para construir una tabla/ranking consistente
+    "K-Means": 0.00,  # Placeholder: K-Means no es supervisado, este valor no es accuracy real
+    "Logistic Regression": 0.88,  # Accuracy ejemplo para un baseline lineal supervisado
+    "MLP": 0.94,  # Accuracy ejemplo para un modelo no lineal con mayor capacidad
+}  # Cierra el diccionario de resultados
 
-assert items[0][1] == max(results.values())
-for _, acc in items:
-    assert 0.0 <= acc <= 1.0
+
+items = sorted(results.items(), key=lambda kv: kv[1], reverse=True)  # Ordena por accuracy descendente: mejor modelo primero
+
+
+assert items[0][1] == max(results.values())  # Invariante: el primer elemento debe tener el máximo accuracy
+for _, acc in items:  # Itera por accuracies para validar que son métricas válidas
+    assert 0.0 <= acc <= 1.0  # Invariante: accuracy está acotado en [0,1]
 ```
 
 <details open>
@@ -2018,17 +2021,17 @@ Senior: "Mi modelo tiene 92% accuracy. Los errores se concentran en:
 Error Analysis - Visualización de Fallos del Modelo
 Nivel Senior: No solo accuracy, también entender los errores.
 """
-import numpy as np
-import matplotlib.pyplot as plt
-from typing import Tuple, List
+import numpy as np  # Importa NumPy: máscaras booleanas, np.where, reshape y cálculos auxiliares
+import matplotlib.pyplot as plt  # Importa Matplotlib: crea grids de imágenes, plots de curvas y guarda figuras
+from typing import Tuple, List  # Tipos: documenta colecciones usadas en curvas de aprendizaje
 
 
-def analyze_errors(
-    model,
-    X_test: np.ndarray,
-    y_test: np.ndarray,
-    n_errors: int = 20
-) -> dict:
+def analyze_errors(  # Analiza predicciones erróneas: cuantifica errores, top confusiones y visualiza ejemplos
+    model,  # Modelo entrenado: debe implementar .predict(X) y devolver etiquetas/clases
+    X_test: np.ndarray,  # Features de test: se asume que cada muestra se puede reshaper a 28×28
+    y_test: np.ndarray,  # Labels verdaderos: referencia para marcar errores
+    n_errors: int = 20  # Número máximo de errores a visualizar en el grid
+) -> dict:  # Devuelve un dict con estadísticas para reporting
     """
     Analiza y visualiza los errores del modelo.
 
@@ -2042,64 +2045,66 @@ def analyze_errors(
         Diccionario con análisis completo
     """
     # Predicciones
-    y_pred = model.predict(X_test)
+    y_pred = model.predict(X_test)  # Predice sobre X_test: necesario para comparar vs y_test
 
     # Identificar errores
-    errors_mask = y_pred != y_test
-    error_indices = np.where(errors_mask)[0]
+    errors_mask = y_pred != y_test  # Máscara booleana: True donde la predicción falla
+    error_indices = np.where(errors_mask)[0]  # Índices de fallos: permite muestrear y visualizar
 
-    print("=" * 60)
-    print("ANÁLISIS DE ERRORES")
-    print("=" * 60)
-    print(f"Total errores: {len(error_indices)} / {len(y_test)}")
-    print(f"Error rate: {100 * len(error_indices) / len(y_test):.2f}%")
+    print("=" * 60)  # Separador para legibilidad en consola
+    print("ANÁLISIS DE ERRORES")  # Título del reporte
+    print("=" * 60)  # Cierra el encabezado visual
+    print(f"Total errores: {len(error_indices)} / {len(y_test)}")  # Conteo absoluto de errores
+    print(f"Error rate: {100 * len(error_indices) / len(y_test):.2f}%")  # Tasa de error en porcentaje
 
     # Matriz de confusión de errores
-    confusion_pairs = {}
-    for idx in error_indices:
-        pair = (y_test[idx], y_pred[idx])
-        confusion_pairs[pair] = confusion_pairs.get(pair, 0) + 1
+    confusion_pairs = {}  # Dict {(true,pred): count}: cuenta tipos de confusión
+    for idx in error_indices:  # Recorre fallos para registrar qué clases se confunden
+        pair = (y_test[idx], y_pred[idx])  # Par (verdadero,predicho) que identifica la confusión
+        confusion_pairs[pair] = confusion_pairs.get(pair, 0) + 1  # Incrementa contador de esa confusión
 
     # Top confusiones
-    sorted_pairs = sorted(confusion_pairs.items(), key=lambda x: -x[1])
+    sorted_pairs = sorted(confusion_pairs.items(), key=lambda x: -x[1])  # Ordena confusiones por frecuencia descendente
 
-    print("\n📊 TOP CONFUSIONES:")
-    for (true, pred), count in sorted_pairs[:10]:
-        print(f"  {true} → {pred}: {count} errores")
+    print("\n📊 TOP CONFUSIONES:")  # Encabezado: lista de confusiones más comunes
+    for (true, pred), count in sorted_pairs[:10]:  # Itera top-10 confusiones (si existen)
+        print(f"  {true} → {pred}: {count} errores")  # Imprime true→pred con su conteo
 
     # Visualizar errores
-    fig, axes = plt.subplots(4, 5, figsize=(12, 10))
-    fig.suptitle("Ejemplos de Errores del Modelo", fontsize=14)
+    fig, axes = plt.subplots(4, 5, figsize=(12, 10))  # Grid 4×5: muestra hasta 20 errores
+    fig.suptitle("Ejemplos de Errores del Modelo", fontsize=14)  # Título global de la figura
 
-    for i, ax in enumerate(axes.flat):
-        if i < min(n_errors, len(error_indices)):
-            idx = error_indices[i]
-            img = X_test[idx].reshape(28, 28)
-            ax.imshow(img, cmap='gray')
-            ax.set_title(f"True: {y_test[idx]}, Pred: {y_pred[idx]}",
-                        color='red', fontsize=10)
-            ax.axis('off')
-        else:
-            ax.axis('off')
+    for i, ax in enumerate(axes.flat):  # Recorre subplots de forma plana para indexar fácilmente
+        if i < min(n_errors, len(error_indices)):  # Si hay errores para mostrar, renderiza el ejemplo i
+            idx = error_indices[i]  # Índice real del dataset del i-ésimo error
+            img = X_test[idx].reshape(28, 28)  # Reconstruye imagen 28×28 para visualización
+            ax.imshow(img, cmap='gray')  # Muestra imagen en escala de grises
+            ax.set_title(  # Configura título informativo para entender la confusión
+                f"True: {y_test[idx]}, Pred: {y_pred[idx]}",  # Texto: etiqueta real vs predicha
+                color='red', fontsize=10  # Estilo: rojo para resaltar que es un error
+            )  # Cierra set_title
+            ax.axis('off')  # Oculta ejes para priorizar la imagen
+        else:  # Rama alternativa: cuando no hay más ejemplos a renderizar, se deja el subplot vacío
+            ax.axis('off')  # Si no hay más errores, deja el subplot vacío
 
-    plt.tight_layout()
-    plt.savefig('error_analysis.png', dpi=150)
-    plt.show()
+    plt.tight_layout()  # Ajusta layout para evitar solapes
+    plt.savefig('error_analysis.png', dpi=150)  # Guarda figura a disco para reportes
+    plt.show()  # Muestra la figura en pantalla
 
-    return {
-        'n_errors': len(error_indices),
-        'error_rate': len(error_indices) / len(y_test),
-        'confusion_pairs': sorted_pairs,
-        'error_indices': error_indices
-    }
+    return {  # Retorna resumen estructurado para reporting
+        'n_errors': len(error_indices),  # Conteo de errores
+        'error_rate': len(error_indices) / len(y_test),  # Tasa de error como fracción
+        'confusion_pairs': sorted_pairs,  # Lista ordenada de confusiones con conteos
+        'error_indices': error_indices  # Índices de errores para inspección posterior
+    }  # Fin del dict de retorno
 
 
-def plot_learning_curves(
-    train_losses: List[float],
-    val_losses: List[float],
-    train_accs: List[float],
-    val_accs: List[float]
-) -> None:
+def plot_learning_curves(  # Grafica curvas loss/accuracy para diagnosticar bias-variance
+    train_losses: List[float],  # Loss por época en entrenamiento
+    val_losses: List[float],  # Loss por época en validación
+    train_accs: List[float],  # Accuracy por época en entrenamiento
+    val_accs: List[float]  # Accuracy por época en validación
+) -> None:  # No retorna: solo grafica y hace prints de diagnóstico
     """
     Visualiza curvas de aprendizaje para diagnóstico Bias-Variance.
 
@@ -2107,49 +2112,49 @@ def plot_learning_curves(
     - Train bajo, Val alto → Overfitting (High Variance)
     - Train bajo, Val bajo → Buen modelo
     """
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))  # Figura con 2 subplots: loss y accuracy
 
-    epochs = range(1, len(train_losses) + 1)
+    epochs = range(1, len(train_losses) + 1)  # Eje x: 1..N épocas (asume listas no vacías)
 
     # Loss curves
-    ax1.plot(epochs, train_losses, 'b-', label='Train Loss')
-    ax1.plot(epochs, val_losses, 'r-', label='Validation Loss')
-    ax1.set_xlabel('Epoch')
-    ax1.set_ylabel('Loss')
-    ax1.set_title('Learning Curves: Loss')
-    ax1.legend()
-    ax1.grid(True, alpha=0.3)
+    ax1.plot(epochs, train_losses, 'b-', label='Train Loss')  # Curva de loss en train (azul)
+    ax1.plot(epochs, val_losses, 'r-', label='Validation Loss')  # Curva de loss en val (rojo)
+    ax1.set_xlabel('Epoch')  # Etiqueta eje x
+    ax1.set_ylabel('Loss')  # Etiqueta eje y
+    ax1.set_title('Learning Curves: Loss')  # Título subplot loss
+    ax1.legend()  # Leyenda
+    ax1.grid(True, alpha=0.3)  # Grilla suave
 
     # Accuracy curves
-    ax2.plot(epochs, train_accs, 'b-', label='Train Accuracy')
-    ax2.plot(epochs, val_accs, 'r-', label='Validation Accuracy')
-    ax2.set_xlabel('Epoch')
-    ax2.set_ylabel('Accuracy')
-    ax2.set_title('Learning Curves: Accuracy')
-    ax2.legend()
-    ax2.grid(True, alpha=0.3)
+    ax2.plot(epochs, train_accs, 'b-', label='Train Accuracy')  # Curva accuracy train
+    ax2.plot(epochs, val_accs, 'r-', label='Validation Accuracy')  # Curva accuracy val
+    ax2.set_xlabel('Epoch')  # Etiqueta eje x
+    ax2.set_ylabel('Accuracy')  # Etiqueta eje y
+    ax2.set_title('Learning Curves: Accuracy')  # Título subplot accuracy
+    ax2.legend()  # Leyenda
+    ax2.grid(True, alpha=0.3)  # Grilla suave
 
     # Diagnóstico
-    final_gap = train_accs[-1] - val_accs[-1]
+    final_gap = train_accs[-1] - val_accs[-1]  # Gap final: mide sobreajuste (train mucho mayor que val)
 
-    if val_accs[-1] < 0.7:
-        diagnosis = "⚠️ UNDERFITTING: Modelo muy simple o poco entrenamiento"
-    elif final_gap > 0.1:
-        diagnosis = "⚠️ OVERFITTING: Gap train-val > 10%"
-    else:
-        diagnosis = "✓ BUEN AJUSTE: Modelo generaliza bien"
+    if val_accs[-1] < 0.7:  # Regla 1: validación baja sugiere underfitting (alto sesgo)
+        diagnosis = "⚠️ UNDERFITTING: Modelo muy simple o poco entrenamiento"  # Val bajo sugiere underfitting
+    elif final_gap > 0.1:  # Regla 2: gap train-val grande sugiere overfitting (alta varianza)
+        diagnosis = "⚠️ OVERFITTING: Gap train-val > 10%"  # Gap grande sugiere overfitting
+    else:  # Regla 3: si no se cumplen las anteriores, se asume un ajuste razonable (generaliza)
+        diagnosis = "✓ BUEN AJUSTE: Modelo generaliza bien"  # Buen balance sugiere generalización
 
-    fig.suptitle(f"Diagnóstico: {diagnosis}", fontsize=12, y=1.02)
+    fig.suptitle(f"Diagnóstico: {diagnosis}", fontsize=12, y=1.02)  # Título global con diagnóstico
 
-    plt.tight_layout()
-    plt.savefig('learning_curves.png', dpi=150)
-    plt.show()
+    plt.tight_layout()  # Ajusta layout
+    plt.savefig('learning_curves.png', dpi=150)  # Guarda figura a disco
+    plt.show()  # Muestra la figura
 
-    print("\n📈 DIAGNÓSTICO BIAS-VARIANCE:")
-    print(f"  Train Accuracy Final: {train_accs[-1]:.4f}")
-    print(f"  Val Accuracy Final:   {val_accs[-1]:.4f}")
-    print(f"  Gap:                  {final_gap:.4f}")
-    print(f"  → {diagnosis}")
+    print("\n📈 DIAGNÓSTICO BIAS-VARIANCE:")  # Encabezado en consola
+    print(f"  Train Accuracy Final: {train_accs[-1]:.4f}")  # Accuracy final train
+    print(f"  Val Accuracy Final:   {val_accs[-1]:.4f}")  # Accuracy final val
+    print(f"  Gap:                  {final_gap:.4f}")  # Gap final
+    print(f"  → {diagnosis}")  # Conclusión
 ```
 
 ### Sección Obligatoria en MODEL_COMPARISON.md

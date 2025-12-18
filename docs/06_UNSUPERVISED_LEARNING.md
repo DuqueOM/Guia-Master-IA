@@ -238,7 +238,7 @@ Donde:
 ### 1.1 Algoritmo de Lloyd
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para RNG, arrays, distancias cuadráticas y muestreo probabilístico en K-Means++
 
 """
 K-MEANS CLUSTERING (Algoritmo de Lloyd)
@@ -259,11 +259,11 @@ Función objetivo (minimizar):
 Donde xⱼ pertenece al cluster i con centroide μᵢ
 """
 
-def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
+def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:  # Distancia euclidiana entre dos puntos.
     """Distancia euclidiana entre dos puntos."""
-    return np.sqrt(np.sum((a - b) ** 2))
+    return np.sqrt(np.sum((a - b) ** 2))  # Calcula ||a-b||₂: resta vectorial, eleva al cuadrado, suma por dimensión y aplica raíz
 
-def assign_clusters(X: np.ndarray, centroids: np.ndarray) -> np.ndarray:
+def assign_clusters(X: np.ndarray, centroids: np.ndarray) -> np.ndarray:  # Asigna cada punto al centroide más cercano.
     """
     Asigna cada punto al centroide más cercano.
 
@@ -274,18 +274,18 @@ def assign_clusters(X: np.ndarray, centroids: np.ndarray) -> np.ndarray:
     Returns:
         labels: índice del cluster para cada punto (n_samples,)
     """
-    n_samples = X.shape[0]
-    k = centroids.shape[0]
+    n_samples = X.shape[0]  # Número de puntos: define cuántas filas tendrá la matriz de distancias y la longitud de labels
+    k = centroids.shape[0]  # Número de centroides/clusters: define cuántas columnas tendrá la matriz de distancias
 
     # Calcular distancia de cada punto a cada centroide
-    distances = np.zeros((n_samples, k))
-    for i in range(k):
-        distances[:, i] = np.sqrt(np.sum((X - centroids[i]) ** 2, axis=1))
+    distances = np.zeros((n_samples, k))  # Reserva distancias (n,k): cada entrada [j,i] será la distancia de X[j] al centroide i
+    for i in range(k):  # Recorre centroides: calcula distancias de TODOS los puntos a un centroide a la vez (vectorizado por filas)
+        distances[:, i] = np.sqrt(np.sum((X - centroids[i]) ** 2, axis=1))  # Distancia Euclídea por punto: sum over features y sqrt para cada fila
 
     # Asignar al más cercano
-    return np.argmin(distances, axis=1)
+    return np.argmin(distances, axis=1)  # Label por punto: índice i del centroide con distancia mínima (argmin sobre columnas)
 
-def update_centroids(X: np.ndarray, labels: np.ndarray, k: int) -> np.ndarray:
+def update_centroids(X: np.ndarray, labels: np.ndarray, k: int) -> np.ndarray:  # Actualiza centroides como el promedio de los puntos asignados.
     """
     Actualiza centroides como el promedio de los puntos asignados.
 
@@ -297,23 +297,23 @@ def update_centroids(X: np.ndarray, labels: np.ndarray, k: int) -> np.ndarray:
     Returns:
         nuevos centroides
     """
-    n_features = X.shape[1]
-    centroids = np.zeros((k, n_features))
+    n_features = X.shape[1]  # Dimensionalidad d: número de features por punto, define el ancho del array de centroides
+    centroids = np.zeros((k, n_features))  # Inicializa centroides nuevos (k,d): se llenan con medias por cluster
 
-    for i in range(k):
-        points_in_cluster = X[labels == i]
-        if len(points_in_cluster) > 0:
-            centroids[i] = np.mean(points_in_cluster, axis=0)
+    for i in range(k):  # Recorre cada cluster i: recalcula su centroide como promedio de sus puntos asignados
+        points_in_cluster = X[labels == i]  # Selecciona puntos asignados al cluster i: indexación booleana
+        if len(points_in_cluster) > 0:  # Evita cluster vacío: sin puntos no se puede calcular media (mean sobre vacío -> warning/NaN)
+            centroids[i] = np.mean(points_in_cluster, axis=0)  # Media por feature: define el nuevo centroide como el "centro" de su nube
 
-    return centroids
+    return centroids  # Devuelve centroides actualizados (k,d): promedios por cluster para el siguiente paso de asignación
 ```
 
 ### 1.2 K-Means++ Initialization
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para RNG, distancias cuadráticas y muestreo ponderado en la inicialización K-Means++
 
-def kmeans_plus_plus_init(X: np.ndarray, k: int, random_state: int = None) -> np.ndarray:
+def kmeans_plus_plus_init(X: np.ndarray, k: int, random_state: int = None) -> np.ndarray:  # Inicializa centroides con K-Means++ (mejora convergencia vs random)
     """
     Inicialización K-Means++.
 
@@ -328,54 +328,54 @@ def kmeans_plus_plus_init(X: np.ndarray, k: int, random_state: int = None) -> np
        a. Calcular distancia de cada punto al centroide más cercano
        b. Elegir nuevo centroide con probabilidad proporcional a d²
     """
-    if random_state is not None:
-        np.random.seed(random_state)
+    if random_state is not None:  # Si se provee semilla, fijamos el RNG para reproducibilidad del muestreo de centroides
+        np.random.seed(random_state)  # Setea semilla global: controla randint/choice usados abajo
 
-    n_samples, n_features = X.shape
-    centroids = np.zeros((k, n_features))
+    n_samples, n_features = X.shape  # Extrae shapes: n puntos y d features para dimensionar estructuras y muestrear índices
+    centroids = np.zeros((k, n_features))  # Reserva matriz de centroides: (k,d) para ir llenándola iterativamente
 
     # Primer centroide aleatorio
-    first_idx = np.random.randint(n_samples)
-    centroids[0] = X[first_idx]
+    first_idx = np.random.randint(n_samples)  # Elige índice inicial uniforme: primer centroide se toma al azar (paso 1 de K-Means++)
+    centroids[0] = X[first_idx]  # Copia el primer centroide desde X: garantiza que el centroide es un punto real del dataset
 
     # Centroides restantes
-    for c in range(1, k):
+    for c in range(1, k):  # Para cada centroide restante: selecciona un nuevo centroide sesgado hacia puntos lejanos
         # Calcular distancia al centroide más cercano para cada punto
-        distances = np.zeros(n_samples)
-        for i in range(n_samples):
-            min_dist = float('inf')
-            for j in range(c):
-                dist = np.sum((X[i] - centroids[j]) ** 2)
-                min_dist = min(min_dist, dist)
-            distances[i] = min_dist
+        distances = np.zeros(n_samples)  # Vector d² mínimo por punto: almacenará la distancia^2 al centroide más cercano
+        for i in range(n_samples):  # Recorre cada muestra i: calcula su distancia al centroide más cercano (entre los ya elegidos)
+            min_dist = float('inf')  # Inicializa mínimo: se actualizará comparando con cada centroide existente
+            for j in range(c):  # Recorre centroides ya elegidos (0..c-1): busca el más cercano al punto i
+                dist = np.sum((X[i] - centroids[j]) ** 2)  # Distancia^2 a centroide j: evita sqrt y preserva orden para argmin
+                min_dist = min(min_dist, dist)  # Actualiza mínimo: mantiene la menor distancia^2 encontrada hasta ahora
+            distances[i] = min_dist  # Guarda d² mínimo para el punto i: define su probabilidad de ser elegido
 
         # Probabilidad proporcional a d²
-        probabilities = distances / np.sum(distances)
+        probabilities = distances / np.sum(distances)  # Normaliza d² a distribución: suma 1 y prioriza puntos lejanos a centroides actuales
 
         # Elegir nuevo centroide
-        new_idx = np.random.choice(n_samples, p=probabilities)
-        centroids[c] = X[new_idx]
+        new_idx = np.random.choice(n_samples, p=probabilities)  # Samplea índice según probs: implementa el sesgo K-Means++ (paso 2)
+        centroids[c] = X[new_idx]  # Asigna el nuevo centroide: toma un punto real de X para evitar centroides fuera del soporte
 
-    return centroids
+    return centroids  # Devuelve centroides iniciales (k,d): se pasan a K-Means/Lloyd para empezar iteraciones desde una buena semilla
 ```
 
 ### 1.3 Implementación Completa
 
 ```python
-import numpy as np
-from typing import Tuple
+import numpy as np  # Importa NumPy: se usa para RNG, álgebra vectorizada y operaciones de distancia/centroides
+from typing import Tuple  # Importa typing: documenta tipos de retorno/entradas (no afecta runtime)
 
-class KMeans:
-    """K-Means Clustering implementado desde cero."""
+class KMeans:  # Implementa K-Means desde cero: alterna asignación de clusters y actualización de centroides hasta convergencia
+    """K-Means Clustering implementado desde cero."""  # Docstring: describe la clase; es un literal string y no cambia el comportamiento
 
-    def __init__(
-        self,
-        n_clusters: int = 3,
-        max_iter: int = 300,
-        tol: float = 1e-4,
-        init: str = 'kmeans++',
-        random_state: int = None
-    ):
+    def __init__(  # Inicializa hiperparámetros y atributos del modelo
+        self,  # Referencia a la instancia: permite setear atributos persistentes del estimador
+        n_clusters: int = 3,  # k: cantidad de clusters/centroides a aprender
+        max_iter: int = 300,  # Máximo de iteraciones: tope de seguridad si no converge
+        tol: float = 1e-4,  # Tolerancia de convergencia: umbral para detener cuando los centroides cambian muy poco
+        init: str = 'kmeans++',  # Estrategia de inicialización: 'kmeans++' o 'random'
+        random_state: int = None  # Semilla opcional: hace reproducibles tanto init como sampling aleatorio
+    ):  # Cierra firma: se ejecuta al definir el método
         """
         Args:
             n_clusters: número de clusters (k)
@@ -384,93 +384,93 @@ class KMeans:
             init: 'kmeans++' o 'random'
             random_state: semilla para reproducibilidad
         """
-        self.n_clusters = n_clusters
-        self.max_iter = max_iter
-        self.tol = tol
-        self.init = init
-        self.random_state = random_state
+        self.n_clusters = n_clusters  # Guarda k: se reutiliza en fit/predict y en loops internos
+        self.max_iter = max_iter  # Guarda límite de iteraciones: controla el ciclo de entrenamiento
+        self.tol = tol  # Guarda tolerancia: define criterio de parada por desplazamiento de centroides
+        self.init = init  # Guarda modo de init: decide cómo se eligen centroides iniciales
+        self.random_state = random_state  # Guarda semilla: permite reproducibilidad de resultados
 
-        self.centroids = None
-        self.labels_ = None
-        self.inertia_ = None
-        self.n_iter_ = 0
+        self.centroids = None  # Placeholder: centroides aprendidos (k, n_features); se setea en fit
+        self.labels_ = None  # Placeholder: asignación por muestra (n_samples,); se setea en fit
+        self.inertia_ = None  # Placeholder: SSE final dentro de clusters; se computa al final del fit
+        self.n_iter_ = 0  # Contador de iteraciones ejecutadas: útil para diagnóstico de convergencia
 
-    def _init_centroids(self, X: np.ndarray) -> np.ndarray:
-        """Inicializa centroides."""
-        if self.random_state is not None:
-            np.random.seed(self.random_state)
+    def _init_centroids(self, X: np.ndarray) -> np.ndarray:  # Inicializa centroides de acuerdo al modo elegido
+        """Inicializa centroides."""  # Docstring: describe el helper; no altera la lógica
+        if self.random_state is not None:  # Si hay semilla, fijamos el RNG global para reproducibilidad del muestreo de centroides
+            np.random.seed(self.random_state)  # Setea semilla: controla np.random.choice/np.random.randint usados abajo
 
-        if self.init == 'kmeans++':
-            return kmeans_plus_plus_init(X, self.n_clusters, self.random_state)
-        else:
+        if self.init == 'kmeans++':  # Rama 1: init informado por distancia (mejor que random para evitar mínimos malos)
+            return kmeans_plus_plus_init(X, self.n_clusters, self.random_state)  # Devuelve centroides iniciales con K-Means++
+        else:  # Rama 2: init aleatorio (baseline) para comparación/rapidez
             # Inicialización aleatoria
-            indices = np.random.choice(len(X), self.n_clusters, replace=False)
-            return X[indices].copy()
+            indices = np.random.choice(len(X), self.n_clusters, replace=False)  # Samplea k índices distintos: evita centroides duplicados
+            return X[indices].copy()  # Copia centroides iniciales: evita aliasing con X al modificarlos durante el training
 
-    def _compute_inertia(self, X: np.ndarray) -> float:
+    def _compute_inertia(self, X: np.ndarray) -> float:  # Calcula inercia/SSE dentro de clusters para el estado actual
         """
         Calcula inercia (within-cluster sum of squares).
 
         Inercia = Σᵢ Σⱼ ||xⱼ - μᵢ||²
         """
-        inertia = 0
-        for i in range(self.n_clusters):
-            cluster_points = X[self.labels_ == i]
-            if len(cluster_points) > 0:
-                inertia += np.sum((cluster_points - self.centroids[i]) ** 2)
-        return inertia
+        inertia = 0  # Acumulador SSE: suma distancias cuadradas de cada punto a su centroide asignado
+        for i in range(self.n_clusters):  # Itera clusters: computa contribución por centroide i
+            cluster_points = X[self.labels_ == i]  # Selecciona puntos asignados al cluster i: indexación booleana
+            if len(cluster_points) > 0:  # Evita cluster vacío: si no hay puntos, su SSE contribuye 0
+                inertia += np.sum((cluster_points - self.centroids[i]) ** 2)  # Suma distancias^2 al centroide i
+        return inertia  # Devuelve SSE total: se usa en elbow method y diagnóstico
 
-    def fit(self, X: np.ndarray) -> 'KMeans':
-        """Entrena el modelo."""
+    def fit(self, X: np.ndarray) -> 'KMeans':  # Entrena el modelo: aprende centroides y labels para X
+        """Entrena el modelo."""  # Docstring: describe método; no modifica el entrenamiento
         # Inicializar centroides
-        self.centroids = self._init_centroids(X)
+        self.centroids = self._init_centroids(X)  # Setea centroides iniciales: punto de partida del loop iterativo
 
-        for iteration in range(self.max_iter):
+        for iteration in range(self.max_iter):  # Loop principal: alterna asignación (E-step) y actualización (M-step)
             # Guardar centroides anteriores
-            old_centroids = self.centroids.copy()
+            old_centroids = self.centroids.copy()  # Copia para medir desplazamiento: criterio de convergencia
 
             # Paso 1: Asignar puntos a clusters
-            self.labels_ = assign_clusters(X, self.centroids)
+            self.labels_ = assign_clusters(X, self.centroids)  # Asigna cada punto al centroide más cercano (por distancia^2)
 
             # Paso 2: Actualizar centroides
-            self.centroids = update_centroids(X, self.labels_, self.n_clusters)
+            self.centroids = update_centroids(X, self.labels_, self.n_clusters)  # Recalcula centroides como media de puntos asignados
 
             # Verificar convergencia
-            centroid_shift = np.sum((self.centroids - old_centroids) ** 2)
-            if centroid_shift < self.tol:
-                break
+            centroid_shift = np.sum((self.centroids - old_centroids) ** 2)  # Shift global: suma de desplazamientos^2 entre iteraciones
+            if centroid_shift < self.tol:  # Si el cambio total es pequeño, asumimos convergencia (ya no mejora materialmente)
+                break  # Sale temprano: ahorra cómputo manteniendo la solución estable
 
-        self.n_iter_ = iteration + 1
-        self.inertia_ = self._compute_inertia(X)
+        self.n_iter_ = iteration + 1  # Guarda iteraciones efectivas (iteration es 0-index)
+        self.inertia_ = self._compute_inertia(X)  # Calcula inercia final: métrica interna del ajuste
 
-        return self
+        return self  # Permite chaining (kmeans.fit(X).predict(X)) y acceso a atributos entrenados
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        """Predice clusters para nuevos datos."""
-        return assign_clusters(X, self.centroids)
+    def predict(self, X: np.ndarray) -> np.ndarray:  # Predice cluster para datos nuevos usando centroides ya aprendidos
+        """Predice clusters para nuevos datos."""  # Docstring: describe uso; no cambia la predicción
+        return assign_clusters(X, self.centroids)  # Reutiliza misma asignación: calcula distancias a centroides y retorna argmin
 
-    def fit_predict(self, X: np.ndarray) -> np.ndarray:
-        """Entrena y predice."""
-        self.fit(X)
-        return self.labels_
+    def fit_predict(self, X: np.ndarray) -> np.ndarray:  # Atajo: fit + retorna labels en una sola llamada
+        """Entrena y predice."""  # Docstring: describe atajo
+        self.fit(X)  # Entrena primero: actualiza centroides/labels/inercia
+        return self.labels_  # Devuelve labels aprendidas: resultado principal del clustering
 
 
 # Demo
-np.random.seed(42)
+np.random.seed(42)  # Fija semilla: hace reproducible el dataset sintético del demo
 
 # Generar datos sintéticos (3 clusters)
-cluster1 = np.random.randn(100, 2) + [0, 0]
-cluster2 = np.random.randn(100, 2) + [5, 5]
-cluster3 = np.random.randn(100, 2) + [10, 0]
-X = np.vstack([cluster1, cluster2, cluster3])
+cluster1 = np.random.randn(100, 2) + [0, 0]  # Cluster 1: nube gaussiana centrada en (0,0)
+cluster2 = np.random.randn(100, 2) + [5, 5]  # Cluster 2: nube gaussiana centrada en (5,5)
+cluster3 = np.random.randn(100, 2) + [10, 0]  # Cluster 3: nube gaussiana centrada en (10,0)
+X = np.vstack([cluster1, cluster2, cluster3])  # Dataset final: concatena clusters => shape (300,2)
 
 # Entrenar
-kmeans = KMeans(n_clusters=3, random_state=42)
-labels = kmeans.fit_predict(X)
+kmeans = KMeans(n_clusters=3, random_state=42)  # Crea estimador con k=3: coincide con generación sintética
+labels = kmeans.fit_predict(X)  # Ajusta el modelo y obtiene labels: debería separar bien los 3 grupos
 
-print(f"Iteraciones: {kmeans.n_iter_}")
-print(f"Inercia: {kmeans.inertia_:.2f}")
-print(f"Centroides:\n{kmeans.centroids}")
+print(f"Iteraciones: {kmeans.n_iter_}")  # Muestra iteraciones: indica rapidez de convergencia
+print(f"Inercia: {kmeans.inertia_:.2f}")  # Muestra SSE final: menor suele implicar clusters más compactos (pero depende de k)
+print(f"Centroides:\n{kmeans.centroids}")  # Muestra centroides aprendidos: aproximan los centros de las nubes
 ```
 
 ---
@@ -507,7 +507,7 @@ Enlaces rápidos:
 ### 2.1 Inercia (Within-Cluster Sum of Squares)
 
 ```python
-def compute_inertia(X: np.ndarray, labels: np.ndarray, centroids: np.ndarray) -> float:
+def compute_inertia(X: np.ndarray, labels: np.ndarray, centroids: np.ndarray) -> float:  # Calcula inercia/SSE: suma de distancias^2 de puntos a su centroide (métrica interna de compactación)
     """
     Inercia: suma de distancias cuadradas al centroide.
 
@@ -516,44 +516,44 @@ def compute_inertia(X: np.ndarray, labels: np.ndarray, centroids: np.ndarray) ->
     Problema: siempre disminuye al aumentar k.
     Solución: usar método del codo.
     """
-    inertia = 0
-    for i, centroid in enumerate(centroids):
-        cluster_points = X[labels == i]
-        inertia += np.sum((cluster_points - centroid) ** 2)
-    return inertia
+    inertia = 0  # Acumulador SSE: suma de distancias cuadráticas intra-cluster (cuanto menor, más compactos los clusters)
+    for i, centroid in enumerate(centroids):  # Recorre centroides: agrega contribución de cada cluster i a la inercia total
+        cluster_points = X[labels == i]  # Selecciona puntos asignados al cluster i: subconjunto sobre el que se mide compactación
+        inertia += np.sum((cluster_points - centroid) ** 2)  # Suma ||x-μ_i||^2 sobre puntos del cluster i: define la SSE intra-cluster
+    return inertia  # Devuelve inercia total: se usa para comparar k en el elbow method (aunque siempre decrece al aumentar k)
 ```
 
 ### 2.2 Método del Codo (Elbow Method)
 
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy as np  # Importa NumPy: se usa para almacenar/operar con listas de inercia y manejar rangos de k
+import matplotlib.pyplot as plt  # Importa Matplotlib: se usa para graficar la curva de inercia vs k ("codo")
 
-def elbow_method(X: np.ndarray, k_range: range) -> list:
+def elbow_method(X: np.ndarray, k_range: range) -> list:  # Ejecuta KMeans para múltiples k y devuelve la lista de inercias para detectar el “codo”
     """
     Método del codo para elegir k óptimo.
 
     Busca el punto donde añadir más clusters
     no reduce significativamente la inercia.
     """
-    inertias = []
+    inertias = []  # Lista de inercia por k: se llena en el loop y luego se grafica para buscar el “codo”
 
-    for k in k_range:
-        kmeans = KMeans(n_clusters=k, random_state=42)
-        kmeans.fit(X)
-        inertias.append(kmeans.inertia_)
+    for k in k_range:  # Itera candidatos k: prueba distintos números de clusters para ver cómo cae la inercia
+        kmeans = KMeans(n_clusters=k, random_state=42)  # Instancia KMeans: fija random_state para que comparaciones entre k sean reproducibles
+        kmeans.fit(X)  # Ajusta el modelo: ejecuta Lloyd y aprende centroides/labels; calcula inercia final
+        inertias.append(kmeans.inertia_)  # Guarda la inercia del modelo: suma de distancias cuadráticas intra-cluster (menor es mejor pero sesga a k alto)
 
-    return inertias
+    return inertias  # Devuelve lista alineada con k_range: se usa para graficar y detectar visualmente el punto de codo
 
-def plot_elbow(k_range: range, inertias: list):
+def plot_elbow(k_range: range, inertias: list):  # Grafica la curva k vs inercia para elegir k por criterio visual/heurístico
     """Visualiza el método del codo."""
-    plt.figure(figsize=(8, 5))
-    plt.plot(list(k_range), inertias, 'bo-')
-    plt.xlabel('Número de clusters (k)')
-    plt.ylabel('Inercia')
-    plt.title('Método del Codo')
-    plt.grid(True)
-    plt.show()
+    plt.figure(figsize=(8, 5))  # Crea figura: define tamaño para una lectura clara de la curva
+    plt.plot(list(k_range), inertias, 'bo-')  # Curva k vs inercia: puntos azules con línea (visualiza tendencia y posible “codo”)
+    plt.xlabel('Número de clusters (k)')  # Etiqueta eje x: variable controlada (cantidad de clusters)
+    plt.ylabel('Inercia')  # Etiqueta eje y: métrica interna que siempre baja con k (no debe optimizarse “a ciegas”)
+    plt.title('Método del Codo')  # Título: contextualiza la gráfica
+    plt.grid(True)  # Activa grilla: facilita comparar caídas relativas entre k consecutivos
+    plt.show()  # Renderiza la figura: muestra el plot al usuario
 
 # Demo
 # inertias = elbow_method(X, range(1, 11))
@@ -563,9 +563,9 @@ def plot_elbow(k_range: range, inertias: list):
 ### 2.3 Silhouette Score
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para sqrt/sum/mean, comparaciones, uniques y manejo de arrays
 
-def silhouette_sample(X: np.ndarray, labels: np.ndarray, idx: int) -> float:
+def silhouette_sample(X: np.ndarray, labels: np.ndarray, idx: int) -> float:  # Silhouette puntual: calcula s(i) para una muestra i
     """
     Calcula silhouette para un solo punto.
 
@@ -580,41 +580,41 @@ def silhouette_sample(X: np.ndarray, labels: np.ndarray, idx: int) -> float:
     - 0: punto en frontera entre clusters
     - -1: punto mal asignado
     """
-    point = X[idx]
-    label = labels[idx]
+    point = X[idx]  # Punto i: vector de features para el que se calcula silhouette
+    label = labels[idx]  # Label del punto i: define su cluster para calcular cohesión (a) y separación (b)
 
     # a(i): distancia promedio intra-cluster
-    same_cluster = X[labels == label]
-    if len(same_cluster) > 1:
-        a = np.mean([np.sqrt(np.sum((point - p) ** 2))
-                     for p in same_cluster if not np.array_equal(p, point)])
-    else:
-        a = 0
+    same_cluster = X[labels == label]  # Puntos del mismo cluster: se usan para promedio intra-cluster a(i)
+    if len(same_cluster) > 1:  # Si el cluster tiene más de 1 punto, a(i) se define como promedio de distancias a los demás
+        a = np.mean([np.sqrt(np.sum((point - p) ** 2))  # Distancia Euclídea a cada punto del mismo cluster
+                     for p in same_cluster if not np.array_equal(p, point)])  # Excluye el propio punto: evita incluir distancia 0
+    else:  # Si el cluster es unitario (solo i), no hay vecinos intra-cluster para promediar: usamos convención a=0
+        a = 0  # Edge case: cluster unitario (solo el punto) => cohesión se define como 0 por convención
 
     # b(i): distancia promedio al cluster más cercano
-    unique_labels = np.unique(labels)
-    b = float('inf')
-    for other_label in unique_labels:
-        if other_label != label:
-            other_cluster = X[labels == other_label]
-            if len(other_cluster) > 0:
-                avg_dist = np.mean([np.sqrt(np.sum((point - p) ** 2))
-                                   for p in other_cluster])
-                b = min(b, avg_dist)
+    unique_labels = np.unique(labels)  # Clusters presentes: se iteran para buscar el cluster alternativo más cercano
+    b = float('inf')  # Inicializa b(i): se busca el mínimo promedio a cualquier cluster distinto
+    for other_label in unique_labels:  # Itera clusters alternativos: busca el cluster “vecino” con menor distancia media (b(i))
+        if other_label != label:  # Omite el propio cluster: b(i) se define respecto a otros clusters
+            other_cluster = X[labels == other_label]  # Puntos del cluster candidato: se usan para distancia media inter-cluster
+            if len(other_cluster) > 0:  # Evita mean sobre vacío: aunque np.unique suele garantizar que el cluster existe, es defensa adicional
+                avg_dist = np.mean([np.sqrt(np.sum((point - p) ** 2))  # Distancia Euclídea a cada punto del cluster candidato
+                                   for p in other_cluster])  # Promedio: distancia media de i al cluster other_label
+                b = min(b, avg_dist)  # Actualiza mejor b(i): elige el cluster con menor distancia media
 
-    if b == float('inf'):
-        return 0
+    if b == float('inf'):  # Edge case: no se encontró cluster alternativo (labels degenerados) => b(i) no está definido
+        return 0  # Convención: score neutral cuando no hay comparación posible
 
-    return (b - a) / max(a, b)
+    return (b - a) / max(a, b)  # Fórmula silhouette puntual: normaliza para acotar en [-1,1] y comparar cohesión vs separación
 
-def silhouette_score(X: np.ndarray, labels: np.ndarray) -> float:
+def silhouette_score(X: np.ndarray, labels: np.ndarray) -> float:  # Silhouette global: promedio de s(i) sobre todas las muestras
     """
     Silhouette Score promedio para todos los puntos.
 
     Mayor es mejor (max = 1).
     """
-    scores = [silhouette_sample(X, labels, i) for i in range(len(X))]
-    return np.mean(scores)
+    scores = [silhouette_sample(X, labels, i) for i in range(len(X))]  # Calcula s(i) para cada punto: comprensión lista para promediar
+    return np.mean(scores)  # Promedia scores por punto: devuelve silhouette global del clustering
 
 
 # Demo
@@ -827,7 +827,7 @@ Lectura: la nube está casi en una línea; proyectar a 1D conserva casi toda la 
 2) SVD de `X_c` (recomendado) o eigen de `Σ`.
 3) Elegir `k` por varianza acumulada (y/o error de reconstrucción).
 4) Proyectar `Z = X_c @ V_k`.
-5) (Opcional) Reconstruir `X_hat = Z @ V_kᵀ + mean` para medir pérdida.
+5) (Opcional) Reconstruir `X_hat = Z @ V_kᵀ + mean`.
 
 #### Implementación práctica (código)
 
@@ -882,9 +882,9 @@ Aplicaciones:
 ### 3.2 PCA via Eigendecomposition
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para medias, covarianza, eigen, ordenamientos y proyecciones en PCA (vía eig)
 
-def pca_eigen(X: np.ndarray, n_components: int) -> tuple:
+def pca_eigen(X: np.ndarray, n_components: int) -> tuple:  # PCA por eigendecomposition: forma covarianza y extrae eigenvectors/eigenvalues
     """
     PCA usando eigendecomposition de la matriz de covarianza.
 
@@ -901,44 +901,44 @@ def pca_eigen(X: np.ndarray, n_components: int) -> tuple:
         explained_variance_ratio: proporción de varianza por componente
     """
     # 1. Centrar
-    mean = np.mean(X, axis=0)
-    X_centered = X - mean
+    mean = np.mean(X, axis=0)  # Media por feature: se resta para que la covarianza represente variación alrededor de 0
+    X_centered = X - mean  # Centra datos: elimina offset por feature para que PCA encuentre direcciones de varianza
 
     # 2. Matriz de covarianza
-    n_samples = X.shape[0]
-    cov_matrix = (X_centered.T @ X_centered) / (n_samples - 1)
+    n_samples = X.shape[0]  # Número de muestras n: se usa para normalizar covarianza con factor (n-1)
+    cov_matrix = (X_centered.T @ X_centered) / (n_samples - 1)  # Covarianza (d,d): Xc^T Xc /(n-1) (asumiendo centrado)
 
     # 3. Eigendecomposition
-    eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+    eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)  # Eig: encuentra λ y v tales que cov v = λ v (direcciones principales)
 
     # Convertir a reales (puede haber componentes imaginarias pequeñas)
-    eigenvalues = eigenvalues.real
-    eigenvectors = eigenvectors.real
+    eigenvalues = eigenvalues.real  # Descarta parte imaginaria pequeña: puede aparecer por errores numéricos en eig
+    eigenvectors = eigenvectors.real  # Mantiene eigenvectors reales: PCA real espera ejes en ℝ^d
 
     # 4. Ordenar por eigenvalue descendente
-    idx = np.argsort(eigenvalues)[::-1]
-    eigenvalues = eigenvalues[idx]
-    eigenvectors = eigenvectors[:, idx]
+    idx = np.argsort(eigenvalues)[::-1]  # Índices ordenados desc: prioriza componentes que explican más varianza
+    eigenvalues = eigenvalues[idx]  # Reordena eigenvalues: queda λ1 ≥ λ2 ≥ ... para seleccionar top-k
+    eigenvectors = eigenvectors[:, idx]  # Reordena columnas de eigenvectors: alinea v_j con eigenvalue λ_j ordenado
 
     # 5. Seleccionar top k componentes
-    components = eigenvectors[:, :n_components]
+    components = eigenvectors[:, :n_components]  # Toma primeras k columnas: matriz (d,k) de componentes principales
 
     # 6. Proyectar
-    X_pca = X_centered @ components
+    X_pca = X_centered @ components  # Proyección lineal: (n,d)@(d,k)->(n,k) da coordenadas en el subespacio de máxima varianza
 
     # 7. Varianza explicada
-    total_variance = np.sum(eigenvalues)
-    explained_variance_ratio = eigenvalues[:n_components] / total_variance
+    total_variance = np.sum(eigenvalues)  # Varianza total: suma de eigenvalues equivale al trace(cov) (varianza total en d dims)
+    explained_variance_ratio = eigenvalues[:n_components] / total_variance  # Ratio por componente: fracción de varianza explicada por cada λ_j
 
-    return X_pca, components, explained_variance_ratio, mean
+    return X_pca, components, explained_variance_ratio, mean  # Devuelve proyección, ejes, ratios y media para poder reconstruir/inferir
 ```
 
 ### 3.3 PCA via SVD (Más Estable)
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para SVD, medias, proyecciones y varianza explicada en PCA (vía SVD)
 
-def pca_svd(X: np.ndarray, n_components: int) -> tuple:
+def pca_svd(X: np.ndarray, n_components: int) -> tuple:  # PCA por SVD: alternativa más estable que eig para obtener componentes principales
     """
     PCA usando SVD (Singular Value Decomposition).
 
@@ -949,75 +949,75 @@ def pca_svd(X: np.ndarray, n_components: int) -> tuple:
     - Σ²/(n-1) son los eigenvalues (varianzas)
     """
     # 1. Centrar
-    mean = np.mean(X, axis=0)
-    X_centered = X - mean
+    mean = np.mean(X, axis=0)  # Media por feature: se resta para centrar y alinear PCA con covarianza (no con offsets)
+    X_centered = X - mean  # Centra X: elimina offset para que SVD capture direcciones de varianza
 
     # 2. SVD
-    U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)
+    U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)  # SVD compacta: Xc=U diag(S) Vt; estable numéricamente
 
     # 3. Componentes principales (filas de Vt, o columnas de V)
-    components = Vt[:n_components].T
+    components = Vt[:n_components].T  # Componentes (d,k): toma primeras k filas de Vt y transpone para usar como matriz de proyección
 
     # 4. Proyectar
-    X_pca = X_centered @ components
+    X_pca = X_centered @ components  # Proyecta a k dims: coordenadas en el subespacio principal (scores)
 
     # 5. Varianza explicada
-    n_samples = X.shape[0]
-    variance = (S ** 2) / (n_samples - 1)
-    explained_variance_ratio = variance[:n_components] / np.sum(variance)
+    n_samples = X.shape[0]  # n: se usa en el factor (n-1) para convertir S^2 en varianzas (eigenvalues)
+    variance = (S ** 2) / (n_samples - 1)  # Varianza por componente: S^2/(n-1) corresponde a eigenvalues de cov(X)
+    explained_variance_ratio = variance[:n_components] / np.sum(variance)  # Ratio truncado: var explicada por cada una de las k componentes
 
-    return X_pca, components, explained_variance_ratio, mean
+    return X_pca, components, explained_variance_ratio, mean  # Devuelve proyección, ejes (d,k), ratios y media para reconstrucción
 ```
 
 ### 3.4 Implementación Completa
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para SVD, medias, proyecciones y generación de datos sintéticos en el demo
 
-class PCA:
-    """Principal Component Analysis implementado desde cero."""
+class PCA:  # Implementa PCA desde cero: aprende ejes principales (componentes) y permite proyectar/reconstruir
+    """Principal Component Analysis implementado desde cero."""  # Docstring: describe la clase; no afecta cálculos
 
-    def __init__(self, n_components: int = 2):
+    def __init__(self, n_components: int = 2):  # Inicializa PCA con k componentes a retener (dimensión reducida)
         """
         Args:
             n_components: número de componentes a retener
         """
-        self.n_components = n_components
-        self.components_ = None  # (n_features, n_components)
-        self.explained_variance_ratio_ = None
-        self.mean_ = None
+        self.n_components = n_components  # Guarda k: se usa para truncar Vt y para shapes de proyección
+        self.components_ = None  # (n_features, n_components)  # Placeholder: ejes principales aprendidos (columnas)
+        self.explained_variance_ratio_ = None  # Placeholder: fracción de varianza explicada por cada componente
+        self.mean_ = None  # Placeholder: media por feature para centrar y descentrar (inverse_transform)
 
-    def fit(self, X: np.ndarray) -> 'PCA':
-        """Calcula componentes principales."""
+    def fit(self, X: np.ndarray) -> 'PCA':  # Ajusta PCA: estima media, componentes y varianza explicada a partir de X
+        """Calcula componentes principales."""  # Docstring: describe fit; no altera el resultado
         # Centrar
-        self.mean_ = np.mean(X, axis=0)
-        X_centered = X - self.mean_
+        self.mean_ = np.mean(X, axis=0)  # Media por columna: PCA estándar requiere centrar para capturar covarianza
+        X_centered = X - self.mean_  # Centra X: elimina offset para que SVD capture direcciones de varianza
 
         # SVD
-        U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)
+        U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)  # SVD: X=U S V^T; V contiene direcciones principales en espacio de features
 
         # Componentes principales
-        self.components_ = Vt[:self.n_components].T
+        self.components_ = Vt[:self.n_components].T  # Componentes (d,k): toma primeras k filas de Vt y transpone para usar como matriz de proyección
 
         # Varianza explicada
-        n_samples = X.shape[0]
-        variance = (S ** 2) / (n_samples - 1)
-        self.explained_variance_ratio_ = variance[:self.n_components] / np.sum(variance)
-        self.singular_values_ = S[:self.n_components]
+        n_samples = X.shape[0]  # n: se usa en el factor (n-1) para convertir S^2 en varianzas (eigenvalues)
+        variance = (S ** 2) / (n_samples - 1)  # Varianza por componente: S^2/(n-1) corresponde a eigenvalues de cov(X)
+        self.explained_variance_ratio_ = variance[:self.n_components] / np.sum(variance)  # Normaliza por varianza total: proporción explicada
+        self.singular_values_ = S[:self.n_components]  # Guarda valores singulares truncados: útiles para covarianza aproximada
 
-        return self
+        return self  # Permite chaining (pca.fit(X).transform(X)) y acceso a atributos entrenados
 
-    def transform(self, X: np.ndarray) -> np.ndarray:
-        """Proyecta datos a espacio de componentes principales."""
-        X_centered = X - self.mean_
-        return X_centered @ self.components_
+    def transform(self, X: np.ndarray) -> np.ndarray:  # Proyecta X al subespacio PCA (coordenadas en base de componentes)
+        """Proyecta datos a espacio de componentes principales."""  # Docstring: describe proyección
+        X_centered = X - self.mean_  # Centra con la media aprendida: garantiza consistencia entre train y test
+        return X_centered @ self.components_  # Proyección lineal: (n_samples,n_features)@(n_features,k) -> (n_samples,k)
 
-    def fit_transform(self, X: np.ndarray) -> np.ndarray:
-        """Fit y transform en un paso."""
-        self.fit(X)
-        return self.transform(X)
+    def fit_transform(self, X: np.ndarray) -> np.ndarray:  # Atajo: ajusta PCA y devuelve la proyección en una llamada
+        """Fit y transform en un paso."""  # Docstring: describe atajo
+        self.fit(X)  # Aprende media/componentes: actualiza estado interno
+        return self.transform(X)  # Proyecta X usando el estado recién aprendido
 
-    def inverse_transform(self, X_pca: np.ndarray) -> np.ndarray:
+    def inverse_transform(self, X_pca: np.ndarray) -> np.ndarray:  # Reconstruye aproximación en espacio original desde coordenadas PCA
         """
         Reconstruye datos desde el espacio PCA.
 
@@ -1025,52 +1025,52 @@ class PCA:
 
         Nota: hay pérdida de información si n_components < n_features
         """
-        return X_pca @ self.components_.T + self.mean_
+        return X_pca @ self.components_.T + self.mean_  # Re-proyecta a features y suma media: reconstrucción es aproximada si k<n_features
 
-    def get_covariance(self) -> np.ndarray:
-        """Retorna matriz de covarianza aproximada."""
-        return self.components_ @ np.diag(self.singular_values_ ** 2) @ self.components_.T
+    def get_covariance(self) -> np.ndarray:  # Aproxima cov(X) usando componentes y valores singulares (relación con Σ^2)
+        """Retorna matriz de covarianza aproximada."""  # Docstring: describe la salida (matriz n_features x n_features)
+        return self.components_ @ np.diag(self.singular_values_ ** 2) @ self.components_.T  # Reconstruye cov aprox en base PCA
 
 
 # Demo
-np.random.seed(42)
+np.random.seed(42)  # Fija semilla: hace reproducible el demo (mismos datos => mismas métricas/resultados)
 
 # Datos correlacionados en 3D
-n_samples = 200
-X = np.random.randn(n_samples, 3)
+n_samples = 200  # Cantidad de muestras sintéticas: controla tamaño del dataset para el ejemplo
+X = np.random.randn(n_samples, 3)  # Genera datos base iid: luego se induce correlación entre columnas
 X[:, 1] = X[:, 0] * 2 + np.random.randn(n_samples) * 0.1  # y correlacionado con x
-X[:, 2] = X[:, 0] + X[:, 1] + np.random.randn(n_samples) * 0.1
+X[:, 2] = X[:, 0] + X[:, 1] + np.random.randn(n_samples) * 0.1  # z correlacionado con x e y: crea estructura subespacial
 
 # PCA
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X)
+pca = PCA(n_components=2)  # Instancia PCA para reducir de 3D a 2D: debería capturar casi toda la varianza
+X_pca = pca.fit_transform(X)  # Ajusta PCA y proyecta: obtiene coordenadas (n_samples,2)
 
-print(f"Shape original: {X.shape}")
-print(f"Shape reducido: {X_pca.shape}")
-print(f"Varianza explicada: {pca.explained_variance_ratio_}")
-print(f"Varianza total: {np.sum(pca.explained_variance_ratio_):.2%}")
+print(f"Shape original: {X.shape}")  # Reporta shape original: (n,3) para verificar dimensiones del dataset
+print(f"Shape reducido: {X_pca.shape}")  # Reporta shape reducido: debe ser (n,2) por n_components=2
+print(f"Varianza explicada: {pca.explained_variance_ratio_}")  # Muestra varianza por componente: debería ser alta en datos correlacionados
+print(f"Varianza total: {np.sum(pca.explained_variance_ratio_):.2%}")  # Suma varianza explicada: indica cuánto conserva la reducción
 ```
 
 ### 3.5 Reconstrucción y Error
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para sum/mean/cumsum/argmax y cálculo de errores en utilidades de PCA
 
-def reconstruction_error(X: np.ndarray, pca: PCA) -> float:
+def reconstruction_error(X: np.ndarray, pca: PCA) -> float:  # Error de reconstrucción relativo: cuantifica pérdida al proyectar y reconstruir
     """
     Calcula el error de reconstrucción.
 
     Error = ||X - X_reconstructed||² / ||X||²
     """
-    X_pca = pca.transform(X)
-    X_reconstructed = pca.inverse_transform(X_pca)
+    X_pca = pca.transform(X)  # Proyecta X al subespacio PCA: obtiene coordenadas de dimensión reducida
+    X_reconstructed = pca.inverse_transform(X_pca)  # Reconstruye a espacio original: aproxima X usando solo n_components
 
-    error = np.sum((X - X_reconstructed) ** 2)
-    total = np.sum((X - np.mean(X, axis=0)) ** 2)
+    error = np.sum((X - X_reconstructed) ** 2)  # SSE de reconstrucción: energía del residuo (cuánto “se perdió” al comprimir)
+    total = np.sum((X - np.mean(X, axis=0)) ** 2)  # SSE total alrededor de la media: normaliza para obtener un error relativo comparable
 
-    return error / total
+    return error / total  # Retorna fracción de varianza no explicada (aprox): más bajo implica mejor reconstrucción
 
-def choose_n_components(X: np.ndarray, variance_threshold: float = 0.95) -> int:
+def choose_n_components(X: np.ndarray, variance_threshold: float = 0.95) -> int:  # Elige k mínimo tal que la varianza acumulada supere un umbral
     """
     Elige número de componentes para retener cierta varianza.
 
@@ -1078,16 +1078,16 @@ def choose_n_components(X: np.ndarray, variance_threshold: float = 0.95) -> int:
         variance_threshold: proporción de varianza a retener (ej: 0.95 = 95%)
     """
     # PCA con todos los componentes
-    pca = PCA(n_components=min(X.shape))
-    pca.fit(X)
+    pca = PCA(n_components=min(X.shape))  # Ajusta PCA con el máximo posible: k=min(n_samples,n_features) para capturar toda la varianza
+    pca.fit(X)  # Entrena PCA completo: llena explained_variance_ratio_ para luego acumular y decidir k
 
     # Varianza acumulada
-    cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
+    cumulative_variance = np.cumsum(pca.explained_variance_ratio_)  # Suma acumulada: varianza explicada por las primeras j componentes
 
     # Encontrar n_components
-    n_components = np.argmax(cumulative_variance >= variance_threshold) + 1
+    n_components = np.argmax(cumulative_variance >= variance_threshold) + 1  # Primer índice donde se supera el umbral (+1 por 0-index)
 
-    return n_components, cumulative_variance
+    return n_components, cumulative_variance  # Devuelve k elegido y la curva acumulada: permite auditar visualmente la decisión
 ```
 
 ---
@@ -1275,9 +1275,9 @@ Integración con ejecución y validación:
 ### 4.1 Compresión de Imágenes
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: representa la imagen como array y soporta operaciones vectorizadas usadas por PCA
 
-def compress_image_pca(image: np.ndarray, n_components: int) -> tuple:
+def compress_image_pca(image: np.ndarray, n_components: int) -> tuple:  # Compresión PCA: reduce dimensionalidad de filas y reconstruye una aproximación
     """
     Comprime una imagen usando PCA.
 
@@ -1289,50 +1289,50 @@ def compress_image_pca(image: np.ndarray, n_components: int) -> tuple:
         imagen comprimida, pca model
     """
     # Tratar filas como muestras
-    pca = PCA(n_components=n_components)
-    image_pca = pca.fit_transform(image)
+    pca = PCA(n_components=n_components)  # Instancia PCA: retiene k componentes para comprimir cada fila (ancho) de la imagen
+    image_pca = pca.fit_transform(image)  # Proyecta filas: (height,width)->(height,k) reduce dimensión horizontal conservando varianza
 
     # Reconstruir
-    image_reconstructed = pca.inverse_transform(image_pca)
+    image_reconstructed = pca.inverse_transform(image_pca)  # Reconstruye a width original: aproxima la imagen usando solo k componentes
 
-    return image_reconstructed, pca
+    return image_reconstructed, pca  # Devuelve imagen reconstruida y el modelo PCA: permite inspeccionar varianza/errores
 
-def compression_ratio_pca(original_shape: tuple, n_components: int) -> float:
+def compression_ratio_pca(original_shape: tuple, n_components: int) -> float:  # Estima ratio de compresión: compara números a guardar vs tamaño original (heurístico)
     """Calcula ratio de compresión."""
-    height, width = original_shape
-    original_size = height * width
+    height, width = original_shape  # Desempaqueta shape: alto y ancho para estimar tamaños de almacenamiento
+    original_size = height * width  # Tamaño original: número de píxeles (asumiendo 1 valor por pixel)
     # Almacenamos: componentes + proyecciones + media
-    compressed_size = n_components * width + height * n_components + width
-    return compressed_size / original_size
+    compressed_size = n_components * width + height * n_components + width  # Estima parámetros a guardar: componentes + scores + media (aprox)
+    return compressed_size / original_size  # Ratio: <1 implica compresión (menos números que almacenar que la imagen original)
 ```
 
 ### 4.2 Visualización en 2D
 
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy as np  # Importa NumPy: se usa para obtener labels únicos y crear máscaras booleanas de selección
+import matplotlib.pyplot as plt  # Importa Matplotlib: se usa para dibujar el scatter 2D y la leyenda/ejes
 
-def visualize_pca_2d(X: np.ndarray, labels: np.ndarray = None, title: str = "PCA"):
+def visualize_pca_2d(X: np.ndarray, labels: np.ndarray = None, title: str = "PCA"):  # Reduce a 2D con PCA y grafica (coloreando por label si existe)
     """Reduce a 2D y visualiza."""
-    pca = PCA(n_components=2)
-    X_2d = pca.fit_transform(X)
+    pca = PCA(n_components=2)  # Instancia PCA 2D: elige 2 componentes para poder graficar en un plano
+    X_2d = pca.fit_transform(X)  # Ajusta y proyecta: transforma X (n,d) a coordenadas (n,2)
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(10, 6))  # Crea figura: define tamaño para legibilidad (ancho/alto en pulgadas)
 
-    if labels is not None:
-        for label in np.unique(labels):
-            mask = labels == label
-            plt.scatter(X_2d[mask, 0], X_2d[mask, 1],
-                       label=f'Clase {label}', alpha=0.7)
-        plt.legend()
-    else:
-        plt.scatter(X_2d[:, 0], X_2d[:, 1], alpha=0.7)
+    if labels is not None:  # Si hay etiquetas, colorea por clase/cluster para interpretar separación en el plano PCA
+        for label in np.unique(labels):  # Itera clases únicas: crea una nube por label para la leyenda
+            mask = labels == label  # Máscara booleana: selecciona puntos que pertenecen a la clase actual
+            plt.scatter(X_2d[mask, 0], X_2d[mask, 1],  # Scatter por clase: x=PC1, y=PC2 para los puntos filtrados
+                       label=f'Clase {label}', alpha=0.7)  # Etiqueta/alpha: identifica clase y hace puntos semi-translúcidos
+        plt.legend()  # Muestra leyenda: permite mapear colores a clases
+    else:  # Caso sin labels: se grafica todo en un solo color para ver estructura global sin segmentación
+        plt.scatter(X_2d[:, 0], X_2d[:, 1], alpha=0.7)  # Scatter sin labels: muestra la estructura global sin separar por clase
 
-    plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%} var)')
-    plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.1%} var)')
-    plt.title(title)
-    plt.grid(True, alpha=0.3)
-    plt.show()
+    plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%} var)')  # Etiqueta eje x: incluye % varianza explicada por PC1
+    plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.1%} var)')  # Etiqueta eje y: incluye % varianza explicada por PC2
+    plt.title(title)  # Título del gráfico: permite contextualizar dataset/experimento
+    plt.grid(True, alpha=0.3)  # Grilla suave: mejora lectura de densidades/posiciones
+    plt.show()  # Renderiza la figura: despliega el plot en pantalla/notebook
 ```
 
 ---
@@ -1366,27 +1366,27 @@ Reglas:
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para construir arrays demo, broadcasting y verificaciones numéricas con asserts
 
-X = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 2.0], [3.0, 3.0]])
-C = np.array([[0.0, 0.0], [2.0, 2.0]])
+X = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 2.0], [3.0, 3.0]])  # Dataset pequeño (n=4,d=2): puntos 2D para validar distancias y argmin
+C = np.array([[0.0, 0.0], [2.0, 2.0]])  # Centroides (k=2,d=2): dos centros candidatos para asignación por distancia^2
 
 # (n,1,d) - (1,k,d) -> (n,k,d)
-diff = X[:, None, :] - C[None, :, :]
-D2 = np.sum(diff ** 2, axis=2)
+diff = X[:, None, :] - C[None, :, :]  # Broadcasting: resta cada centroide a cada punto para obtener tensor (n,k,d) de diferencias
+D2 = np.sum(diff ** 2, axis=2)  # Distancias^2 (n,k): suma sobre d para obtener ||X_i - C_j||^2 sin sqrt (más eficiente)
 
-assert D2.shape == (X.shape[0], C.shape[0])
+assert D2.shape == (X.shape[0], C.shape[0])  # Verifica shape: debe ser (n,k) para poder hacer argmin por punto
 
-labels = np.argmin(D2, axis=1)
-assert labels.shape == (X.shape[0],)
-assert labels.min() >= 0 and labels.max() < C.shape[0]
+labels = np.argmin(D2, axis=1)  # Asignación: elige el centroide más cercano por punto (argmin sobre k)
+assert labels.shape == (X.shape[0],)  # Verifica shape de labels: un label por muestra
+assert labels.min() >= 0 and labels.max() < C.shape[0]  # Verifica rango: labels debe ser un índice válido en [0, k-1]
 
 i = 2  # X[i] = [0,2]
-manual0 = np.sum((X[i] - C[0]) ** 2)
-manual1 = np.sum((X[i] - C[1]) ** 2)
-assert np.isclose(D2[i, 0], manual0)
-assert np.isclose(D2[i, 1], manual1)
-assert labels[i] == int(np.argmin([manual0, manual1]))
+manual0 = np.sum((X[i] - C[0]) ** 2)  # Distancia^2 manual a C0: sirve para comprobar que el cálculo vectorizado es correcto
+manual1 = np.sum((X[i] - C[1]) ** 2)  # Distancia^2 manual a C1: segunda comparación para el mismo punto i
+assert np.isclose(D2[i, 0], manual0)  # Verifica D2 vectorizado vs manual: entrada (i,0) coincide numéricamente
+assert np.isclose(D2[i, 1], manual1)  # Verifica D2 vectorizado vs manual: entrada (i,1) coincide numéricamente
+assert labels[i] == int(np.argmin([manual0, manual1]))  # Verifica argmin: el label debe coincidir con el mínimo de las distancias manuales
 ```
 
 <details open>
@@ -1434,22 +1434,22 @@ assert labels[i] == int(np.argmin([manual0, manual1]))
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para arrays, broadcasting, argmin y validación con np.isfinite en el ejemplo
 
-X = np.array([[0.0, 0.0], [1.0, 0.0], [10.0, 10.0], [11.0, 10.0]])
-C = np.array([[0.0, 0.0], [10.0, 10.0]])
+X = np.array([[0.0, 0.0], [1.0, 0.0], [10.0, 10.0], [11.0, 10.0]])  # Dataset 2D: dos grupos alrededor de (0,0) y (10,10) para probar actualización de centroides
+C = np.array([[0.0, 0.0], [10.0, 10.0]])  # Centroides iniciales: uno por cada grupo para asignación por distancia^2
 
-diff = X[:, None, :] - C[None, :, :]
-labels = np.argmin(np.sum(diff ** 2, axis=2), axis=1)
+diff = X[:, None, :] - C[None, :, :]  # Tensor (n,k,d): diferencias punto-centroide por broadcasting para calcular distancias en lote
+labels = np.argmin(np.sum(diff ** 2, axis=2), axis=1)  # Asignación por distancia^2: elige el centroide más cercano para cada punto
 
-C_new = C.copy()
-for j in range(C.shape[0]):
-    mask = labels == j
-    if np.any(mask):
-        C_new[j] = np.mean(X[mask], axis=0)
+C_new = C.copy()  # Inicializa centroides nuevos: copia para poder conservar centroides si un cluster queda vacío
+for j in range(C.shape[0]):  # Recorre clusters: recalcula centroide j como promedio de los puntos asignados
+    mask = labels == j  # Máscara booleana: selecciona puntos del cluster j
+    if np.any(mask):  # Evita cluster vacío: sin puntos, mean produciría NaN y rompería el algoritmo
+        C_new[j] = np.mean(X[mask], axis=0)  # Actualiza centroide: media por feature minimiza SSE con labels fijos
 
-assert C_new.shape == C.shape
-assert np.isfinite(C_new).all()
+assert C_new.shape == C.shape  # Verifica shape: la actualización no debe cambiar dimensionalidad ni número de centroides
+assert np.isfinite(C_new).all()  # Verifica finitud: asegura que no se generaron NaN/inf por clusters vacíos u operaciones inválidas
 ```
 
 <details open>
@@ -1499,43 +1499,43 @@ assert np.isfinite(C_new).all()
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para broadcasting, sumas, argmin y generación de datos sintéticos
 
-def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:
-    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)
-    return np.argmin(D2, axis=1)
-
-
-def update_centroids(X: np.ndarray, labels: np.ndarray, C: np.ndarray) -> np.ndarray:
-    C_new = C.copy()
-    for j in range(C.shape[0]):
-        mask = labels == j
-        if np.any(mask):
-            C_new[j] = np.mean(X[mask], axis=0)
-    return C_new
+def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:  # Asigna cada punto al centroide más cercano (Lloyd step: asignación)
+    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)  # Distancias^2 a cada centroide: (n,1,d)-(1,k,d)->(n,k,d) y suma en d
+    return np.argmin(D2, axis=1)  # Label por punto: índice del centroide con menor distancia^2
 
 
-def inertia(X: np.ndarray, C: np.ndarray, labels: np.ndarray) -> float:
-    diffs = X - C[labels]
-    return float(np.sum(diffs ** 2))
+def update_centroids(X: np.ndarray, labels: np.ndarray, C: np.ndarray) -> np.ndarray:  # Recalcula centroides como media de puntos asignados (Lloyd step: actualización)
+    C_new = C.copy()  # Copia centroides: evita modificar C in-place (mantiene comparaciones/diagnóstico coherentes)
+    for j in range(C.shape[0]):  # Itera cada cluster j: actualiza su centro si tiene puntos asignados
+        mask = labels == j  # Máscara booleana: selecciona los puntos cuya etiqueta es j
+        if np.any(mask):  # Solo actualiza si hay puntos: evita mean sobre vacío y conserva centroide si cluster quedó vacío
+            C_new[j] = np.mean(X[mask], axis=0)  # Nuevo centroide: media minimiza SSE intra-cluster para labels fijos
+    return C_new  # Devuelve centroides actualizados: se usan en la siguiente asignación
 
 
-np.random.seed(0)
-X = np.vstack([
-    np.random.randn(50, 2) + np.array([0.0, 0.0]),
-    np.random.randn(50, 2) + np.array([5.0, 5.0]),
-])
+def inertia(X: np.ndarray, C: np.ndarray, labels: np.ndarray) -> float:  # Inercia/SSE: suma distancias^2 de puntos a su centroide asignado
+    diffs = X - C[labels]  # Residuales por punto: resta el centroide correspondiente a cada label (indexación avanzada)
+    return float(np.sum(diffs ** 2))  # SSE total: escalar float útil para asserts/prints (no depende de dtype)
 
-C0 = np.array([[0.0, 5.0], [5.0, 0.0]])
-labels0 = assign_labels(X, C0)
-J0 = inertia(X, C0, labels0)
 
-C1 = update_centroids(X, labels0, C0)
-labels1 = assign_labels(X, C1)
-J1 = inertia(X, C1, labels1)
+np.random.seed(0)  # Fija semilla: hace reproducible el experimento/validación
+X = np.vstack([  # Construye dataset: concatena dos nubes gaussianas (dos clusters) para probar Lloyd
+    np.random.randn(50, 2) + np.array([0.0, 0.0]),  # Cluster 0: 50 puntos alrededor de (0,0)
+    np.random.randn(50, 2) + np.array([5.0, 5.0]),  # Cluster 1: 50 puntos alrededor de (5,5)
+])  # Cierra vstack: X queda con shape (100,2)
 
-assert J1 <= J0 + 1e-12
-assert J0 >= 0.0 and J1 >= 0.0
+C0 = np.array([[0.0, 5.0], [5.0, 0.0]])  # Centroides iniciales “cruzados”: no coinciden con centros reales a propósito
+labels0 = assign_labels(X, C0)  # Asignación inicial (E-step): etiqueta por punto según C0
+J0 = inertia(X, C0, labels0)  # Inercia inicial: SSE antes de la actualización de centroides
+
+C1 = update_centroids(X, labels0, C0)  # Actualiza centroides (M-step): recomputa C con labels0 fijos
+labels1 = assign_labels(X, C1)  # Re-asigna con centroides nuevos: completa 1 iteración de Lloyd
+J1 = inertia(X, C1, labels1)  # Inercia tras 1 iteración: debe no aumentar (monotonía)
+
+assert J1 <= J0 + 1e-12  # Monotonía de Lloyd: la inercia baja o se mantiene (tolerancia por flotantes)
+assert J0 >= 0.0 and J1 >= 0.0  # Inercia no-negativa: suma de cuadrados nunca debe ser negativa
 ```
 
 <details open>
@@ -1584,31 +1584,31 @@ assert J0 >= 0.0 and J1 >= 0.0
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para RNG moderno, operaciones vectorizadas y aserciones numéricas en K-Means++
 
-def kmeans_plus_plus(X: np.ndarray, k: int, seed: int = 0) -> np.ndarray:
-    rng = np.random.default_rng(seed)
-    n = X.shape[0]
-    centroids = [X[rng.integers(n)]]
+def kmeans_plus_plus(X: np.ndarray, k: int, seed: int = 0) -> np.ndarray:  # Inicialización K-Means++: elige centroides separados para mejorar el arranque de Lloyd
+    rng = np.random.default_rng(seed)  # Crea generador RNG local: evita depender del estado global de np.random y hace reproducible la selección
+    n = X.shape[0]  # Número de muestras: define el rango válido de índices para muestrear puntos de X
+    centroids = [X[rng.integers(n)]]  # Elige primer centroide uniforme: toma un punto real de X para iniciar la lista de centroides
 
-    for _ in range(1, k):
-        C = np.array(centroids)
-        d2 = np.min(np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2), axis=1)
-        assert np.all(d2 >= 0)
-        probs = d2 / np.sum(d2)
-        assert np.isclose(np.sum(probs), 1.0)
-        centroids.append(X[rng.choice(n, p=probs)])
+    for _ in range(1, k):  # Itera para seleccionar los k-1 centroides restantes: en cada paso recalcula distancias al centroide más cercano
+        C = np.array(centroids)  # Apila centroides actuales a array (c,d): facilita broadcasting contra X para calcular distancias en lote
+        d2 = np.min(np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2), axis=1)  # d² mínimo por punto: distancia^2 al centroide más cercano (para probabilidad K-Means++)
+        assert np.all(d2 >= 0)  # Chequeo: distancias cuadradas no deben ser negativas (sirve para detectar NaNs/errores numéricos)
+        probs = d2 / np.sum(d2)  # Normaliza a distribución: cada punto se elige con probabilidad proporcional a su d² (más lejos => más probable)
+        assert np.isclose(np.sum(probs), 1.0)  # Valida normalización: la suma de probabilidades debe ser 1 (tolerancia de float)
+        centroids.append(X[rng.choice(n, p=probs)])  # Samplea nuevo centroide según probs: implementa la regla de muestreo de K-Means++
 
-    return np.array(centroids)
+    return np.array(centroids)  # Devuelve centroides iniciales: shape (k, n_features) para arrancar el loop de K-Means
 
 
-np.random.seed(1)
-X = np.random.randn(30, 2)
-C = kmeans_plus_plus(X, k=3, seed=123)
+np.random.seed(1)  # Fija semilla global: hace reproducible la generación de datos sintéticos del ejemplo
+X = np.random.randn(30, 2)  # Genera dataset demo (30,2): puntos 2D para verificar que los centroides elegidos pertenecen a X
+C = kmeans_plus_plus(X, k=3, seed=123)  # Inicializa 3 centroides con K-Means++: se valida output y pertenencia a X
 
-assert C.shape == (3, 2)
-for j in range(C.shape[0]):
-    assert np.any(np.all(np.isclose(X, C[j]), axis=1))
+assert C.shape == (3, 2)  # Verifica shape: debe haber k centroides y cada uno con d=2 features
+for j in range(C.shape[0]):  # Recorre centroides devueltos: valida que cada centroide sea exactamente uno de los puntos del dataset
+    assert np.any(np.all(np.isclose(X, C[j]), axis=1))  # Chequea pertenencia: existe una fila en X (casi igual) a cada centroide C[j]
 ```
 
 <details open>
@@ -1657,28 +1657,28 @@ for j in range(C.shape[0]):
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para broadcasting, argmin y scaling por feature para ilustrar sensibilidad a escala
 
-def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:
-    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)
-    return np.argmin(D2, axis=1)
+def assign_labels(X: np.ndarray, C: np.ndarray) -> np.ndarray:  # Asigna labels por distancia^2: mismo criterio que K-Means (sin actualizar centroides)
+    D2 = np.sum((X[:, None, :] - C[None, :, :]) ** 2, axis=2)  # Matriz (n,k) de distancias^2: usa broadcasting para evitar loops
+    return np.argmin(D2, axis=1)  # Devuelve label por punto: índice del centroide más cercano (mínimo sobre k)
 
 
 # Punto cerca en x pero lejos en y (y domina si la escalas)
-X = np.array([
-    [2.0, 0.0],
-], dtype=float)
-C = np.array([
-    [0.0, 0.0],
-    [2.0, 2.0],
-], dtype=float)
+X = np.array([  # Define punto de prueba: se elige para que el segundo eje pueda dominar al escalarlo
+    [2.0, 0.0],  # Punto (x=2,y=0): su distancia depende de cuánto pese el eje y en la métrica euclídea
+], dtype=float)  # Fuerza dtype float: evita enteros y hace explícitas operaciones de scaling y distancias
+C = np.array([  # Define dos centroides: uno en origen y otro en (2,2) para que el punto cambie de asignación con scaling
+    [0.0, 0.0],  # Centroide 0: origen, cercano en y cuando y está poco escalado
+    [2.0, 2.0],  # Centroide 1: comparte x con el punto pero difiere en y, clave para provocar cambio al escalar y
+], dtype=float)  # dtype float: mantiene coherencia numérica con X para comparaciones de distancia
 
-labels_s_small = assign_labels(X * np.array([1.0, 0.1]), C * np.array([1.0, 0.1]))
-labels_s_big = assign_labels(X * np.array([1.0, 10.0]), C * np.array([1.0, 10.0]))
+labels_s_small = assign_labels(X * np.array([1.0, 0.1]), C * np.array([1.0, 0.1]))  # Escala y por 0.1: reduce su contribución a la distancia
+labels_s_big = assign_labels(X * np.array([1.0, 10.0]), C * np.array([1.0, 10.0]))  # Escala y por 10: amplifica su contribución y puede cambiar el argmin
 
-assert labels_s_small.shape == (1,)
-assert labels_s_big.shape == (1,)
-assert labels_s_small[0] != labels_s_big[0]
+assert labels_s_small.shape == (1,)  # Verifica shape: un label para el único punto en X
+assert labels_s_big.shape == (1,)  # Verifica shape: se preserva el formato tras el re-escalado
+assert labels_s_small[0] != labels_s_big[0]  # Verifica sensibilidad: el label debe cambiar al modificar escalas (distancia euclídea cambia)
 ```
 
 <details open>
@@ -1723,30 +1723,30 @@ assert labels_s_small[0] != labels_s_big[0]
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para SVD, generación de datos sintéticos y validación de shapes/propiedades
 
-def pca_svd(X: np.ndarray, k: int):
-    Xc = X - X.mean(axis=0)
-    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
-    comps = Vt[:k].T
-    Xk = Xc @ comps
-    var = (S ** 2) / (Xc.shape[0] - 1)
-    ratio = var / np.sum(var)
-    return Xk, comps, ratio[:k]
+def pca_svd(X: np.ndarray, k: int):  # PCA por SVD: aprende componentes principales sin formar la covarianza explícita
+    Xc = X - X.mean(axis=0)  # Centra datos: PCA requiere media cero por feature para que SVD capture direcciones de máxima varianza
+    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)  # SVD compacta: Xc=U diag(S) Vt; Vt contiene direcciones principales en espacio de features
+    comps = Vt[:k].T  # Selecciona k componentes: toma primeras k filas de Vt y transpone => matriz (d,k) para proyectar
+    Xk = Xc @ comps  # Proyección a k dims: (n,d)@(d,k)->(n,k) da coordenadas en el subespacio PCA
+    var = (S ** 2) / (Xc.shape[0] - 1)  # Varianza por componente: S^2/(n-1) equivale a eigenvalues de covarianza (cuando X está centrado)
+    ratio = var / np.sum(var)  # Ratio de varianza explicada: normaliza para obtener proporciones que suman 1 sobre todas las componentes
+    return Xk, comps, ratio[:k]  # Devuelve proyección, componentes (d,k) y ratios truncados (k,) para inspección/validación
 
 
-np.random.seed(0)
-n = 300
-z = np.random.randn(n)
-X = np.stack([z, 2.0 * z + 0.1 * np.random.randn(n), -z + 0.1 * np.random.randn(n)], axis=1)
+np.random.seed(0)  # Fija semilla global: hace reproducible el dataset sintético usado para validar PCA
+n = 300  # Número de muestras: controla tamaño del dataset (más n => estimaciones de varianza más estables)
+z = np.random.randn(n)  # Latente 1D: variable base que induce correlaciones lineales entre columnas
+X = np.stack([z, 2.0 * z + 0.1 * np.random.randn(n), -z + 0.1 * np.random.randn(n)], axis=1)  # Construye X (n,3): features correlacionadas para que PCA tenga estructura
 
-X2, comps, r = pca_svd(X, k=2)
+X2, comps, r = pca_svd(X, k=2)  # Aplica PCA a 2 componentes: obtiene proyección 2D, matriz de componentes y ratios de varianza
 
-assert X2.shape == (n, 2)
-assert comps.shape == (3, 2)
-assert r.shape == (2,)
-assert r[0] >= r[1]
-assert 0.0 <= r.sum() <= 1.0
+assert X2.shape == (n, 2)  # Verifica proyección: n filas (muestras) y k=2 columnas (componentes)
+assert comps.shape == (3, 2)  # Verifica componentes: d=3 features originales y k=2 ejes principales retenidos
+assert r.shape == (2,)  # Verifica ratios: debe haber exactamente k proporciones de varianza explicada
+assert r[0] >= r[1]  # Verifica orden: la primera componente debe explicar >= varianza que la segunda
+assert 0.0 <= r.sum() <= 1.0  # Verifica rango: suma parcial de ratios debe estar entre 0 y 1 (al truncar, suele ser < 1)
 ```
 
 <details open>
@@ -1793,30 +1793,30 @@ assert 0.0 <= r.sum() <= 1.0
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para SVD, medias, normas y generación de datos sintéticos del ejercicio
 
-def pca_reconstruct(X: np.ndarray, k: int) -> np.ndarray:
-    mu = X.mean(axis=0)
-    Xc = X - mu
-    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
-    Vk = Vt[:k].T
-    Xk = Xc @ Vk
-    X_rec = Xk @ Vk.T + mu
-    return X_rec
+def pca_reconstruct(X: np.ndarray, k: int) -> np.ndarray:  # Reconstrucción PCA: proyecta a k dims y vuelve al espacio original (aprox)
+    mu = X.mean(axis=0)  # Calcula media por feature: se usa para centrar y luego descentrar (reconstrucción en el sistema original)
+    Xc = X - mu  # Centra X: PCA trabaja sobre datos de media cero para que los ejes representen covarianza
+    U, S, Vt = np.linalg.svd(Xc, full_matrices=False)  # SVD: obtiene base ortonormal de componentes; Vt contiene vectores principales
+    Vk = Vt[:k].T  # Toma subespacio de dimensión k: matriz (d,k) con los k ejes principales (columnas)
+    Xk = Xc @ Vk  # Proyección a subespacio: coordenadas (n,k) en la base PCA truncada
+    X_rec = Xk @ Vk.T + mu  # Reconstruye: vuelve a (n,d) aplicando el proyector Vk Vk^T y re-suma la media
+    return X_rec  # Devuelve reconstrucción aproximada: error debe no aumentar al incrementar k
 
 
-np.random.seed(1)
-n = 200
-z = np.random.randn(n)
-X = np.stack([z, 2.0 * z + 0.2 * np.random.randn(n), -z + 0.2 * np.random.randn(n)], axis=1)
+np.random.seed(1)  # Fija semilla global: hace reproducible el dataset sintético para comparar errores de reconstrucción
+n = 200  # Número de muestras: tamaño del dataset para el test de monotonía del error
+z = np.random.randn(n)  # Latente 1D: induce correlación lineal entre columnas para que PCA capture estructura en pocas componentes
+X = np.stack([z, 2.0 * z + 0.2 * np.random.randn(n), -z + 0.2 * np.random.randn(n)], axis=1)  # Construye X (n,3): features correlacionadas + ruido
 
-X1 = pca_reconstruct(X, k=1)
-X2 = pca_reconstruct(X, k=2)
+X1 = pca_reconstruct(X, k=1)  # Reconstrucción con 1 componente: mayor compresión => típicamente mayor error
+X2 = pca_reconstruct(X, k=2)  # Reconstrucción con 2 componentes: subespacio más grande => error no debe aumentar
 
-err1 = np.linalg.norm(X - X1)
-err2 = np.linalg.norm(X - X2)
+err1 = np.linalg.norm(X - X1)  # Error de reconstrucción k=1: norma Frobenius (por defecto) del residuo total
+err2 = np.linalg.norm(X - X2)  # Error de reconstrucción k=2: debería ser <= err1 por propiedad de proyecciones ortogonales
 
-assert err2 <= err1 + 1e-12
+assert err2 <= err1 + 1e-12  # Verifica monotonía: permitir epsilon numérico por redondeo en SVD/multiplicaciones
 ```
 
 <details open>
@@ -1848,45 +1848,45 @@ assert err2 <= err1 + 1e-12
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para álgebra vectorizada, broadcasting y funciones de agregación
 
-def pairwise_dist(X: np.ndarray) -> np.ndarray:
-    D2 = np.sum((X[:, None, :] - X[None, :, :]) ** 2, axis=2)
-    return np.sqrt(np.maximum(D2, 0.0))
-
-
-def silhouette_score(X: np.ndarray, labels: np.ndarray) -> float:
-    X = np.asarray(X, dtype=float)
-    labels = np.asarray(labels, dtype=int)
-    D = pairwise_dist(X)
-    n = X.shape[0]
-    uniq = np.unique(labels)
-    s = np.zeros(n, dtype=float)
-    for i in range(n):
-        same = labels == labels[i]
-        same[i] = False
-        a = np.mean(D[i, same]) if np.any(same) else 0.0
-
-        b = np.inf
-        for c in uniq:
-            if c == labels[i]:
-                continue
-            mask = labels == c
-            if np.any(mask):
-                b = min(b, float(np.mean(D[i, mask])))
-
-        if b == np.inf:
-            s[i] = 0.0
-        else:
-            denom = max(a, b)
-            s[i] = 0.0 if denom == 0.0 else (b - a) / denom
-    return float(np.mean(s))
+def pairwise_dist(X: np.ndarray) -> np.ndarray:  # Distancias pairwise: construye matriz (n,n) de distancias Euclídeas
+    D2 = np.sum((X[:, None, :] - X[None, :, :]) ** 2, axis=2)  # Distancias^2 por broadcasting: (n,1,d)-(1,n,d)->(n,n,d) y suma en d
+    return np.sqrt(np.maximum(D2, 0.0))  # Raíz para Euclídea y clamp numérico: evita sqrt de valores negativos por redondeo
 
 
-X = np.array([[0.0, 0.0], [0.2, 0.1], [5.0, 5.0], [5.1, 4.9]])
-labels = np.array([0, 0, 1, 1])
-score = silhouette_score(X, labels)
-assert -1.0 <= score <= 1.0
+def silhouette_score(X: np.ndarray, labels: np.ndarray) -> float:  # Silhouette promedio: s(i)=(b(i)-a(i))/max(a(i),b(i)) en [-1,1]
+    X = np.asarray(X, dtype=float)  # Normaliza entrada a float: garantiza operaciones de distancia y medias en tipo numérico estable
+    labels = np.asarray(labels, dtype=int)  # Normaliza labels a int: facilita comparaciones e indexación booleana por cluster
+    D = pairwise_dist(X)  # Precalcula distancias pairwise (n,n): se reutiliza para a(i) y b(i) sin recomputar distancias
+    n = X.shape[0]  # Número de puntos: controla el loop que calcula s(i) por cada muestra
+    uniq = np.unique(labels)  # Clusters únicos presentes: define el conjunto de clusters a evaluar para b(i)
+    s = np.zeros(n, dtype=float)  # Vector de silhouettes por punto: se promedia al final
+    for i in range(n):  # Recorre cada punto i: silhouette se define punto a punto
+        same = labels == labels[i]  # Máscara del cluster de i: selecciona puntos del mismo cluster
+        same[i] = False  # Excluye el propio punto: evita distancia 0 consigo mismo en el promedio intra-cluster
+        a = np.mean(D[i, same]) if np.any(same) else 0.0  # a(i): distancia media intra-cluster; 0 si i está solo en su cluster
+
+        b = np.inf  # Inicializa b(i): buscamos el mínimo promedio a cualquier cluster distinto (si no hay, queda inf)
+        for c in uniq:  # Itera clusters candidatos: calcula distancia media de i a cada cluster distinto
+            if c == labels[i]:  # Omite el cluster propio: b(i) se define sobre otros clusters
+                continue  # Salta a siguiente cluster candidato
+            mask = labels == c  # Máscara del cluster candidato c: selecciona sus puntos
+            if np.any(mask):  # Asegura que hay puntos en el cluster: evita mean sobre array vacío
+                b = min(b, float(np.mean(D[i, mask])))  # Actualiza mejor b(i): toma el cluster con menor distancia media
+
+        if b == np.inf:  # Edge case: no existe otro cluster válido (o labels degenerados), entonces b(i) no se define
+            s[i] = 0.0  # Convención: score neutral si no hay comparación posible
+        else:  # Caso normal: existe otro cluster para comparar, así que podemos calcular s(i) con a(i) y b(i)
+            denom = max(a, b)  # Denominador estándar: normaliza para acotar en [-1,1] y evita dividir por valores pequeños
+            s[i] = 0.0 if denom == 0.0 else (b - a) / denom  # Calcula s(i): si denom=0 (distancias 0), fuerza 0 para evitar NaN
+    return float(np.mean(s))  # Promedio final: silhouette global del clustering
+
+
+X = np.array([[0.0, 0.0], [0.2, 0.1], [5.0, 5.0], [5.1, 4.9]])  # Dataset mini 2D: dos clusters bien separados (cerca de (0,0) y (5,5))
+labels = np.array([0, 0, 1, 1])  # Etiquetas de cluster: agrupa los dos primeros y los dos últimos
+score = silhouette_score(X, labels)  # Calcula silhouette: debería ser positivo si clusters están bien definidos
+assert -1.0 <= score <= 1.0  # Invariante del score: silhouette siempre cae en el rango [-1,1]
 ```
 
 <details open>
@@ -1931,169 +1931,169 @@ Autor: [Tu nombre]
 Módulo: 06 - Unsupervised Learning
 """
 
-import numpy as np
-from typing import Tuple, List
+import numpy as np  # Importa NumPy: base para álgebra lineal, RNG, broadcasting y operaciones vectorizadas en clustering/PCA
+from typing import Tuple, List  # Importa typing: documenta retornos/colecciones (no afecta runtime)
 
 
 # ============================================================
 # K-MEANS CLUSTERING
 # ============================================================
 
-def kmeans_plus_plus(X: np.ndarray, k: int, seed: int = None) -> np.ndarray:
-    """Inicialización K-Means++."""
-    if seed: np.random.seed(seed)
-    n = len(X)
-    centroids = [X[np.random.randint(n)]]
+def kmeans_plus_plus(X: np.ndarray, k: int, seed: int = None) -> np.ndarray:  # Inicialización K-Means++: elige centroides separados para mejorar convergencia
+    """Inicialización K-Means++."""  # Docstring 1-línea: describe propósito; se ejecuta como literal string y no cambia el algoritmo
+    if seed: np.random.seed(seed)  # Fija semilla si es truthy: hace reproducible la inicialización (nota: seed=0 no entra por este if)
+    n = len(X)  # Número de muestras: se usa para muestrear índices válidos al escoger centroides
+    centroids = [X[np.random.randint(n)]]  # Elige primer centroide al azar: punto inicial para el esquema de selección probabilística
 
-    for _ in range(1, k):
-        distances = np.array([min(np.sum((x - c)**2) for c in centroids) for x in X])
-        probs = distances / distances.sum()
-        centroids.append(X[np.random.choice(n, p=probs)])
+    for _ in range(1, k):  # Selecciona los k-1 centroides restantes: cada paso agrega un centroide nuevo
+        distances = np.array([min(np.sum((x - c)**2) for c in centroids) for x in X])  # Distancia^2 al centroide más cercano: define qué tan “mal cubierto” está cada punto
+        probs = distances / distances.sum()  # Normaliza a distribución: puntos más lejanos tienen mayor probabilidad de ser elegidos
+        centroids.append(X[np.random.choice(n, p=probs)])  # Samplea nuevo centroide según probs: mejora separación inicial de clusters
 
-    return np.array(centroids)
+    return np.array(centroids)  # Devuelve centroides iniciales (k,d): salida que se usa como init en K-Means/Lloyd
 
 
-class KMeans:
-    def __init__(self, n_clusters=3, max_iter=300, tol=1e-4, seed=None):
-        self.n_clusters = n_clusters
-        self.max_iter = max_iter
-        self.tol = tol
-        self.seed = seed
-        self.centroids = None
-        self.labels_ = None
-        self.inertia_ = None
-        self.n_iter_ = 0
+class KMeans:  # Implementación simple de K-Means: alterna asignación de clusters y actualización de centroides hasta converger
+    def __init__(self, n_clusters=3, max_iter=300, tol=1e-4, seed=None):  # Configura hiperparámetros (k, iteraciones, tolerancia, semilla)
+        self.n_clusters = n_clusters  # k: número de clusters/centroides a aprender
+        self.max_iter = max_iter  # Límite de iteraciones: evita loops infinitos si no converge
+        self.tol = tol  # Tolerancia: umbral para decidir convergencia (en este código, compara shift cuadrático)
+        self.seed = seed  # Semilla opcional: se pasa a K-Means++ para reproducibilidad de inicialización
+        self.centroids = None  # Centroides aprendidos: se setea en fit y luego se usa en predict
+        self.labels_ = None  # Etiquetas por muestra (cluster asignado): output principal del clustering
+        self.inertia_ = None  # Inercia final: suma de distancias cuadradas intra-cluster (métrica interna)
+        self.n_iter_ = 0  # Iteraciones ejecutadas: útil para diagnóstico (convergió rápido vs lento)
 
-    def fit(self, X: np.ndarray) -> 'KMeans':
-        self.centroids = kmeans_plus_plus(X, self.n_clusters, self.seed)
+    def fit(self, X: np.ndarray) -> 'KMeans':  # Entrena K-Means sobre X: aprende centroides y asignaciones
+        self.centroids = kmeans_plus_plus(X, self.n_clusters, self.seed)  # Inicializa centroides: un buen init reduce iteraciones y malos mínimos
 
-        for i in range(self.max_iter):
-            old_centroids = self.centroids.copy()
+        for i in range(self.max_iter):  # Loop EM-like: alterna asignación (E-step) y actualización (M-step)
+            old_centroids = self.centroids.copy()  # Guarda centroides previos: permite medir desplazamiento para criterio de parada
 
             # Asignar
-            distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])
-            self.labels_ = np.argmin(distances, axis=1)
+            distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])  # Matriz (n_samples,k) de distancias^2 a cada centroide
+            self.labels_ = np.argmin(distances, axis=1)  # Asigna cada punto al centroide más cercano: minimiza SSE localmente
 
             # Actualizar
-            for j in range(self.n_clusters):
-                points = X[self.labels_ == j]
-                if len(points) > 0:
-                    self.centroids[j] = points.mean(axis=0)
+            for j in range(self.n_clusters):  # Recalcula cada centroide j usando los puntos asignados
+                points = X[self.labels_ == j]  # Subconjunto del cluster j: todas las muestras cuyo label es j
+                if len(points) > 0:  # Evita cluster vacío: si no hay puntos, se conserva el centroide anterior
+                    self.centroids[j] = points.mean(axis=0)  # Nuevo centroide: promedio (minimiza SSE para ese cluster)
 
-            if np.sum((self.centroids - old_centroids)**2) < self.tol:
-                break
+            if np.sum((self.centroids - old_centroids)**2) < self.tol:  # Criterio de convergencia: shift total cuadrático bajo tolerancia
+                break  # Detiene iteraciones: ya no cambia significativamente la solución
 
-        self.n_iter_ = i + 1
-        self.inertia_ = sum(np.sum((X[self.labels_ == j] - self.centroids[j])**2)
-                           for j in range(self.n_clusters))
-        return self
+        self.n_iter_ = i + 1  # Guarda iteraciones realmente ejecutadas (i es 0-index)
+        self.inertia_ = sum(np.sum((X[self.labels_ == j] - self.centroids[j])**2)  # SSE por cluster: suma distancias^2 de puntos al centroide asignado
+                          for j in range(self.n_clusters))  # Suma sobre todos los clusters: métrica interna usada en elbow method
+        return self  # Permite chaining (kmeans.fit(X).labels_)
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])
-        return np.argmin(distances, axis=1)
+    def predict(self, X: np.ndarray) -> np.ndarray:  # Predice labels para nuevos datos usando centroides ya aprendidos
+        distances = np.array([[np.sum((x - c)**2) for c in self.centroids] for x in X])  # Distancias^2 a centroides aprendidos: (n,k)
+        return np.argmin(distances, axis=1)  # Retorna índice del centroide más cercano para cada muestra
 
-    def fit_predict(self, X: np.ndarray) -> np.ndarray:
-        self.fit(X)
-        return self.labels_
+    def fit_predict(self, X: np.ndarray) -> np.ndarray:  # Convenience: entrena y devuelve labels en una sola llamada
+        self.fit(X)  # Ejecuta entrenamiento: produce centroides y labels_
+        return self.labels_  # Retorna labels aprendidas: evita llamar fit() y luego acceder a labels_
 
 
 # ============================================================
 # PCA
 # ============================================================
 
-class PCA:
-    def __init__(self, n_components: int = 2):
-        self.n_components = n_components
-        self.components_ = None
-        self.explained_variance_ratio_ = None
-        self.mean_ = None
+class PCA:  # PCA vía SVD: aprende ejes principales y proyecta datos a un subespacio de menor dimensión
+    def __init__(self, n_components: int = 2):  # Configura cuántas componentes (dimensión reducida) se desea retener
+        self.n_components = n_components  # k: número de componentes principales a conservar
+        self.components_ = None  # Matriz de componentes: se setea en fit (n_features, k)
+        self.explained_variance_ratio_ = None  # Fracción de varianza explicada por cada componente: útil para decidir k
+        self.mean_ = None  # Media por feature: necesaria para centrar en fit y para transformar/invertir consistentemente
 
-    def fit(self, X: np.ndarray) -> 'PCA':
-        self.mean_ = X.mean(axis=0)
-        X_centered = X - self.mean_
+    def fit(self, X: np.ndarray) -> 'PCA':  # Ajusta PCA: calcula media, componentes y varianza explicada a partir de X
+        self.mean_ = X.mean(axis=0)  # Media por columna: centrar es obligatorio para PCA estándar (captura covarianza, no offset)
+        X_centered = X - self.mean_  # Centra datos: elimina el sesgo de traslación para que SVD capture direcciones de máxima varianza
 
-        U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)
+        U, S, Vt = np.linalg.svd(X_centered, full_matrices=False)  # SVD compacta: descompone X centrado para extraer componentes principales (Vt)
 
-        self.components_ = Vt[:self.n_components].T
-        variance = (S**2) / (len(X) - 1)
-        self.explained_variance_ratio_ = variance[:self.n_components] / variance.sum()
+        self.components_ = Vt[:self.n_components].T  # Toma las k filas principales de Vt y transpone: (n_features,k) para proyección X@components_
+        variance = (S**2) / (len(X) - 1)  # Eigenvalues de covarianza: Σ^2/(n-1) corresponde a varianza por componente
+        self.explained_variance_ratio_ = variance[:self.n_components] / variance.sum()  # Proporción explicada: normaliza por varianza total
 
-        return self
+        return self  # Devuelve instancia entrenada: permite chaining y acceso a componentes/ratios aprendidos
 
-    def transform(self, X: np.ndarray) -> np.ndarray:
-        return (X - self.mean_) @ self.components_
+    def transform(self, X: np.ndarray) -> np.ndarray:  # Proyecta datos al subespacio PCA (dimensión k)
+        return (X - self.mean_) @ self.components_  # Centra con la misma media aprendida y proyecta: (n,k)
 
-    def fit_transform(self, X: np.ndarray) -> np.ndarray:
-        self.fit(X)
-        return self.transform(X)
+    def fit_transform(self, X: np.ndarray) -> np.ndarray:  # Atajo: fit + transform en una sola llamada
+        self.fit(X)  # Aprende componentes y media
+        return self.transform(X)  # Devuelve proyección PCA sin requerir llamada extra
 
-    def inverse_transform(self, X_pca: np.ndarray) -> np.ndarray:
-        return X_pca @ self.components_.T + self.mean_
+    def inverse_transform(self, X_pca: np.ndarray) -> np.ndarray:  # Reconstruye aproximación en espacio original desde coordenadas PCA
+        return X_pca @ self.components_.T + self.mean_  # Re-proyecta a features y re-agrega la media: reconstrucción pierde info si k<n_features
 
 
 # ============================================================
 # MÉTRICAS
 # ============================================================
 
-def inertia(X: np.ndarray, labels: np.ndarray, centroids: np.ndarray) -> float:
-    """Within-cluster sum of squares."""
-    return sum(np.sum((X[labels == i] - centroids[i])**2)
-               for i in range(len(centroids)))
+def inertia(X: np.ndarray, labels: np.ndarray, centroids: np.ndarray) -> float:  # Inercia/SSE: suma de distancias^2 intra-cluster (métrica interna)
+    """Within-cluster sum of squares."""  # Docstring 1-línea: define la métrica; cuenta como literal ejecutado
+    return sum(np.sum((X[labels == i] - centroids[i])**2)  # SSE por cluster i: distancias^2 de sus puntos al centroide i
+               for i in range(len(centroids)))  # Suma sobre todos los centroides: se usa en elbow method y diagnóstico
 
-def silhouette_score(X: np.ndarray, labels: np.ndarray) -> float:
-    """Silhouette score promedio."""
-    n = len(X)
-    scores = []
+def silhouette_score(X: np.ndarray, labels: np.ndarray) -> float:  # Silhouette promedio: combina cohesión (a) y separación (b) sin ground truth
+    """Silhouette score promedio."""  # Docstring 1-línea: explica salida; se ejecuta como string literal
+    n = len(X)  # Número de puntos: controla el loop externo del cálculo por muestra
+    scores = []  # Acumula s_i por punto: luego se promedia para el score global
 
-    for i in range(n):
+    for i in range(n):  # Recorre cada punto i: silhouette requiere evaluar su cohesión/separación relativa
         # a: distancia promedio intra-cluster
-        same = X[labels == labels[i]]
-        a = np.mean([np.sqrt(np.sum((X[i] - x)**2)) for x in same if not np.array_equal(x, X[i])])
+        same = X[labels == labels[i]]  # Puntos del mismo cluster que i (incluye a i): base para cohesión intra-cluster
+        a = np.mean([np.sqrt(np.sum((X[i] - x)**2)) for x in same if not np.array_equal(x, X[i])])  # Distancia media a otros del mismo cluster (excluye i)
 
         # b: distancia promedio al cluster más cercano
-        b = float('inf')
-        for label in np.unique(labels):
-            if label != labels[i]:
-                other = X[labels == label]
-                if len(other) > 0:
-                    b = min(b, np.mean([np.sqrt(np.sum((X[i] - x)**2)) for x in other]))
+        b = float('inf')  # Inicializa b con infinito: buscamos el mínimo promedio a cualquier cluster alternativo
+        for label in np.unique(labels):  # Recorre clusters existentes: evalúa el “cluster vecino” más cercano en distancia promedio
+            if label != labels[i]:  # Excluye el cluster propio: b se define como mejor cluster distinto
+                other = X[labels == label]  # Puntos del cluster candidato: se usa para distancia media inter-cluster
+                if len(other) > 0:  # Evita clusters vacíos: no aportan un promedio definido
+                    b = min(b, np.mean([np.sqrt(np.sum((X[i] - x)**2)) for x in other]))  # Actualiza mínimo: elige cluster alternativo más cercano
 
-        if b == float('inf'):
-            scores.append(0)
-        else:
-            scores.append((b - a) / max(a, b))
+        if b == float('inf'):  # Si no existió cluster alternativo válido (edge case), no se puede definir b correctamente
+            scores.append(0)  # Convención simple: retorna 0 para ese punto (neutral)
+        else:  # Caso normal: existe un cluster alternativo; se calcula s(i) comparando cohesión (a) vs separación (b)
+            scores.append((b - a) / max(a, b))  # Fórmula silhouette: s=(b-a)/max(a,b) en [-1,1]; >0 indica buena asignación
 
-    return np.mean(scores)
+    return np.mean(scores)  # Promedia s_i: define el silhouette global del clustering (más alto => mejor separación/cohesión)
 
 
 # ============================================================
 # TESTS
 # ============================================================
 
-if __name__ == "__main__":
-    np.random.seed(42)
+if __name__ == "__main__":  # Entry point: permite ejecutar este módulo como script para correr pruebas rápidas
+    np.random.seed(42)  # Fija semilla global: hace reproducible el dataset sintético y por tanto los resultados del test
 
     # Test K-Means
-    c1 = np.random.randn(50, 2) + [0, 0]
-    c2 = np.random.randn(50, 2) + [5, 5]
-    c3 = np.random.randn(50, 2) + [10, 0]
-    X = np.vstack([c1, c2, c3])
+    c1 = np.random.randn(50, 2) + [0, 0]  # Cluster 1: 50 puntos alrededor de (0,0)
+    c2 = np.random.randn(50, 2) + [5, 5]  # Cluster 2: 50 puntos alrededor de (5,5)
+    c3 = np.random.randn(50, 2) + [10, 0]  # Cluster 3: 50 puntos alrededor de (10,0)
+    X = np.vstack([c1, c2, c3])  # Dataset final: concatena clusters (150,2) para probar K-Means y PCA
 
-    kmeans = KMeans(n_clusters=3, seed=42)
-    labels = kmeans.fit_predict(X)
+    kmeans = KMeans(n_clusters=3, seed=42)  # Instancia K-Means con k=3: coincide con la generación sintética
+    labels = kmeans.fit_predict(X)  # Entrena y obtiene labels: debe separar aproximadamente los 3 grupos
 
-    print(f"K-Means Inertia: {kmeans.inertia_:.2f}")
-    print(f"Silhouette Score: {silhouette_score(X, labels):.4f}")
+    print(f"K-Means Inertia: {kmeans.inertia_:.2f}")  # Reporta inercia final: útil para comparar con otros k/datasets
+    print(f"Silhouette Score: {silhouette_score(X, labels):.4f}")  # Reporta silhouette: idealmente cercano a 1 si clusters bien separados
 
     # Test PCA
-    pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X)
-    X_reconstructed = pca.inverse_transform(X_pca)
+    pca = PCA(n_components=2)  # Instancia PCA para reducir 2D (aquí X ya es 2D, sirve para validar pipeline)
+    X_pca = pca.fit_transform(X)  # Ajusta y transforma: obtiene proyección en el subespacio (n,2)
+    X_reconstructed = pca.inverse_transform(X_pca)  # Reconstruye desde PCA: útil para medir error de reconstrucción
 
-    print(f"\nPCA Varianza explicada: {pca.explained_variance_ratio_}")
-    print(f"Error reconstrucción: {np.mean((X - X_reconstructed)**2):.6f}")
+    print(f"\nPCA Varianza explicada: {pca.explained_variance_ratio_}")  # Muestra proporción de varianza por componente: sanity check
+    print(f"Error reconstrucción: {np.mean((X - X_reconstructed)**2):.6f}")  # Mide MSE de reconstrucción: debe ser pequeño si k es suficiente
 
-    print("\n✓ Todos los tests pasaron!")
+    print("\n✓ Todos los tests pasaron!")  # Mensaje final: indica ejecución completa del bloque de pruebas sin excepciones
 ```
 
 ---
@@ -2113,12 +2113,12 @@ Shadow Mode - Unsupervised Learning
 Comparación: implementaciones desde cero vs sklearn.
 """
 
-import numpy as np
-from sklearn.cluster import KMeans as SklearnKMeans
-from sklearn.decomposition import PCA as SklearnPCA
+import numpy as np  # Importa NumPy: se usa para type hints, posibles conversiones y operaciones auxiliares
+from sklearn.cluster import KMeans as SklearnKMeans  # Importa KMeans de sklearn: baseline para validar resultados (no para aprender)
+from sklearn.decomposition import PCA as SklearnPCA  # Importa PCA de sklearn: baseline para comparar varianza explicada
 
 
-def shadow_mode_kmeans(X: np.ndarray, k: int = 3, seed: int = 42) -> None:
+def shadow_mode_kmeans(X: np.ndarray, k: int = 3, seed: int = 42) -> None:  # Compara tu K-Means (from scratch) contra sklearn (referencia)
     """Compara inercia de tu K-Means vs sklearn."""
     # Tu implementación
     # my = KMeans(n_clusters=k, random_state=seed)
@@ -2126,33 +2126,33 @@ def shadow_mode_kmeans(X: np.ndarray, k: int = 3, seed: int = 42) -> None:
     # my_inertia = my.inertia_
 
     # Placeholder (reemplazar con tu código)
-    my_inertia = 0.0
+    my_inertia = 0.0  # Placeholder: aquí debe ir la inercia de TU implementación (se deja en 0 para que el ejemplo sea ejecutable)
 
     # sklearn
-    sk = SklearnKMeans(n_clusters=k, init="k-means++", n_init=10, random_state=seed)
-    sk.fit(X)
+    sk = SklearnKMeans(n_clusters=k, init="k-means++", n_init=10, random_state=seed)  # Instancia sklearn KMeans: usa K-Means++ y reinicios para estabilidad
+    sk.fit(X)  # Ajusta sklearn KMeans: aprende centroides y calcula inercia interna en sk.inertia_
 
-    print("=" * 60)
-    print("SHADOW MODE: K-Means")
-    print("=" * 60)
-    print(f"Tu inercia:      {my_inertia:.4f}")
-    print(f"sklearn inertia: {sk.inertia_:.4f}")
+    print("=" * 60)  # Separador visual: hace más legible la salida en consola
+    print("SHADOW MODE: K-Means")  # Encabezado: indica que esta sección corresponde a la comparación de K-Means
+    print("=" * 60)  # Repite separador: encuadra el bloque de resultados
+    print(f"Tu inercia:      {my_inertia:.4f}")  # Reporta la inercia de tu implementación (placeholder hasta reemplazar)
+    print(f"sklearn inertia: {sk.inertia_:.4f}")  # Reporta inercia de sklearn: referencia para detectar discrepancias grandes
 
 
-def shadow_mode_pca(X: np.ndarray, n_components: int = 2) -> None:
+def shadow_mode_pca(X: np.ndarray, n_components: int = 2) -> None:  # Compara PCA from scratch vs sklearn en varianza explicada
     """Compara varianza explicada de tu PCA vs sklearn."""
     # Tu implementación
     # my = PCA(n_components=n_components)
     # X_my = my.fit_transform(X)
 
     # sklearn
-    sk = SklearnPCA(n_components=n_components)
-    sk.fit(X)
+    sk = SklearnPCA(n_components=n_components)  # Instancia sklearn PCA: calcula componentes principales por SVD internamente
+    sk.fit(X)  # Ajusta PCA: estima explained_variance_ratio_ para comparar con tu implementación
 
-    print("=" * 60)
-    print("SHADOW MODE: PCA")
-    print("=" * 60)
-    print(f"sklearn explained_variance_ratio_: {sk.explained_variance_ratio_}")
+    print("=" * 60)  # Separador visual: delimita salida del bloque PCA
+    print("SHADOW MODE: PCA")  # Encabezado: indica comparación de PCA
+    print("=" * 60)  # Repite separador: mantiene consistencia con el bloque anterior
+    print(f"sklearn explained_variance_ratio_: {sk.explained_variance_ratio_}")  # Varianza explicada de sklearn: baseline para tu PCA
 ```
 
 ---

@@ -148,8 +148,8 @@ Diagrama sugerido (dibújalo): un grafo pequeño con nodos `z = Wx + b`, `a = φ
 ### 1.1 Concepto de Derivada
 
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy as np  # Importar librería para computación numérica
+import matplotlib.pyplot as plt  # Importar librería para visualización
 
 """
 DERIVADA: Tasa de cambio instantánea de una función.
@@ -163,33 +163,33 @@ Notaciones equivalentes:
     f'(x) = df/dx = d/dx f(x) = Df(x)
 """
 
-def numerical_derivative(f, x: float, h: float = 1e-7) -> float:
+def numerical_derivative(f, x: float, h: float = 1e-7) -> float:  # Definir función de derivada numérica
     """
     Calcula la derivada numérica usando diferencias finitas.
 
     Método: diferencia central (más preciso)
     f'(x) ≈ (f(x+h) - f(x-h)) / (2h)
     """
-    return (f(x + h) - f(x - h)) / (2 * h)
+    return (f(x + h) - f(x - h)) / (2 * h)  # Calcular diferencia central
 
 
 # Ejemplo: f(x) = x²
-def f(x):
-    return x ** 2
+def f(x):  # Definir función de ejemplo
+    return x ** 2  # Calcular x al cuadrado
 
 # Derivada analítica: f'(x) = 2x
-def f_prime_analytical(x):
-    return 2 * x
+def f_prime_analytical(x):  # Definir derivada analítica
+    return 2 * x  # Calcular 2x
 
 # Comparar
-x = 3.0
-numerical = numerical_derivative(f, x)
-analytical = f_prime_analytical(x)
+x = 3.0  # Punto de evaluación
+numerical = numerical_derivative(f, x)  # Calcular derivada numérica
+analytical = f_prime_analytical(x)  # Calcular derivada analítica
 
-print(f"f(x) = x² en x={x}")
-print(f"Derivada numérica:  {numerical:.6f}")
-print(f"Derivada analítica: {analytical:.6f}")
-print(f"Error: {abs(numerical - analytical):.2e}")
+print(f"f(x) = x² en x={x}")  # Mostrar función y punto
+print(f"Derivada numérica:  {numerical:.6f}")  # Mostrar derivada numérica
+print(f"Derivada analítica: {analytical:.6f}")  # Mostrar derivada analítica
+print(f"Error: {abs(numerical - analytical):.2e}")  # Mostrar error
 ```
 
 <details open>
@@ -252,29 +252,29 @@ print(f"Error: {abs(numerical - analytical):.2e}")
 ### 1.2 Derivadas Comunes en ML
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 """
 DERIVADAS QUE NECESITAS MEMORIZAR PARA ML:
 
-1. Constante:     d/dx(c) = 0
-2. Lineal:        d/dx(x) = 1
-3. Potencia:      d/dx(xⁿ) = n·x^(n-1)
-4. Exponencial:   d/dx(eˣ) = eˣ
-5. Logaritmo:     d/dx(ln x) = 1/x
-6. Suma:          d/dx(f+g) = f' + g'
-7. Producto:      d/dx(f·g) = f'g + fg'
-8. Cociente:      d/dx(f/g) = (f'g - fg')/g²
-9. Cadena:        d/dx(f(g(x))) = f'(g(x))·g'(x)
+1. Constante:     d/dx(c) = 0  # Derivada de constante es cero
+2. Lineal:        d/dx(x) = 1  # Derivada de identidad es uno
+3. Potencia:      d/dx(xⁿ) = n·x^(n-1)  # Regla de la potencia
+4. Exponencial:   d/dx(eˣ) = eˣ  # Exponencial es su propia derivada
+5. Logaritmo:     d/dx(ln x) = 1/x  # Derivada del logaritmo natural
+6. Suma:          d/dx(f+g) = f' + g'  # Derivada de suma
+7. Producto:      d/dx(f·g) = f'g + fg'  # Regla del producto
+8. Cociente:      d/dx(f/g) = (f'g - fg')/g²  # Regla del cociente
+9. Cadena:        d/dx(f(g(x))) = f'(g(x))·g'(x)  # Regla de la cadena
 """
 
 # Funciones de activación y sus derivadas
 
-def sigmoid(x: np.ndarray) -> np.ndarray:
+def sigmoid(x: np.ndarray) -> np.ndarray:  # Definir función sigmoide
     """σ(x) = 1 / (1 + e^(-x))"""
-    return 1 / (1 + np.exp(-x))
+    return 1 / (1 + np.exp(-x))  # Calcular sigmoide
 
-def sigmoid_derivative(x: np.ndarray) -> np.ndarray:
+def sigmoid_derivative(x: np.ndarray) -> np.ndarray:  # Definir derivada de sigmoide
     """
     d/dx σ(x) = σ(x) · (1 - σ(x))
 
@@ -284,40 +284,40 @@ def sigmoid_derivative(x: np.ndarray) -> np.ndarray:
           = e^(-x) / (1 + e^(-x))²
           = σ(x) · (1 - σ(x))
     """
-    s = sigmoid(x)
-    return s * (1 - s)
+    s = sigmoid(x)  # Calcular sigmoide una vez
+    return s * (1 - s)  # Aplicar fórmula σ(1-σ)
 
 
-def relu(x: np.ndarray) -> np.ndarray:
+def relu(x: np.ndarray) -> np.ndarray:  # Definir función ReLU
     """ReLU(x) = max(0, x)"""
-    return np.maximum(0, x)
+    return np.maximum(0, x)  # Calcular máximo entre 0 y x
 
-def relu_derivative(x: np.ndarray) -> np.ndarray:
+def relu_derivative(x: np.ndarray) -> np.ndarray:  # Definir derivada de ReLU
     """
     d/dx ReLU(x) = { 1 si x > 0
                   { 0 si x < 0
-                  { indefinido si x = 0 (usamos 0)
+                  { indefinido si x = 0 (usamos 0)  # En x=0 definimos como 0
     """
-    return (x > 0).astype(float)
+    return (x > 0).astype(float)  # Convertir boolean a float (1 si True, 0 si False)
 
 
-def tanh_derivative(x: np.ndarray) -> np.ndarray:
+def tanh_derivative(x: np.ndarray) -> np.ndarray:  # Definir derivada de tanh
     """
     d/dx tanh(x) = 1 - tanh²(x)
     """
-    return 1 - np.tanh(x) ** 2
+    return 1 - np.tanh(x) ** 2  # Aplicar fórmula 1 - tanh²(x)
 
 
 # Verificar con derivada numérica
-def verify_derivative(f, f_prime, x, name):
-    numerical = (f(x + 1e-7) - f(x - 1e-7)) / (2e-7)
-    analytical = f_prime(x)
-    error = np.abs(numerical - analytical).max()
-    print(f"{name}: error máximo = {error:.2e}")
+def verify_derivative(f, f_prime, x, name):  # Definir función de verificación
+    numerical = (f(x + 1e-7) - f(x - 1e-7)) / (2e-7)  # Calcular derivada numérica
+    analytical = f_prime(x)  # Calcular derivada analítica
+    error = np.abs(numerical - analytical).max()  # Calcular error máximo
+    print(f"{name}: error máximo = {error:.2e}")  # Mostrar error
 
-x = np.array([-2, -1, 0.5, 1, 2])
-verify_derivative(sigmoid, sigmoid_derivative, x, "Sigmoid")
-verify_derivative(np.tanh, tanh_derivative, x, "Tanh")
+x = np.array([-2, -1, 0.5, 1, 2])  # Puntos de prueba
+verify_derivative(sigmoid, sigmoid_derivative, x, "Sigmoid")  # Verificar sigmoide
+verify_derivative(np.tanh, tanh_derivative, x, "Tanh")  # Verificar tanh
 ```
 
 <details open>
@@ -379,11 +379,11 @@ verify_derivative(np.tanh, tanh_derivative, x, "Tanh")
 ### 1.3 Derivadas Parciales
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 """
 DERIVADA PARCIAL: Derivada respecto a UNA variable,
-manteniendo las otras constantes.
+manteniendo las otras constantes.  # Mantener otras variables fijas
 
 Para f(x, y):
     ∂f/∂x = derivada respecto a x, tratando y como constante
@@ -392,51 +392,51 @@ Para f(x, y):
 Notación: ∂ (partial) en lugar de d
 """
 
-def f(x: float, y: float) -> float:
+def f(x: float, y: float) -> float:  # Definir función de dos variables
     """f(x, y) = x² + 3xy + y²"""
-    return x**2 + 3*x*y + y**2
+    return x**2 + 3*x*y + y**2  # Evaluar función
 
 # Derivadas parciales analíticas:
-# ∂f/∂x = 2x + 3y
-# ∂f/∂y = 3x + 2y
+# ∂f/∂x = 2x + 3y  # Derivada parcial respecto a x
+# ∂f/∂y = 3x + 2y  # Derivada parcial respecto a y
 
-def df_dx(x: float, y: float) -> float:
+def df_dx(x: float, y: float) -> float:  # Definir derivada parcial respecto a x
     """∂f/∂x = 2x + 3y"""
-    return 2*x + 3*y
+    return 2*x + 3*y  # Calcular derivada parcial
 
-def df_dy(x: float, y: float) -> float:
+def df_dy(x: float, y: float) -> float:  # Definir derivada parcial respecto a y
     """∂f/∂y = 3x + 2y"""
-    return 3*x + 2*y
+    return 3*x + 2*y  # Calcular derivada parcial
 
 
 # Derivada parcial numérica
-def partial_derivative(f, var_idx: int, point: list, h: float = 1e-7) -> float:
+def partial_derivative(f, var_idx: int, point: list, h: float = 1e-7) -> float:  # Definir función de derivada parcial numérica
     """
     Calcula ∂f/∂xᵢ en un punto dado.
 
     Args:
-        f: función
-        var_idx: índice de la variable (0 para x, 1 para y, etc.)
-        point: punto donde evaluar [x, y, ...]
-        h: paso pequeño
+        f: función  # Función a derivar
+        var_idx: índice de la variable (0 para x, 1 para y, etc.)  # Índice de variable a derivar
+        point: punto donde evaluar [x, y, ...]  # Punto de evaluación
+        h: paso pequeño  # Paso para diferencias finitas
     """
-    point_plus = point.copy()
-    point_minus = point.copy()
-    point_plus[var_idx] += h
-    point_minus[var_idx] -= h
-    return (f(*point_plus) - f(*point_minus)) / (2 * h)
+    point_plus = point.copy()  # Copiar punto original
+    point_minus = point.copy()  # Copiar punto original
+    point_plus[var_idx] += h  # Perturbar variable hacia arriba
+    point_minus[var_idx] -= h  # Perturbar variable hacia abajo
+    return (f(*point_plus) - f(*point_minus)) / (2 * h)  # Calcular derivada central
 
 
 # Verificar
-point = [2.0, 3.0]
-print(f"Punto: x={point[0]}, y={point[1]}")
-print(f"f(x,y) = {f(*point)}")
-print(f"\n∂f/∂x:")
-print(f"  Analítica: {df_dx(*point)}")
-print(f"  Numérica:  {partial_derivative(f, 0, point):.6f}")
-print(f"\n∂f/∂y:")
-print(f"  Analítica: {df_dy(*point)}")
-print(f"  Numérica:  {partial_derivative(f, 1, point):.6f}")
+point = [2.0, 3.0]  # Punto de evaluación
+print(f"Punto: x={point[0]}, y={point[1]}")  # Mostrar punto
+print(f"f(x,y) = {f(*point)}")  # Mostrar valor de función
+print(f"\n∂f/∂x:")  # Mostrar título
+print(f"  Analítica: {df_dx(*point)}")  # Mostrar derivada analítica
+print(f"  Numérica:  {partial_derivative(f, 0, point):.6f}")  # Mostrar derivada numérica
+print(f"\n∂f/∂y:")  # Mostrar etiqueta para derivada parcial respecto a y
+print(f"  Analítica: {df_dy(*point)}")  # Mostrar derivada analítica
+print(f"  Numérica:  {partial_derivative(f, 1, point):.6f}")  # Mostrar derivada numérica
 ```
 
 <details open>
@@ -502,7 +502,7 @@ print(f"  Numérica:  {partial_derivative(f, 1, point):.6f}")
 ### 2.1 Definición del Gradiente
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 """
 GRADIENTE: Vector de todas las derivadas parciales.
@@ -517,50 +517,50 @@ Propiedades importantes:
 3. -∇f apunta en la dirección de MÁXIMO DESCENSO (usado en optimización)
 """
 
-def compute_gradient(f, point: np.ndarray, h: float = 1e-7) -> np.ndarray:
+def compute_gradient(f, point: np.ndarray, h: float = 1e-7) -> np.ndarray:  # Definir función de gradiente numérico
     """
     Calcula el gradiente de f en un punto usando diferencias finitas.
 
     Args:
-        f: función f(x) donde x es un array
-        point: punto donde calcular el gradiente
-        h: paso para diferencias finitas
+        f: función f(x) donde x es un array  # Función a derivar
+        point: punto donde calcular el gradiente  # Punto de evaluación
+        h: paso para diferencias finitas  # Paso para diferencias
 
     Returns:
-        gradiente como array
+        gradiente como array  # Vector gradiente resultante
     """
-    n = len(point)
-    gradient = np.zeros(n)
+    n = len(point)  # Número de dimensiones
+    gradient = np.zeros(n)  # Inicializar gradiente con ceros
 
-    for i in range(n):
-        point_plus = point.copy()
-        point_minus = point.copy()
-        point_plus[i] += h
-        point_minus[i] -= h
-        gradient[i] = (f(point_plus) - f(point_minus)) / (2 * h)
+    for i in range(n):  # Iterar sobre cada dimensión
+        point_plus = point.copy()  # Copiar punto original
+        point_minus = point.copy()  # Copiar punto original
+        point_plus[i] += h  # Perturbar dimensión i hacia arriba
+        point_minus[i] -= h  # Perturbar dimensión i hacia abajo
+        gradient[i] = (f(point_plus) - f(point_minus)) / (2 * h)  # Calcular derivada parcial
 
-    return gradient
+    return gradient  # Devolver vector gradiente
 
 
 # Ejemplo: f(x, y) = x² + y²
-def paraboloid(p: np.ndarray) -> float:
+def paraboloid(p: np.ndarray) -> float:  # Definir función paraboloide
     """Paraboloide: f(x,y) = x² + y²"""
-    return p[0]**2 + p[1]**2
+    return p[0]**2 + p[1]**2  # Evaluar paraboloide
 
 # Gradiente analítico: ∇f = [2x, 2y]
-def paraboloid_gradient_analytical(p: np.ndarray) -> np.ndarray:
-    return np.array([2*p[0], 2*p[1]])
+def paraboloid_gradient_analytical(p: np.ndarray) -> np.ndarray:  # Definir gradiente analítico
+    return np.array([2*p[0], 2*p[1]])  # Calcular gradiente [2x, 2y]
 
 
 # Verificar
-point = np.array([3.0, 4.0])
-grad_numerical = compute_gradient(paraboloid, point)
-grad_analytical = paraboloid_gradient_analytical(point)
+point = np.array([3.0, 4.0])  # Punto de evaluación
+grad_numerical = compute_gradient(paraboloid, point)  # Calcular gradiente numérico
+grad_analytical = paraboloid_gradient_analytical(point)  # Calcular gradiente analítico
 
-print(f"Punto: {point}")
-print(f"f(punto) = {paraboloid(point)}")
-print(f"Gradiente numérico:  {grad_numerical}")
-print(f"Gradiente analítico: {grad_analytical}")
+print(f"Punto: {point}")  # Mostrar punto
+print(f"f(punto) = {paraboloid(point)}")  # Mostrar valor de función
+print(f"Gradiente numérico:  {grad_numerical}")  # Mostrar gradiente numérico
+print(f"Gradiente analítico: {grad_analytical}")  # Mostrar gradiente analítico
 ```
 
 <details open>
@@ -622,48 +622,48 @@ print(f"Gradiente analítico: {grad_analytical}")
 ### 2.2 Visualización del Gradiente
 
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy as np  # Importar librería para computación numérica
+import matplotlib.pyplot as plt  # Importar librería para visualización
 
-def visualize_gradient():
+def visualize_gradient():  # Definir función de visualización del gradiente
     """Visualiza el gradiente como campo vectorial."""
 
     # Crear grid
-    x = np.linspace(-3, 3, 15)
-    y = np.linspace(-3, 3, 15)
-    X, Y = np.meshgrid(x, y)
+    x = np.linspace(-3, 3, 15)  # Crear 15 puntos en eje x
+    y = np.linspace(-3, 3, 15)  # Crear 15 puntos en eje y
+    X, Y = np.meshgrid(x, y)  # Crear malla 2D
 
     # Función: f(x,y) = x² + y²
-    Z = X**2 + Y**2
+    Z = X**2 + Y**2  # Evaluar función en la malla
 
     # Gradiente: ∇f = [2x, 2y]
-    U = 2 * X  # ∂f/∂x
-    V = 2 * Y  # ∂f/∂y
+    U = 2 * X  # ∂f/∂x  # Componente x del gradiente
+    V = 2 * Y  # ∂f/∂y  # Componente y del gradiente
 
     # Normalizar para visualización
-    magnitude = np.sqrt(U**2 + V**2)
-    U_norm = U / (magnitude + 0.1)
-    V_norm = V / (magnitude + 0.1)
+    magnitude = np.sqrt(U**2 + V**2)  # Calcular magnitud del gradiente
+    U_norm = U / (magnitude + 0.1)  # Normalizar componente x
+    V_norm = V / (magnitude + 0.1)  # Normalizar componente y
 
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(10, 8))  # Crear figura
 
     # Contornos de nivel
-    plt.contour(X, Y, Z, levels=20, cmap='viridis', alpha=0.5)
-    plt.colorbar(label='f(x,y) = x² + y²')
+    plt.contour(X, Y, Z, levels=20, cmap='viridis', alpha=0.5)  # Dibujar contornos
+    plt.colorbar(label='f(x,y) = x² + y²')  # Agregar barra de color
 
     # Flechas del gradiente
-    plt.quiver(X, Y, U_norm, V_norm, magnitude, cmap='Reds', alpha=0.8)
+    plt.quiver(X, Y, U_norm, V_norm, magnitude, cmap='Reds', alpha=0.8)  # Dibujar campo vectorial
 
     # Punto mínimo
-    plt.plot(0, 0, 'g*', markersize=15, label='Mínimo global')
+    plt.plot(0, 0, 'g*', markersize=15, label='Mínimo global')  # Marcar mínimo global
 
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title('Gradiente de f(x,y) = x² + y²\nLas flechas apuntan hacia ARRIBA (máximo ascenso)')
-    plt.legend()
-    plt.axis('equal')
-    plt.grid(True, alpha=0.3)
-    plt.show()
+    plt.xlabel('x')  # Etiqueta eje x
+    plt.ylabel('y')  # Etiqueta eje y
+    plt.title('Gradiente de f(x,y) = x² + y²\nLas flechas apuntan hacia ARRIBA (máximo ascenso)')  # Título
+    plt.legend()  # Mostrar leyenda
+    plt.axis('equal')  # Ejes iguales
+    plt.grid(True, alpha=0.3)  # Cuadrícula
+    plt.show()  # Mostrar gráfico
 
 # visualize_gradient()  # Descomentar para ejecutar
 
@@ -832,20 +832,24 @@ def gradient_descent(
 def f(p: np.ndarray) -> float:
     return p[0]**2 + p[1]**2
 
-def grad_f(p: np.ndarray) -> np.ndarray:
-    return np.array([2*p[0], 2*p[1]])
+            # Ejecutar
+            x0 = np.array([4.0, 3.0])
+            x_final, history_x, history_f = gradient_descent(f, grad_f, x0, learning_rate=0.1)
 
-# Ejecutar
-x0 = np.array([4.0, 3.0])
-x_final, history_x, history_f = gradient_descent(f, grad_f, x0, learning_rate=0.1)
+            print(f"\nPunto inicial: {x0}")  # Mostrar punto inicial
+            print(f"Mínimo encontrado: {x_final}")  # Mostrar punto mínimo encontrado
+            print(f"f(mínimo) = {f(x_final):.6f}")
+            print(f"Iteraciones: {len(history_f)}")
 
-print(f"\nPunto inicial: {x0}")
-print(f"Mínimo encontrado: {x_final}")
-print(f"f(mínimo) = {f(x_final):.6f}")
-print(f"Iteraciones: {len(history_f)}")
+            <details open>
+            <summary><strong>📌 Complemento pedagógico — Tema 3.1: Algoritmo Básico (Gradient Descent)</strong></summary>
 
-<details open>
-<summary><strong>📌 Complemento pedagógico — Tema 3.1: Algoritmo Básico (Gradient Descent)</strong></summary>
+            #### 1) Metadatos
+            - **Título:** Gradient Descent como iteración `x ← x - α∇f(x)`
+            - **ID (opcional):** `M03-T03_1`
+            - **Duración estimada:** 90–150 min
+            - **Nivel:** Intermedio
+            - **Dependencias:** 2.1 (gradiente), 2.2 (intuición geométrica)
 
 #### 1) Metadatos
 - **Título:** Gradient Descent como iteración `x ← x - α∇f(x)`
@@ -1391,33 +1395,33 @@ dy/dx = f'(g(x)) · g'(x)
 ```
 
 ```python
-def g(x):
-    return x**2 + 1
+def g(x):  # Definir función interna
+    return x**2 + 1  # Calcular x^2 + 1
 
 
-def f(u):
-    return u**3
+def f(u):  # Definir función externa
+    return u**3  # Calcular u^3
 
 
-def y(x):
-    return f(g(x))
+def y(x):  # Definir función compuesta
+    return f(g(x))  # Componer f con g
 
 
-def dy_dx_analytical(x):
+def dy_dx_analytical(x):  # Definir derivada analítica
     """Derivada usando chain rule."""
-    return 6 * x * (x**2 + 1)**2
+    return 6 * x * (x**2 + 1)**2  # Aplicar regla de la cadena
 
 
-def dy_dx_numerical(x, h=1e-7):
+def dy_dx_numerical(x, h=1e-7):  # Definir derivada numérica
     """Derivada numérica."""
-    return (y(x + h) - y(x - h)) / (2 * h)
+    return (y(x + h) - y(x - h)) / (2 * h)  # Calcular diferencia central
 
 
 # Verificar
-x = 2.0
-print(f"y({x}) = {y(x)}")
-print(f"dy/dx analítica:  {dy_dx_analytical(x)}")
-print(f"dy/dx numérica:   {dy_dx_numerical(x):.6f}")
+x = 2.0  # Punto de evaluación
+print(f"y({x}) = {y(x)}")  # Mostrar valor de función
+print(f"dy/dx analítica:  {dy_dx_analytical(x)}")  # Mostrar derivada analítica
+print(f"dy/dx numérica:   {dy_dx_numerical(x):.6f}")  # Mostrar derivada numérica
 ```
 
 <details open>
@@ -1497,78 +1501,78 @@ print(f"dy/dx numérica:   {dy_dx_numerical(x):.6f}")
     `∂L/∂b = ∂L/∂a · ∂a/∂z · ∂z/∂b`
 
 ```python
-def simple_forward_backward():
+def simple_forward_backward():  # Definir función de ejemplo forward/backward
     """
     Ejemplo simplificado de forward y backward pass.
 
     Red: x → [z = wx + b] → [a = sigmoid(z)] → [L = (a - y)²]
     """
     # Datos
-    x = 2.0          # Input
-    y_true = 1.0     # Target
+    x = 2.0          # Input  # Valor de entrada
+    y_true = 1.0     # Target  # Valor objetivo
 
     # Parámetros
-    w = 0.5
-    b = 0.1
+    w = 0.5  # Peso inicial
+    b = 0.1  # Sesgo inicial
 
     # ========== FORWARD PASS ==========
-    z = w * x + b                    # z = wx + b
-    a = 1 / (1 + np.exp(-z))         # a = sigmoid(z)
-    L = (a - y_true) ** 2            # L = MSE
+    z = w * x + b                    # z = wx + b  # Pre-activación
+    a = 1 / (1 + np.exp(-z))         # a = sigmoid(z)  # Activación
+    L = (a - y_true) ** 2            # L = MSE  # Pérdida
 
-    print("=== FORWARD PASS ===")
-    print(f"z = w*x + b = {w}*{x} + {b} = {z}")
-    print(f"a = sigmoid(z) = {a:.4f}")
-    print(f"L = (a - y)² = ({a:.4f} - {y_true})² = {L:.4f}")
+    print("=== FORWARD PASS ===")  # Imprimir título
+    print(f"z = w*x + b = {w}*{x} + {b} = {z}")  # Mostrar cálculo de z
+    print(f"a = sigmoid(z) = {a:.4f}")  # Mostrar activación
+    print(f"L = (a - y)² = ({a:.4f} - {y_true})² = {L:.4f}")  # Mostrar pérdida
 
     # ========== BACKWARD PASS (Chain Rule) ==========
     # Objetivo: calcular ∂L/∂w y ∂L/∂b
 
     # Paso 1: ∂L/∂a
-    dL_da = 2 * (a - y_true)
+    dL_da = 2 * (a - y_true)  # Derivada de pérdida respecto a activación
 
     # Paso 2: ∂a/∂z = sigmoid'(z) = a(1-a)
-    da_dz = a * (1 - a)
+    da_dz = a * (1 - a)  # Derivada de sigmoide
 
     # Paso 3: ∂z/∂w = x,  ∂z/∂b = 1
-    dz_dw = x
-    dz_db = 1
+    dz_dw = x  # Derivada de z respecto a w
+    dz_db = 1  # Derivada de z respecto a b
 
     # Aplicar Chain Rule
     dL_dz = dL_da * da_dz           # ∂L/∂z = ∂L/∂a · ∂a/∂z
-    dL_dw = dL_dz * dz_dw           # ∂L/∂w = ∂L/∂z · ∂z/∂w
-    dL_db = dL_dz * dz_db           # ∂L/∂b = ∂L/∂z · ∂z/∂b
+    dL_dw = dL_dz * dz_dw           # ∂L/∂w = ∂L/∂z · ∂z/∂w  # Gradiente respecto a w
+    dL_db = dL_dz * dz_db           # ∂L/∂b = ∂L/∂z · ∂z/∂b  # Gradiente respecto a b
 
-    print("\n=== BACKWARD PASS (Chain Rule) ===")
-    print(f"∂L/∂a = 2(a - y) = {dL_da:.4f}")
-    print(f"∂a/∂z = a(1-a) = {da_dz:.4f}")
-    print(f"∂z/∂w = x = {dz_dw}")
-    print(f"∂z/∂b = 1")
-    print(f"\n∂L/∂w = ∂L/∂a · ∂a/∂z · ∂z/∂w = {dL_dw:.4f}")
-    print(f"∂L/∂b = ∂L/∂a · ∂a/∂z · ∂z/∂b = {dL_db:.4f}")
+    print("\n=== BACKWARD PASS (Chain Rule) ===")  # Imprimir título
+    print(f"∂L/∂a = 2(a - y) = {dL_da:.4f}")  # Mostrar gradiente respecto a a
+    print(f"∂a/∂z = a(1-a) = {da_dz:.4f}")  # Mostrar gradiente respecto a z
+    print(f"∂z/∂w = x = {dz_dw}")  # Mostrar derivada de z respecto a w
+    print(f"∂z/∂b = 1")  # Mostrar derivada de z respecto a b
+    print(f"\n∂L/∂w = ∂L/∂a · ∂a/∂z · ∂z/∂w = {dL_dw:.4f}")  # Mostrar gradiente final de w
+    print(f"∂L/∂b = ∂L/∂a · ∂a/∂z · ∂z/∂b = {dL_db:.4f}")  # Mostrar gradiente final de b
 
     # ========== VERIFICACIÓN NUMÉRICA ==========
-    h = 1e-7
+    h = 1e-7  # Paso pequeño para diferencias finitas
 
     # ∂L/∂w numérica
-    z_plus = (w + h) * x + b
-    a_plus = 1 / (1 + np.exp(-z_plus))
-    L_plus = (a_plus - y_true) ** 2
+    z_plus = (w + h) * x + b  # z con w perturbado
+    a_plus = 1 / (1 + np.exp(-z_plus))  # Activación con w perturbado
+    L_plus = (a_plus - y_true) ** 2  # Pérdida con w perturbado
 
-    z_minus = (w - h) * x + b
-    a_minus = 1 / (1 + np.exp(-z_minus))
-    L_minus = (a_minus - y_true) ** 2
+    z_minus = (w - h) * x + b  # z con w perturbado negativamente
+    a_minus = 1 / (1 + np.exp(-z_minus))  # Activación con w perturbado negativamente
+    L_minus = (a_minus - y_true) ** 2  # Pérdida con w perturbado negativamente
 
-    dL_dw_numerical = (L_plus - L_minus) / (2 * h)
+    dL_dw_numerical = (L_plus - L_minus) / (2 * h)  # Gradiente numérico de w
 
-    print(f"\n=== VERIFICACIÓN ===")
-    print(f"∂L/∂w analítica: {dL_dw:.6f}")
-    print(f"∂L/∂w numérica:  {dL_dw_numerical:.6f}")
-    print(f"Error: {abs(dL_dw - dL_dw_numerical):.2e}")
+    print(f"\n=== VERIFICACIÓN ===")  # Imprimir título de verificación
+    print(f"∂L/∂w analítica: {dL_dw:.6f}")  # Mostrar gradiente analítico
+    print(f"∂L/∂w numérica:  {dL_dw_numerical:.6f}")  # Mostrar gradiente numérico
+    print(f"Error: {abs(dL_dw - dL_dw_numerical):.2e}")  # Mostrar error entre gradientes
 
-    return dL_dw, dL_db
+    return dL_dw, dL_db  # Devolver gradientes analíticos
 
-simple_forward_backward()
+simple_forward_backward()  # Ejecutar ejemplo
 
 ```
 
@@ -1644,130 +1648,131 @@ simple_forward_backward()
     `∂L/∂W₁ = ∂L/∂a₂ · ∂a₂/∂z₂ · ∂z₂/∂a₁ · ∂a₁/∂z₁ · ∂z₁/∂W₁`
 
 ```python
-class SimpleNeuralNet:
+class SimpleNeuralNet:  # Definir clase de red neuronal simple
     """Red neuronal de 2 capas para demostrar backprop."""
 
-    def __init__(self, input_size: int, hidden_size: int, output_size: int):
+    def __init__(self, input_size: int, hidden_size: int, output_size: int):  # Constructor
         # Inicializar pesos (Xavier initialization)
-        self.W1 = np.random.randn(hidden_size, input_size) * np.sqrt(2 / input_size)
-        self.b1 = np.zeros(hidden_size)
-        self.W2 = np.random.randn(output_size, hidden_size) * np.sqrt(2 / hidden_size)
-        self.b2 = np.zeros(output_size)
+        self.W1 = np.random.randn(hidden_size, input_size) * np.sqrt(2 / input_size)  # Pesos capa 1
+        self.b1 = np.zeros(hidden_size)  # Sesgos capa 1
+        self.W2 = np.random.randn(output_size, hidden_size) * np.sqrt(2 / hidden_size)  # Pesos capa 2
+        self.b2 = np.zeros(output_size)  # Sesgos capa 2
 
         # Cache para backprop
-        self.cache = {}
+        self.cache = {}  # Diccionario para guardar valores intermedios
 
-    def sigmoid(self, z):
-        return 1 / (1 + np.exp(-np.clip(z, -500, 500)))
+    def sigmoid(self, z):  # Definir función sigmoide
+        return 1 / (1 + np.exp(-np.clip(z, -500, 500)))  # Sigmoide con clip para evitar overflow
 
-    def sigmoid_derivative(self, a):
-        return a * (1 - a)
+    def sigmoid_derivative(self, a):  # Definir derivada de sigmoide
+        return a * (1 - a)  # σ'(a) = σ(1-σ)
 
-    def forward(self, x: np.ndarray) -> np.ndarray:
+    def forward(self, x: np.ndarray) -> np.ndarray:  # Definir forward pass
         """Forward pass guardando valores intermedios."""
         # Capa 1
-        z1 = self.W1 @ x + self.b1
-        a1 = self.sigmoid(z1)
+        z1 = self.W1 @ x + self.b1  # Pre-activación capa 1: z1 = W1x + b1
+        a1 = self.sigmoid(z1)  # Activación capa 1: a1 = sigmoid(z1)
 
         # Capa 2
-        z2 = self.W2 @ a1 + self.b2
-        a2 = self.sigmoid(z2)
+        z2 = self.W2 @ a1 + self.b2  # Pre-activación capa 2: z2 = W2a1 + b2
+        a2 = self.sigmoid(z2)  # Activación capa 2: a2 = sigmoid(z2)
 
         # Guardar para backprop
-        self.cache = {'x': x, 'z1': z1, 'a1': a1, 'z2': z2, 'a2': a2}
+        self.cache = {'x': x, 'z1': z1, 'a1': a1, 'z2': z2, 'a2': a2}  # Guardar valores intermedios
 
-        return a2
+        return a2  # Devolver salida de la red
 
-    def backward(self, y_true: np.ndarray) -> dict:
+    def backward(self, y_true: np.ndarray) -> dict:  # Definir backward pass
         """
         Backward pass usando Chain Rule.
 
         Returns:
             Gradientes de todos los parámetros
         """
-        x = self.cache['x']
-        a1 = self.cache['a1']
-        a2 = self.cache['a2']
+        x = self.cache['x']  # Recuperar entrada original
+        a1 = self.cache['a1']  # Recuperar activación capa 1
+        a2 = self.cache['a2']  # Recuperar activación capa 2
 
         # ∂L/∂a₂ (MSE)
-        dL_da2 = 2 * (a2 - y_true)
+        dL_da2 = 2 * (a2 - y_true)  # Derivada de MSE respecto a a2
 
         # ∂a₂/∂z₂
-        da2_dz2 = self.sigmoid_derivative(a2)
+        da2_dz2 = self.sigmoid_derivative(a2)  # Derivada de sigmoide en a2
 
         # ∂L/∂z₂ = ∂L/∂a₂ · ∂a₂/∂z₂
-        dL_dz2 = dL_da2 * da2_dz2
+        dL_dz2 = dL_da2 * da2_dz2  # Aplicar regla de la cadena
 
         # Gradientes de capa 2
         # ∂z₂/∂W₂ = a₁, ∂z₂/∂b₂ = 1
-        dL_dW2 = np.outer(dL_dz2, a1)
-        dL_db2 = dL_dz2
+        dL_dW2 = np.outer(dL_dz2, a1)  # Gradiente respecto a W2: producto externo
+        dL_db2 = dL_dz2  # Gradiente respecto a b2: mismo valor
 
         # Propagar hacia atrás a capa 1
         # ∂z₂/∂a₁ = W₂
-        dL_da1 = self.W2.T @ dL_dz2
+        dL_da1 = self.W2.T @ dL_dz2  # Propagar error hacia atrás: W2^T · dL_dz2
 
         # ∂a₁/∂z₁
-        da1_dz1 = self.sigmoid_derivative(a1)
+        da1_dz1 = self.sigmoid_derivative(a1)  # Derivada de sigmoide en a1
 
         # ∂L/∂z₁
-        dL_dz1 = dL_da1 * da1_dz1
+        dL_dz1 = dL_da1 * da1_dz1  # Aplicar regla de la cadena
 
         # Gradientes de capa 1
-        dL_dW1 = np.outer(dL_dz1, x)
-        dL_db1 = dL_dz1
+        # ∂z₁/∂W₁ = x, ∂z₁/∂b₁ = 1
+        dL_dW1 = np.outer(dL_dz1, x)  # Gradiente respecto a W1: producto externo
+        dL_db1 = dL_dz1  # Gradiente respecto a b1: mismo valor
 
-        return {
-            'dW1': dL_dW1, 'db1': dL_db1,
-            'dW2': dL_dW2, 'db2': dL_db2
-        }
+        return {  # Devolver todos los gradientes
+            'dW1': dL_dW1, 'db1': dL_db1,  # Gradientes capa 1
+            'dW2': dL_dW2, 'db2': dL_db2   # Gradientes capa 2
+        }  # Devolver diccionario con todos los gradientes
 
-    def update(self, gradients: dict, learning_rate: float):
+    def update(self, gradients: dict, learning_rate: float):  # Definir método de actualización
         """Actualiza parámetros usando gradient descent."""
-        self.W1 -= learning_rate * gradients['dW1']
-        self.b1 -= learning_rate * gradients['db1']
-        self.W2 -= learning_rate * gradients['dW2']
-        self.b2 -= learning_rate * gradients['db2']
+        self.W1 -= learning_rate * gradients['dW1']  # Actualizar W1: W1 = W1 - α·dW1
+        self.b1 -= learning_rate * gradients['db1']  # Actualizar b1: b1 = b1 - α·db1
+        self.W2 -= learning_rate * gradients['dW2']  # Actualizar W2: W2 = W2 - α·dW2
+        self.b2 -= learning_rate * gradients['db2']  # Actualizar b2: b2 = b2 - α·db2
 
 
 # Demo: XOR problem
-def demo_xor():
+def demo_xor():  # Definir demostración con problema XOR
     """Entrena la red para resolver XOR."""
     # XOR data
-    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]]).T  # 2x4
-    y = np.array([[0], [1], [1], [0]]).T              # 1x4
+    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]]).T  # 2x4  # Entradas XOR transpuestas
+    y = np.array([[0], [1], [1], [0]]).T              # 1x4  # Salidas XOR transpuestas
 
     # Crear red
-    net = SimpleNeuralNet(input_size=2, hidden_size=4, output_size=1)
+    net = SimpleNeuralNet(input_size=2, hidden_size=4, output_size=1)  # Red 2-4-1
 
     # Entrenar
-    losses = []
-    for epoch in range(10000):
-        total_loss = 0
-        for i in range(4):
+    losses = []  # Lista para guardar pérdidas
+    for epoch in range(10000):  # 10000 épocas de entrenamiento
+        total_loss = 0  # Inicializar pérdida total
+        for i in range(4):  # Iterar sobre 4 ejemplos XOR
             # Forward
-            output = net.forward(X[:, i])
-            loss = (output - y[:, i]) ** 2
-            total_loss += loss[0]
+            output = net.forward(X[:, i])  # Propagar entrada i
+            loss = (output - y[:, i]) ** 2  # Calcular pérdida MSE
+            total_loss += loss[0]  # Acumular pérdida
 
             # Backward
-            gradients = net.backward(y[:, i])
+            gradients = net.backward(y[:, i])  # Calcular gradientes
 
             # Update
-            net.update(gradients, learning_rate=0.5)
+            net.update(gradients, learning_rate=0.5)  # Actualizar pesos con lr=0.5
 
-        losses.append(total_loss / 4)
+        losses.append(total_loss / 4)  # Guardar pérdida promedio
 
-        if epoch % 2000 == 0:
-            print(f"Epoch {epoch}: Loss = {losses[-1]:.4f}")
+        if epoch % 2000 == 0:  # Imprimir cada 2000 épocas
+            print(f"Epoch {epoch}: Loss = {losses[-1]:.4f}")  # Mostrar pérdida
 
     # Test
-    print("\n=== Resultados XOR ===")
-    for i in range(4):
-        pred = net.forward(X[:, i])
-        print(f"Input: {X[:, i]} → Pred: {pred[0]:.3f} (Target: {y[0, i]})")
+    print("\n=== Resultados XOR ===")  # Imprimir resultados
+    for i in range(4):  # Probar cada ejemplo
+        pred = net.forward(X[:, i])  # Obtener predicción
+        print(f"Input: {X[:, i]} → Pred: {pred[0]:.3f} (Target: {y[0, i]})")  # Mostrar resultado
 
-demo_xor()
+demo_xor()  # Ejecutar demostración
 ```
 
 <details open>
@@ -1862,7 +1867,7 @@ Reglas:
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 
 # Aproximamos derivadas numéricamente usando *diferencias centrales*.
@@ -1870,54 +1875,54 @@ import numpy as np
 # cancela términos de error de primer orden y suele ser más preciso que la
 # diferencia hacia adelante.
 
-def num_derivative_central(f, x: float, h: float = 1e-6) -> float:
-    # f: función escalar f(x).
-    # x: punto donde evaluamos la derivada.
-    # h: tamaño de paso. Hay tradeoff:
-    # - h grande => error de truncamiento (aproximación) domina
-    # - h muy pequeño => cancelación numérica (floating point) domina
+def num_derivative_central(f, x: float, h: float = 1e-6) -> float:  # Definir derivada numérica central
+    # f: función escalar f(x).  # Función a derivar
+    # x: punto donde evaluamos la derivada.  # Punto de evaluación
+    # h: tamaño de paso. Hay tradeoff:  # Tamaño del paso
+    # - h grande => error de truncamiento (aproximación) domina  # Error por paso grande
+    # - h muy pequeño => cancelación numérica (floating point) domina  # Error por paso pequeño
     # Devolvemos float para facilitar asserts y logs.
-    return float((f(x + h) - f(x - h)) / (2.0 * h))
+    return float((f(x + h) - f(x - h)) / (2.0 * h))  # Calcular diferencia central
 
 
-def f(x: float) -> float:
+def f(x: float) -> float:  # Definir función de prueba
     # Función de prueba (suave y derivable).
-    return x**3 + 2.0 * x
+    return x**3 + 2.0 * x  # Función cúbica simple
 
 
-def f_prime(x: float) -> float:
+def f_prime(x: float) -> float:  # Definir derivada analítica
     # Derivada analítica:
-    # d/dx (x^3) = 3x^2
-    # d/dx (2x)  = 2
-    return 3.0 * x**2 + 2.0
+    # d/dx (x^3) = 3x^2  # Derivada de x^3
+    # d/dx (2x)  = 2  # Derivada de 2x
+    return 3.0 * x**2 + 2.0  # Sumar derivadas
 
 
-# Probamos varios puntos para evitar que pase “por casualidad” en un solo x.
-xs = [-2.0, -0.5, 0.0, 1.0, 3.0]
-for x in xs:
+# Probamos varios puntos para evitar que pase "por casualidad" en un solo x.
+xs = [-2.0, -0.5, 0.0, 1.0, 3.0]  # Puntos de prueba
+for x in xs:  # Iterar sobre cada punto
     # Aproximación numérica.
-    approx = num_derivative_central(f, x, h=1e-6)
+    approx = num_derivative_central(f, x, h=1e-6)  # Calcular derivada numérica
     # Valor exacto (analítico).
-    exact = f_prime(x)
+    exact = f_prime(x)  # Calcular derivada exacta
     # np.isclose compara igualdad aproximada con tolerancias:
     # - rtol: tolerancia relativa (escala con el tamaño)
     # - atol: tolerancia absoluta (útil cerca de 0)
-    assert np.isclose(approx, exact, rtol=1e-6, atol=1e-6)
+    assert np.isclose(approx, exact, rtol=1e-6, atol=1e-6)  # Verificar coincidencia
 
 
 # Estudiamos cómo cambia el error con distintos h.
 # Nota: no imponemos monotonía estricta porque h extremadamente pequeño puede
 # empeorar por precisión de máquina.
-x0 = 1.234
-errs = []
-for h in [1e-2, 1e-4, 1e-6]:
+x0 = 1.234  # Punto fijo para análisis
+errs = []  # Lista para errores
+for h in [1e-2, 1e-4, 1e-6]:  # Probar diferentes tamaños de paso
     # Misma x0, distinto paso.
-    approx = num_derivative_central(f, x0, h=h)
+    approx = num_derivative_central(f, x0, h=h)  # Calcular aproximación
     # Error absoluto vs derivada analítica.
-    errs.append(abs(approx - f_prime(x0)))
+    errs.append(abs(approx - f_prime(x0)))  # Calcular y guardar error
 
 # Sanidad mínima: al refinar de 1e-2 a 1e-4, no debería empeorar.
-assert errs[1] <= errs[0] + 1e-6
+assert errs[1] <= errs[0] + 1e-6  # Verificar que error disminuya
 ```
 
 ---
@@ -1943,44 +1948,44 @@ Sea `f(x, y) = x^2 y + sin(y)`.
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def f_xy(x: float, y: float) -> float:
+def f_xy(x: float, y: float) -> float:  # Definir función de 2 variables
     # Función escalar de 2 variables:
     # f(x, y) = x^2 * y + sin(y)
-    return x**2 * y + np.sin(y)
+    return x**2 * y + np.sin(y)  # Evaluar función
 
 
-def grad_f_xy(x: float, y: float) -> np.ndarray:
+def grad_f_xy(x: float, y: float) -> np.ndarray:  # Definir gradiente analítico
     # Gradiente analítico (derivadas parciales):
-    # ∂f/∂x = 2xy
-    # ∂f/∂y = x^2 + cos(y)
-    dfdx = 2.0 * x * y
-    dfdy = x**2 + np.cos(y)
+    # ∂f/∂x = 2xy  # Derivada parcial respecto a x
+    # ∂f/∂y = x^2 + cos(y)  # Derivada parcial respecto a y
+    dfdx = 2.0 * x * y  # Calcular derivada respecto a x
+    dfdy = x**2 + np.cos(y)  # Calcular derivada respecto a y
     # Empaquetamos como vector [df/dx, df/dy].
-    return np.array([dfdx, dfdy], dtype=float)
+    return np.array([dfdx, dfdy], dtype=float)  # Devolver vector gradiente
 
 
-def num_grad_2d(f, x: float, y: float, h: float = 1e-6) -> np.ndarray:
+def num_grad_2d(f, x: float, y: float, h: float = 1e-6) -> np.ndarray:  # Definir gradiente numérico 2D
     # Gradiente numérico con diferencias centrales.
     # Para cada variable, perturbamos solo esa coordenada.
-    dfdx = (f(x + h, y) - f(x - h, y)) / (2.0 * h)
-    dfdy = (f(x, y + h) - f(x, y - h)) / (2.0 * h)
+    dfdx = (f(x + h, y) - f(x - h, y)) / (2.0 * h)  # Calcular derivada parcial respecto a x
+    dfdy = (f(x, y + h) - f(x, y - h)) / (2.0 * h)  # Calcular derivada parcial respecto a y
     # Vector gradiente.
-    return np.array([dfdx, dfdy], dtype=float)
+    return np.array([dfdx, dfdy], dtype=float)  # Devolver gradiente numérico
 
 
 # Punto de evaluación (no trivial para evitar simetrías).
-x0, y0 = 1.2, -0.7
+x0, y0 = 1.2, -0.7  # Punto de prueba
 
 # Gradiente analítico.
-g_anal = grad_f_xy(x0, y0)
+g_anal = grad_f_xy(x0, y0)  # Calcular gradiente analítico
 
 # Gradiente numérico (check independiente).
-g_num = num_grad_2d(f_xy, x0, y0)
+g_num = num_grad_2d(f_xy, x0, y0)  # Calcular gradiente numérico
 
 # Deben coincidir si las derivadas están bien.
-assert np.allclose(g_anal, g_num, rtol=1e-5, atol=1e-6)
+assert np.allclose(g_anal, g_num, rtol=1e-5, atol=1e-6)  # Verificar coincidencia
 ```
 
 ---
@@ -2004,43 +2009,43 @@ assert np.allclose(g_anal, g_num, rtol=1e-5, atol=1e-6)
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def f_xy(x: float, y: float) -> float:
+def f_xy(x: float, y: float) -> float:  # Definir función de 2 variables
     # Misma función del ejercicio anterior.
-    return x**2 * y + np.sin(y)
+    return x**2 * y + np.sin(y)  # Evaluar función
 
 
-def grad_f_xy(x: float, y: float) -> np.ndarray:
+def grad_f_xy(x: float, y: float) -> np.ndarray:  # Definir gradiente
     # ∇f(x,y) = [∂f/∂x, ∂f/∂y]
-    return np.array([2.0 * x * y, x**2 + np.cos(y)], dtype=float)
+    return np.array([2.0 * x * y, x**2 + np.cos(y)], dtype=float)  # Calcular gradiente
 
 
 # Punto base p0 = (x0, y0).
-x0, y0 = 0.5, 1.0
+x0, y0 = 0.5, 1.0  # Punto de evaluación
 
 # Gradiente en p0.
-g = grad_f_xy(x0, y0)
+g = grad_f_xy(x0, y0)  # Calcular gradiente en punto
 
 # Vector dirección (aún no unitario).
-u = np.array([3.0, 4.0], dtype=float)
+u = np.array([3.0, 4.0], dtype=float)  # Vector dirección inicial
 
 # La derivada direccional se define sobre u unitario: ||u|| = 1.
-u = u / np.linalg.norm(u)
+u = u / np.linalg.norm(u)  # Normalizar vector dirección
 
 # Derivada direccional analítica: D_u f = ∇f · u.
-dir_anal = float(np.dot(g, u))
+dir_anal = float(np.dot(g, u))  # Calcular producto punto
 
 # Verificación numérica: avanzamos/retrocedemos h sobre la recta p(t)=p0 + t u.
-h = 1e-6
-f_plus = f_xy(x0 + h * u[0], y0 + h * u[1])
-f_minus = f_xy(x0 - h * u[0], y0 - h * u[1])
+h = 1e-6  # Paso pequeño
+f_plus = f_xy(x0 + h * u[0], y0 + h * u[1])  # Evaluar función adelante
+f_minus = f_xy(x0 - h * u[0], y0 - h * u[1])  # Evaluar función atrás
 
 # Diferencia central en la dirección u.
-dir_num = float((f_plus - f_minus) / (2.0 * h))
+dir_num = float((f_plus - f_minus) / (2.0 * h))  # Calcular derivada direccional numérica
 
 # Comparación con tolerancia.
-assert np.isclose(dir_anal, dir_num, rtol=1e-5, atol=1e-6)
+assert np.isclose(dir_anal, dir_num, rtol=1e-5, atol=1e-6)  # Verificar coincidencia
 ```
 
 ---
@@ -2066,68 +2071,68 @@ Sea `g(x1,x2) = [x1^2 + x2, sin(x1 x2)]`.
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def g(x: np.ndarray) -> np.ndarray:
+def g(x: np.ndarray) -> np.ndarray:  # Definir función vectorial g
     # Función vectorial g: R^2 -> R^2.
     # Convertimos a float para evitar dtypes raros (int) y asegurar operaciones reales.
-    x1, x2 = float(x[0]), float(x[1])
+    x1, x2 = float(x[0]), float(x[1])  # Extraer componentes como float
     # Definimos:
     # g1 = x1^2 + x2
     # g2 = sin(x1 * x2)
-    return np.array([x1**2 + x2, np.sin(x1 * x2)], dtype=float)
+    return np.array([x1**2 + x2, np.sin(x1 * x2)], dtype=float)  # Devolver array con g1 y g2
 
 
-def J_analytical(x: np.ndarray) -> np.ndarray:
+def J_analytical(x: np.ndarray) -> np.ndarray:  # Definir Jacobiano analítico
     # Jacobiano J: matriz de derivadas parciales.
     # J[i, j] = ∂g_i / ∂x_j
     # Aquí hay 2 salidas y 2 entradas => J es 2x2.
-    x1, x2 = float(x[0]), float(x[1])
+    x1, x2 = float(x[0]), float(x[1])  # Extraer componentes como float
 
     # g1 = x1^2 + x2
     # ∂g1/∂x1 = 2x1
     # ∂g1/∂x2 = 1
-    dg1_dx1 = 2.0 * x1
-    dg1_dx2 = 1.0
+    dg1_dx1 = 2.0 * x1  # Derivada parcial de g1 respecto a x1
+    dg1_dx2 = 1.0  # Derivada parcial de g1 respecto a x2
 
     # g2 = sin(x1*x2)
     # Regla de la cadena:
     # ∂g2/∂x1 = cos(x1*x2) * x2
     # ∂g2/∂x2 = cos(x1*x2) * x1
-    dg2_dx1 = np.cos(x1 * x2) * x2
-    dg2_dx2 = np.cos(x1 * x2) * x1
+    dg2_dx1 = np.cos(x1 * x2) * x2  # Derivada parcial de g2 respecto a x1
+    dg2_dx2 = np.cos(x1 * x2) * x1  # Derivada parcial de g2 respecto a x2
 
     # Empaquetamos en una matriz 2x2.
-    return np.array([[dg1_dx1, dg1_dx2], [dg2_dx1, dg2_dx2]], dtype=float)
+    return np.array([[dg1_dx1, dg1_dx2], [dg2_dx1, dg2_dx2]], dtype=float)  # Devolver Jacobiano
 
 
-def J_numeric(g, x: np.ndarray, h: float = 1e-6) -> np.ndarray:
+def J_numeric(g, x: np.ndarray, h: float = 1e-6) -> np.ndarray:  # Definir Jacobiano numérico
     # Jacobiano numérico con diferencias centrales.
     # Para cada coordenada j, perturbamos x por ±h e_j y obtenemos la columna J[:, j].
-    x = x.astype(float)
+    x = x.astype(float)  # Convertir a float para operaciones
     # m: dimensión de salida, n: dimensión de entrada.
-    m = g(x).shape[0]
-    n = x.shape[0]
+    m = g(x).shape[0]  # Número de salidas
+    n = x.shape[0]  # Número de entradas
     # Inicializamos J.
-    J = np.zeros((m, n), dtype=float)
-    for j in range(n):
+    J = np.zeros((m, n), dtype=float)  # Inicializar Jacobiano con ceros
+    for j in range(n):  # Iterar sobre cada columna (dimensión de entrada)
         # Vector base e_j.
-        e = np.zeros(n)
-        e[j] = 1.0
+        e = np.zeros(n)  # Crear vector base
+        e[j] = 1.0  # Poner 1 en posición j
         # Diferencia central para todas las salidas a la vez.
-        J[:, j] = (g(x + h * e) - g(x - h * e)) / (2.0 * h)
-    return J
+        J[:, j] = (g(x + h * e) - g(x - h * e)) / (2.0 * h)  # Calcular columna j del Jacobiano
+    return J  # Devolver Jacobiano numérico
 
 
 # Punto de prueba.
-x0 = np.array([0.7, -1.1])
+x0 = np.array([0.7, -1.1])  # Punto de evaluación
 
 # Comparamos Jacobiano analítico vs numérico.
-Ja = J_analytical(x0)
-Jn = J_numeric(g, x0)
+Ja = J_analytical(x0)  # Calcular Jacobiano analítico
+Jn = J_numeric(g, x0)  # Calcular Jacobiano numérico
 
 # Si la derivación está correcta, deben ser casi iguales.
-assert np.allclose(Ja, Jn, rtol=1e-5, atol=1e-6)
+assert np.allclose(Ja, Jn, rtol=1e-5, atol=1e-6)  # Verificar que Jacobianos sean casi iguales
 ```
 
 ---
@@ -2153,21 +2158,21 @@ Sea `f(x1,x2) = x1^2 + 2 x2^2`.
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 # Para f(x1,x2)=x1^2 + 2x2^2:
-# - ∂²f/∂x1² = 2
-# - ∂²f/∂x2² = 4
-# - derivadas cruzadas = 0
-H = np.array([[2.0, 0.0], [0.0, 4.0]], dtype=float)
+# - ∂²f/∂x1² = 2  # Segunda derivada respecto a x1
+# - ∂²f/∂x2² = 4  # Segunda derivada respecto a x2
+# - derivadas cruzadas = 0  # Derivadas cruzadas son cero
+H = np.array([[2.0, 0.0], [0.0, 4.0]], dtype=float)  # Matriz Hessiana
 
 # El Hessiano de una función escalar dos-veces derivable debe ser simétrico.
-assert np.allclose(H, H.T)
+assert np.allclose(H, H.T)  # Verificar simetría
 
 # Hessiano definido positivo => función estrictamente convexa.
 # En particular, un criterio suficiente aquí es: eigenvalores > 0.
-eigvals = np.linalg.eigvals(H)
-assert np.all(eigvals > 0)
+eigvals = np.linalg.eigvals(H)  # Calcular eigenvalores
+assert np.all(eigvals > 0)  # Verificar que sean positivos
 ```
 
 ---
@@ -2193,42 +2198,42 @@ Minimiza `f(x) = (x - 3)^2` con Gradient Descent.
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def f(x: float) -> float:
+def f(x: float) -> float:  # Definir función de pérdida
     # Función convexa con mínimo global en x=3.
-    return (x - 3.0) ** 2
+    return (x - 3.0) ** 2  # Función cuadrática simple
 
 
-def grad_f(x: float) -> float:
+def grad_f(x: float) -> float:  # Definir gradiente
     # Derivada: d/dx (x-3)^2 = 2(x-3)
-    return 2.0 * (x - 3.0)
+    return 2.0 * (x - 3.0)  # Calcular gradiente
 
 
 # Inicialización.
-x = 10.0
+x = 10.0  # Punto inicial
 
 # Learning rate (tamaño de paso).
-alpha = 0.1
+alpha = 0.1  # Tasa de aprendizaje
 
 # Historial de iteraciones para inspección y asserts.
-history = []
-for _ in range(200):
+history = []  # Lista para guardar historial
+for _ in range(200):  # Iterar 200 veces
     # Gradiente en el punto actual.
-    g = grad_f(x)
+    g = grad_f(x)  # Calcular gradiente
     # Guardamos (x, f(x)) antes de actualizar.
-    history.append((x, f(x)))
+    history.append((x, f(x)))  # Guardar en historial
     # Criterio de parada: gradiente cerca de 0 => cerca del mínimo.
-    if abs(g) < 1e-8:
-        break
+    if abs(g) < 1e-8:  # Verificar si gradiente es pequeño
+        break  # Salir del bucle
     # Actualización de Gradient Descent.
-    x = x - alpha * g
+    x = x - alpha * g  # Actualizar x
 
 # Debe converger cerca de 3.
-assert abs(x - 3.0) < 1e-4
+assert abs(x - 3.0) < 1e-4  # Verificar convergencia al mínimo
 
 # La pérdida final no debería ser mayor que la inicial.
-assert history[-1][1] <= history[0][1]
+assert history[-1][1] <= history[0][1]  # Verificar que pérdida disminuyó
 ```
 
 ---
@@ -2254,34 +2259,34 @@ Minimiza `f(x)=x^2` con Gradient Descent desde `x0=1`.
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def run_gd_x2(alpha: float, steps: int = 10) -> np.ndarray:
+def run_gd_x2(alpha: float, steps: int = 10) -> np.ndarray:  # Definir función de GD
     # Minimizamos f(x)=x^2 con GD. Su gradiente es 2x.
-    x = 1.0
+    x = 1.0  # Punto inicial
     # Guardamos la trayectoria.
-    xs = [x]
-    for _ in range(steps):
+    xs = [x]  # Lista para historial
+    for _ in range(steps):  # Iterar pasos
         # Gradiente en el punto actual.
-        grad = 2.0 * x
+        grad = 2.0 * x  # Calcular gradiente
         # Paso de GD.
-        x = x - alpha * grad
+        x = x - alpha * grad  # Actualizar x
         # Guardamos el nuevo x.
-        xs.append(x)
+        xs.append(x)  # Agregar a historial
     # Convertimos a np.array para análisis.
-    return np.array(xs)
+    return np.array(xs)  # Devolver trayectoria
 
 
 # Con alpha=0.25, el factor (1-2α)=0.5 => converge.
-xs_good = run_gd_x2(alpha=0.25, steps=10)
+xs_good = run_gd_x2(alpha=0.25, steps=10)  # Ejecutar GD con alpha bueno
 
 # La magnitud debe decrecer.
-assert abs(xs_good[-1]) < abs(xs_good[0])
+assert abs(xs_good[-1]) < abs(xs_good[0])  # Verificar convergencia
 
 
 # Con alpha=1.1, |1-2α| = |1-2.2| = 1.2 > 1 => diverge.
-xs_bad = run_gd_x2(alpha=1.1, steps=10)
-assert abs(xs_bad[-1]) > abs(xs_bad[0])
+xs_bad = run_gd_x2(alpha=1.1, steps=10)  # Ejecutar GD con alpha malo
+assert abs(xs_bad[-1]) > abs(xs_bad[0])  # Verificar divergencia
 ```
 
 ---
@@ -2305,50 +2310,50 @@ assert abs(xs_bad[-1]) > abs(xs_bad[0])
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def f(w: np.ndarray) -> float:
+def f(w: np.ndarray) -> float:  # Definir función escalar
     # Función escalar sobre un vector: f(w) = sum_i w_i^3.
     # Convertimos a float para devolver un escalar Python.
-    return float(np.sum(w ** 3))
+    return float(np.sum(w ** 3))  # Sumar cubos de elementos
 
 
-def grad_analytical(w: np.ndarray) -> np.ndarray:
+def grad_analytical(w: np.ndarray) -> np.ndarray:  # Definir gradiente analítico
     # Gradiente analítico: ∂/∂w_i (w_i^3) = 3 w_i^2.
-    return 3.0 * (w ** 2)
+    return 3.0 * (w ** 2)  # Calcular 3*w_i^2 para cada elemento
 
 
-def grad_numeric(f, w: np.ndarray, h: float = 1e-6) -> np.ndarray:
+def grad_numeric(f, w: np.ndarray, h: float = 1e-6) -> np.ndarray:  # Definir gradiente numérico
     # Gradiente numérico con diferencias centrales.
     # Para cada coordenada i, perturbamos w por ±h e_i.
-    w = w.astype(float)
+    w = w.astype(float)  # Convertir a float
     # Vector de gradientes numéricos.
-    g = np.zeros_like(w)
-    for i in range(w.size):
+    g = np.zeros_like(w)  # Inicializar con ceros
+    for i in range(w.size):  # Iterar sobre cada elemento
         # Vector base e_i.
-        e = np.zeros_like(w)
-        e[i] = 1.0
+        e = np.zeros_like(w)  # Crear vector base
+        e[i] = 1.0  # Poner 1 en posición i
         # Diferencia central: ∂f/∂w_i ≈ (f(w+h e_i) - f(w-h e_i)) / (2h)
-        g[i] = (f(w + h * e) - f(w - h * e)) / (2.0 * h)
-    return g
+        g[i] = (f(w + h * e) - f(w - h * e)) / (2.0 * h)  # Calcular derivada parcial
+    return g  # Devolver gradiente numérico
 
 
 # Semilla para reproducibilidad.
-np.random.seed(0)
+np.random.seed(0)  # Fijar semilla
 
 # Vector de prueba.
-w = np.random.randn(5)
+w = np.random.randn(5)  # Vector aleatorio de 5 dimensiones
 
 # Gradientes analítico y numérico.
-g_a = grad_analytical(w)
-g_n = grad_numeric(f, w)
+g_a = grad_analytical(w)  # Calcular gradiente analítico
+g_n = grad_numeric(f, w)  # Calcular gradiente numérico
 
 # Error relativo: más robusto que el error absoluto porque normaliza escalas.
-eps = 1e-12
-rel_err = np.linalg.norm(g_n - g_a) / (np.linalg.norm(g_n) + np.linalg.norm(g_a) + eps)
+eps = 1e-12  # Pequeño valor para evitar división por cero
+rel_err = np.linalg.norm(g_n - g_a) / (np.linalg.norm(g_n) + np.linalg.norm(g_a) + eps)  # Calcular error relativo
 
 # Si falla, normalmente indica error en derivada o un h inapropiado.
-assert rel_err < 1e-7
+assert rel_err < 1e-7  # Verificar que error sea pequeño
 ```
 
 ---
@@ -2378,83 +2383,83 @@ Una neurona:
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def sigmoid(z: float) -> float:
+def sigmoid(z: float) -> float:  # Definir función sigmoide
     # Sigmoide σ(z) = 1 / (1 + exp(-z)).
     # Convertimos a float para devolver escalar.
-    return float(1.0 / (1.0 + np.exp(-z)))
+    return float(1.0 / (1.0 + np.exp(-z)))  # Calcular sigmoide y convertir a float
 
 
-def loss_mse(y_hat: float, y: float) -> float:
+def loss_mse(y_hat: float, y: float) -> float:  # Definir función de pérdida MSE
     # Pérdida MSE para un solo ejemplo: (ŷ - y)^2
-    return float((y_hat - y) ** 2)
+    return float((y_hat - y) ** 2)  # Calcular error cuadrático medio
 
 
-def forward(w: np.ndarray, b: float, x: np.ndarray, y: float) -> float:
+def forward(w: np.ndarray, b: float, x: np.ndarray, y: float) -> float:  # Definir forward pass
     # Forward de una neurona:
     # z = w·x + b
     # ŷ = σ(z)
     # L = (ŷ - y)^2
-    z = float(np.dot(w, x) + b)
-    y_hat = sigmoid(z)
-    return loss_mse(y_hat, y)
+    z = float(np.dot(w, x) + b)  # Calcular pre-activación: z = w·x + b
+    y_hat = sigmoid(z)  # Calcular activación: ŷ = σ(z)
+    return loss_mse(y_hat, y)  # Retornar pérdida MSE
 
 
-def grads_analytical(w: np.ndarray, b: float, x: np.ndarray, y: float):
+def grads_analytical(w: np.ndarray, b: float, x: np.ndarray, y: float):  # Definir gradientes analíticos
     # Gradientes analíticos vía Chain Rule.
-    z = float(np.dot(w, x) + b)
-    y_hat = sigmoid(z)
+    z = float(np.dot(w, x) + b)  # Calcular pre-activación
+    y_hat = sigmoid(z)  # Calcular activación
 
     # dL/dŷ cuando L=(ŷ-y)^2.
-    dL_dyhat = 2.0 * (y_hat - y)
+    dL_dyhat = 2.0 * (y_hat - y)  # Derivada de pérdida respecto a ŷ
     # dŷ/dz para sigmoide: σ'(z)=σ(z)(1-σ(z)).
-    dyhat_dz = y_hat * (1.0 - y_hat)
+    dyhat_dz = y_hat * (1.0 - y_hat)  # Derivada de sigmoide
     # Chain rule: dL/dz = dL/dŷ * dŷ/dz.
-    dL_dz = dL_dyhat * dyhat_dz
+    dL_dz = dL_dyhat * dyhat_dz  # Aplicar regla de la cadena
 
-    # z = w·x + b => dz/dw = x y dz/db = 1.
-    # Entonces:
-    # dL/dw = dL/dz * x
-    # dL/db = dL/dz
-    dL_dw = dL_dz * x
-    dL_db = dL_dz
-    return dL_dw.astype(float), float(dL_db)
+    # z = w·x + b => dz/dw = x y dz/db = 1.  # Derivadas de z respecto a pesos
+    # Entonces:  # Aplicando regla de la cadena
+    # dL/dw = dL/dz * x  # Gradiente respecto a w
+    # dL/db = dL/dz  # Gradiente respecto a b
+    dL_dw = dL_dz * x  # Calcular gradiente de w
+    dL_db = dL_dz  # Calcular gradiente de b
+    return dL_dw.astype(float), float(dL_db)  # Devolver gradientes como float
 
 
-def grads_numeric(w: np.ndarray, b: float, x: np.ndarray, y: float, h: float = 1e-6):
+def grads_numeric(w: np.ndarray, b: float, x: np.ndarray, y: float, h: float = 1e-6):  # Definir gradientes numéricos
     # Gradientes numéricos por diferencias centrales.
-    gw = np.zeros_like(w, dtype=float)
-    for i in range(w.size):
+    gw = np.zeros_like(w, dtype=float)  # Inicializar gradiente de w con ceros
+    for i in range(w.size):  # Iterar sobre cada elemento de w
         # Vector base e_i.
-        e = np.zeros_like(w)
-        e[i] = 1.0
+        e = np.zeros_like(w)  # Crear vector base
+        e[i] = 1.0  # Poner 1 en posición i
         # ∂L/∂w_i ≈ (L(w+h e_i) - L(w-h e_i)) / (2h)
-        gw[i] = (forward(w + h * e, b, x, y) - forward(w - h * e, b, x, y)) / (2.0 * h)
+        gw[i] = (forward(w + h * e, b, x, y) - forward(w - h * e, b, x, y)) / (2.0 * h)  # Calcular gradiente numérico
 
     # ∂L/∂b ≈ (L(b+h) - L(b-h)) / (2h)
-    gb = (forward(w, b + h, x, y) - forward(w, b - h, x, y)) / (2.0 * h)
-    return gw, float(gb)
+    gb = (forward(w, b + h, x, y) - forward(w, b - h, x, y)) / (2.0 * h)  # Calcular gradiente de b
+    return gw, float(gb)  # Devolver gradientes numéricos
 
 
 # Reproducibilidad.
-np.random.seed(1)
+np.random.seed(1)  # Fijar semilla para reproducibilidad
 
 # Parámetros y entrada de ejemplo.
-w = np.random.randn(3)
-b = 0.1
-x = np.random.randn(3)
+w = np.random.randn(3)  # Pesos aleatorios de 3 dimensiones
+b = 0.1  # Sesgo inicial
+x = np.random.randn(3)  # Entrada aleatoria de 3 dimensiones
 
 # Etiqueta objetivo.
-y = 1.0
+y = 1.0  # Salida deseada
 
 # Comparamos gradientes.
-gw_a, gb_a = grads_analytical(w, b, x, y)
-gw_n, gb_n = grads_numeric(w, b, x, y)
+gw_a, gb_a = grads_analytical(w, b, x, y)  # Calcular gradientes analíticos
+gw_n, gb_n = grads_numeric(w, b, x, y)  # Calcular gradientes numéricos
 
 # Si la derivación por chain rule está bien, deben coincidir.
-assert np.allclose(gw_a, gw_n, rtol=1e-5, atol=1e-6)
-assert np.isclose(gb_a, gb_n, rtol=1e-5, atol=1e-6)
+assert np.allclose(gw_a, gw_n, rtol=1e-5, atol=1e-6)  # Verificar gradiente de w
+assert np.isclose(gb_a, gb_n, rtol=1e-5, atol=1e-6)  # Verificar gradiente de b
 ```
 
 ---
@@ -2470,23 +2475,23 @@ Gradient Descent Demo - Visualización de Optimización
 Este script implementa Gradient Descent desde cero y visualiza
 la trayectoria de optimización en diferentes funciones.
 
-Autor: [Tu nombre]
-Módulo: 03 - Cálculo Multivariante
+Autor: [Tu nombre]  # Nombre del autor
+Módulo: 03 - Cálculo Multivariante  # Módulo al que pertenece
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from typing import Callable, Tuple, List
+import numpy as np  # Importar librería para computación numérica
+import matplotlib.pyplot as plt  # Importar librería para visualización
+from typing import Callable, Tuple, List  # Importar tipos para anotaciones
 
 
-def gradient_descent(
-    f: Callable[[np.ndarray], float],
-    grad_f: Callable[[np.ndarray], np.ndarray],
-    x0: np.ndarray,
-    learning_rate: float = 0.1,
-    max_iterations: int = 100,
-    tolerance: float = 1e-8
-) -> Tuple[np.ndarray, List[np.ndarray], List[float]]:
+def gradient_descent(  # Definir función de descenso por gradiente
+    f: Callable[[np.ndarray], float],  # Función objetivo a minimizar
+    grad_f: Callable[[np.ndarray], np.ndarray],  # Gradiente de la función
+    x0: np.ndarray,  # Punto inicial de optimización
+    learning_rate: float = 0.1,  # Tasa de aprendizaje (alpha)
+    max_iterations: int = 100,  # Máximo número de iteraciones
+    tolerance: float = 1e-8  # Criterio de convergencia por gradiente
+) -> Tuple[np.ndarray, List[np.ndarray], List[float]]:  # Tipos de retorno
     """
     Implementación de Gradient Descent.
 
@@ -2501,136 +2506,136 @@ def gradient_descent(
     Returns:
         x_final, history_x, history_f
     """
-    x = x0.copy().astype(float)
-    history_x = [x.copy()]
-    history_f = [f(x)]
+    x = x0.copy().astype(float)  # Copiar punto inicial y convertir a float
+    history_x = [x.copy()]  # Guardar histórico de posiciones
+    history_f = [f(x)]  # Guardar histórico de valores de función
 
-    for i in range(max_iterations):
-        grad = grad_f(x)
+    for i in range(max_iterations):  # Iterar hasta máximo de iteraciones
+        grad = grad_f(x)  # Calcular gradiente en punto actual
 
-        if np.linalg.norm(grad) < tolerance:
-            break
+        if np.linalg.norm(grad) < tolerance:  # Verificar criterio de convergencia
+            break  # Salir si gradiente es pequeño
 
-        x = x - learning_rate * grad
-        history_x.append(x.copy())
-        history_f.append(f(x))
+        x = x - learning_rate * grad  # Actualizar posición: x = x - α∇f
+        history_x.append(x.copy())  # Guardar nueva posición
+        history_f.append(f(x))  # Guardar nuevo valor de función
 
-    return x, history_x, history_f
+    return x, history_x, history_f  # Devolver posición final e históricos
 
 
-def visualize_optimization(
-    f: Callable,
-    grad_f: Callable,
-    x0: np.ndarray,
-    learning_rate: float,
-    title: str,
-    xlim: Tuple[float, float] = (-5, 5),
-    ylim: Tuple[float, float] = (-5, 5)
-):
+def visualize_optimization(  # Definir función para visualizar optimización
+    f: Callable,  # Función objetivo
+    grad_f: Callable,  # Gradiente de la función
+    x0: np.ndarray,  # Punto inicial
+    learning_rate: float,  # Tasa de aprendizaje
+    title: str,  # Título para la gráfica
+    xlim: Tuple[float, float] = (-5, 5),  # Límites en eje x
+    ylim: Tuple[float, float] = (-5, 5)  # Límites en eje y
+):  # Cerrar definición de función de visualización
     """Visualiza la trayectoria de optimización."""
 
-    x_final, history_x, history_f = gradient_descent(
-        f, grad_f, x0, learning_rate, max_iterations=50
-    )
+    x_final, history_x, history_f = gradient_descent(  # Ejecutar descenso por gradiente
+        f, grad_f, x0, learning_rate, max_iterations=50  # Con máximo 50 iteraciones
+    )  # Cerrar llamada a gradient_descent
 
     # Crear grid para contornos
-    x = np.linspace(xlim[0], xlim[1], 100)
-    y = np.linspace(ylim[0], ylim[1], 100)
-    X, Y = np.meshgrid(x, y)
-    Z = np.array([[f(np.array([xi, yi])) for xi, yi in zip(row_x, row_y)]
-                  for row_x, row_y in zip(X, Y)])
+    x = np.linspace(xlim[0], xlim[1], 100)  # Crear 100 puntos en eje x
+    y = np.linspace(ylim[0], ylim[1], 100)  # Crear 100 puntos en eje y
+    X, Y = np.meshgrid(x, y)  # Crear malla 2D
+    Z = np.array([[f(np.array([xi, yi])) for xi, yi in zip(row_x, row_y)]  # Evaluar función en cada punto
+                  for row_x, row_y in zip(X, Y)])  # Usando list comprehension anidada
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))  # Crear figura con 2 subgráficos
 
     # Plot 1: Contornos y trayectoria
-    ax1 = axes[0]
-    contour = ax1.contour(X, Y, Z, levels=30, cmap='viridis')
-    ax1.clabel(contour, inline=True, fontsize=8)
+    ax1 = axes[0]  # Primer subplot para contornos
+    contour = ax1.contour(X, Y, Z, levels=30, cmap='viridis')  # Dibujar contornos
+    ax1.clabel(contour, inline=True, fontsize=8)  # Etiquetar niveles de contorno
 
     # Trayectoria
-    history_x = np.array(history_x)
-    ax1.plot(history_x[:, 0], history_x[:, 1], 'r.-', markersize=8, linewidth=1.5)
-    ax1.plot(history_x[0, 0], history_x[0, 1], 'go', markersize=12, label='Inicio')
-    ax1.plot(history_x[-1, 0], history_x[-1, 1], 'r*', markersize=15, label='Final')
+    history_x = np.array(history_x)  # Convertir histórico a array numpy
+    ax1.plot(history_x[:, 0], history_x[:, 1], 'r.-', markersize=8, linewidth=1.5)  # Dibujar trayectoria
+    ax1.plot(history_x[0, 0], history_x[0, 1], 'go', markersize=12, label='Inicio')  # Marcar inicio
+    ax1.plot(history_x[-1, 0], history_x[-1, 1], 'r*', markersize=15, label='Final')  # Marcar final
 
-    ax1.set_xlabel('x')
-    ax1.set_ylabel('y')
-    ax1.set_title(f'{title}\nα = {learning_rate}')
-    ax1.legend()
-    ax1.set_xlim(xlim)
-    ax1.set_ylim(ylim)
+    ax1.set_xlabel('x')  # Etiqueta eje x
+    ax1.set_ylabel('y')  # Etiqueta eje y
+    ax1.set_title(f'{title}\nα = {learning_rate}')  # Título con tasa de aprendizaje
+    ax1.legend()  # Mostrar leyenda
+    ax1.set_xlim(xlim)  # Establecer límites x
+    ax1.set_ylim(ylim)  # Establecer límites y
 
     # Plot 2: Convergencia
-    ax2 = axes[1]
-    ax2.semilogy(history_f, 'b-o', markersize=4)
-    ax2.set_xlabel('Iteración')
-    ax2.set_ylabel('f(x) (escala log)')
-    ax2.set_title('Convergencia')
-    ax2.grid(True)
+    ax2 = axes[1]  # Segundo subplot para convergencia
+    ax2.semilogy(history_f, 'b-o', markersize=4)  # Gráfico logarítmico de convergencia
+    ax2.set_xlabel('Iteración')  # Etiqueta eje x
+    ax2.set_ylabel('f(x) (escala log)')  # Etiqueta eje y
+    ax2.set_title('Convergencia')  # Título
+    ax2.grid(True)  # Activar cuadrícula
 
-    plt.tight_layout()
-    plt.savefig(f'gd_{title.lower().replace(" ", "_")}.png', dpi=150)
-    plt.show()
+    plt.tight_layout()  # Ajustar diseño automáticamente
+    plt.savefig(f'gd_{title.lower().replace(" ", "_")}.png', dpi=150)  # Guardar gráfico
+    plt.show()  # Mostrar gráfico en pantalla
 
-    print(f"\n{title}")
-    print(f"  Punto inicial: {x0}")
-    print(f"  Mínimo encontrado: {x_final}")
-    print(f"  f(mínimo): {f(x_final):.6f}")
-    print(f"  Iteraciones: {len(history_f)}")
+    print(f"\n{title}")  # Imprimir título del resultado
+    print(f"  Punto inicial: {x0}")  # Mostrar punto inicial
+    print(f"  Mínimo encontrado: {x_final}")  # Mostrar punto mínimo encontrado
+    print(f"  f(mínimo): {f(x_final):.6f}")  # Mostrar valor mínimo con 6 decimales
+    print(f"  Iteraciones: {len(history_f)}")  # Mostrar número de iteraciones
 
 
-def main():
+def main():  # Definir función principal
     """Ejecutar demos."""
 
     # === Función 1: Paraboloide ===
-    def paraboloid(p):
-        return p[0]**2 + p[1]**2
+    def paraboloid(p):  # Definir paraboloide simple
+        return p[0]**2 + p[1]**2  # f(x,y) = x² + y²
 
-    def grad_paraboloid(p):
-        return np.array([2*p[0], 2*p[1]])
+    def grad_paraboloid(p):  # Gradiente del paraboloide
+        return np.array([2*p[0], 2*p[1]])  # ∇f = [2x, 2y]
 
-    visualize_optimization(
-        paraboloid, grad_paraboloid,
-        x0=np.array([4.0, 3.0]),
-        learning_rate=0.1,
-        title="Paraboloide f(x,y) = x² + y²"
-    )
+    visualize_optimization(  # Visualizar optimización del paraboloide
+        paraboloid, grad_paraboloid,  # Función y gradiente
+        x0=np.array([4.0, 3.0]),  # Punto inicial
+        learning_rate=0.1,  # Tasa de aprendizaje
+        title="Paraboloide f(x,y) = x² + y²"  # Título
+    )  # Cerrar llamada a visualize_optimization para paraboloide
 
     # === Función 2: Rosenbrock (más difícil) ===
-    def rosenbrock(p):
-        return (1 - p[0])**2 + 100*(p[1] - p[0]**2)**2
+    def rosenbrock(p):  # Definir función de Rosenbrock
+        return (1 - p[0])**2 + 100*(p[1] - p[0]**2)**2  # f(x,y) = (1-x)² + 100(y-x²)²
 
-    def grad_rosenbrock(p):
-        dx = -2*(1 - p[0]) - 400*p[0]*(p[1] - p[0]**2)
-        dy = 200*(p[1] - p[0]**2)
-        return np.array([dx, dy])
+    def grad_rosenbrock(p):  # Gradiente de Rosenbrock
+        dx = -2*(1 - p[0]) - 400*p[0]*(p[1] - p[0]**2)  # Derivada respecto a x
+        dy = 200*(p[1] - p[0]**2)  # Derivada respecto a y
+        return np.array([dx, dy])  # Retornar gradiente
 
-    visualize_optimization(
-        rosenbrock, grad_rosenbrock,
-        x0=np.array([-1.0, 1.0]),
-        learning_rate=0.001,
-        title="Rosenbrock f(x,y) = (1-x)² + 100(y-x²)²",
-        xlim=(-2, 2),
-        ylim=(-1, 3)
-    )
+    visualize_optimization(  # Visualizar optimización de Rosenbrock
+        rosenbrock, grad_rosenbrock,  # Función y gradiente
+        x0=np.array([-1.0, 1.0]),  # Punto inicial
+        learning_rate=0.001,  # Tasa de aprendizaje pequeña
+        title="Rosenbrock f(x,y) = (1-x)² + 100(y-x²)²",  # Título
+        xlim=(-2, 2),  # Límites en x
+        ylim=(-1, 3)  # Límites en y
+    )  # Cerrar llamada a visualize_optimization para Rosenbrock
 
     # === Función 3: Cuadrática elíptica ===
-    def elliptic(p):
-        return p[0]**2 + 10*p[1]**2
+    def elliptic(p):  # Definir función elíptica
+        return p[0]**2 + 10*p[1]**2  # f(x,y) = x² + 10y²
 
-    def grad_elliptic(p):
-        return np.array([2*p[0], 20*p[1]])
+    def grad_elliptic(p):  # Gradiente de función elíptica
+        return np.array([2*p[0], 20*p[1]])  # ∇f = [2x, 20y]
 
-    visualize_optimization(
-        elliptic, grad_elliptic,
-        x0=np.array([4.0, 2.0]),
-        learning_rate=0.05,
-        title="Elíptica f(x,y) = x² + 10y²"
-    )
+    visualize_optimization(  # Visualizar optimización elíptica
+        elliptic, grad_elliptic,  # Función y gradiente
+        x0=np.array([4.0, 2.0]),  # Punto inicial
+        learning_rate=0.05,  # Tasa de aprendizaje
+        title="Elíptica f(x,y) = x² + 10y²"  # Título
+    )  # Cerrar llamada a visualize_optimization para función elíptica
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__":  # Si se ejecuta como script
+    main()  # Ejecutar función principal
 
 ```
 
@@ -2645,18 +2650,18 @@ if __name__ == "__main__":
 Gradient Checking - Validación de Derivadas
 Técnica estándar de CS231n Stanford para debugging de backprop.
 
-Autor: [Tu nombre]
-Módulo: 03 - Cálculo Multivariante
+Autor: [Tu nombre]  # Nombre del autor
+Módulo: 03 - Cálculo Multivariante  # Módulo al que pertenece
 """
-import numpy as np
-from typing import Callable, Dict, Tuple
+import numpy as np  # Importar librería para computación numérica
+from typing import Callable, Dict, Tuple  # Importar tipos para anotaciones
 
 
-def numerical_gradient(
-    f: Callable[[np.ndarray], float],
-    x: np.ndarray,
-    epsilon: float = 1e-5
-) -> np.ndarray:
+def numerical_gradient(  # Definir función para calcular gradiente numérico
+    f: Callable[[np.ndarray], float],  # Función escalar a minimizar
+    x: np.ndarray,  # Punto donde calcular el gradiente (vector)
+    epsilon: float = 1e-5  # Tamaño pequeño del paso para diferencias
+) -> np.ndarray:  # Retornar array numpy con gradiente
     """
     Calcula el gradiente numérico usando diferencias centrales.
 
@@ -2668,37 +2673,37 @@ def numerical_gradient(
     Returns:
         Gradiente numérico aproximado
     """
-    grad = np.zeros_like(x)
+    grad = np.zeros_like(x)  # Inicializar gradiente con ceros del mismo tamaño que x
 
     # Iterar sobre cada dimensión
-    it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
-    while not it.finished:
-        idx = it.multi_index
-        old_value = x[idx]
+    it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])  # Iterador multidimensional
+    while not it.finished:  # Mientras haya elementos por procesar
+        idx = it.multi_index  # Obtener índice multidimensional actual
+        old_value = x[idx]  # Guardar valor original para restaurar después
 
         # f(x + epsilon)
-        x[idx] = old_value + epsilon
-        fx_plus = f(x)
+        x[idx] = old_value + epsilon  # Perturbar elemento con +epsilon
+        fx_plus = f(x)  # Evaluar función en x + epsilon
 
         # f(x - epsilon)
-        x[idx] = old_value - epsilon
-        fx_minus = f(x)
+        x[idx] = old_value - epsilon  # Perturbar elemento con -epsilon
+        fx_minus = f(x)  # Evaluar función en x - epsilon
 
         # Diferencias centrales: (f(x+ε) - f(x-ε)) / 2ε
-        grad[idx] = (fx_plus - fx_minus) / (2 * epsilon)
+        grad[idx] = (fx_plus - fx_minus) / (2 * epsilon)  # Calcular derivada central
 
         # Restaurar valor original
-        x[idx] = old_value
-        it.iternext()
+        x[idx] = old_value  # Restaurar valor original del elemento
+        it.iternext()  # Avanzar al siguiente elemento del iterador
 
-    return grad
+    return grad  # Devolver gradiente numérico calculado
 
 
-def gradient_check(
-    analytic_grad: np.ndarray,
-    numerical_grad: np.ndarray,
-    threshold: float = 1e-7
-) -> Tuple[bool, float]:
+def gradient_check(  # Definir función para comparar gradientes
+    analytic_grad: np.ndarray,  # Gradiente calculado analíticamente
+    numerical_grad: np.ndarray,  # Gradiente calculado numéricamente
+    threshold: float = 1e-7  # Umbral de error aceptable
+) -> Tuple[bool, float]:  # Retornar tupla con resultado y error
     """
     Compara gradiente analítico vs numérico.
 
@@ -2711,182 +2716,182 @@ def gradient_check(
         (passed, relative_error)
     """
     # Error relativo: ||a - n|| / (||a|| + ||n||)
-    diff = np.linalg.norm(analytic_grad - numerical_grad)
-    norm_sum = np.linalg.norm(analytic_grad) + np.linalg.norm(numerical_grad)
+    diff = np.linalg.norm(analytic_grad - numerical_grad)  # Calcular norma de la diferencia
+    norm_sum = np.linalg.norm(analytic_grad) + np.linalg.norm(numerical_grad)  # Sumar normas
 
-    if norm_sum == 0:
-        relative_error = 0.0
-    else:
-        relative_error = diff / norm_sum
+    if norm_sum == 0:  # Evitar división por cero
+        relative_error = 0.0  # Si ambas normas son cero, error es cero
+    else:  # Si la suma de normas no es cero
+        relative_error = diff / norm_sum  # Calcular error relativo
 
-    passed = relative_error < threshold
-    return passed, relative_error
+    passed = relative_error < threshold  # Verificar si está bajo el umbral
+    return passed, relative_error  # Devolver resultado y error
 
 
 # === EJEMPLO: Validar gradiente de MSE Loss ===
 
-def mse_loss(y_pred: np.ndarray, y_true: np.ndarray) -> float:
+def mse_loss(y_pred: np.ndarray, y_true: np.ndarray) -> float:  # Definir función de pérdida MSE
     """Mean Squared Error."""
-    return float(np.mean((y_pred - y_true) ** 2))
+    return float(np.mean((y_pred - y_true) ** 2))  # Calcular promedio de errores cuadráticos
 
-def mse_gradient_analytic(y_pred: np.ndarray, y_true: np.ndarray) -> np.ndarray:
+def mse_gradient_analytic(y_pred: np.ndarray, y_true: np.ndarray) -> np.ndarray:  # Definir gradiente analítico MSE
     """Gradiente analítico de MSE respecto a y_pred."""
-    n = len(y_true)
-    return 2 * (y_pred - y_true) / n
+    n = len(y_true)  # Obtener número de muestras
+    return 2 * (y_pred - y_true) / n  # Calcular derivada: 2(y_pred - y_true)/n
 
 
-def test_mse_gradient():
+def test_mse_gradient():  # Definir función para probar gradiente MSE
     """Test: Validar gradiente de MSE."""
-    print("=" * 60)
-    print("GRADIENT CHECK: MSE Loss")
-    print("=" * 60)
+    print("=" * 60)  # Imprimir línea separadora
+    print("GRADIENT CHECK: MSE Loss")  # Imprimir título
+    print("=" * 60)  # Imprimir línea separadora
 
-    np.random.seed(42)
-    y_pred = np.random.randn(10)
-    y_true = np.random.randn(10)
+    np.random.seed(42)  # Fijar semilla para reproducibilidad
+    y_pred = np.random.randn(10)  # Generar predicciones aleatorias
+    y_true = np.random.randn(10)  # Generar valores verdaderos aleatorios
 
     # Gradiente analítico
-    grad_analytic = mse_gradient_analytic(y_pred, y_true)
+    grad_analytic = mse_gradient_analytic(y_pred, y_true)  # Calcular gradiente analítico
 
     # Gradiente numérico
-    def loss_fn(pred):
-        return mse_loss(pred, y_true)
+    def loss_fn(pred):  # Definir función de pérdida interna
+        return mse_loss(pred, y_true)  # Retornar pérdida MSE
 
-    grad_numerical = numerical_gradient(loss_fn, y_pred.copy())
+    grad_numerical = numerical_gradient(loss_fn, y_pred.copy())  # Calcular gradiente numérico
 
     # Comparar
-    passed, error = gradient_check(grad_analytic, grad_numerical)
+    passed, error = gradient_check(grad_analytic, grad_numerical)  # Comparar gradientes
 
-    print(f"Gradiente Analítico: {grad_analytic[:3]}...")
-    print(f"Gradiente Numérico:  {grad_numerical[:3]}...")
-    print(f"Error Relativo: {error:.2e}")
-    print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")
+    print(f"Gradiente Analítico: {grad_analytic[:3]}...")  # Mostrar primeros 3 valores
+    print(f"Gradiente Numérico:  {grad_numerical[:3]}...")  # Mostrar primeros 3 valores
+    print(f"Error Relativo: {error:.2e}")  # Mostrar error en notación científica
+    print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")  # Mostrar resultado
 
-    return passed
+    return passed  # Devolver si pasó la prueba
 
 
 # === EJEMPLO: Validar gradiente de Sigmoid ===
 
-def sigmoid(z: np.ndarray) -> np.ndarray:
+def sigmoid(z: np.ndarray) -> np.ndarray:  # Definir función sigmoide
     """Sigmoid activation."""
-    return 1 / (1 + np.exp(-z))
+    return 1 / (1 + np.exp(-z))  # Calcular sigmoide: 1/(1+e^-z)
 
-def sigmoid_derivative_analytic(z: np.ndarray) -> np.ndarray:
+def sigmoid_derivative_analytic(z: np.ndarray) -> np.ndarray:  # Definir derivada sigmoide
     """Derivada analítica: σ'(z) = σ(z)(1 - σ(z))"""
-    s = sigmoid(z)
-    return s * (1 - s)
+    s = sigmoid(z)  # Calcular sigmoide
+    return s * (1 - s)  # Calcular derivada: σ(1-σ)
 
 
-def test_sigmoid_gradient():
+def test_sigmoid_gradient():  # Definir función para probar gradiente sigmoide
     """Test: Validar derivada de sigmoid."""
-    print("\n" + "=" * 60)
-    print("GRADIENT CHECK: Sigmoid Derivative")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Imprimir línea separadora con salto
+    print("GRADIENT CHECK: Sigmoid Derivative")  # Imprimir título
+    print("=" * 60)  # Imprimir línea separadora
 
-    np.random.seed(42)
-    z = np.random.randn(5)
+    np.random.seed(42)  # Fijar semilla para reproducibilidad
+    z = np.random.randn(5)  # Generar valores aleatorios para sigmoide
 
     # Derivada analítica
-    grad_analytic = sigmoid_derivative_analytic(z)
+    grad_analytic = sigmoid_derivative_analytic(z)  # Calcular derivada analítica
 
     # Derivada numérica (para cada elemento)
-    def sigmoid_element(z_arr):
+    def sigmoid_element(z_arr):  # Definir función auxiliar para gradiente numérico
         return float(np.sum(sigmoid(z_arr)))  # Suma para tener escalar
 
-    grad_numerical = numerical_gradient(sigmoid_element, z.copy())
+    grad_numerical = numerical_gradient(sigmoid_element, z.copy())  # Calcular gradiente numérico
 
     # Comparar
-    passed, error = gradient_check(grad_analytic, grad_numerical)
+    passed, error = gradient_check(grad_analytic, grad_numerical)  # Comparar gradientes
 
-    print(f"Derivada Analítica: {grad_analytic}")
-    print(f"Derivada Numérica:  {grad_numerical}")
-    print(f"Error Relativo: {error:.2e}")
-    print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")
+    print(f"Derivada Analítica: {grad_analytic}")  # Mostrar derivada analítica
+    print(f"Derivada Numérica:  {grad_numerical}")  # Mostrar derivada numérica
+    print(f"Error Relativo: {error:.2e}")  # Mostrar error en notación científica
+    print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")  # Mostrar resultado
 
-    return passed
+    return passed  # Devolver si pasó la prueba
 
 
 # === EJEMPLO: Validar gradiente de una capa lineal ===
 
-def test_linear_layer_gradient():
+def test_linear_layer_gradient():  # Definir función para probar gradiente de capa lineal
     """Test: Validar gradiente de capa lineal y = Wx + b."""
-    print("\n" + "=" * 60)
-    print("GRADIENT CHECK: Linear Layer (y = Wx + b)")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Imprimir línea separadora con salto
+    print("GRADIENT CHECK: Linear Layer (y = Wx + b)")  # Imprimir título
+    print("=" * 60)  # Imprimir línea separadora
 
-    np.random.seed(42)
+    np.random.seed(42)  # Fijar semilla para reproducibilidad
 
     # Dimensiones
-    n_in, n_out = 4, 3
+    n_in, n_out = 4, 3  # Definir dimensiones de entrada y salida
 
     # Parámetros
-    W = np.random.randn(n_out, n_in)
-    b = np.random.randn(n_out)
-    x = np.random.randn(n_in)
-    y_true = np.random.randn(n_out)
+    W = np.random.randn(n_out, n_in)  # Inicializar pesos aleatorios
+    b = np.random.randn(n_out)  # Inicializar sesgos aleatorios
+    x = np.random.randn(n_in)  # Generar entrada aleatoria
+    y_true = np.random.randn(n_out)  # Generar salida verdadera aleatoria
 
     # Forward + Loss
-    def forward_and_loss(W_flat):
-        W_reshaped = W_flat.reshape(n_out, n_in)
-        y_pred = W_reshaped @ x + b
-        return mse_loss(y_pred, y_true)
+    def forward_and_loss(W_flat):  # Definir función para forward y pérdida
+        W_reshaped = W_flat.reshape(n_out, n_in)  # Redimensionar pesos
+        y_pred = W_reshaped @ x + b  # Calcular predicción: Wx + b
+        return mse_loss(y_pred, y_true)  # Retornar pérdida MSE
 
     # Gradiente analítico de W
-    y_pred = W @ x + b
-    dL_dy = 2 * (y_pred - y_true) / n_out  # Gradiente de MSE
-    dL_dW_analytic = np.outer(dL_dy, x)    # ∂L/∂W = ∂L/∂y · x^T
+    y_pred = W @ x + b  # Calcular predicción actual
+    dL_dy = 2 * (y_pred - y_true) / n_out  # Gradiente de MSE respecto a y
+    dL_dW_analytic = np.outer(dL_dy, x)    # ∂L/∂W = ∂L/∂y · x^T (producto externo)
 
     # Gradiente numérico de W
-    dL_dW_numerical = numerical_gradient(forward_and_loss, W.flatten().copy())
-    dL_dW_numerical = dL_dW_numerical.reshape(n_out, n_in)
+    dL_dW_numerical = numerical_gradient(forward_and_loss, W.flatten().copy())  # Calcular gradiente numérico
+    dL_dW_numerical = dL_dW_numerical.reshape(n_out, n_in)  # Redimensionar gradiente
 
     # Comparar
-    passed, error = gradient_check(
-        dL_dW_analytic.flatten(),
-        dL_dW_numerical.flatten()
-    )
+    passed, error = gradient_check(  # Comparar gradientes
+        dL_dW_analytic.flatten(),  # Aplanar gradiente analítico
+        dL_dW_numerical.flatten()  # Aplanar gradiente numérico
+    )  # Cerrar llamada a gradient_check
 
-    print(f"Error Relativo: {error:.2e}")
-    print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")
+    print(f"Error Relativo: {error:.2e}")  # Mostrar error en notación científica
+    print(f"Resultado: {'✓ PASSED' if passed else '✗ FAILED'}")  # Mostrar resultado
 
-    return passed
+    return passed  # Devolver si pasó la prueba
 
 
-def main():
+def main():  # Definir función principal
     """Ejecutar todos los gradient checks."""
-    print("\n" + "=" * 60)
-    print("       GRADIENT CHECKING SUITE")
-    print("       Validación Matemática v3.3")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Imprimir línea separadora con salto
+    print("       GRADIENT CHECKING SUITE")  # Imprimir título
+    print("       Validación Matemática v3.3")  # Imprimir versión
+    print("=" * 60)  # Imprimir línea separadora
 
-    results = []
-    results.append(("MSE Loss", test_mse_gradient()))
-    results.append(("Sigmoid", test_sigmoid_gradient()))
-    results.append(("Linear Layer", test_linear_layer_gradient()))
+    results = []  # Inicializar lista de resultados
+    results.append(("MSE Loss", test_mse_gradient()))  # Ejecutar test MSE
+    results.append(("Sigmoid", test_sigmoid_gradient()))  # Ejecutar test sigmoide
+    results.append(("Linear Layer", test_linear_layer_gradient()))  # Ejecutar test capa lineal
 
-    print("\n" + "=" * 60)
-    print("RESUMEN")
-    print("=" * 60)
+    print("\n" + "=" * 60)  # Imprimir línea separadora con salto
+    print("RESUMEN")  # Imprimir título resumen
+    print("=" * 60)  # Imprimir línea separadora
 
-    all_passed = True
-    for name, passed in results:
-        status = "✓ PASSED" if passed else "✗ FAILED"
-        print(f"  {name}: {status}")
-        all_passed = all_passed and passed
+    all_passed = True  # Inicializar bandera de todos pasados
+    for name, passed in results:  # Iterar sobre resultados
+        status = "✓ PASSED" if passed else "✗ FAILED"  # Determinar estado
+        print(f"  {name}: {status}")  # Mostrar resultado
+        all_passed = all_passed and passed  # Actualizar bandera
 
-    print("-" * 60)
-    if all_passed:
-        print("✓ TODOS LOS GRADIENT CHECKS PASARON")
-        print("  Tu implementación de derivadas es correcta.")
-    else:
-        print("✗ ALGUNOS GRADIENT CHECKS FALLARON")
-        print("  Revisa tu implementación de backprop.")
+    print("-" * 60)  # Imprimir línea separadora
+    if all_passed:  # Si todos pasaron
+        print("✓ TODOS LOS GRADIENT CHECKS PASARON")  # Mensaje de éxito
+        print("  Tu implementación de derivadas es correcta.")  # Felicitación
+    else:  # Si alguno falló
+        print("✗ ALGUNOS GRADIENT CHECKS FALLARON")  # Mensaje de error
+        print("  Revisa tu implementación de backprop.")  # Recomendación
 
-    return all_passed
+    return all_passed  # Devolver si todos pasaron
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__":  # Si se ejecuta como script
+    main()  # Ejecutar función principal
 
 ```
 ---

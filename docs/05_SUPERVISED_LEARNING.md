@@ -158,7 +158,7 @@ Tipos principales:
 ### 1.1 Modelo
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para arrays y operaciones numéricas
 
 """
 REGRESIÓN LINEAL
@@ -179,14 +179,14 @@ Donde:
 - ŷ: vector (m × 1) de predicciones
 """
 
-def add_bias_term(X: np.ndarray) -> np.ndarray:
+def add_bias_term(X: np.ndarray) -> np.ndarray:  # añade término de bias (columna de 1s)
     """Añade columna de 1s para el término de bias."""
-    m = X.shape[0]
-    return np.column_stack([np.ones(m), X])
+    m = X.shape[0]  # número de muestras (filas) en X
+    return np.column_stack([np.ones(m), X])  # concatena columna de 1s (bias) con X
 
-def predict_linear(X: np.ndarray, theta: np.ndarray) -> np.ndarray:
+def predict_linear(X: np.ndarray, theta: np.ndarray) -> np.ndarray:  # predicción lineal: y_hat = Xθ
     """Predicción lineal: ŷ = Xθ"""
-    return X @ theta
+    return X @ theta  # producto matricial para obtener las predicciones
 ```
 
 <details open>
@@ -252,9 +252,9 @@ def predict_linear(X: np.ndarray, theta: np.ndarray) -> np.ndarray:
 ### 1.2 Función de Costo (MSE)
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para arrays y operaciones numéricas
 
-def mse_cost(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> float:
+def mse_cost(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> float:  # calcula el costo MSE para θ
     """
     Mean Squared Error Cost Function.
 
@@ -263,21 +263,21 @@ def mse_cost(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> float:
 
     El factor 1/2 es por conveniencia (cancela con la derivada).
     """
-    m = len(y)
-    predictions = X @ theta
-    errors = predictions - y
-    return (1 / (2 * m)) * np.sum(errors ** 2)
+    m = len(y)  # número de muestras
+    predictions = X @ theta  # predicciones del modelo (ŷ)
+    errors = predictions - y  # residuos (ŷ - y)
+    return (1 / (2 * m)) * np.sum(errors ** 2)  # costo MSE con factor 1/2m
 
-def mse_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
+def mse_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:  # gradiente del MSE respecto a θ
     """
     Gradiente del MSE respecto a θ.
 
     ∂J/∂θ = (1/m) Xᵀ(Xθ - y)
     """
-    m = len(y)
-    predictions = X @ theta
-    errors = predictions - y
-    return (1 / m) * X.T @ errors
+    m = len(y)  # número de muestras
+    predictions = X @ theta  # predicciones del modelo (ŷ)
+    errors = predictions - y  # residuos (ŷ - y)
+    return (1 / m) * X.T @ errors  # gradiente vectorizado: (1/m) Xᵀ(ŷ-y)
 ```
 
 <details open>
@@ -340,9 +340,9 @@ def mse_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
 ### 1.3 Solución Cerrada (Normal Equation)
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para arrays y operaciones numéricas
 
-def normal_equation(X: np.ndarray, y: np.ndarray) -> np.ndarray:
+def normal_equation(X: np.ndarray, y: np.ndarray) -> np.ndarray:  # calcula θ por ecuación normal
     """
     Solución cerrada para regresión lineal.
 
@@ -357,12 +357,12 @@ def normal_equation(X: np.ndarray, y: np.ndarray) -> np.ndarray:
     - No funciona si XᵀX es singular
     - No escala bien para n grande (>10,000 features)
     """
-    XtX = X.T @ X
-    Xty = X.T @ y
+    XtX = X.T @ X  # calcula XᵀX
+    Xty = X.T @ y  # calcula Xᵀy
 
     # Usar solve en lugar de inv para estabilidad numérica
-    theta = np.linalg.solve(XtX, Xty)
-    return theta
+    theta = np.linalg.solve(XtX, Xty)  # resuelve el sistema lineal XtX·θ = Xty
+    return theta  # devuelve el vector de parámetros θ
 ```
 
 <details open>
@@ -428,21 +428,21 @@ def normal_equation(X: np.ndarray, y: np.ndarray) -> np.ndarray:
 import numpy as np  # Importa NumPy para operaciones matemáticas
 from typing import List, Tuple  # Importa tipos para anotaciones
 
-class LinearRegression:
+class LinearRegression:  # modelo de regresión lineal con GD o ecuación normal
     """Regresión Lineal implementada desde cero."""
 
-    def __init__(self):
+    def __init__(self):  # inicializa parámetros e historial
         self.theta = None  # Parámetros del modelo (pesos + bias)
         self.cost_history = []  # Historial de costos para monitoreo
 
-    def fit(
-        self,
-        X: np.ndarray,
-        y: np.ndarray,
-        method: str = 'gradient_descent',
-        learning_rate: float = 0.01,
-        n_iterations: int = 1000
-    ) -> 'LinearRegression':
+    def fit(  # entrena el modelo usando GD o ecuación normal
+        self,  # instancia del modelo
+        X: np.ndarray,  # features (m, n)
+        y: np.ndarray,  # targets (m,)
+        method: str = 'gradient_descent',  # método de entrenamiento
+        learning_rate: float = 0.01,  # tasa de aprendizaje (solo GD)
+        n_iterations: int = 1000  # número de iteraciones (solo GD)
+    ) -> 'LinearRegression':  # retorna self para estilo sklearn
         """
         Entrena el modelo.
 
@@ -454,34 +454,34 @@ class LinearRegression:
             n_iterations: número de iteraciones (solo para GD)
         """
         # Añadir bias a las features
-        X_b = add_bias_term(X)
+        X_b = add_bias_term(X)  # construye X con término de bias
         m, n = X_b.shape  # m: muestras, n: features + bias
 
-        if method == 'normal_equation':
+        if method == 'normal_equation':  # entrena con solución cerrada
             self.theta = normal_equation(X_b, y)  # Solución analítica directa
-        else:
+        else:  # entrena con descenso de gradiente
             # Inicializar theta con ceros o valores pequeños
-            self.theta = np.zeros(n)
+            self.theta = np.zeros(n)  # inicializa parámetros
 
-            for i in range(n_iterations):
+            for i in range(n_iterations):  # iteraciones de GD
                 # Calcular gradiente del MSE
-                gradient = mse_gradient(X_b, y, self.theta)
+                gradient = mse_gradient(X_b, y, self.theta)  # gradiente del coste MSE
 
                 # Actualizar theta usando gradient descent
-                self.theta = self.theta - learning_rate * gradient
+                self.theta = self.theta - learning_rate * gradient  # update: θ ← θ − α∇θ
 
                 # Guardar costo para monitoreo de convergencia
-                cost = mse_cost(X_b, y, self.theta)
-                self.cost_history.append(cost)
+                cost = mse_cost(X_b, y, self.theta)  # calcula coste actual
+                self.cost_history.append(cost)  # guarda histórico de coste
 
-        return self
+        return self  # permite chaining
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: np.ndarray) -> np.ndarray:  # predice y_hat para nuevas muestras
         """Predice valores."""
         X_b = add_bias_term(X)  # Añade bias para predicción
         return X_b @ self.theta  # Predicción lineal: y = X·θ
 
-    def score(self, X: np.ndarray, y: np.ndarray) -> float:
+    def score(self, X: np.ndarray, y: np.ndarray) -> float:  # calcula R² como métrica de ajuste
         """R² score."""
         y_pred = self.predict(X)  # Predicciones del modelo
         ss_res = np.sum((y - y_pred) ** 2)  # Suma de residuos al cuadrado
@@ -716,51 +716,51 @@ Interpretación: la predicción es “bastante” correcta, por eso la loss es p
 Objetivo: ver que la **frontera de decisión** (`p=0.5`) es lineal, aunque la salida `σ(z)` sea curva (curva en *probabilidad*, no en geometría de la frontera).
 
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy as np  # arrays, álgebra lineal y generación de números aleatorios
+import matplotlib.pyplot as plt  # visualización de datos y frontera de decisión
 
 
-def make_blobs_2d(n=200, seed=42):
-    rng = np.random.default_rng(seed)
-    c0 = rng.normal(loc=(-2.0, -1.5), scale=0.8, size=(n // 2, 2))
-    c1 = rng.normal(loc=(2.0, 1.5), scale=0.8, size=(n // 2, 2))
-    X = np.vstack([c0, c1])
-    y = np.array([0] * (n // 2) + [1] * (n // 2))
-    return X, y
+def make_blobs_2d(n=200, seed=42):  # genera dos clusters 2D para clasificación binaria
+    rng = np.random.default_rng(seed)  # inicializa RNG reproducible
+    c0 = rng.normal(loc=(-2.0, -1.5), scale=0.8, size=(n // 2, 2))  # clase 0: gaussiana 2D
+    c1 = rng.normal(loc=(2.0, 1.5), scale=0.8, size=(n // 2, 2))  # clase 1: gaussiana 2D
+    X = np.vstack([c0, c1])  # concatena muestras de ambas clases (features)
+    y = np.array([0] * (n // 2) + [1] * (n // 2))  # vector de etiquetas 0/1
+    return X, y  # retorna dataset sintético
 
 
-def sigmoid(z):
-    z = np.clip(z, -500, 500)
-    return 1 / (1 + np.exp(-z))
+def sigmoid(z):  # sigmoide para mapear logits a (0,1)
+    z = np.clip(z, -500, 500)  # evita overflow numérico en exp para |z| grande
+    return 1 / (1 + np.exp(-z))  # aplica la función sigmoide elemento a elemento
 
 
-def add_bias(X):
-    return np.column_stack([np.ones(len(X)), X])
+def add_bias(X):  # añade columna de 1s para intercepto
+    return np.column_stack([np.ones(len(X)), X])  # añade columna de 1s para el término bias
 
 
-def plot_decision_boundary(model, X, y, title="Decision boundary"):
-    x_min, x_max = X[:, 0].min() - 1.0, X[:, 0].max() + 1.0
-    y_min, y_max = X[:, 1].min() - 1.0, X[:, 1].max() + 1.0
+def plot_decision_boundary(model, X, y, title="Decision boundary"):  # grafica probabilidad y frontera p=0.5 en 2D
+    x_min, x_max = X[:, 0].min() - 1.0, X[:, 0].max() + 1.0  # rango en x con margen
+    y_min, y_max = X[:, 1].min() - 1.0, X[:, 1].max() + 1.0  # rango en y con margen
 
-    xx, yy = np.meshgrid(
-        np.linspace(x_min, x_max, 250),
-        np.linspace(y_min, y_max, 250),
-    )
+    xx, yy = np.meshgrid(  # crea una malla regular para evaluar el modelo
+        np.linspace(x_min, x_max, 250),  # muestrea coordenadas x
+        np.linspace(y_min, y_max, 250),  # muestrea coordenadas y
+    )  # retorna matrices (xx, yy) con coordenadas del grid
 
-    grid = np.column_stack([xx.ravel(), yy.ravel()])
-    proba = model.predict_proba(grid).reshape(xx.shape)
+    grid = np.column_stack([xx.ravel(), yy.ravel()])  # aplana la malla a lista de puntos (N, 2)
+    proba = model.predict_proba(grid).reshape(xx.shape)  # evalúa p(y=1|x) y re-forma a la malla
 
-    plt.figure(figsize=(7, 6))
-    plt.contourf(xx, yy, proba, levels=20, cmap="RdBu", alpha=0.35)
-    plt.contour(xx, yy, proba, levels=[0.5], colors="black", linewidths=2)
+    plt.figure(figsize=(7, 6))  # crea figura
+    plt.contourf(xx, yy, proba, levels=20, cmap="RdBu", alpha=0.35)  # mapa de calor de probabilidad
+    plt.contour(xx, yy, proba, levels=[0.5], colors="black", linewidths=2)  # línea de decisión p=0.5
 
-    plt.scatter(X[y == 0, 0], X[y == 0, 1], s=18, label="Clase 0")
-    plt.scatter(X[y == 1, 0], X[y == 1, 1], s=18, label="Clase 1")
+    plt.scatter(X[y == 0, 0], X[y == 0, 1], s=18, label="Clase 0")  # puntos de la clase 0
+    plt.scatter(X[y == 1, 0], X[y == 1, 1], s=18, label="Clase 1")  # puntos de la clase 1
 
-    plt.title(title)
-    plt.legend()
-    plt.grid(True, alpha=0.2)
-    plt.show()
+    plt.title(title)  # título del gráfico
+    plt.legend()  # leyenda de clases
+    plt.grid(True, alpha=0.2)  # rejilla suave para lectura
+    plt.show()  # renderiza la figura
 
 
 # Usa TU LogisticRegression del módulo (la clase ya existe más abajo)
@@ -887,7 +887,7 @@ Y verifica que `X @ θ` te da `(m,)`.
 ```python
 import numpy as np  # Importa NumPy para operaciones matemáticas
 
-def sigmoid(z: np.ndarray) -> np.ndarray:
+def sigmoid(z: np.ndarray) -> np.ndarray:  # aplica la función logística elemento a elemento
     """
     Función sigmoid/logística.
 
@@ -899,7 +899,7 @@ def sigmoid(z: np.ndarray) -> np.ndarray:
     - σ'(z) = σ(z)(1 - σ(z))
     """
     # Clip para evitar overflow en exp() con valores extremos
-    z = np.clip(z, -500, 500)
+    z = np.clip(z, -500, 500)  # limita z para evitar overflow/underflow en exp()
     return 1 / (1 + np.exp(-z))  # Fórmula matemática de la sigmoide
 
 # Visualizar la función sigmoid
@@ -994,13 +994,13 @@ Equivalente a:
 El "decision boundary" está en θᵀx = 0
 """
 
-def predict_proba(X: np.ndarray, theta: np.ndarray) -> np.ndarray:
+def predict_proba(X: np.ndarray, theta: np.ndarray) -> np.ndarray:  # predice probabilidad P(y=1|x) usando σ(Xθ)
     """Predice probabilidad de clase 1."""
-    return sigmoid(X @ theta)
+    return sigmoid(X @ theta)  # calcula p=σ(Xθ)
 
-def predict_class(X: np.ndarray, theta: np.ndarray, threshold: float = 0.5) -> np.ndarray:
+def predict_class(X: np.ndarray, theta: np.ndarray, threshold: float = 0.5) -> np.ndarray:  # predice clase usando umbral
     """Predice clase (0 o 1)."""
-    return (predict_proba(X, theta) >= threshold).astype(int)
+    return (predict_proba(X, theta) >= threshold).astype(int)  # convierte probas a clases 0/1
 ```
 
 <details open>
@@ -1061,14 +1061,14 @@ def predict_class(X: np.ndarray, theta: np.ndarray, threshold: float = 0.5) -> n
 ### 2.3 Binary Cross-Entropy Loss
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones numéricas
 
-def binary_cross_entropy(
-    X: np.ndarray,
-    y: np.ndarray,
-    theta: np.ndarray,
-    eps: float = 1e-15
-) -> float:
+def binary_cross_entropy(  # BCE (log-loss) para regresión logística
+    X: np.ndarray,  # matriz de features (m, d)
+    y: np.ndarray,  # etiquetas binarias (m,)
+    theta: np.ndarray,  # parámetros (d,)
+    eps: float = 1e-15  # epsilon para estabilidad numérica
+) -> float:  # retorna el costo promedio
     """
     Binary Cross-Entropy (Log Loss).
 
@@ -1081,16 +1081,16 @@ def binary_cross_entropy(
     - Penaliza mucho las predicciones muy incorrectas
     - Es la derivación de Maximum Likelihood Estimation
     """
-    m = len(y)
-    h = sigmoid(X @ theta)
+    m = len(y)  # número de muestras
+    h = sigmoid(X @ theta)  # probabilidades predichas p=σ(Xθ)
 
     # Clip para evitar log(0)
-    h = np.clip(h, eps, 1 - eps)
+    h = np.clip(h, eps, 1 - eps)  # limita p para evitar log(0) y log(1)
 
-    cost = -(1/m) * np.sum(y * np.log(h) + (1 - y) * np.log(1 - h))
-    return cost
+    cost = -(1/m) * np.sum(y * np.log(h) + (1 - y) * np.log(1 - h))  # BCE promedio
+    return cost  # retorna costo escalar
 
-def bce_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
+def bce_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:  # gradiente de BCE w.r.t. theta
     """
     Gradiente de Binary Cross-Entropy.
 
@@ -1100,9 +1100,9 @@ def bce_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
     Esto es porque derivamos σ(z) y la derivada σ'(z) = σ(z)(1-σ(z))
     cancela parte de la expresión.
     """
-    m = len(y)
-    h = sigmoid(X @ theta)
-    return (1/m) * X.T @ (h - y)
+    m = len(y)  # número de muestras
+    h = sigmoid(X @ theta)  # probabilidades predichas p=σ(Xθ)
+    return (1/m) * X.T @ (h - y)  # ∇θ = (1/m) Xᵀ(p - y)
 ```
 
 <details open>
@@ -1166,74 +1166,74 @@ def bce_gradient(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
 ### 2.4 Implementación Completa
 
 ```python
-import numpy as np
-from typing import List
+import numpy as np  # Importa NumPy: se usa para arrays, operaciones vectorizadas, RNG y construcción de datasets sintéticos
+from typing import List  # Importa List: soporte de tipado (anotaciones) para listas; no afecta el runtime
 
-class LogisticRegression:
+class LogisticRegression:  # Regresión logística binaria desde cero: aprende θ para predecir P(y=1|x)=σ(X_bθ)
     """Regresión Logística implementada desde cero."""
 
-    def __init__(self):
-        self.theta = None
-        self.cost_history = []
+    def __init__(self):  # Inicializa el modelo: prepara parámetros y contenedor de costes
+        self.theta = None  # Vector de parámetros (d+1,): incluye bias en theta[0]; se asigna en fit
+        self.cost_history = []  # Historial de coste (BCE) por iteración: útil para evaluar convergencia
 
-    def fit(
-        self,
-        X: np.ndarray,
-        y: np.ndarray,
-        learning_rate: float = 0.1,
-        n_iterations: int = 1000
-    ) -> 'LogisticRegression':
+    def fit(  # Entrena por gradient descent: minimiza BCE actualizando θ iterativamente
+        self,  # Referencia al objeto: permite almacenar theta/cost_history en la instancia
+        X: np.ndarray,  # Matriz de features (n,d): datos de entrada sin bias (se agrega dentro)
+        y: np.ndarray,  # Vector de labels (n,): valores 0/1 para clasificación binaria
+        learning_rate: float = 0.1,  # Tasa de aprendizaje α: escala el paso del update θ ← θ − α·grad
+        n_iterations: int = 1000  # Número de iteraciones: cuántos pasos de GD se ejecutan
+    ) -> 'LogisticRegression':  # Retorna self tipado: estilo sklearn para encadenar llamadas
         """Entrena con gradient descent."""
         # Añadir bias
-        X_b = np.column_stack([np.ones(len(X)), X])
-        m, n = X_b.shape
+        X_b = np.column_stack([np.ones(len(X)), X])  # Construye X con bias: agrega columna de 1s para intercepto
+        m, n = X_b.shape  # Extrae shapes: m=n muestras, n=d+1 parámetros (incluye bias)
 
         # Inicializar
-        self.theta = np.zeros(n)
+        self.theta = np.zeros(n)  # Inicializa θ en cero: punto de partida estándar para GD
 
-        for i in range(n_iterations):
+        for i in range(n_iterations):  # Loop de entrenamiento: repite updates de GD n_iterations veces
             # Gradiente
-            gradient = bce_gradient(X_b, y, self.theta)
+            gradient = bce_gradient(X_b, y, self.theta)  # Calcula ∂BCE/∂θ: gradiente del coste respecto a parámetros
 
             # Actualizar
-            self.theta = self.theta - learning_rate * gradient
+            self.theta = self.theta - learning_rate * gradient  # Update GD: mueve θ en dirección opuesta al gradiente
 
             # Guardar costo
-            cost = binary_cross_entropy(X_b, y, self.theta)
-            self.cost_history.append(cost)
+            cost = binary_cross_entropy(X_b, y, self.theta)  # Calcula BCE actual: mide qué tan bien ajusta el modelo en esta iteración
+            self.cost_history.append(cost)  # Guarda coste: permite inspeccionar si baja y detectar divergencia/NaN
 
-        return self
+        return self  # Devuelve la instancia entrenada: habilita chaining (model.fit(...).predict(...))
 
-    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:  # Predice probabilidades: devuelve P(y=1|x) en (0,1)
         """Predice probabilidades."""
-        X_b = np.column_stack([np.ones(len(X)), X])
-        return sigmoid(X_b @ self.theta)
+        X_b = np.column_stack([np.ones(len(X)), X])  # Añade bias: alinea X con theta aprendida
+        return sigmoid(X_b @ self.theta)  # Aplica σ a logits: σ(X_bθ) produce probabilidades por muestra
 
-    def predict(self, X: np.ndarray, threshold: float = 0.5) -> np.ndarray:
+    def predict(self, X: np.ndarray, threshold: float = 0.5) -> np.ndarray:  # Predice clases: umbraliza probabilidades para obtener 0/1
         """Predice clases."""
-        return (self.predict_proba(X) >= threshold).astype(int)
+        return (self.predict_proba(X) >= threshold).astype(int)  # Comparación booleana y cast: devuelve etiquetas enteras
 
-    def score(self, X: np.ndarray, y: np.ndarray) -> float:
+    def score(self, X: np.ndarray, y: np.ndarray) -> float:  # Evalúa accuracy: fracción de predicciones correctas
         """Accuracy."""
-        return np.mean(self.predict(X) == y)
+        return np.mean(self.predict(X) == y)  # Promedio de aciertos: compara arrays (True/False) y promedia
 
 
 # Demo con datos sintéticos
-np.random.seed(42)
+np.random.seed(42)  # Fija semilla global: hace reproducible el dataset sintético de la demo
 
 # Generar datos de dos clases
-n_samples = 200
-X_class0 = np.random.randn(n_samples // 2, 2) + np.array([-2, -2])
-X_class1 = np.random.randn(n_samples // 2, 2) + np.array([2, 2])
-X = np.vstack([X_class0, X_class1])
-y = np.array([0] * (n_samples // 2) + [1] * (n_samples // 2))
+n_samples = 200  # Número total de muestras: se divide en dos mitades (clase 0 y clase 1)
+X_class0 = np.random.randn(n_samples // 2, 2) + np.array([-2, -2])  # Clase 0: nube gaussiana centrada en (-2,-2)
+X_class1 = np.random.randn(n_samples // 2, 2) + np.array([2, 2])  # Clase 1: nube gaussiana centrada en (2,2)
+X = np.vstack([X_class0, X_class1])  # Apila features: matriz final (n,2) con ambas clases
+y = np.array([0] * (n_samples // 2) + [1] * (n_samples // 2))  # Labels: 0 para clase 0 y 1 para clase 1 (balanceado)
 
 # Entrenar
-model = LogisticRegression()
-model.fit(X, y, learning_rate=0.1, n_iterations=1000)
+model = LogisticRegression()  # Crea modelo: instancia la implementación desde cero
+model.fit(X, y, learning_rate=0.1, n_iterations=1000)  # Entrena por GD: ajusta theta usando el dataset sintético
 
-print(f"Accuracy: {model.score(X, y):.2%}")
-print(f"Parámetros: {model.theta}")
+print(f"Accuracy: {model.score(X, y):.2%}")  # Reporta accuracy en train: en dataset separable debería ser alta (sanity check)
+print(f"Parámetros: {model.theta}")  # Imprime theta: permite inspeccionar signo/magnitud (incluye bias en theta[0])
 ```
 
 <details open>
@@ -1512,9 +1512,9 @@ Integración con Plan v4/v5:
 ### 3.1 Matriz de Confusión
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones vectorizadas para conteos
 
-def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
+def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:  # matriz de confusión para clasificación binaria/multiclase
     """
     Calcula la matriz de confusión.
 
@@ -1530,23 +1530,23 @@ def confusion_matrix(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
     - FP (False Positive): Predijo 1, era 0 (Error Tipo I)
     - FN (False Negative): Predijo 0, era 1 (Error Tipo II)
     """
-    classes = np.unique(np.concatenate([y_true, y_pred]))
-    n_classes = len(classes)
-    cm = np.zeros((n_classes, n_classes), dtype=int)
+    classes = np.unique(np.concatenate([y_true, y_pred]))  # obtiene clases presentes en true y pred
+    n_classes = len(classes)  # número de clases
+    cm = np.zeros((n_classes, n_classes), dtype=int)  # inicializa matriz KxK de conteos
 
-    for i, true_class in enumerate(classes):
-        for j, pred_class in enumerate(classes):
-            cm[i, j] = np.sum((y_true == true_class) & (y_pred == pred_class))
+    for i, true_class in enumerate(classes):  # recorre clases reales (filas)
+        for j, pred_class in enumerate(classes):  # recorre clases predichas (columnas)
+            cm[i, j] = np.sum((y_true == true_class) & (y_pred == pred_class))  # cuenta ocurrencias (true=i, pred=j)
 
-    return cm
+    return cm  # retorna matriz de confusión
 
-def extract_tp_tn_fp_fn(y_true: np.ndarray, y_pred: np.ndarray):
+def extract_tp_tn_fp_fn(y_true: np.ndarray, y_pred: np.ndarray):  # extrae TP/TN/FP/FN (asumiendo clase positiva=1)
     """Extrae TP, TN, FP, FN para clasificación binaria."""
-    tp = np.sum((y_true == 1) & (y_pred == 1))
-    tn = np.sum((y_true == 0) & (y_pred == 0))
-    fp = np.sum((y_true == 0) & (y_pred == 1))
-    fn = np.sum((y_true == 1) & (y_pred == 0))
-    return tp, tn, fp, fn
+    tp = np.sum((y_true == 1) & (y_pred == 1))  # true positives
+    tn = np.sum((y_true == 0) & (y_pred == 0))  # true negatives
+    fp = np.sum((y_true == 0) & (y_pred == 1))  # false positives
+    fn = np.sum((y_true == 1) & (y_pred == 0))  # false negatives
+    return tp, tn, fp, fn  # retorna conteos
 ```
 
 <details open>
@@ -1613,9 +1613,9 @@ def extract_tp_tn_fp_fn(y_true: np.ndarray, y_pred: np.ndarray):
 ### 3.2 Accuracy, Precision, Recall, F1
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones vectorizadas para métricas
 
-def accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+def accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:  # accuracy binario: proporción de aciertos
     """
     Accuracy = (TP + TN) / (TP + TN + FP + FN)
 
@@ -1624,9 +1624,9 @@ def accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     Problema: Puede ser engañoso con clases desbalanceadas.
     Si 99% son clase 0, predecir siempre 0 da 99% accuracy.
     """
-    return np.mean(y_true == y_pred)
+    return np.mean(y_true == y_pred)  # promedio de booleanos True/False => accuracy en [0,1]
 
-def precision(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+def precision(y_true: np.ndarray, y_pred: np.ndarray) -> float:  # precision binario: confiabilidad de positivos
     """
     Precision = TP / (TP + FP)
 
@@ -1635,12 +1635,12 @@ def precision(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     Alta precisión = pocos falsos positivos.
     Importante cuando el costo de FP es alto (ej: spam → inbox).
     """
-    tp, tn, fp, fn = extract_tp_tn_fp_fn(y_true, y_pred)
-    if tp + fp == 0:
-        return 0.0
-    return tp / (tp + fp)
+    tp, tn, fp, fn = extract_tp_tn_fp_fn(y_true, y_pred)  # extrae conteos de confusión
+    if tp + fp == 0:  # caso borde: no hay predicciones positivas
+        return 0.0  # por convención, precision=0
+    return tp / (tp + fp)  # TP/(TP+FP)
 
-def recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+def recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:  # recall binario: cobertura de positivos reales
     """
     Recall (Sensitivity, True Positive Rate) = TP / (TP + FN)
 
@@ -1649,12 +1649,12 @@ def recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     Alto recall = pocos falsos negativos.
     Importante cuando el costo de FN es alto (ej: detección de cáncer).
     """
-    tp, tn, fp, fn = extract_tp_tn_fp_fn(y_true, y_pred)
-    if tp + fn == 0:
-        return 0.0
-    return tp / (tp + fn)
+    tp, tn, fp, fn = extract_tp_tn_fp_fn(y_true, y_pred)  # extrae conteos de confusión
+    if tp + fn == 0:  # caso borde: no hay positivos reales
+        return 0.0  # por convención, recall=0
+    return tp / (tp + fn)  # TP/(TP+FN)
 
-def f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+def f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:  # F1 binario: balance entre precision y recall
     """
     F1 = 2 * (precision * recall) / (precision + recall)
 
@@ -1663,22 +1663,22 @@ def f1_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     Útil cuando quieres un balance entre ambas métricas.
     F1 alto solo si AMBAS precision y recall son altas.
     """
-    p = precision(y_true, y_pred)
-    r = recall(y_true, y_pred)
-    if p + r == 0:
-        return 0.0
-    return 2 * (p * r) / (p + r)
+    p = precision(y_true, y_pred)  # calcula precision
+    r = recall(y_true, y_pred)  # calcula recall
+    if p + r == 0:  # caso borde: ambas métricas en 0
+        return 0.0  # por convención, F1=0
+    return 2 * (p * r) / (p + r)  # 2PR/(P+R)
 
-def specificity(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+def specificity(y_true: np.ndarray, y_pred: np.ndarray) -> float:  # especificidad: cobertura de negativos reales
     """
     Specificity (True Negative Rate) = TN / (TN + FP)
 
     De todos los negativos reales, ¿cuántos identifiqué?
     """
-    tp, tn, fp, fn = extract_tp_tn_fp_fn(y_true, y_pred)
-    if tn + fp == 0:
-        return 0.0
-    return tn / (tn + fp)
+    tp, tn, fp, fn = extract_tp_tn_fp_fn(y_true, y_pred)  # extrae conteos de confusión
+    if tn + fp == 0:  # caso borde: no hay negativos reales
+        return 0.0  # por convención, specificity=0
+    return tn / (tn + fp)  # TN/(TN+FP)
 ```
 
 <details open>
@@ -1744,21 +1744,21 @@ def specificity(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 ### 3.3 Clase Metrics Completa
 
 ```python
-import numpy as np
-from dataclasses import dataclass
+import numpy as np  # arrays y operaciones numéricas para métricas
+from dataclasses import dataclass  # decorador para crear clases de datos
 
-@dataclass
-class ClassificationReport:
+@dataclass  # genera __init__/__repr__/etc. para el reporte
+class ClassificationReport:  # contenedor tipado para métricas de clasificación
     """Reporte de métricas de clasificación."""
-    accuracy: float
-    precision: float
-    recall: float
-    f1: float
-    specificity: float
-    confusion_matrix: np.ndarray
+    accuracy: float  # proporción de aciertos
+    precision: float  # TP / (TP + FP)
+    recall: float  # TP / (TP + FN)
+    f1: float  # media armónica de precision/recall
+    specificity: float  # TN / (TN + FP)
+    confusion_matrix: np.ndarray  # matriz 2x2 de conteos
 
-    def __str__(self) -> str:
-        cm = self.confusion_matrix
+    def __str__(self) -> str:  # formatea el reporte como texto legible
+        cm = self.confusion_matrix  # alias local para interpolar en el template
         return f"""
 Classification Report
 =====================
@@ -1774,23 +1774,23 @@ Actual 0   {cm[0,0]:5d}   {cm[0,1]:5d}
 Actual 1   {cm[1,0]:5d}   {cm[1,1]:5d}
 """
 
-def classification_report(y_true: np.ndarray, y_pred: np.ndarray) -> ClassificationReport:
+def classification_report(y_true: np.ndarray, y_pred: np.ndarray) -> ClassificationReport:  # empaqueta métricas en un objeto
     """Genera reporte completo de métricas."""
-    return ClassificationReport(
-        accuracy=accuracy(y_true, y_pred),
-        precision=precision(y_true, y_pred),
-        recall=recall(y_true, y_pred),
-        f1=f1_score(y_true, y_pred),
-        specificity=specificity(y_true, y_pred),
-        confusion_matrix=confusion_matrix(y_true, y_pred)
-    )
+    return ClassificationReport(  # construye el reporte con métricas base
+        accuracy=accuracy(y_true, y_pred),  # accuracy global
+        precision=precision(y_true, y_pred),  # precision (clase positiva)
+        recall=recall(y_true, y_pred),  # recall (clase positiva)
+        f1=f1_score(y_true, y_pred),  # F1-score
+        specificity=specificity(y_true, y_pred),  # especificidad (clase negativa)
+        confusion_matrix=confusion_matrix(y_true, y_pred)  # matriz de confusión 2x2
+    )  # retorna instancia de ClassificationReport
 
 # Demo
-y_true = np.array([0, 0, 0, 0, 1, 1, 1, 1, 1, 1])
-y_pred = np.array([0, 0, 1, 0, 1, 1, 0, 1, 1, 1])
+y_true = np.array([0, 0, 0, 0, 1, 1, 1, 1, 1, 1])  # etiquetas reales
+y_pred = np.array([0, 0, 1, 0, 1, 1, 0, 1, 1, 1])  # predicciones (ejemplo)
 
-report = classification_report(y_true, y_pred)
-print(report)
+report = classification_report(y_true, y_pred)  # genera reporte de métricas
+print(report)  # imprime reporte formateado
 ```
 
 <details open>
@@ -1958,14 +1958,14 @@ Conectar esto con el Pathway:
 ### 4.1 Train/Test Split
 
 ```python
-import numpy as np
+import numpy as np  # arrays y utilidades de aleatoriedad
 
-def train_test_split(
-    X: np.ndarray,
-    y: np.ndarray,
-    test_size: float = 0.2,
-    random_state: int = None
-) -> tuple:
+def train_test_split(  # divide X/y en train y test de forma reproducible
+    X: np.ndarray,  # features
+    y: np.ndarray,  # targets
+    test_size: float = 0.2,  # proporción para test
+    random_state: int = None  # semilla opcional
+) -> tuple:  # retorna (X_train, X_test, y_train, y_test)
     """
     Divide datos en conjuntos de entrenamiento y prueba.
 
@@ -1975,17 +1975,17 @@ def train_test_split(
         test_size: proporción para test (0-1)
         random_state: semilla para reproducibilidad
     """
-    if random_state is not None:
-        np.random.seed(random_state)
+    if random_state is not None:  # si se pide reproducibilidad
+        np.random.seed(random_state)  # fija semilla global de numpy
 
-    n = len(y)
-    indices = np.random.permutation(n)
+    n = len(y)  # número de muestras
+    indices = np.random.permutation(n)  # permuta índices de 0..n-1
 
-    test_size_n = int(n * test_size)
-    test_indices = indices[:test_size_n]
-    train_indices = indices[test_size_n:]
+    test_size_n = int(n * test_size)  # tamaño del test en número de muestras
+    test_indices = indices[:test_size_n]  # índices para test
+    train_indices = indices[test_size_n:]  # índices para train
 
-    return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
+    return X[train_indices], X[test_indices], y[train_indices], y[test_indices]  # indexa y retorna splits
 ```
 
 <details open>
@@ -2045,67 +2045,67 @@ def train_test_split(
 ### 4.2 K-Fold Cross Validation
 
 ```python
-import numpy as np
-from typing import List, Tuple
+import numpy as np  # Importa NumPy: se usa para generar índices, barajar, concatenar y calcular estadísticas
+from typing import List, Tuple  # Importa tipos: anota listas de folds y tuplas (train_idx, val_idx) para claridad
 
-def k_fold_split(n: int, k: int) -> List[Tuple[np.ndarray, np.ndarray]]:
+def k_fold_split(n: int, k: int) -> List[Tuple[np.ndarray, np.ndarray]]:  # Genera folds: devuelve pares (train_indices, val_indices)
     """
     Genera índices para K-Fold Cross Validation.
 
     Returns:
         Lista de (train_indices, val_indices) para cada fold
     """
-    indices = np.arange(n)
-    np.random.shuffle(indices)
+    indices = np.arange(n)  # Crea índices 0..n-1: base para particionar el dataset en folds
+    np.random.shuffle(indices)  # Baraja in-place: randomiza el orden para evitar sesgos por ordenación
 
-    fold_size = n // k
-    folds = []
+    fold_size = n // k  # Tamaño de cada fold: división entera (si sobra, el último fold se ajusta)
+    folds = []  # Lista acumuladora: contendrá k tuplas (train_idx, val_idx)
 
-    for i in range(k):
-        start = i * fold_size
-        end = start + fold_size if i < k - 1 else n
+    for i in range(k):  # Itera k folds: cada i define un segmento distinto para validación
+        start = i * fold_size  # Inicio del fold i dentro del vector de índices barajados
+        end = start + fold_size if i < k - 1 else n  # Fin del fold: último fold captura el remanente para cubrir todos
 
-        val_indices = indices[start:end]
-        train_indices = np.concatenate([indices[:start], indices[end:]])
+        val_indices = indices[start:end]  # Índices de validación: subarray del fold i
+        train_indices = np.concatenate([indices[:start], indices[end:]])  # Índices de entrenamiento: todos los índices fuera del fold i
 
-        folds.append((train_indices, val_indices))
+        folds.append((train_indices, val_indices))  # Guarda fold: par (train,val) para consumirlo en cross_validate
 
-    return folds
+    return folds  # Devuelve lista de folds: cada elemento permite indexar X e y con train/val
 
-def cross_validate(
-    model_class,
-    X: np.ndarray,
-    y: np.ndarray,
-    k: int = 5,
-    **model_params
-) -> dict:
+def cross_validate(  # ejecuta validación cruzada K-Fold para una clase de modelo
+    model_class,  # Clase del modelo a evaluar: debe poder instanciarse como model_class() y tener fit/score
+    X: np.ndarray,  # Matriz de features (n,d): datos completos a partir de los cuales se generan folds
+    y: np.ndarray,  # Vector de etiquetas (n,): targets alineados con X
+    k: int = 5,  # Número de folds: más folds => menos sesgo pero más costo computacional
+    **model_params  # Hiperparámetros: se pasan a model.fit(...) en cada fold
+) -> dict:  # Retorna un dict con scores por fold y agregados (mean/std)
     """
     Realiza K-Fold Cross Validation.
 
     Returns:
         Dict con scores de cada fold y promedio
     """
-    folds = k_fold_split(len(y), k)
-    scores = []
+    folds = k_fold_split(len(y), k)  # Genera folds: lista de pares (train_idx, val_idx) para iterar
+    scores = []  # Acumula scores por fold: se agregan para media y desviación
 
-    for i, (train_idx, val_idx) in enumerate(folds):
+    for i, (train_idx, val_idx) in enumerate(folds):  # Recorre folds: cada iteración entrena en train y evalúa en val
         # Split
-        X_train, X_val = X[train_idx], X[val_idx]
-        y_train, y_val = y[train_idx], y[val_idx]
+        X_train, X_val = X[train_idx], X[val_idx]  # Subconjuntos de features: train/val para el fold actual
+        y_train, y_val = y[train_idx], y[val_idx]  # Subconjuntos de labels: targets alineados con los índices
 
         # Train
-        model = model_class()
-        model.fit(X_train, y_train, **model_params)
+        model = model_class()  # Instancia un modelo nuevo: evita contaminación de estado entre folds
+        model.fit(X_train, y_train, **model_params)  # Entrena en train: aplica hiperparámetros pasados por **model_params
 
         # Evaluate
-        score = model.score(X_val, y_val)
-        scores.append(score)
+        score = model.score(X_val, y_val)  # Evalúa desempeño en validación: métrica provista por el modelo (p.ej., accuracy)
+        scores.append(score)  # Guarda score del fold: se usará para estadística final
 
-    return {
-        'scores': scores,
-        'mean': np.mean(scores),
-        'std': np.std(scores)
-    }
+    return {  # Devuelve resumen de CV: permite reportar distribución y estabilidad del rendimiento
+        'scores': scores,  # Lista de scores por fold: muestra variación por partición
+        'mean': np.mean(scores),  # Promedio de scores: estimación puntual del rendimiento
+        'std': np.std(scores)  # Desviación estándar: cuantifica sensibilidad al split (inestabilidad)
+    }  # Cierra dict: estructura final de resultados para logging/decisiones
 
 # Demo
 # cv_results = cross_validate(LogisticRegression, X, y, k=5, learning_rate=0.1, n_iterations=500)
@@ -2170,79 +2170,79 @@ def cross_validate(
 ### 4.3 Regularización
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy: se usa para álgebra vectorizada, concatenación, abs/sign y operaciones en coste/gradiente
 
-class LogisticRegressionRegularized:
+class LogisticRegressionRegularized:  # Logistic Regression con regularización: añade penalización L1/L2 para controlar complejidad
     """Logistic Regression con regularización L1/L2."""
 
-    def __init__(self, regularization: str = 'l2', lambda_: float = 0.01):
+    def __init__(self, regularization: str = 'l2', lambda_: float = 0.01):  # Inicializa configuración de regularización (tipo y fuerza)
         """
         Args:
             regularization: 'l1', 'l2', o None
             lambda_: fuerza de regularización
         """
-        self.regularization = regularization
-        self.lambda_ = lambda_
-        self.theta = None
-        self.cost_history = []
+        self.regularization = regularization  # Tipo de penalización: 'l2' (ridge), 'l1' (lasso) o None (sin regularizar)
+        self.lambda_ = lambda_  # Parámetro λ: escala cuánto pesa la penalización respecto a la loss base
+        self.theta = None  # Parámetros del modelo (d+1,): incluye bias en theta[0]; se inicializa al entrenar
+        self.cost_history = []  # Historial del coste total por iteración: útil para ver convergencia y efecto de λ
 
-    def _cost(self, X: np.ndarray, y: np.ndarray) -> float:
+    def _cost(self, X: np.ndarray, y: np.ndarray) -> float:  # calcula el coste BCE + término de regularización
         """Costo con regularización."""
-        m = len(y)
-        h = sigmoid(X @ self.theta)
-        h = np.clip(h, 1e-15, 1 - 1e-15)
+        m = len(y)  # Número de muestras: se usa para promediar la loss y escalar el término de regularización
+        h = sigmoid(X @ self.theta)  # Probabilidades predichas: aplica σ a logits Xθ (X ya incluye bias)
+        h = np.clip(h, 1e-15, 1 - 1e-15)  # Evita log(0): recorta h para estabilidad numérica en cross-entropy
 
         # Cross-entropy base
-        bce = -(1/m) * np.sum(y * np.log(h) + (1 - y) * np.log(1 - h))
+        bce = -(1/m) * np.sum(y * np.log(h) + (1 - y) * np.log(1 - h))  # BCE promedio: log-loss binaria (cross-entropy)
 
         # Regularización (excluir bias theta[0])
-        if self.regularization == 'l2':
+        if self.regularization == 'l2':  # L2/Ridge: penaliza suma de cuadrados de pesos (excluyendo el bias)
             # Ridge: λ/2m * Σθⱼ²
-            reg = (self.lambda_ / (2 * m)) * np.sum(self.theta[1:] ** 2)
-        elif self.regularization == 'l1':
+            reg = (self.lambda_ / (2 * m)) * np.sum(self.theta[1:] ** 2)  # Término L2: (λ/2m)||θ_{1:}||²
+        elif self.regularization == 'l1':  # L1/Lasso: penaliza suma de valores absolutos (promueve sparsity)
             # Lasso: λ/m * Σ|θⱼ|
-            reg = (self.lambda_ / m) * np.sum(np.abs(self.theta[1:]))
-        else:
-            reg = 0
+            reg = (self.lambda_ / m) * np.sum(np.abs(self.theta[1:]))  # Término L1: (λ/m)||θ_{1:}||₁
+        else:  # Sin regularización: no se añade penalización al coste
+            reg = 0  # Penalización nula: coste total coincide con BCE
 
-        return bce + reg
+        return bce + reg  # Coste total: loss base + penalización (controla overfitting)
 
-    def _gradient(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def _gradient(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:  # calcula gradiente BCE + contribución de regularización
         """Gradiente con regularización."""
-        m = len(y)
-        h = sigmoid(X @ self.theta)
+        m = len(y)  # Número de muestras: normaliza el gradiente (promedio)
+        h = sigmoid(X @ self.theta)  # Probabilidades: σ(Xθ) para construir el gradiente de la loss
 
         # Gradiente base
-        grad = (1/m) * X.T @ (h - y)
+        grad = (1/m) * X.T @ (h - y)  # Gradiente BCE: (1/m) Xᵀ(h−y) para logística (sin regularización)
 
         # Regularización (excluir bias)
-        if self.regularization == 'l2':
-            reg_grad = np.concatenate([[0], (self.lambda_ / m) * self.theta[1:]])
-        elif self.regularization == 'l1':
-            reg_grad = np.concatenate([[0], (self.lambda_ / m) * np.sign(self.theta[1:])])
-        else:
-            reg_grad = 0
+        if self.regularization == 'l2':  # Gradiente L2: proporcional a θ (excepto bias)
+            reg_grad = np.concatenate([[0], (self.lambda_ / m) * self.theta[1:]])  # [0, (λ/m)θ₁:]: excluye bias en la penalización
+        elif self.regularization == 'l1':  # Gradiente L1: usa signo (subgradiente) para empujar a 0
+            reg_grad = np.concatenate([[0], (self.lambda_ / m) * np.sign(self.theta[1:])])  # [0, (λ/m)sign(θ₁:)]: excluye bias
+        else:  # Sin regularización: no se suma gradiente adicional
+            reg_grad = 0  # Penalización nula: gradiente total coincide con grad base
 
-        return grad + reg_grad
+        return grad + reg_grad  # Gradiente total: grad base + contribución de regularización
 
-    def fit(self, X: np.ndarray, y: np.ndarray,
-            learning_rate: float = 0.1, n_iterations: int = 1000):
-        X_b = np.column_stack([np.ones(len(X)), X])
-        self.theta = np.zeros(X_b.shape[1])
+    def fit(self, X: np.ndarray, y: np.ndarray,  # entrena el modelo con GD (firma multi-línea)
+            learning_rate: float = 0.1, n_iterations: int = 1000):  # Entrena por GD: actualiza θ usando gradiente con regularización
+        X_b = np.column_stack([np.ones(len(X)), X])  # Añade bias: crea X_b (n,d+1) con columna de 1s al inicio
+        self.theta = np.zeros(X_b.shape[1])  # Inicializa θ: un parámetro por columna de X_b (incluye bias)
 
-        for _ in range(n_iterations):
-            gradient = self._gradient(X_b, y)
-            self.theta -= learning_rate * gradient
-            self.cost_history.append(self._cost(X_b, y))
+        for _ in range(n_iterations):  # Loop de entrenamiento: repite actualizaciones de GD
+            gradient = self._gradient(X_b, y)  # Calcula gradiente total en el punto actual (incluye regularización)
+            self.theta -= learning_rate * gradient  # Actualiza θ: θ ← θ − α·grad
+            self.cost_history.append(self._cost(X_b, y))  # Registra coste: permite inspeccionar convergencia y overfitting
 
-        return self
+        return self  # Devuelve self: permite chaining estilo sklearn
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        X_b = np.column_stack([np.ones(len(X)), X])
-        return (sigmoid(X_b @ self.theta) >= 0.5).astype(int)
+    def predict(self, X: np.ndarray) -> np.ndarray:  # predice etiquetas binarias aplicando σ y umbral 0.5
+        X_b = np.column_stack([np.ones(len(X)), X])  # Añade bias: alinea features con theta aprendida (incluye intercepto)
+        return (sigmoid(X_b @ self.theta) >= 0.5).astype(int)  # Umbraliza probas: devuelve etiquetas 0/1 según prob>=0.5
 
-    def score(self, X: np.ndarray, y: np.ndarray) -> float:
-        return np.mean(self.predict(X) == y)
+    def score(self, X: np.ndarray, y: np.ndarray) -> float:  # calcula accuracy promedio sobre (X,y)
+        return np.mean(self.predict(X) == y)  # Accuracy: promedio de aciertos del clasificador sobre (X,y)
 ```
 
 <details open>
@@ -2324,20 +2324,20 @@ Si no puedes decir el caso base en 1 línea, tu implementación del árbol proba
 #### Ejemplo: suma recursiva (practica el modelo mental)
 
 ```python
-from typing import Sequence
+from typing import Sequence  # Importa Sequence para anotar entradas indexables (listas/tuplas)
 
-def sum_recursive(xs: Sequence[float]) -> float:
+def sum_recursive(xs: Sequence[float]) -> float:  # suma recursiva de una secuencia de números
     # Caso base: la suma de una lista vacía es 0
-    if len(xs) == 0:
-        return 0.0
+    if len(xs) == 0:  # condición de parada: secuencia vacía
+        return 0.0  # retorna 0 como elemento neutro de la suma
 
     # Paso recursivo: reduces el problema quitando el primer elemento
-    return float(xs[0]) + sum_recursive(xs[1:])
+    return float(xs[0]) + sum_recursive(xs[1:])  # suma primer elemento y recurre con el resto
 
 
-assert sum_recursive([]) == 0.0
-assert sum_recursive([3.0]) == 3.0
-assert sum_recursive([3.0, 2.0, 5.0]) == 10.0
+assert sum_recursive([]) == 0.0  # test: caso base (lista vacía)
+assert sum_recursive([3.0]) == 3.0  # test: un solo elemento
+assert sum_recursive([3.0, 2.0, 5.0]) == 10.0  # test: suma de varios elementos
 ```
 
 #### Pila de llamadas (lo que Python está haciendo)
@@ -2438,25 +2438,25 @@ Reglas:
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones numéricas
 
-np.random.seed(0)
-n, d = 500, 3
-X = np.random.randn(n, d)
-w_true = np.array([0.7, -1.5, 2.0])
-noise = 0.05 * np.random.randn(n)
-y = X @ w_true + noise
+np.random.seed(0)  # fija semilla para reproducibilidad
+n, d = 500, 3  # número de muestras y dimensión
+X = np.random.randn(n, d)  # features gaussianas
+w_true = np.array([0.7, -1.5, 2.0])  # pesos "verdaderos" para generar y
+noise = 0.05 * np.random.randn(n)  # ruido gaussiano aditivo
+y = X @ w_true + noise  # targets con ruido
 
 # Normal equation: (X^T X) w = X^T y
-XtX = X.T @ X
-Xty = X.T @ y
-w_hat = np.linalg.solve(XtX, Xty)
+XtX = X.T @ X  # matriz X^T X
+Xty = X.T @ y  # vector X^T y
+w_hat = np.linalg.solve(XtX, Xty)  # estima w por ecuación normal
 
-mse = np.mean((X @ w_hat - y) ** 2)
+mse = np.mean((X @ w_hat - y) ** 2)  # error cuadrático medio
 
-assert w_hat.shape == (d,)
-assert np.linalg.norm(w_hat - w_true) < 0.15
-assert mse < 0.01
+assert w_hat.shape == (d,)  # sanity check: shape de w_hat
+assert np.linalg.norm(w_hat - w_true) < 0.15  # sanity check: recupera pesos
+assert mse < 0.01  # sanity check: MSE pequeño
 ```
 
 ---
@@ -2480,31 +2480,31 @@ assert mse < 0.01
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones numéricas
 
-np.random.seed(1)
-n, d = 400, 4
-X = np.random.randn(n, d)
-w_true = np.array([1.0, -2.0, 0.5, 3.0])
-y = X @ w_true + 0.1 * np.random.randn(n)
+np.random.seed(1)  # fija semilla para reproducibilidad
+n, d = 400, 4  # número de muestras y dimensión
+X = np.random.randn(n, d)  # features gaussianas
+w_true = np.array([1.0, -2.0, 0.5, 3.0])  # pesos "verdaderos" para generar y
+y = X @ w_true + 0.1 * np.random.randn(n)  # targets con ruido gaussiano
 
-XtX = X.T @ X
-Xty = X.T @ y
-w_ne = np.linalg.solve(XtX, Xty)
+XtX = X.T @ X  # matriz X^T X
+Xty = X.T @ y  # vector X^T y
+w_ne = np.linalg.solve(XtX, Xty)  # solución cerrada (normal equation)
 
-w = np.zeros(d)
-alpha = 0.05
-losses = []
-for _ in range(3000):
-    r = X @ w - y
-    grad = (X.T @ r) / n
-    w = w - alpha * grad
-    losses.append(float(np.mean(r**2)))
+w = np.zeros(d)  # inicializa pesos para GD
+alpha = 0.05  # learning rate
+losses = []  # historial de loss (MSE) para verificar descenso
+for _ in range(3000):  # iteraciones de GD
+    r = X @ w - y  # residuo (pred - real)
+    grad = (X.T @ r) / n  # gradiente de MSE: (1/n) X^T (Xw - y)
+    w = w - alpha * grad  # actualización: w <- w - alpha * grad
+    losses.append(float(np.mean(r**2)))  # guarda MSE actual
 
-w_gd = w
+w_gd = w  # pesos aprendidos por GD
 
-assert losses[-1] <= losses[0]
-assert np.linalg.norm(w_gd - w_ne) < 0.2
+assert losses[-1] <= losses[0]  # sanity check: el loss baja
+assert np.linalg.norm(w_gd - w_ne) < 0.2  # sanity check: GD se aproxima a normal equation
 ```
 
 ---
@@ -2528,39 +2528,39 @@ assert np.linalg.norm(w_gd - w_ne) < 0.2
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones vectorizadas
 
-def confusion_counts(y_true: np.ndarray, y_pred: np.ndarray):
-    y_true = np.asarray(y_true).astype(int)
-    y_pred = np.asarray(y_pred).astype(int)
-    tp = int(np.sum((y_true == 1) & (y_pred == 1)))
-    tn = int(np.sum((y_true == 0) & (y_pred == 0)))
-    fp = int(np.sum((y_true == 0) & (y_pred == 1)))
-    fn = int(np.sum((y_true == 1) & (y_pred == 0)))
-    return tp, tn, fp, fn
-
-
-def precision_recall_f1(y_true: np.ndarray, y_pred: np.ndarray):
-    tp, tn, fp, fn = confusion_counts(y_true, y_pred)
-    eps = 1e-12
-    acc = (tp + tn) / (tp + tn + fp + fn + eps)
-    prec = tp / (tp + fp + eps)
-    rec = tp / (tp + fn + eps)
-    f1 = 2 * prec * rec / (prec + rec + eps)
-    return float(acc), float(prec), float(rec), float(f1)
+def confusion_counts(y_true: np.ndarray, y_pred: np.ndarray):  # calcula TP/TN/FP/FN para binario
+    y_true = np.asarray(y_true).astype(int)  # normaliza a ndarray de enteros
+    y_pred = np.asarray(y_pred).astype(int)  # normaliza a ndarray de enteros
+    tp = int(np.sum((y_true == 1) & (y_pred == 1)))  # true positives
+    tn = int(np.sum((y_true == 0) & (y_pred == 0)))  # true negatives
+    fp = int(np.sum((y_true == 0) & (y_pred == 1)))  # false positives
+    fn = int(np.sum((y_true == 1) & (y_pred == 0)))  # false negatives
+    return tp, tn, fp, fn  # retorna conteos
 
 
-y_true = np.array([1, 1, 1, 0, 0, 0])
-y_pred = np.array([1, 0, 1, 0, 1, 0])
-tp, tn, fp, fn = confusion_counts(y_true, y_pred)
+def precision_recall_f1(y_true: np.ndarray, y_pred: np.ndarray):  # calcula métricas binarias desde conteos
+    tp, tn, fp, fn = confusion_counts(y_true, y_pred)  # obtiene TP/TN/FP/FN
+    eps = 1e-12  # estabilizador para evitar división por cero
+    acc = (tp + tn) / (tp + tn + fp + fn + eps)  # accuracy
+    prec = tp / (tp + fp + eps)  # precision
+    rec = tp / (tp + fn + eps)  # recall
+    f1 = 2 * prec * rec / (prec + rec + eps)  # F1-score
+    return float(acc), float(prec), float(rec), float(f1)  # retorna métricas como floats
 
-assert (tp, tn, fp, fn) == (2, 2, 1, 1)
 
-acc, prec, rec, f1 = precision_recall_f1(y_true, y_pred)
-assert np.isclose(acc, 4/6)
-assert np.isclose(prec, 2/3)
-assert np.isclose(rec, 2/3)
-assert np.isclose(f1, 2/3)
+y_true = np.array([1, 1, 1, 0, 0, 0])  # etiquetas verdaderas (binarias)
+y_pred = np.array([1, 0, 1, 0, 1, 0])  # predicciones (binarias)
+tp, tn, fp, fn = confusion_counts(y_true, y_pred)  # computa conteos de confusión
+
+assert (tp, tn, fp, fn) == (2, 2, 1, 1)  # valida conteos esperados
+
+acc, prec, rec, f1 = precision_recall_f1(y_true, y_pred)  # calcula métricas
+assert np.isclose(acc, 4/6)  # valida accuracy
+assert np.isclose(prec, 2/3)  # valida precision
+assert np.isclose(rec, 2/3)  # valida recall
+assert np.isclose(f1, 2/3)  # valida F1
 ```
 
 ---
@@ -2586,25 +2586,25 @@ assert np.isclose(f1, 2/3)
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones numéricas
 
-def sigmoid(z: np.ndarray) -> np.ndarray:
-    z = np.asarray(z, dtype=float)
-    z = np.clip(z, -500, 500)
-    return 1.0 / (1.0 + np.exp(-z))
-
-
-def bce(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
-    y_true = np.asarray(y_true, dtype=float)
-    y_pred = np.asarray(y_pred, dtype=float)
-    y_pred = np.clip(y_pred, eps, 1.0 - eps)
-    return float(-np.mean(y_true * np.log(y_pred) + (1.0 - y_true) * np.log(1.0 - y_pred)))
+def sigmoid(z: np.ndarray) -> np.ndarray:  # sigmoide estable para logits
+    z = np.asarray(z, dtype=float)  # asegura ndarray float
+    z = np.clip(z, -500, 500)  # evita overflow en exp para |z| grande
+    return 1.0 / (1.0 + np.exp(-z))  # σ(z)=1/(1+e^{-z})
 
 
-y_true = np.array([1.0, 0.0, 1.0, 0.0])
-y_pred_good = np.array([0.999, 0.001, 0.999, 0.001])
-assert bce(y_true, y_pred_good) < 0.01
-assert np.isclose(bce(np.array([1.0]), np.array([0.9])), -np.log(0.9), atol=1e-12)
+def bce(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:  # BCE estable con clipping
+    y_true = np.asarray(y_true, dtype=float)  # normaliza etiquetas a float
+    y_pred = np.asarray(y_pred, dtype=float)  # normaliza predicciones a float
+    y_pred = np.clip(y_pred, eps, 1.0 - eps)  # evita log(0) y log(1)
+    return float(-np.mean(y_true * np.log(y_pred) + (1.0 - y_true) * np.log(1.0 - y_pred)))  # BCE promedio
+
+
+y_true = np.array([1.0, 0.0, 1.0, 0.0])  # etiquetas reales
+y_pred_good = np.array([0.999, 0.001, 0.999, 0.001])  # predicciones casi perfectas
+assert bce(y_true, y_pred_good) < 0.01  # BCE debe ser cercana a 0
+assert np.isclose(bce(np.array([1.0]), np.array([0.9])), -np.log(0.9), atol=1e-12)  # caso y=1, p=0.9
 ```
 
 ---
@@ -2630,45 +2630,45 @@ assert np.isclose(bce(np.array([1.0]), np.array([0.9])), -np.log(0.9), atol=1e-1
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays, álgebra lineal y utilidades numéricas
 
-def sigmoid(z: np.ndarray) -> np.ndarray:
-    z = np.asarray(z, dtype=float)
-    z = np.clip(z, -500, 500)
-    return 1.0 / (1.0 + np.exp(-z))
-
-
-def bce_from_logits(X: np.ndarray, y: np.ndarray, w: np.ndarray, eps: float = 1e-15) -> float:
-    logits = X @ w
-    y_hat = sigmoid(logits)
-    y_hat = np.clip(y_hat, eps, 1.0 - eps)
-    return float(-np.mean(y * np.log(y_hat) + (1.0 - y) * np.log(1.0 - y_hat)))
+def sigmoid(z: np.ndarray) -> np.ndarray:  # función logística para mapear logits a probabilidades
+    z = np.asarray(z, dtype=float)  # asegura ndarray float para operaciones estables
+    z = np.clip(z, -500, 500)  # evita overflow en exp para valores extremos
+    return 1.0 / (1.0 + np.exp(-z))  # aplica sigmoide elemento a elemento
 
 
-def grad_bce(X: np.ndarray, y: np.ndarray, w: np.ndarray) -> np.ndarray:
-    y_hat = sigmoid(X @ w)
-    return (X.T @ (y_hat - y)) / X.shape[0]
+def bce_from_logits(X: np.ndarray, y: np.ndarray, w: np.ndarray, eps: float = 1e-15) -> float:  # BCE dada X,y,w
+    logits = X @ w  # calcula logits z = Xw
+    y_hat = sigmoid(logits)  # convierte logits a probabilidades
+    y_hat = np.clip(y_hat, eps, 1.0 - eps)  # evita log(0) en la BCE
+    return float(-np.mean(y * np.log(y_hat) + (1.0 - y) * np.log(1.0 - y_hat)))  # BCE promedio
 
 
-np.random.seed(2)
-n, d = 200, 3
-X = np.random.randn(n, d)
-w0 = np.array([0.3, -0.7, 1.2])
-probs = sigmoid(X @ w0)
-y = (np.random.rand(n) < probs).astype(float)
+def grad_bce(X: np.ndarray, y: np.ndarray, w: np.ndarray) -> np.ndarray:  # gradiente de BCE para logística
+    y_hat = sigmoid(X @ w)  # predicción probabilística ŷ
+    return (X.T @ (y_hat - y)) / X.shape[0]  # ∇w = (1/n) X^T (ŷ - y)
 
-w = np.random.randn(d)
-g = grad_bce(X, y, w)
 
-idx = 1
-h = 1e-6
-e = np.zeros(d)
-e[idx] = 1.0
-L_plus = bce_from_logits(X, y, w + h * e)
-L_minus = bce_from_logits(X, y, w - h * e)
-g_num = (L_plus - L_minus) / (2.0 * h)
+np.random.seed(2)  # fija semilla global para reproducibilidad
+n, d = 200, 3  # número de muestras y dimensión
+X = np.random.randn(n, d)  # features gaussianas
+w0 = np.array([0.3, -0.7, 1.2])  # pesos "verdaderos" para generar etiquetas
+probs = sigmoid(X @ w0)  # probabilidades base p(y=1|x) según w0
+y = (np.random.rand(n) < probs).astype(float)  # samplea y ~ Bernoulli(probs)
 
-assert np.isclose(g[idx], g_num, rtol=1e-4, atol=1e-6)
+w = np.random.randn(d)  # inicializa pesos para evaluar gradiente
+g = grad_bce(X, y, w)  # gradiente analítico
+
+idx = 1  # coordenada del gradiente a verificar
+h = 1e-6  # tamaño de paso para diferencias centrales
+e = np.zeros(d)  # vector base para perturbar una sola coordenada
+e[idx] = 1.0  # activa la coordenada idx
+L_plus = bce_from_logits(X, y, w + h * e)  # pérdida con w[idx] + h
+L_minus = bce_from_logits(X, y, w - h * e)  # pérdida con w[idx] - h
+g_num = (L_plus - L_minus) / (2.0 * h)  # aproximación numérica del gradiente (central)
+
+assert np.isclose(g[idx], g_num, rtol=1e-4, atol=1e-6)  # valida gradiente analítico vs numérico
 ```
 
 ---
@@ -2692,35 +2692,35 @@ assert np.isclose(g[idx], g_num, rtol=1e-4, atol=1e-6)
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones vectorizadas
 
-def predict_threshold(p: np.ndarray, t: float) -> np.ndarray:
-    return (np.asarray(p) >= t).astype(int)
-
-
-def precision_recall(y_true: np.ndarray, y_pred: np.ndarray):
-    y_true = np.asarray(y_true).astype(int)
-    y_pred = np.asarray(y_pred).astype(int)
-    tp = np.sum((y_true == 1) & (y_pred == 1))
-    fp = np.sum((y_true == 0) & (y_pred == 1))
-    fn = np.sum((y_true == 1) & (y_pred == 0))
-    eps = 1e-12
-    prec = tp / (tp + fp + eps)
-    rec = tp / (tp + fn + eps)
-    return float(prec), float(rec)
+def predict_threshold(p: np.ndarray, t: float) -> np.ndarray:  # aplica umbral t a probabilidades
+    return (np.asarray(p) >= t).astype(int)  # boolean -> int (0/1)
 
 
-np.random.seed(3)
-y_true = np.array([1, 0, 1, 0, 1, 0, 1, 0])
-p = np.array([0.9, 0.6, 0.55, 0.52, 0.4, 0.35, 0.2, 0.1])
+def precision_recall(y_true: np.ndarray, y_pred: np.ndarray):  # calcula precision/recall desde etiquetas
+    y_true = np.asarray(y_true).astype(int)  # normaliza etiquetas reales
+    y_pred = np.asarray(y_pred).astype(int)  # normaliza etiquetas predichas
+    tp = np.sum((y_true == 1) & (y_pred == 1))  # true positives
+    fp = np.sum((y_true == 0) & (y_pred == 1))  # false positives
+    fn = np.sum((y_true == 1) & (y_pred == 0))  # false negatives
+    eps = 1e-12  # estabilizador numérico
+    prec = tp / (tp + fp + eps)  # precision = TP/(TP+FP)
+    rec = tp / (tp + fn + eps)  # recall = TP/(TP+FN)
+    return float(prec), float(rec)  # retorna métricas
 
-pred_05 = predict_threshold(p, 0.5)
-pred_03 = predict_threshold(p, 0.3)
 
-prec05, rec05 = precision_recall(y_true, pred_05)
-prec03, rec03 = precision_recall(y_true, pred_03)
+np.random.seed(3)  # semilla del demo (no estrictamente necesaria aquí)
+y_true = np.array([1, 0, 1, 0, 1, 0, 1, 0])  # etiquetas reales
+p = np.array([0.9, 0.6, 0.55, 0.52, 0.4, 0.35, 0.2, 0.1])  # probabilidades predichas
 
-assert rec03 >= rec05
+pred_05 = predict_threshold(p, 0.5)  # predicciones con umbral 0.5
+pred_03 = predict_threshold(p, 0.3)  # predicciones con umbral 0.3
+
+prec05, rec05 = precision_recall(y_true, pred_05)  # métricas con t=0.5
+prec03, rec03 = precision_recall(y_true, pred_03)  # métricas con t=0.3
+
+assert rec03 >= rec05  # al bajar umbral suele subir recall (capturas más positivos)
 ```
 
 ---
@@ -2744,22 +2744,22 @@ assert rec03 >= rec05
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y álgebra lineal
 
-np.random.seed(4)
-n, d = 300, 5
-X = np.random.randn(n, d)
-w_true = np.array([2.0, -1.0, 0.5, 0.0, 3.0])
-y = X @ w_true + 0.2 * np.random.randn(n)
+np.random.seed(4)  # fija semilla para reproducibilidad
+n, d = 300, 5  # número de muestras y dimensión
+X = np.random.randn(n, d)  # features gaussianas
+w_true = np.array([2.0, -1.0, 0.5, 0.0, 3.0])  # pesos "verdaderos" para generar y
+y = X @ w_true + 0.2 * np.random.randn(n)  # targets con ruido
 
-XtX = X.T @ X
-Xty = X.T @ y
-w_ols = np.linalg.solve(XtX, Xty)
+XtX = X.T @ X  # matriz X^T X
+Xty = X.T @ y  # vector X^T y
+w_ols = np.linalg.solve(XtX, Xty)  # solución OLS (lambda=0)
 
-lam = 10.0
-w_ridge = np.linalg.solve(XtX + lam * np.eye(d), Xty)
+lam = 10.0  # fuerza de regularización L2
+w_ridge = np.linalg.solve(XtX + lam * np.eye(d), Xty)  # solución ridge: (XtX + λI)w = Xty
 
-assert np.linalg.norm(w_ridge) <= np.linalg.norm(w_ols) + 1e-8
+assert np.linalg.norm(w_ridge) <= np.linalg.norm(w_ols) + 1e-8  # ridge tiende a reducir la norma de w
 ```
 
 ---
@@ -2783,33 +2783,33 @@ assert np.linalg.norm(w_ridge) <= np.linalg.norm(w_ols) + 1e-8
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y RNG para generar datos y permutar índices
 
-def train_test_split(X: np.ndarray, y: np.ndarray, test_size: float = 0.2, seed: int = 0):
-    X = np.asarray(X)
-    y = np.asarray(y)
-    n = X.shape[0]
-    rng = np.random.default_rng(seed)
-    idx = np.arange(n)
-    rng.shuffle(idx)
-    n_test = int(round(n * test_size))
-    test_idx = idx[:n_test]
-    train_idx = idx[n_test:]
-    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
+def train_test_split(X: np.ndarray, y: np.ndarray, test_size: float = 0.2, seed: int = 0):  # split reproducible
+    X = np.asarray(X)  # asegura ndarray para indexación
+    y = np.asarray(y)  # asegura ndarray para indexación
+    n = X.shape[0]  # número de muestras
+    rng = np.random.default_rng(seed)  # RNG reproducible
+    idx = np.arange(n)  # índices 0..n-1
+    rng.shuffle(idx)  # permuta índices in-place
+    n_test = int(round(n * test_size))  # tamaño del test (redondeo)
+    test_idx = idx[:n_test]  # índices del split de test
+    train_idx = idx[n_test:]  # índices del split de train
+    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]  # retorna (X_train, X_test, y_train, y_test)
 
 
-np.random.seed(0)
-X = np.random.randn(100, 2)
-y = (np.random.rand(100) < 0.5).astype(int)
+np.random.seed(0)  # fija semilla global para reproducibilidad del demo
+X = np.random.randn(100, 2)  # dataset sintético (100,2)
+y = (np.random.rand(100) < 0.5).astype(int)  # etiquetas binarias aleatorias
 
-Xtr1, Xte1, ytr1, yte1 = train_test_split(X, y, test_size=0.25, seed=42)
-Xtr2, Xte2, ytr2, yte2 = train_test_split(X, y, test_size=0.25, seed=42)
+Xtr1, Xte1, ytr1, yte1 = train_test_split(X, y, test_size=0.25, seed=42)  # primer split
+Xtr2, Xte2, ytr2, yte2 = train_test_split(X, y, test_size=0.25, seed=42)  # segundo split (misma seed)
 
-assert np.allclose(Xtr1, Xtr2)
-assert np.allclose(Xte1, Xte2)
-assert np.all(ytr1 == ytr2)
-assert np.all(yte1 == yte2)
-assert Xtr1.shape[0] + Xte1.shape[0] == 100
+assert np.allclose(Xtr1, Xtr2)  # verifica reproducibilidad en train
+assert np.allclose(Xte1, Xte2)  # verifica reproducibilidad en test
+assert np.all(ytr1 == ytr2)  # verifica reproducibilidad de y_train
+assert np.all(yte1 == yte2)  # verifica reproducibilidad de y_test
+assert Xtr1.shape[0] + Xte1.shape[0] == 100  # verifica que no se pierden muestras
 ```
 
 ---
@@ -2833,26 +2833,26 @@ assert Xtr1.shape[0] + Xte1.shape[0] == 100
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y RNG para particiones
 
-def kfold_indices(n: int, k: int, seed: int = 0):
-    rng = np.random.default_rng(seed)
-    idx = np.arange(n)
-    rng.shuffle(idx)
-    folds = np.array_split(idx, k)
-    for i in range(k):
-        val_idx = folds[i]
-        train_idx = np.concatenate([folds[j] for j in range(k) if j != i])
-        yield train_idx, val_idx
+def kfold_indices(n: int, k: int, seed: int = 0):  # genera índices (train, val) para K-fold
+    rng = np.random.default_rng(seed)  # RNG reproducible
+    idx = np.arange(n)  # índices 0..n-1
+    rng.shuffle(idx)  # permuta índices
+    folds = np.array_split(idx, k)  # divide en k folds (tamaños casi iguales)
+    for i in range(k):  # itera folds como validación
+        val_idx = folds[i]  # fold i como validación
+        train_idx = np.concatenate([folds[j] for j in range(k) if j != i])  # resto como train
+        yield train_idx, val_idx  # retorna par (train_idx, val_idx)
 
 
-n = 23
-k = 5
-seen = np.zeros(n, dtype=int)
-for tr, va in kfold_indices(n, k, seed=123):
-    assert len(np.intersect1d(tr, va)) == 0
-    seen[va] += 1
-assert np.all(seen == 1)
+n = 23  # número de muestras
+k = 5  # número de folds
+seen = np.zeros(n, dtype=int)  # contador de apariciones en validación
+for tr, va in kfold_indices(n, k, seed=123):  # recorre folds
+    assert len(np.intersect1d(tr, va)) == 0  # train/val no se solapan
+    seen[va] += 1  # marca que estos índices aparecieron en validación
+assert np.all(seen == 1)  # cada índice aparece exactamente una vez en validación
 ```
 
 ---
@@ -2876,38 +2876,38 @@ assert np.all(seen == 1)
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones numéricas
 
-def gini(y: np.ndarray) -> float:
-    y = np.asarray(y).astype(int)
-    if y.size == 0:
-        return 0.0
-    p1 = np.mean(y == 1)
-    p0 = 1.0 - p1
-    return float(1.0 - (p0**2 + p1**2))
-
-
-def info_gain_gini(x: np.ndarray, y: np.ndarray, t: float) -> float:
-    x = np.asarray(x, dtype=float)
-    y = np.asarray(y, dtype=int)
-    parent = gini(y)
-    left = y[x <= t]
-    right = y[x > t]
-    w_left = left.size / y.size
-    w_right = right.size / y.size
-    child = w_left * gini(left) + w_right * gini(right)
-    return float(parent - child)
+def gini(y: np.ndarray) -> float:  # impurity Gini para etiquetas binarias
+    y = np.asarray(y).astype(int)  # normaliza a ndarray de enteros
+    if y.size == 0:  # caso borde: sin muestras
+        return 0.0  # por convención, impurity nula
+    p1 = np.mean(y == 1)  # proporción de la clase 1
+    p0 = 1.0 - p1  # proporción de la clase 0
+    return float(1.0 - (p0**2 + p1**2))  # Gini = 1 - Σ_k p_k^2
 
 
-x = np.array([0.1, 0.2, 0.25, 0.8, 0.85, 0.9])
-y = np.array([0, 0, 0, 1, 1, 1])
+def info_gain_gini(x: np.ndarray, y: np.ndarray, t: float) -> float:  # information gain usando Gini como impurity
+    x = np.asarray(x, dtype=float)  # normaliza feature 1D
+    y = np.asarray(y, dtype=int)  # normaliza etiquetas
+    parent = gini(y)  # impurity del nodo padre
+    left = y[x <= t]  # etiquetas que caen a la izquierda del umbral
+    right = y[x > t]  # etiquetas que caen a la derecha del umbral
+    w_left = left.size / y.size  # peso (fracción) del hijo izquierdo
+    w_right = right.size / y.size  # peso (fracción) del hijo derecho
+    child = w_left * gini(left) + w_right * gini(right)  # impurity ponderada de hijos
+    return float(parent - child)  # gain = impurity_padre - impurity_hijos
 
-candidates = [0.2, 0.25, 0.8]
-gains = [info_gain_gini(x, y, t) for t in candidates]
-best_t = candidates[int(np.argmax(gains))]
 
-assert best_t in [0.25, 0.8]
-assert max(gains) > 0.0
+x = np.array([0.1, 0.2, 0.25, 0.8, 0.85, 0.9])  # feature 1D de juguete
+y = np.array([0, 0, 0, 1, 1, 1])  # etiquetas binarias asociadas
+
+candidates = [0.2, 0.25, 0.8]  # umbrales candidatos a evaluar
+gains = [info_gain_gini(x, y, t) for t in candidates]  # ganancia por cada umbral
+best_t = candidates[int(np.argmax(gains))]  # selecciona umbral con mayor gain
+
+assert best_t in [0.25, 0.8]  # valida que el mejor umbral separa las clases
+assert max(gains) > 0.0  # valida que hay ganancia positiva
 ```
 
 ---
@@ -2921,26 +2921,26 @@ assert max(gains) > 0.0
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # arrays y operaciones numéricas
 
-np.random.seed(5)
-n, d = 30, 2
-X = np.random.randn(n, d)
-w_true = np.array([1.2, -0.4])
-y = X @ w_true + 0.01 * np.random.randn(n)
+np.random.seed(5)  # fija semilla para reproducibilidad
+n, d = 30, 2  # número de muestras y dimensión
+X = np.random.randn(n, d)  # features sintéticas
+w_true = np.array([1.2, -0.4])  # pesos "verdaderos" para generar y
+y = X @ w_true + 0.01 * np.random.randn(n)  # targets con ruido pequeño
 
-w_ne = np.linalg.solve(X.T @ X, X.T @ y)
+w_ne = np.linalg.solve(X.T @ X, X.T @ y)  # solución cerrada (normal equation)
 
-w = np.zeros(d)
-alpha = 0.1
-for _ in range(2000):
-    grad = (X.T @ (X @ w - y)) / n
-    w = w - alpha * grad
+w = np.zeros(d)  # inicializa pesos para GD
+alpha = 0.1  # learning rate
+for _ in range(2000):  # iteraciones de GD
+    grad = (X.T @ (X @ w - y)) / n  # gradiente MSE: (1/n) Xᵀ(Xw - y)
+    w = w - alpha * grad  # actualización: w <- w - alpha * grad
 
-y_ne = X @ w_ne
-y_gd = X @ w
+y_ne = X @ w_ne  # predicción usando solución cerrada
+y_gd = X @ w  # predicción usando pesos de GD
 
-assert np.mean((y_ne - y_gd) ** 2) < 1e-4
+assert np.mean((y_ne - y_gd) ** 2) < 1e-4  # verifica que GD aproxima la solución cerrada
 ```
 
 
@@ -2965,191 +2965,191 @@ Autor: [Tu nombre]
 Módulo: 05 - Supervised Learning
 """
 
-import numpy as np
-from typing import Tuple, List, Optional
-from dataclasses import dataclass
+import numpy as np  # Importa NumPy: base para álgebra lineal, vectorización, RNG y operaciones usadas en regresión y métricas
+from typing import Tuple, List, Optional  # Importa tipos: anota firmas para claridad/herramientas (no afecta el runtime)
+from dataclasses import dataclass  # Importa dataclass: permite definir contenedores de datos simples si se usan en el módulo
 
 
 # ============================================================
 # FUNCIONES AUXILIARES
 # ============================================================
 
-def sigmoid(z: np.ndarray) -> np.ndarray:
-    z = np.clip(z, -500, 500)
-    return 1 / (1 + np.exp(-z))
+def sigmoid(z: np.ndarray) -> np.ndarray:  # Sigmoide: transforma logits reales a probabilidades (0,1), usada en regresión logística
+    z = np.clip(z, -500, 500)  # Estabilidad numérica: evita overflow en exp() con valores muy grandes en magnitud
+    return 1 / (1 + np.exp(-z))  # σ(z)=1/(1+e^{-z}): cálculo vectorizado para arrays
 
-def add_bias(X: np.ndarray) -> np.ndarray:
-    return np.column_stack([np.ones(len(X)), X])
+def add_bias(X: np.ndarray) -> np.ndarray:  # Añade bias: inserta columna de 1s para modelar intercepto como theta[0]
+    return np.column_stack([np.ones(len(X)), X])  # Construye X_b (n,d+1): concatena 1s con features para usar X_b @ theta
 
 
 # ============================================================
 # REGRESIÓN LINEAL
 # ============================================================
 
-class LinearRegression:
-    def __init__(self):
-        self.theta = None
-        self.cost_history = []
+class LinearRegression:  # Regresión lineal: aprende parámetros θ para predecir y≈Xθ (incluye intercepto via bias)
+    def __init__(self):  # Inicializa el modelo: prepara parámetros y un historial opcional de coste
+        self.theta = None  # Parámetros del modelo (d+1,): se aprenden en fit y se usan en predict
+        self.cost_history = []  # Historial de MSE por iteración: útil si se entrena con descenso de gradiente
 
-    def fit(self, X: np.ndarray, y: np.ndarray,
-            method: str = 'normal', lr: float = 0.01, n_iter: int = 1000):
-        X_b = add_bias(X)
+    def fit(self, X: np.ndarray, y: np.ndarray,  # Ajusta θ: elige solución cerrada (normal) o iterativa (GD)
+            method: str = 'normal', lr: float = 0.01, n_iter: int = 1000):  # Hiperparámetros: método, learning rate y número de iteraciones
+        X_b = add_bias(X)  # Añade columna de 1s: permite aprender el intercepto en theta[0]
 
-        if method == 'normal':
-            self.theta = np.linalg.solve(X_b.T @ X_b, X_b.T @ y)
-        else:
-            m, n = X_b.shape
-            self.theta = np.zeros(n)
-            for _ in range(n_iter):
-                grad = (1/m) * X_b.T @ (X_b @ self.theta - y)
-                self.theta -= lr * grad
-                self.cost_history.append(np.mean((X_b @ self.theta - y)**2))
-        return self
+        if method == 'normal':  # Ecuación normal: obtiene θ óptimo para MSE sin iterar (mínimos cuadrados)
+            self.theta = np.linalg.solve(X_b.T @ X_b, X_b.T @ y)  # Resuelve (XᵀX)θ=Xᵀy (más estable que invertir XᵀX)
+        else:  # Descenso de gradiente batch: optimiza MSE iterativamente
+            m, n = X_b.shape  # m=n muestras (normaliza gradiente), n=d+1 parámetros (incluye bias)
+            self.theta = np.zeros(n)  # Inicializa θ: vector de ceros como punto de partida de GD
+            for _ in range(n_iter):  # Itera n_iter pasos de GD: cada paso reduce (idealmente) el coste
+                grad = (1/m) * X_b.T @ (X_b @ self.theta - y)  # Gradiente MSE: (1/m) Xᵀ(Xθ−y)
+                self.theta -= lr * grad  # Actualización: θ ← θ − α·grad
+                self.cost_history.append(np.mean((X_b @ self.theta - y)**2))  # Guarda MSE actual: permite trazar convergencia
+        return self  # Devuelve self: permite chaining estilo sklearn (model.fit(...).predict(...))
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        return add_bias(X) @ self.theta
+    def predict(self, X: np.ndarray) -> np.ndarray:  # Predice valores continuos: y_hat = X_b θ
+        return add_bias(X) @ self.theta  # Multiplicación matriz-vector: produce predicciones (n,)
 
-    def score(self, X: np.ndarray, y: np.ndarray) -> float:
-        y_pred = self.predict(X)
-        ss_res = np.sum((y - y_pred)**2)
-        ss_tot = np.sum((y - np.mean(y))**2)
-        return 1 - ss_res / ss_tot
+    def score(self, X: np.ndarray, y: np.ndarray) -> float:  # R²: mide varianza explicada por el modelo (1 es perfecto)
+        y_pred = self.predict(X)  # Predicción sobre X: base para medir error vs y
+        ss_res = np.sum((y - y_pred)**2)  # SSE/SS_res: suma de cuadrados residual (error no explicado)
+        ss_tot = np.sum((y - np.mean(y))**2)  # SST/SS_tot: suma de cuadrados total (variación respecto a la media)
+        return 1 - ss_res / ss_tot  # R² = 1 - SSE/SST: compara el modelo contra baseline de predecir la media
 
 
 # ============================================================
 # REGRESIÓN LOGÍSTICA
 # ============================================================
 
-class LogisticRegression:
-    def __init__(self, reg: str = None, lambda_: float = 0.01):
-        self.reg = reg
-        self.lambda_ = lambda_
-        self.theta = None
-        self.cost_history = []
+class LogisticRegression:  # Regresión logística binaria: modela P(y=1|x)=σ(X_b θ) y aprende θ por descenso de gradiente
+    def __init__(self, reg: str = None, lambda_: float = 0.01):  # Inicializa configuración de regularización (opcional)
+        self.reg = reg  # Tipo de regularización: None, 'l1' o 'l2' (define penalización aplicada a los pesos)
+        self.lambda_ = lambda_  # Fuerza de regularización λ: escala el término de penalización en el gradiente
+        self.theta = None  # Parámetros del modelo (d+1,): incluye bias; se inicializan en fit
+        self.cost_history = []  # Historial de coste (si se registra): útil para debug/convergencia (aquí no se llena)
 
-    def fit(self, X: np.ndarray, y: np.ndarray,
-            lr: float = 0.1, n_iter: int = 1000):
-        X_b = add_bias(X)
-        m, n = X_b.shape
-        self.theta = np.zeros(n)
+    def fit(self, X: np.ndarray, y: np.ndarray,  # Entrena el clasificador: optimiza cross-entropy implícita vía GD
+            lr: float = 0.1, n_iter: int = 1000):  # Hiperparámetros: learning rate y número de iteraciones
+        X_b = add_bias(X)  # Añade bias: permite intercepto (theta[0]) en el modelo lineal antes de la sigmoide
+        m, n = X_b.shape  # Extrae shapes: m=n muestras (normaliza gradiente), n=d+1 parámetros (incluye bias)
+        self.theta = np.zeros(n)  # Inicializa parámetros: vector de ceros como punto de partida del descenso de gradiente
 
-        for _ in range(n_iter):
-            h = sigmoid(X_b @ self.theta)
-            grad = (1/m) * X_b.T @ (h - y)
+        for _ in range(n_iter):  # Itera GD batch: actualiza θ para reducir el error de clasificación
+            h = sigmoid(X_b @ self.theta)  # Probabilidades predichas: aplica σ a los logits X_bθ
+            grad = (1/m) * X_b.T @ (h - y)  # Gradiente base: deriva de log-loss para logistic regression sin regularización
 
-            if self.reg == 'l2':
-                grad[1:] += (self.lambda_/m) * self.theta[1:]
-            elif self.reg == 'l1':
-                grad[1:] += (self.lambda_/m) * np.sign(self.theta[1:])
+            if self.reg == 'l2':  # L2 (ridge): penaliza magnitudes cuadráticas, favorece pesos pequeños (shrinkage)
+                grad[1:] += (self.lambda_/m) * self.theta[1:]  # No regulariza bias (índice 0): solo aplica a pesos de features
+            elif self.reg == 'l1':  # L1 (lasso): penaliza norma L1, induce sparsity (pesos exactamente 0)
+                grad[1:] += (self.lambda_/m) * np.sign(self.theta[1:])  # Subgradiente L1: signo por componente (maneja no diferenciabilidad en 0)
 
-            self.theta -= lr * grad
-        return self
+            self.theta -= lr * grad  # Actualización de GD: θ ← θ − α·grad
+        return self  # Devuelve self: estilo sklearn para encadenar llamadas
 
-    def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        return sigmoid(add_bias(X) @ self.theta)
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:  # Devuelve probabilidad de clase positiva (y=1) para cada muestra
+        return sigmoid(add_bias(X) @ self.theta)  # Calcula σ(X_bθ): salida en (0,1) interpretada como probabilidad
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        return (self.predict_proba(X) >= 0.5).astype(int)
+    def predict(self, X: np.ndarray) -> np.ndarray:  # Devuelve etiqueta binaria {0,1} aplicando un umbral a predict_proba
+        return (self.predict_proba(X) >= 0.5).astype(int)  # Umbral 0.5: clasifica como 1 si prob>=0.5; castea booleanos a int
 
-    def score(self, X: np.ndarray, y: np.ndarray) -> float:
-        return np.mean(self.predict(X) == y)
+    def score(self, X: np.ndarray, y: np.ndarray) -> float:  # Accuracy: proporción de aciertos (métrica simple de clasificación)
+        return np.mean(self.predict(X) == y)  # Promedio de comparaciones: True=1, False=0 => accuracy en [0,1]
 
 
 # ============================================================
 # MÉTRICAS
 # ============================================================
 
-def accuracy(y_true, y_pred):
-    return np.mean(y_true == y_pred)
+def accuracy(y_true, y_pred):  # Accuracy: proporción de aciertos (clasificación) = mean(y_true == y_pred)
+    return np.mean(y_true == y_pred)  # Calcula promedio de booleanos: True=1, False=0 => valor en [0,1]
 
-def precision(y_true, y_pred):
-    tp = np.sum((y_true == 1) & (y_pred == 1))
-    fp = np.sum((y_true == 0) & (y_pred == 1))
-    return tp / (tp + fp) if (tp + fp) > 0 else 0
+def precision(y_true, y_pred):  # Precision: TP/(TP+FP), qué tan confiables son los positivos predichos
+    tp = np.sum((y_true == 1) & (y_pred == 1))  # True positives: positivos reales predichos como positivos
+    fp = np.sum((y_true == 0) & (y_pred == 1))  # False positives: negativos reales predichos como positivos
+    return tp / (tp + fp) if (tp + fp) > 0 else 0  # Evita división por cero: si no hay predicciones positivas, precision=0
 
-def recall(y_true, y_pred):
-    tp = np.sum((y_true == 1) & (y_pred == 1))
-    fn = np.sum((y_true == 1) & (y_pred == 0))
-    return tp / (tp + fn) if (tp + fn) > 0 else 0
+def recall(y_true, y_pred):  # Recall: TP/(TP+FN), cobertura de positivos reales detectados
+    tp = np.sum((y_true == 1) & (y_pred == 1))  # True positives: positivos reales capturados por el modelo
+    fn = np.sum((y_true == 1) & (y_pred == 0))  # False negatives: positivos reales que el modelo se perdió
+    return tp / (tp + fn) if (tp + fn) > 0 else 0  # Evita división por cero: si no hay positivos reales, recall=0
 
-def f1_score(y_true, y_pred):
-    p, r = precision(y_true, y_pred), recall(y_true, y_pred)
-    return 2*p*r/(p+r) if (p+r) > 0 else 0
+def f1_score(y_true, y_pred):  # F1: media armónica de precision y recall, balancea ambos cuando hay desbalance de clases
+    p, r = precision(y_true, y_pred), recall(y_true, y_pred)  # Calcula precision y recall: ingredientes del F1
+    return 2*p*r/(p+r) if (p+r) > 0 else 0  # Evita división por cero: si p+r=0, no hay señal => F1=0
 
-def confusion_matrix(y_true, y_pred):
-    cm = np.zeros((2, 2), dtype=int)
-    cm[0, 0] = np.sum((y_true == 0) & (y_pred == 0))
-    cm[0, 1] = np.sum((y_true == 0) & (y_pred == 1))
-    cm[1, 0] = np.sum((y_true == 1) & (y_pred == 0))
-    cm[1, 1] = np.sum((y_true == 1) & (y_pred == 1))
-    return cm
+def confusion_matrix(y_true, y_pred):  # Matriz 2x2: filas=clase real, columnas=clase predicha (útil para analizar errores)
+    cm = np.zeros((2, 2), dtype=int)  # Inicializa conteos: [[TN, FP],[FN, TP]] con dtype int
+    cm[0, 0] = np.sum((y_true == 0) & (y_pred == 0))  # TN: negativos reales predichos como negativos
+    cm[0, 1] = np.sum((y_true == 0) & (y_pred == 1))  # FP: negativos reales predichos como positivos
+    cm[1, 0] = np.sum((y_true == 1) & (y_pred == 0))  # FN: positivos reales predichos como negativos
+    cm[1, 1] = np.sum((y_true == 1) & (y_pred == 1))  # TP: positivos reales predichos como positivos
+    return cm  # Devuelve matriz: permite derivar precision/recall y ver tradeoffs por tipo de error
 
 
 # ============================================================
 # VALIDACIÓN
 # ============================================================
 
-def train_test_split(X, y, test_size=0.2, seed=None):
-    if seed: np.random.seed(seed)
-    n = len(y)
-    idx = np.random.permutation(n)
-    split = int(n * test_size)
-    return X[idx[split:]], X[idx[:split]], y[idx[split:]], y[idx[:split]]
+def train_test_split(X, y, test_size=0.2, seed=None):  # Divide en train/test: baraja índices y separa según proporción `test_size`
+    if seed: np.random.seed(seed)  # Si hay semilla, fija RNG global: hace reproducible la partición
+    n = len(y)  # Número de muestras: define el rango de índices a permutar
+    idx = np.random.permutation(n)  # Permutación aleatoria de índices: mezcla el dataset antes de partir
+    split = int(n * test_size)  # Tamaño del test: cantidad de índices que irán al conjunto de evaluación
+    return X[idx[split:]], X[idx[:split]], y[idx[split:]], y[idx[:split]]  # Retorna X_train, X_test, y_train, y_test (según índices permutados)
 
-def cross_validate(model_class, X, y, k=5, **params):
-    n = len(y)
-    idx = np.random.permutation(n)
-    fold_size = n // k
-    scores = []
+def cross_validate(model_class, X, y, k=5, **params):  # K-fold CV: evalúa el modelo entrenando k veces y promediando el score
+    n = len(y)  # Número de muestras: base para construir folds
+    idx = np.random.permutation(n)  # Baraja índices: evita sesgo por orden de los datos
+    fold_size = n // k  # Tamaño del fold: división entera (si sobra, algunos ejemplos pueden quedar fuera)
+    scores = []  # Scores por fold: se agregan para calcular media y desviación
 
-    for i in range(k):
-        val_idx = idx[i*fold_size:(i+1)*fold_size]
-        train_idx = np.concatenate([idx[:i*fold_size], idx[(i+1)*fold_size:]])
+    for i in range(k):  # Itera folds: en cada i, un segmento es validación y el resto es entrenamiento
+        val_idx = idx[i*fold_size:(i+1)*fold_size]  # Índices de validación: slice del fold i
+        train_idx = np.concatenate([idx[:i*fold_size], idx[(i+1)*fold_size:]])  # Índices de train: concatena todos los demás folds
 
-        model = model_class()
-        model.fit(X[train_idx], y[train_idx], **params)
-        scores.append(model.score(X[val_idx], y[val_idx]))
+        model = model_class()  # Instancia modelo nuevo por fold: evita reutilizar estado/θ entre entrenamientos
+        model.fit(X[train_idx], y[train_idx], **params)  # Entrena en el subset de train: pasa hiperparámetros por **params
+        scores.append(model.score(X[val_idx], y[val_idx]))  # Evalúa en validación: guarda score para estadística final
 
-    return {'scores': scores, 'mean': np.mean(scores), 'std': np.std(scores)}
+    return {'scores': scores, 'mean': np.mean(scores), 'std': np.std(scores)}  # Resume CV: lista de scores + media + desviación estándar
 
 
 # ============================================================
 # TESTS
 # ============================================================
 
-if __name__ == "__main__":
-    np.random.seed(42)
+if __name__ == "__main__":  # Entry point: ejecuta pruebas rápidas cuando se corre como script
+    np.random.seed(42)  # Fija semilla global: hace reproducibles los datos sintéticos
 
     # Test Linear Regression
-    X = 2 * np.random.rand(100, 1)
-    y = 4 + 3 * X.flatten() + np.random.randn(100) * 0.5
+    X = 2 * np.random.rand(100, 1)  # Features: 100 valores uniformes en [0,2) con 1 feature (shape (100,1))
+    y = 4 + 3 * X.flatten() + np.random.randn(100) * 0.5  # Target: relación lineal y=4+3x + ruido gaussiano (simula datos reales)
 
-    lr = LinearRegression()
-    lr.fit(X, y)
-    print(f"Linear Regression R²: {lr.score(X, y):.4f}")
+    lr = LinearRegression()  # Instancia modelo de regresión lineal
+    lr.fit(X, y)  # Ajusta θ con el método por defecto (ecuación normal)
+    print(f"Linear Regression R²: {lr.score(X, y):.4f}")  # Imprime R²: sanity check de que el ajuste explica bien la varianza
 
     # Test Logistic Regression
-    X_c0 = np.random.randn(50, 2) + [-2, -2]
-    X_c1 = np.random.randn(50, 2) + [2, 2]
-    X_clf = np.vstack([X_c0, X_c1])
-    y_clf = np.array([0]*50 + [1]*50)
+    X_c0 = np.random.randn(50, 2) + [-2, -2]  # Clase 0: 50 puntos alrededor de (-2,-2) (distribución normal)
+    X_c1 = np.random.randn(50, 2) + [2, 2]  # Clase 1: 50 puntos alrededor de (2,2)
+    X_clf = np.vstack([X_c0, X_c1])  # Junta features: (100,2) concatenando ambas nubes
+    y_clf = np.array([0]*50 + [1]*50)  # Labels: 0 para clase 0 y 1 para clase 1 (shape (100,))
 
-    log_reg = LogisticRegression()
-    log_reg.fit(X_clf, y_clf)
-    print(f"Logistic Regression Accuracy: {log_reg.score(X_clf, y_clf):.4f}")
+    log_reg = LogisticRegression()  # Instancia regresión logística (sin regularización por defecto)
+    log_reg.fit(X_clf, y_clf)  # Entrena θ por GD sobre el dataset sintético
+    print(f"Logistic Regression Accuracy: {log_reg.score(X_clf, y_clf):.4f}")  # Imprime accuracy: verifica que clasifica razonablemente
 
     # Test metrics
-    y_true = np.array([0,0,0,1,1,1,1,1])
-    y_pred = np.array([0,0,1,1,1,0,1,1])
-    print(f"Precision: {precision(y_true, y_pred):.4f}")
-    print(f"Recall: {recall(y_true, y_pred):.4f}")
-    print(f"F1: {f1_score(y_true, y_pred):.4f}")
+    y_true = np.array([0,0,0,1,1,1,1,1])  # Labels reales: ejemplo pequeño para comprobar métricas manualmente
+    y_pred = np.array([0,0,1,1,1,0,1,1])  # Predicciones: incluye FP y FN para que precision/recall no sean triviales
+    print(f"Precision: {precision(y_true, y_pred):.4f}")  # Calcula e imprime precision del ejemplo
+    print(f"Recall: {recall(y_true, y_pred):.4f}")  # Calcula e imprime recall del ejemplo
+    print(f"F1: {f1_score(y_true, y_pred):.4f}")  # Calcula e imprime F1 del ejemplo
 
     # Test CV
-    cv = cross_validate(LogisticRegression, X_clf, y_clf, k=5, lr=0.1, n_iter=500)
-    print(f"CV Score: {cv['mean']:.4f} ± {cv['std']:.4f}")
+    cv = cross_validate(LogisticRegression, X_clf, y_clf, k=5, lr=0.1, n_iter=500)  # Ejecuta CV 5-fold pasando hiperparámetros al fit
+    print(f"CV Score: {cv['mean']:.4f} ± {cv['std']:.4f}")  # Reporta media±std: estima estabilidad del rendimiento
 
-    print("\n✓ Todos los tests pasaron!")
+    print("\n✓ Todos los tests pasaron!")  # Mensaje final: indica que se ejecutaron pruebas sin errores
 ```
 
 ---
@@ -3227,7 +3227,7 @@ Simplificando el término entre paréntesis:
 
 **Forma vectorizada (para código):**
 ```python
-gradient = (1/n) * X.T @ (y_pred - y_true)
+gradient = (1/n) * X.T @ (y_pred - y_true)  # gradiente vectorizado: (1/n) Xᵀ(ŷ - y)
 ```
 
 ### Tu Entregable
@@ -3267,25 +3267,25 @@ Compara tu código desde cero vs sklearn para detectar bugs.
 
 Regla: Si la diferencia de accuracy es >5%, revisar matemáticas.
 """
-import numpy as np
-from sklearn.linear_model import LogisticRegression as SklearnLR
-from sklearn.linear_model import LinearRegression as SklearnLinReg
-from sklearn.metrics import accuracy_score, mean_squared_error
+import numpy as np  # Importa NumPy: se usa para zeros, norma L2, abs y operaciones numéricas en la comparación
+from sklearn.linear_model import LogisticRegression as SklearnLR  # Importa LogisticRegression de sklearn como referencia (“ground truth”)
+from sklearn.linear_model import LinearRegression as SklearnLinReg  # Importa LinearRegression de sklearn para validar MSE contra tu implementación
+from sklearn.metrics import accuracy_score, mean_squared_error  # Importa métricas: accuracy y MSE para comparar resultados
 
 # Importar tu implementación
 # from src.logistic_regression import LogisticRegression as MyLR
 # from src.linear_regression import LinearRegression as MyLinReg
 
 
-def shadow_mode_logistic_regression(X_train, y_train, X_test, y_test):
+def shadow_mode_logistic_regression(X_train, y_train, X_test, y_test):  # Valida tu Logistic Regression contra sklearn y detecta desviaciones
     """
     Compara tu Logistic Regression vs sklearn.
 
     Los coeficientes y accuracy deben ser casi idénticos.
     """
-    print("=" * 60)
-    print("SHADOW MODE: Logistic Regression")
-    print("=" * 60)
+    print("=" * 60)  # Separador visual: hace más legible la salida en consola
+    print("SHADOW MODE: Logistic Regression")  # Título del bloque: indica qué algoritmo se está validando
+    print("=" * 60)  # Separador visual: cierra el encabezado
 
     # ========== TU IMPLEMENTACIÓN ==========
     # my_model = MyLR()
@@ -3295,49 +3295,49 @@ def shadow_mode_logistic_regression(X_train, y_train, X_test, y_test):
     # my_weights = my_model.weights
 
     # Placeholder (reemplazar con tu código)
-    my_acc = 0.85
-    my_weights = np.zeros(X_train.shape[1])
+    my_acc = 0.85  # Placeholder: accuracy dummy (reemplazar por accuracy real de tu modelo)
+    my_weights = np.zeros(X_train.shape[1])  # Placeholder: vector de pesos dummy con dimensión d (reemplazar por pesos reales)
 
     # ========== SKLEARN (GROUND TRUTH) ==========
-    sklearn_model = SklearnLR(max_iter=1000, solver='lbfgs')
-    sklearn_model.fit(X_train, y_train)
-    sklearn_pred = sklearn_model.predict(X_test)
-    sklearn_acc = accuracy_score(y_test, sklearn_pred)
-    sklearn_weights = sklearn_model.coef_.flatten()
+    sklearn_model = SklearnLR(max_iter=1000, solver='lbfgs')  # Crea modelo sklearn: baseline estable para comparar (mismo tipo de modelo)
+    sklearn_model.fit(X_train, y_train)  # Entrena sklearn en el mismo train: produce coeficientes y predicciones de referencia
+    sklearn_pred = sklearn_model.predict(X_test)  # Predice en test: etiquetas binarias para medir accuracy
+    sklearn_acc = accuracy_score(y_test, sklearn_pred)  # Accuracy de referencia: se compara contra tu accuracy
+    sklearn_weights = sklearn_model.coef_.flatten()  # Extrae pesos: coef_ tiene shape (1,d) en binario; flatten -> (d,)
 
     # ========== COMPARACIÓN ==========
-    acc_diff = abs(my_acc - sklearn_acc)
-    weight_diff = np.linalg.norm(my_weights - sklearn_weights[:len(my_weights)])
+    acc_diff = abs(my_acc - sklearn_acc)  # Diferencia absoluta de accuracy: métrica simple para el veredicto
+    weight_diff = np.linalg.norm(my_weights - sklearn_weights[:len(my_weights)])  # Diferencia L2 de pesos: norma de la resta (cuanto menor, más parecido)
 
-    print(f"\n📊 RESULTADOS:")
-    print(f"  Tu Accuracy:     {my_acc:.4f}")
-    print(f"  sklearn Accuracy: {sklearn_acc:.4f}")
-    print(f"  Diferencia:       {acc_diff:.4f}")
+    print(f"\n📊 RESULTADOS:")  # Encabezado de resultados numéricos
+    print(f"  Tu Accuracy:     {my_acc:.4f}")  # Muestra tu accuracy (debería venir de tu implementación real)
+    print(f"  sklearn Accuracy: {sklearn_acc:.4f}")  # Muestra accuracy sklearn (baseline)
+    print(f"  Diferencia:       {acc_diff:.4f}")  # Reporta diferencia: si es grande, hay sospecha de bug
 
-    print(f"\n📐 PESOS:")
-    print(f"  Diferencia L2 de pesos: {weight_diff:.4f}")
+    print(f"\n📐 PESOS:")  # Encabezado de comparación de parámetros
+    print(f"  Diferencia L2 de pesos: {weight_diff:.4f}")  # Norma L2: cuantifica cuánto difieren los coeficientes
 
     # Veredicto
-    print("\n" + "-" * 60)
-    if acc_diff < 0.05:
-        print("✓ PASSED: Tu implementación es correcta")
-        return True
-    else:
-        print("✗ FAILED: Diferencia significativa - revisa tu matemática")
-        print("  Posibles causas:")
-        print("  - Gradiente mal calculado")
-        print("  - Learning rate muy alto/bajo")
-        print("  - Falta de normalización de datos")
-        return False
+    print("\n" + "-" * 60)  # Separador antes del veredicto: delimita la sección final
+    if acc_diff < 0.05:  # Criterio: diferencia <5% se considera aceptable (según la regla indicada)
+        print("✓ PASSED: Tu implementación es correcta")  # Mensaje OK: tu modelo se alinea razonablemente con sklearn
+        return True  # Devuelve True: útil para automatizar checks en pipelines/QA
+    else:  # Caso problemático: la diferencia excede el umbral y se sugiere revisar
+        print("✗ FAILED: Diferencia significativa - revisa tu matemática")  # Mensaje FAIL: indica que hay discrepancia relevante
+        print("  Posibles causas:")  # Lista de hipótesis típicas que causan divergencia
+        print("  - Gradiente mal calculado")  # Error común: derivada/gradiente incorrecto en la función de coste
+        print("  - Learning rate muy alto/bajo")  # Hiperparámetro: puede causar no convergencia o convergencia lenta
+        print("  - Falta de normalización de datos")  # Preprocesamiento: escalas distintas pueden dificultar el entrenamiento
+        return False  # Devuelve False: permite fallar la validación automáticamente
 
 
-def shadow_mode_linear_regression(X_train, y_train, X_test, y_test):
+def shadow_mode_linear_regression(X_train, y_train, X_test, y_test):  # Valida tu Linear Regression contra sklearn comparando MSE
     """
     Compara tu Linear Regression vs sklearn.
     """
-    print("=" * 60)
-    print("SHADOW MODE: Linear Regression")
-    print("=" * 60)
+    print("=" * 60)  # Separador visual: salida más legible
+    print("SHADOW MODE: Linear Regression")  # Título del bloque: indica validación de regresión lineal
+    print("=" * 60)  # Separador visual
 
     # ========== TU IMPLEMENTACIÓN ==========
     # my_model = MyLinReg()
@@ -3346,59 +3346,60 @@ def shadow_mode_linear_regression(X_train, y_train, X_test, y_test):
     # my_mse = mean_squared_error(y_test, my_pred)
 
     # Placeholder
-    my_mse = 0.5
+    my_mse = 0.5  # Placeholder: MSE dummy (reemplazar por MSE real de tu implementación)
 
     # ========== SKLEARN ==========
-    sklearn_model = SklearnLinReg()
-    sklearn_model.fit(X_train, y_train)
-    sklearn_pred = sklearn_model.predict(X_test)
-    sklearn_mse = mean_squared_error(y_test, sklearn_pred)
+    sklearn_model = SklearnLinReg()  # Crea baseline sklearn: regresión lineal por mínimos cuadrados
+    sklearn_model.fit(X_train, y_train)  # Ajusta baseline: obtiene coeficientes óptimos en closed-form
+    sklearn_pred = sklearn_model.predict(X_test)  # Predice en test: valores continuos
+    sklearn_mse = mean_squared_error(y_test, sklearn_pred)  # MSE sklearn: referencia para comparar tu MSE
 
     # ========== COMPARACIÓN ==========
-    mse_ratio = my_mse / sklearn_mse if sklearn_mse > 0 else float('inf')
+    mse_ratio = my_mse / sklearn_mse if sklearn_mse > 0 else float('inf')  # Ratio de errores: >1 implica peor que sklearn; evita dividir por 0
 
-    print(f"\n📊 RESULTADOS:")
-    print(f"  Tu MSE:     {my_mse:.4f}")
-    print(f"  sklearn MSE: {sklearn_mse:.4f}")
-    print(f"  Ratio:       {mse_ratio:.2f}x")
+    print(f"\n📊 RESULTADOS:")  # Encabezado de resultados
+    print(f"  Tu MSE:     {my_mse:.4f}")  # Muestra MSE de tu implementación (placeholder en este snippet)
+    print(f"  sklearn MSE: {sklearn_mse:.4f}")  # Muestra MSE del baseline
+    print(f"  Ratio:       {mse_ratio:.2f}x")  # Reporta cuántas veces es tu error respecto al baseline
 
-    print("\n" + "-" * 60)
-    if mse_ratio < 1.1:  # Dentro del 10%
-        print("✓ PASSED: Tu implementación es correcta")
-        return True
-    else:
-        print("✗ FAILED: Tu MSE es significativamente mayor")
-        return False
+    print("\n" + "-" * 60)  # Separador antes del veredicto
+    if mse_ratio < 1.1:  # Dentro del 10%: tolerancia razonable por diferencias numéricas/implementación
+        print("✓ PASSED: Tu implementación es correcta")  # OK: tu MSE está alineado con el baseline
+        return True  # Devuelve True: validación aprobada
+    else:  # Caso fallo: tu MSE es mucho peor que sklearn
+        print("✗ FAILED: Tu MSE es significativamente mayor")  # FAIL: sugiere bug o mala convergencia
+        return False  # Devuelve False: validación fallida
 
 
 # ============================================================
 # EJEMPLO DE USO
 # ============================================================
 
-if __name__ == "__main__":
-    from sklearn.datasets import make_classification, make_regression
-    from sklearn.model_selection import train_test_split
+if __name__ == "__main__":  # entrypoint: ejecuta la demo solo si se corre como script
+    # Ejecuta la demo de validación: compara tu implementación con sklearn
+    from sklearn.datasets import make_classification, make_regression  # Importa generadores: crean datasets sintéticos para demo/pruebas
+    from sklearn.model_selection import train_test_split  # Importa split sklearn: genera particiones consistentes para la demo
 
     # Dataset de clasificación
-    X_clf, y_clf = make_classification(
-        n_samples=1000, n_features=10, n_classes=2, random_state=42
-    )
-    X_train_c, X_test_c, y_train_c, y_test_c = train_test_split(
-        X_clf, y_clf, test_size=0.2, random_state=42
-    )
+    X_clf, y_clf = make_classification(  # Crea dataset binario: features y labels para probar logistic regression
+        n_samples=1000, n_features=10, n_classes=2, random_state=42  # Parámetros: tamaño, dimensionalidad, nº clases y semilla
+    )  # Devuelve X (n,d) e y (n,) para clasificación
+    X_train_c, X_test_c, y_train_c, y_test_c = train_test_split(  # Divide dataset de clasificación: train/test para validar sin leakage
+        X_clf, y_clf, test_size=0.2, random_state=42  # 20% test: semilla para reproducibilidad
+    )  # Retorna splits: X_train/X_test/y_train/y_test
 
     # Dataset de regresión
-    X_reg, y_reg = make_regression(
-        n_samples=1000, n_features=10, noise=10, random_state=42
-    )
-    X_train_r, X_test_r, y_train_r, y_test_r = train_test_split(
-        X_reg, y_reg, test_size=0.2, random_state=42
-    )
+    X_reg, y_reg = make_regression(  # Crea dataset de regresión: targets continuos con ruido
+        n_samples=1000, n_features=10, noise=10, random_state=42  # Parámetros: tamaño, features, nivel de ruido y semilla
+    )  # Devuelve X (n,d) e y (n,) para regresión
+    X_train_r, X_test_r, y_train_r, y_test_r = train_test_split(  # Divide dataset de regresión: entrenamiento y evaluación
+        X_reg, y_reg, test_size=0.2, random_state=42  # 20% test y semilla fija para reproducibilidad
+    )  # Retorna splits para regresión
 
     # Ejecutar Shadow Mode
-    shadow_mode_logistic_regression(X_train_c, y_train_c, X_test_c, y_test_c)
-    print("\n")
-    shadow_mode_linear_regression(X_train_r, y_train_r, X_test_r, y_test_r)
+    shadow_mode_logistic_regression(X_train_c, y_train_c, X_test_c, y_test_c)  # Ejecuta comparación logistic: devuelve True/False según el umbral
+    print("\n")  # Línea en blanco: separa salidas entre validación de clasificación y regresión
+    shadow_mode_linear_regression(X_train_r, y_train_r, X_test_r, y_test_r)  # Ejecuta comparación lineal: chequea ratio de MSE vs sklearn
 ```
 
 ### Checklist Shadow Mode

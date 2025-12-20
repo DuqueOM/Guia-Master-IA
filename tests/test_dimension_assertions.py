@@ -12,22 +12,25 @@ class TestDimensionAssertions:
 
     def test_matrix_multiplication_dimensions(self):
         """Verifica que matmul produce las dimensiones esperadas."""
-        A = np.random.randn(3, 4)
-        B = np.random.randn(4, 5)
+        rng = np.random.default_rng(0)
+        A = rng.standard_normal((3, 4))
+        B = rng.standard_normal((4, 5))
         C = A @ B
         assert C.shape == (3, 5), f"Expected (3, 5), got {C.shape}"
 
     def test_broadcasting_addition(self):
         """Verifica broadcasting en suma."""
-        A = np.random.randn(3, 4)
-        b = np.random.randn(4)  # Vector 1D
+        rng = np.random.default_rng(1)
+        A = rng.standard_normal((3, 4))
+        b = rng.standard_normal(4)  # Vector 1D
         C = A + b
         assert C.shape == (3, 4), f"Expected (3, 4), got {C.shape}"
 
     def test_broadcasting_column_vector(self):
         """Verifica broadcasting con vector columna."""
-        A = np.random.randn(3, 4)
-        b = np.random.randn(3, 1)  # Vector columna
+        rng = np.random.default_rng(2)
+        A = rng.standard_normal((3, 4))
+        b = rng.standard_normal((3, 1))  # Vector columna
         C = A + b
         assert C.shape == (3, 4), f"Expected (3, 4), got {C.shape}"
 
@@ -39,12 +42,13 @@ class TestDimensionAssertions:
         output_size = 10
 
         # Datos
-        X = np.random.randn(batch_size, input_size)
+        rng = np.random.default_rng(3)
+        X = rng.standard_normal((batch_size, input_size))
 
         # Pesos
-        W1 = np.random.randn(input_size, hidden_size)
+        W1 = rng.standard_normal((input_size, hidden_size))
         b1 = np.zeros((1, hidden_size))
-        W2 = np.random.randn(hidden_size, output_size)
+        W2 = rng.standard_normal((hidden_size, output_size))
         b2 = np.zeros((1, output_size))
 
         # Forward pass
@@ -71,16 +75,17 @@ class TestDimensionAssertions:
         output_size = 10
 
         # Forward (simplificado)
-        X = np.random.randn(batch_size, input_size)
-        W1 = np.random.randn(input_size, hidden_size)
-        W2 = np.random.randn(hidden_size, output_size)
+        rng = np.random.default_rng(4)
+        X = rng.standard_normal((batch_size, input_size))
+        W1 = rng.standard_normal((input_size, hidden_size))
+        W2 = rng.standard_normal((hidden_size, output_size))
 
         Z1 = X @ W1
         A1 = np.maximum(0, Z1)
-        Z2 = A1 @ W2
+        _ = A1 @ W2
 
         # Backward
-        dZ2 = np.random.randn(batch_size, output_size)  # Gradiente de loss
+        dZ2 = rng.standard_normal((batch_size, output_size))  # Gradiente de loss
 
         # Gradientes
         dW2 = A1.T @ dZ2
@@ -100,7 +105,8 @@ class TestDimensionAssertions:
         batch_size = 32
         num_classes = 10
 
-        logits = np.random.randn(batch_size, num_classes)
+        rng = np.random.default_rng(5)
+        logits = rng.standard_normal((batch_size, num_classes))
 
         # Softmax
         exp_logits = np.exp(logits - np.max(logits, axis=1, keepdims=True))
@@ -111,7 +117,8 @@ class TestDimensionAssertions:
 
     def test_reduction_with_keepdims(self):
         """Verifica comportamiento de keepdims."""
-        A = np.random.randn(3, 4, 5)
+        rng = np.random.default_rng(6)
+        A = rng.standard_normal((3, 4, 5))
 
         # Sin keepdims
         s1 = np.sum(A, axis=1)
@@ -141,8 +148,9 @@ class TestDimensionAssertions:
         batch_size = 64
         features = 100
 
-        X = np.random.randn(batch_size, features)
-        W = np.random.randn(features, 1)
+        rng = np.random.default_rng(7)
+        X = rng.standard_normal((batch_size, features))
+        W = rng.standard_normal((features, 1))
         b = np.zeros((1, 1))
 
         # Forward
@@ -150,7 +158,7 @@ class TestDimensionAssertions:
         assert y_pred.shape == (batch_size, 1)
 
         # Loss gradient (asumiendo MSE)
-        y_true = np.random.randn(batch_size, 1)
+        y_true = rng.standard_normal((batch_size, 1))
         dL_dy = 2 * (y_pred - y_true) / batch_size
         assert dL_dy.shape == (batch_size, 1)
 

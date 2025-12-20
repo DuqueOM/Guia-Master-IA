@@ -1873,33 +1873,33 @@ Añade una sección que responda:
 
 ```python
 # Código para análisis Bias-Variance
-def train_and_evaluate(hidden_sizes: list, X_train, y_train, X_test, y_test):
+def train_and_evaluate(hidden_sizes: list, X_train, y_train, X_test, y_test):  # Definir función para entrenar y evaluar modelos
     """Entrenar modelos de diferentes tamaños y comparar."""
-    results = []
+    results = []  # Lista para almacenar resultados de cada configuración
 
-    for sizes in hidden_sizes:
-        model = NeuralNetwork(layers=[784] + list(sizes) + [10])
-        model.fit(X_train, y_train, epochs=100)
+    for sizes in hidden_sizes:  # Iterar sobre diferentes configuraciones de capas ocultas
+        model = NeuralNetwork(layers=[784] + list(sizes) + [10])  # Crear red con arquitectura especificada
+        model.fit(X_train, y_train, epochs=100)  # Entrenar modelo por 100 épocas
 
-        train_acc = model.score(X_train, y_train)
-        test_acc = model.score(X_test, y_test)
+        train_acc = model.score(X_train, y_train)  # Calcular accuracy en entrenamiento
+        test_acc = model.score(X_test, y_test)  # Calcular accuracy en prueba
         gap = train_acc - test_acc  # Gap grande = overfitting
 
-        results.append({
-            'hidden_sizes': sizes,
-            'train_acc': train_acc,
-            'test_acc': test_acc,
-            'gap': gap
-        })
+        results.append({  # Guardar resultados de esta configuración
+            'hidden_sizes': sizes,  # Arquitectura usada
+            'train_acc': train_acc,  # Accuracy entrenamiento
+            'test_acc': test_acc,  # Accuracy prueba
+            'gap': gap  # Diferencia (overfitting)
+        })  # Cerrar diccionario de resultados
 
-    return results
+    return results  # Devolver todos los resultados
 
 # Experimento
-sizes_to_test = [
+sizes_to_test = [  # Definir arquitecturas a probar
     (32,),           # Muy pequeño (alto bias)
     (128, 64),       # Medio (balanceado)
     (512, 256, 128)  # Grande (alta variance)
-]
+]  # Cerrar lista de arquitecturas
 ```
 
 ---

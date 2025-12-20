@@ -450,12 +450,12 @@ Ejemplo: Clasificación de spam
 #### 2.3 Implementación en Python
 
 ```python
-import numpy as np
+import numpy as np  # Importa NumPy para arrays y operaciones numéricas en el demo
 
-def bayes_classifier(x: np.ndarray,
-                     likelihood_spam: float,
-                     likelihood_ham: float,
-                     prior_spam: float = 0.3) -> str:
+def bayes_classifier(x: np.ndarray,  # features del email (placeholder en este ejemplo)
+                     likelihood_spam: float,  # P(x|spam): verosimilitud de observar x si es spam
+                     likelihood_ham: float,  # P(x|ham): verosimilitud de observar x si es ham
+                     prior_spam: float = 0.3) -> str:  # P(spam): prior (creencia previa) de clase spam
     """
     Clasificador Bayesiano simple.
 
@@ -468,23 +468,23 @@ def bayes_classifier(x: np.ndarray,
     Returns:
         'spam' o 'ham'
     """
-    prior_ham = 1 - prior_spam
+    prior_ham = 1 - prior_spam  # prior complementario: P(ham)=1-P(spam)
 
     # Posterior (sin normalizar, solo comparamos)
-    posterior_spam = likelihood_spam * prior_spam
-    posterior_ham = likelihood_ham * prior_ham
+    posterior_spam = likelihood_spam * prior_spam  # score proporcional a P(x|spam)P(spam)
+    posterior_ham = likelihood_ham * prior_ham  # score proporcional a P(x|ham)P(ham)
 
-    return 'spam' if posterior_spam > posterior_ham else 'ham'
+    return 'spam' if posterior_spam > posterior_ham else 'ham'  # decide por argmax (sin calcular P(x))
 
 
 # Ejemplo: Email con palabra "gratis"
 # P("gratis"|spam) = 0.8, P("gratis"|ham) = 0.1
-result = bayes_classifier(
+result = bayes_classifier(  # ejecuta la regla Bayesiana con priors y likelihoods de ejemplo
     x=None,  # simplificado
-    likelihood_spam=0.8,
-    likelihood_ham=0.1,
-    prior_spam=0.3
-)
+    likelihood_spam=0.8,  # probabilidad de observar la señal x si es spam
+    likelihood_ham=0.1,  # probabilidad de observar la señal x si es ham
+    prior_spam=0.3  # prior: probabilidad a priori de spam
+)  # cierra llamada al clasificador
 print(f"Clasificación: {result}")  # spam
 ```
 
@@ -548,27 +548,27 @@ print(f"Clasificación: {result}")  # spam
 #### 2.4 Naive Bayes (Conexión con Supervised Learning)
 
 ```python
-def naive_bayes_predict(X: np.ndarray,
-                        class_priors: np.ndarray,
-                        feature_probs: dict) -> np.ndarray:
+def naive_bayes_predict(X: np.ndarray,  # matriz de features discretas (por muestra)
+                        class_priors: np.ndarray,  # priors por clase P(c)
+                        feature_probs: dict) -> np.ndarray:  # probabilidades por feature P(x_i|c)
     """
     Naive Bayes asume independencia entre features:
     P(x1, x2, ..., xn | clase) = P(x1|clase) · P(x2|clase) · ... · P(xn|clase)
 
     Esta "ingenuidad" simplifica mucho el cálculo.
     """
-    n_samples = X.shape[0]
-    n_classes = len(class_priors)
+    n_samples = X.shape[0]  # número de muestras a clasificar
+    n_classes = len(class_priors)  # número de clases posibles
 
-    log_posteriors = np.zeros((n_samples, n_classes))
+    log_posteriors = np.zeros((n_samples, n_classes))  # matriz para acumular log-scores por clase
 
-    for c in range(n_classes):
+    for c in range(n_classes):  # recorre cada clase y computa su score logarítmico
         # Log para evitar underflow con muchas features
-        log_prior = np.log(class_priors[c])
-        log_likelihood = np.sum(np.log(feature_probs[c][X]), axis=1)
-        log_posteriors[:, c] = log_prior + log_likelihood
+        log_prior = np.log(class_priors[c])  # log P(c): prior en espacio log
+        log_likelihood = np.sum(np.log(feature_probs[c][X]), axis=1)  # suma de log P(x_i|c) por muestra
+        log_posteriors[:, c] = log_prior + log_likelihood  # log posterior no normalizado por muestra
 
-    return np.argmax(log_posteriors, axis=1)
+    return np.argmax(log_posteriors, axis=1)  # predice la clase con score máximo por muestra
 ```
 
 <details open>
@@ -1541,7 +1541,7 @@ MLE: Encontrar los parámetros θ que maximizan la probabilidad
 #### 4.3 MLE para Gaussiana
 
 ```python
-def mle_gaussian(data: np.ndarray) -> tuple[float, float]:
+def mle_gaussian(data: np.ndarray) -> tuple[float, float]:  # estima (mu, sigma) por MLE para una gaussiana
     """
     Estimar parámetros de Gaussiana con MLE.
 
@@ -1555,26 +1555,26 @@ def mle_gaussian(data: np.ndarray) -> tuple[float, float]:
     Returns:
         (mu_mle, sigma_mle)
     """
-    n = len(data)
+    n = len(data)  # número de muestras disponibles
 
     # MLE de la media
-    mu_mle = np.mean(data)
+    mu_mle = np.mean(data)  # μ_MLE: promedio muestral
 
     # MLE de la varianza (dividir por n, no n-1)
-    sigma_squared_mle = np.sum((data - mu_mle) ** 2) / n
-    sigma_mle = np.sqrt(sigma_squared_mle)
+    sigma_squared_mle = np.sum((data - mu_mle) ** 2) / n  # σ²_MLE: varianza muestral con divisor n
+    sigma_mle = np.sqrt(sigma_squared_mle)  # σ_MLE: desviación estándar (raíz de la varianza)
 
-    return mu_mle, sigma_mle
+    return mu_mle, sigma_mle  # retorna estimaciones (μ, σ)
 
 
 # Ejemplo: Generar datos y estimar
-np.random.seed(42)
-true_mu, true_sigma = 5.0, 2.0
-samples = np.random.normal(true_mu, true_sigma, size=1000)
+np.random.seed(42)  # fija semilla para reproducibilidad del muestreo
+true_mu, true_sigma = 5.0, 2.0  # parámetros verdaderos usados para simular datos
+samples = np.random.normal(true_mu, true_sigma, size=1000)  # genera muestras N(true_mu, true_sigma^2)
 
-estimated_mu, estimated_sigma = mle_gaussian(samples)
-print(f"Parámetros reales: μ={true_mu}, σ={true_sigma}")
-print(f"MLE estimados:     μ={estimated_mu:.3f}, σ={estimated_sigma:.3f}")
+estimated_mu, estimated_sigma = mle_gaussian(samples)  # estima parámetros a partir de las muestras simuladas
+print(f"Parámetros reales: μ={true_mu}, σ={true_sigma}")  # muestra parámetros ground truth
+print(f"MLE estimados:     μ={estimated_mu:.3f}, σ={estimated_sigma:.3f}")  # muestra estimaciones MLE
 ```
 
 <details open>
@@ -1716,7 +1716,7 @@ Negative log-likelihood promedio:
 Eso es exactamente **Categorical Cross-Entropy**.
 
 ```python
-def cross_entropy_from_mle():
+def cross_entropy_from_mle():  # demuestra cross-entropy como NLL (derivada desde MLE)
     """
     Demostración de que Cross-Entropy viene de MLE.
 
@@ -1732,20 +1732,20 @@ def cross_entropy_from_mle():
     = Minimizar Cross-Entropy!
     """
     # Ejemplo numérico
-    y_true = np.array([1, 0, 1, 1, 0])
-    y_pred = np.array([0.9, 0.1, 0.8, 0.7, 0.2])  # Probabilidades
+    y_true = np.array([1, 0, 1, 1, 0])  # etiquetas reales (0/1)
+    y_pred = np.array([0.9, 0.1, 0.8, 0.7, 0.2])  # probabilidades predichas p(y=1|x)
 
     # Cross-Entropy (negative log-likelihood promedio)
     epsilon = 1e-15  # Para evitar log(0)
-    ce = -np.mean(
-        y_true * np.log(y_pred + epsilon) +
-        (1 - y_true) * np.log(1 - y_pred + epsilon)
-    )
+    ce = -np.mean(  # NLL promedio: -E[y log(p) + (1-y) log(1-p)]
+        y_true * np.log(y_pred + epsilon) +  # contribución de ejemplos positivos (y=1)
+        (1 - y_true) * np.log(1 - y_pred + epsilon)  # contribución de ejemplos negativos (y=0)
+    )  # cierra promedio de cross-entropy
 
-    print(f"Cross-Entropy Loss: {ce:.4f}")
-    return ce
+    print(f"Cross-Entropy Loss: {ce:.4f}")  # imprime el valor de la loss para inspección
+    return ce  # retorna la cross-entropy calculada
 
-cross_entropy_from_mle()
+cross_entropy_from_mle()  # ejecuta la demo de MLE→cross-entropy
 ```
 
 <details open>
@@ -2142,7 +2142,7 @@ Al restar max(z), todos los exponentes son ≤ 0, evitando overflow.
 ```python
 import numpy as np  # NumPy: necesario para exp/log/max/sum en softmax estable
 
-def softmax(z: np.ndarray) -> np.ndarray:
+def softmax(z: np.ndarray) -> np.ndarray:  # convierte logits a probabilidades (softmax estable)
     """
     Softmax numéricamente estable usando Log-Sum-Exp trick.
 
@@ -2162,7 +2162,7 @@ def softmax(z: np.ndarray) -> np.ndarray:
     return exp_z / np.sum(exp_z, axis=-1, keepdims=True)  # Normaliza para que sumen 1 (distribución)
 
 
-def log_softmax(z: np.ndarray) -> np.ndarray:
+def log_softmax(z: np.ndarray) -> np.ndarray:  # calcula log(softmax(z)) de forma estable
     """
     Log-Softmax estable (útil para Cross-Entropy).
 
@@ -2174,7 +2174,7 @@ def log_softmax(z: np.ndarray) -> np.ndarray:
     return z_stable - log_sum_exp  # log_softmax = z - logsumexp(z)
 
 
-def categorical_cross_entropy_from_logits(y_true: np.ndarray, logits: np.ndarray) -> float:
+def categorical_cross_entropy_from_logits(y_true: np.ndarray, logits: np.ndarray) -> float:  # CCE estable usando logits
     """
     Cross-entropy estable usando logits directamente.
 
@@ -2189,29 +2189,29 @@ def categorical_cross_entropy_from_logits(y_true: np.ndarray, logits: np.ndarray
 # DEMOSTRACIÓN: Por qué el trick es necesario
 # ============================================================
 
-def demo_numerical_stability():
+def demo_numerical_stability():  # muestra overflow/NaN en softmax ingenuo vs estable
     """Muestra por qué necesitamos el Log-Sum-Exp trick."""
 
     # Caso peligroso: logits muy grandes
     z_dangerous = np.array([1000.0, 1001.0, 1002.0])  # Logits extremos: exp() desborda sin protección
 
     # Sin el trick (INCORRECTO)
-    def softmax_naive(z):
+    def softmax_naive(z):  # softmax ingenuo (puede overflow con logits grandes)
         exp_z = np.exp(z)  # ¡Overflow! exp(1000) -> inf
         return exp_z / np.sum(exp_z)  # inf/inf -> NaN (resultado no es una distribución válida)
 
     # Con el trick (CORRECTO)
-    def softmax_stable(z):
+    def softmax_stable(z):  # softmax estable (resta max antes de exp)
         z_stable = z - np.max(z)  # Restar max: invariancia de softmax pero con estabilidad
         exp_z = np.exp(z_stable)  # Ahora exp() es seguro (valores ≤ 0)
         return exp_z / np.sum(exp_z)  # Normaliza a suma 1
 
-    print("Logits peligrosos:", z_dangerous)
-    print()
+    print("Logits peligrosos:", z_dangerous)  # muestra logits extremos que rompen exp sin protección
+    print()  # línea en blanco: separa secciones en la salida
 
     # Naive (falla)
-    import warnings
-    with warnings.catch_warnings():
+    import warnings  # módulo para controlar/ignorar warnings durante la demo
+    with warnings.catch_warnings():  # captura warnings (overflow) para no ensuciar la salida
         warnings.simplefilter("ignore")  # Ignora warning esperado por overflow (demo)
         result_naive = softmax_naive(z_dangerous)  # Resultado ingenuo (suele contener NaN)
         print(f"Softmax NAIVE: {result_naive}")  # Imprime el vector (para ver NaN/inf)
@@ -2222,18 +2222,18 @@ def demo_numerical_stability():
     print(f"\nSoftmax ESTABLE: {result_stable}")  # Imprime el vector estable
     print(f"  → Suma: {np.sum(result_stable):.6f} ✓")  # Suma ~1 confirma distribución válida
 
-demo_numerical_stability()
+demo_numerical_stability()  # ejecuta la demo de estabilidad numérica
 
 
 # Ejemplo: Clasificación multiclase (dígitos 0-9)
-logits = np.array([2.0, 1.0, 0.1, -1.0, 3.0, 0.5, -0.5, 1.5, 0.0, -2.0])
-probs = softmax(logits)
+logits = np.array([2.0, 1.0, 0.1, -1.0, 3.0, 0.5, -0.5, 1.5, 0.0, -2.0])  # logits de ejemplo para 10 clases
+probs = softmax(logits)  # convierte logits a probabilidades (softmax)
 
-print("\nLogits → Probabilidades:")
-for i, (l, p) in enumerate(zip(logits, probs)):
-    print(f"  Clase {i}: logit={l:+.1f} → prob={p:.3f}")
-print(f"\nSuma de probabilidades: {np.sum(probs):.6f}")
-print(f"Clase predicha: {np.argmax(probs)}")
+print("\nLogits → Probabilidades:")  # encabezado: muestra mapeo logit→probabilidad
+for i, (l, p) in enumerate(zip(logits, probs)):  # recorre clases y sus probabilidades
+    print(f"  Clase {i}: logit={l:+.1f} → prob={p:.3f}")  # imprime probabilidad por clase
+print(f"\nSuma de probabilidades: {np.sum(probs):.6f}")  # sanity check: suma debe ser ~1
+print(f"Clase predicha: {np.argmax(probs)}")  # predicción: clase con probabilidad máxima
 
 ```
 
@@ -2300,8 +2300,8 @@ print(f"Clase predicha: {np.argmax(probs)}")
 #### 5.5 Categorical Cross-Entropy (Multiclase)
 
 ```python
-def categorical_cross_entropy(y_true: np.ndarray,
-                               y_pred: np.ndarray) -> float:
+def categorical_cross_entropy(y_true: np.ndarray,  # labels one-hot (n_samples, n_classes)
+                               y_pred: np.ndarray) -> float:  # probabilidades predichas (softmax) (n_samples, n_classes)
     """
     Loss para clasificación multiclase.
 
@@ -2312,24 +2312,24 @@ def categorical_cross_entropy(y_true: np.ndarray,
     Returns:
         Loss promedio
     """
-    epsilon = 1e-15
+    epsilon = 1e-15  # estabilidad numérica: evita log(0)
     # Solo cuenta la clase correcta (donde y_true=1)
-    return -np.mean(np.sum(y_true * np.log(y_pred + epsilon), axis=1))
+    return -np.mean(np.sum(y_true * np.log(y_pred + epsilon), axis=1))  # loss promedio: -mean(sum(y*log(p)))
 
 
 # Ejemplo
-y_true = np.array([
+y_true = np.array([  # labels one-hot para 2 muestras
     [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],  # Clase 4
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # Clase 0
-])
+])  # cierra array de etiquetas y_true
 
-y_pred = np.array([
+y_pred = np.array([  # probabilidades predichas (cada fila suma 1)
     softmax(np.array([0, 0, 0, 0, 5, 0, 0, 0, 0, 0])),  # Confiado en 4
     softmax(np.array([3, 1, 0, 0, 0, 0, 0, 0, 0, 0])),  # Confiado en 0
-])
+])  # cierra array de probabilidades y_pred
 
-loss = categorical_cross_entropy(y_true, y_pred)
-print(f"Categorical Cross-Entropy: {loss:.4f}")
+loss = categorical_cross_entropy(y_true, y_pred)  # calcula la loss CCE para el ejemplo
+print(f"Categorical Cross-Entropy: {loss:.4f}")  # imprime la loss para inspección
 
 ```
 
@@ -2419,24 +2419,24 @@ Reglas:
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 # Simulación con conteos (dataset pequeño)
-n = 100
-count_A = 40
-count_B = 50
-count_A_and_B = 20
+n = 100  # Tamaño total del dataset
+count_A = 40  # Conteo de eventos A
+count_B = 50  # Conteo de eventos B
+count_A_and_B = 20  # Conteo de eventos A y B simultáneamente
 
-P_A = count_A / n
-P_B = count_B / n
-P_A_and_B = count_A_and_B / n
+P_A = count_A / n  # Calcular probabilidad de A
+P_B = count_B / n  # Calcular probabilidad de B
+P_A_and_B = count_A_and_B / n  # Calcular probabilidad conjunta
 
-P_A_given_B = P_A_and_B / P_B
+P_A_given_B = P_A_and_B / P_B  # Calcular probabilidad condicional P(A|B)
 
-assert 0.0 <= P_A <= 1.0
-assert 0.0 <= P_B <= 1.0
-assert 0.0 <= P_A_given_B <= 1.0
-assert np.isclose(P_A_and_B, P_A_given_B * P_B)
+assert 0.0 <= P_A <= 1.0  # Verificar que P_A esté en [0,1]
+assert 0.0 <= P_B <= 1.0  # Verificar que P_B esté en [0,1]
+assert 0.0 <= P_A_given_B <= 1.0  # Verificar que P(A|B) esté en [0,1]
+assert np.isclose(P_A_and_B, P_A_given_B * P_B)  # Verificar regla del producto
 ```
 
 ---
@@ -2462,23 +2462,23 @@ assert np.isclose(P_A_and_B, P_A_given_B * P_B)
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-P_spam = 0.3
-P_ham = 1.0 - P_spam
+P_spam = 0.3  # Probabilidad prior de spam
+P_ham = 1.0 - P_spam  # Probabilidad prior de ham
 
-P_x_given_spam = 0.8
-P_x_given_ham = 0.1
+P_x_given_spam = 0.8  # Verosimilitud P(x|spam)
+P_x_given_ham = 0.1  # Verosimilitud P(x|ham)
 
-score_spam = P_x_given_spam * P_spam
-score_ham = P_x_given_ham * P_ham
+score_spam = P_x_given_spam * P_spam  # Calcular score no normalizado para spam
+score_ham = P_x_given_ham * P_ham  # Calcular score no normalizado para ham
 
-Z = score_spam + score_ham
-P_spam_given_x = score_spam / Z
-P_ham_given_x = score_ham / Z
+Z = score_spam + score_ham  # Calcular constante de normalización
+P_spam_given_x = score_spam / Z  # Calcular posterior P(spam|x)
+P_ham_given_x = score_ham / Z  # Calcular posterior P(ham|x)
 
-assert np.isclose(P_spam_given_x + P_ham_given_x, 1.0)
-assert P_spam_given_x > P_ham_given_x
+assert np.isclose(P_spam_given_x + P_ham_given_x, 1.0)  # Verificar que sumen 1
+assert P_spam_given_x > P_ham_given_x  # Verificar que spam es más probable
 ```
 
 ---
@@ -2502,27 +2502,27 @@ assert P_spam_given_x > P_ham_given_x
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-np.random.seed(0)
-n = 20000
+np.random.seed(0)  # Fijar semilla para reproducibilidad
+n = 20000  # Tamaño de muestra
 
 # Independientes
-A = (np.random.rand(n) < 0.4)
-B = (np.random.rand(n) < 0.5)
+A = (np.random.rand(n) < 0.4)  # Generar eventos A con P=0.4
+B = (np.random.rand(n) < 0.5)  # Generar eventos B con P=0.5
 
-P_A = A.mean()
-P_B = B.mean()
-P_A_and_B = (A & B).mean()
+P_A = A.mean()  # Calcular P(A)
+P_B = B.mean()  # Calcular P(B)
+P_A_and_B = (A & B).mean()  # Calcular P(A∩B)
 
-assert abs(P_A_and_B - (P_A * P_B)) < 0.01
+assert abs(P_A_and_B - (P_A * P_B)) < 0.01  # Verificar independencia
 
 # Dependientes: B es casi A
-B_dep = (A | (np.random.rand(n) < 0.05))
-P_B_dep = B_dep.mean()
-P_A_and_B_dep = (A & B_dep).mean()
+B_dep = (A | (np.random.rand(n) < 0.05))  # B depende de A
+P_B_dep = B_dep.mean()  # Calcular P(B)
+P_A_and_B_dep = (A & B_dep).mean()  # Calcular P(A∩B)
 
-assert abs(P_A_and_B_dep - (P_A * P_B_dep)) > 0.02
+assert abs(P_A_and_B_dep - (P_A * P_B_dep)) > 0.02  # Verificar dependencia
 ```
 
 ---
@@ -2546,15 +2546,15 @@ assert abs(P_A_and_B_dep - (P_A * P_B_dep)) > 0.02
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-np.random.seed(1)
-p_true = 0.7
-n = 5000
-x = (np.random.rand(n) < p_true).astype(float)
+np.random.seed(1)  # Fijar semilla para reproducibilidad
+p_true = 0.7  # Probabilidad verdadera
+n = 5000  # Tamaño de muestra
+x = (np.random.rand(n) < p_true).astype(float)  # Generar muestras Bernoulli
 
-p_hat = float(np.mean(x))
-assert abs(p_hat - p_true) < 0.02
+p_hat = float(np.mean(x))  # Estimar p mediante MLE (promedio)
+assert abs(p_hat - p_true) < 0.02  # Verificar que estimación sea cercana
 ```
 
 ---
@@ -2578,26 +2578,26 @@ assert abs(p_hat - p_true) < 0.02
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:
-    x = np.asarray(x, dtype=float)
-    sigma = float(sigma)
-    assert sigma > 0
-    z = (x - mu) / sigma
-    return (1.0 / (np.sqrt(2.0 * np.pi) * sigma)) * np.exp(-0.5 * z**2)
+def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:  # Definir función PDF gaussiana univariada
+    x = np.asarray(x, dtype=float)  # Convertir x a array numpy
+    sigma = float(sigma)  # Convertir sigma a float
+    assert sigma > 0  # Verificar que sigma sea positivo
+    z = (x - mu) / sigma  # Calcular z-score
+    return (1.0 / (np.sqrt(2.0 * np.pi) * sigma)) * np.exp(-0.5 * z**2)  # Calcular PDF
 
 
-val0 = gaussian_pdf(np.array([0.0]), mu=0.0, sigma=1.0)[0]
-assert np.isclose(val0, 0.39894228, atol=1e-4)
+val0 = gaussian_pdf(np.array([0.0]), mu=0.0, sigma=1.0)[0]  # Calcular PDF en x=0
+assert np.isclose(val0, 0.39894228, atol=1e-4)  # Verificar valor ~1/√(2π)
 
-a = 1.7
-assert np.isclose(
-    gaussian_pdf(np.array([a]), 0.0, 1.0)[0],
-    gaussian_pdf(np.array([-a]), 0.0, 1.0)[0],
-    rtol=1e-12,
-    atol=1e-12,
-)
+a = 1.7  # Definir valor para prueba de simetría
+assert np.isclose(  # Verificar simetría del PDF
+    gaussian_pdf(np.array([a]), 0.0, 1.0)[0],  # PDF en x=a
+    gaussian_pdf(np.array([-a]), 0.0, 1.0)[0],  # PDF en x=-a
+    rtol=1e-12,  # Tolerancia relativa
+    atol=1e-12,  # Tolerancia absoluta
+)  # El PDF gaussiano es simétrico
 ```
 
 ---
@@ -2625,62 +2625,62 @@ assert np.isclose(
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def multivariate_gaussian_pdf(x: np.ndarray, mu: np.ndarray, cov: np.ndarray) -> float:
-    x = np.asarray(x, dtype=float)
-    mu = np.asarray(mu, dtype=float)
-    cov = np.asarray(cov, dtype=float)
-    d = x.shape[0]
+def multivariate_gaussian_pdf(x: np.ndarray, mu: np.ndarray, cov: np.ndarray) -> float:  # Definir función de densidad de probabilidad gaussiana multivariada
+    x = np.asarray(x, dtype=float)  # Convertir x a array numpy
+    mu = np.asarray(mu, dtype=float)  # Convertir mu a array numpy
+    cov = np.asarray(cov, dtype=float)  # Convertir cov a array numpy
+    d = x.shape[0]  # Obtener dimensión
 
-    assert mu.shape == (d,)
-    assert cov.shape == (d, d)
-    assert np.allclose(cov, cov.T)
-    eigvals = np.linalg.eigvals(cov)
-    assert np.all(eigvals > 0)
+    assert mu.shape == (d,)  # Verificar que mu tenga dimensión correcta
+    assert cov.shape == (d, d)  # Verificar que cov sea matriz cuadrada
+    assert np.allclose(cov, cov.T)  # Verificar que cov sea simétrica
+    eigvals = np.linalg.eigvals(cov)  # Calcular eigenvalores
+    assert np.all(eigvals > 0)  # Verificar que cov sea definida positiva
 
-    diff = x - mu
-    inv = np.linalg.inv(cov)
-    det = np.linalg.det(cov)
-    norm = 1.0 / (np.sqrt(((2.0 * np.pi) ** d) * det))
-    expo = -0.5 * float(diff.T @ inv @ diff)
-    return float(norm * np.exp(expo))
-
-
-mu = np.array([0.0, 0.0])
-cov = np.eye(2)
-pdf0 = multivariate_gaussian_pdf(np.array([0.0, 0.0]), mu, cov)
-assert np.isclose(pdf0, 1.0 / (2.0 * np.pi), atol=1e-6)
-assert pdf0 > 0.0
-
-def covariance_ellipse_points(mu: np.ndarray, cov: np.ndarray, k: float = 2.0, n: int = 200) -> np.ndarray:
-    mu = np.asarray(mu, dtype=float)
-    cov = np.asarray(cov, dtype=float)
-    assert mu.shape == (2,)
-    assert cov.shape == (2, 2)
-    assert np.allclose(cov, cov.T)
-
-    eigvals, eigvecs = np.linalg.eigh(cov)
-    assert np.all(eigvals > 0)
-
-    t = np.linspace(0.0, 2.0 * np.pi, n, endpoint=False)
-    circle = np.stack([np.cos(t), np.sin(t)], axis=0)
-
-    transform = eigvecs @ np.diag(np.sqrt(eigvals))
-    pts = (mu.reshape(2, 1) + (k * transform @ circle)).T
-    return pts
+    diff = x - mu  # Calcular diferencia x - mu
+    inv = np.linalg.inv(cov)  # Calcular inversa de cov
+    det = np.linalg.det(cov)  # Calcular determinante de cov
+    norm = 1.0 / (np.sqrt(((2.0 * np.pi) ** d) * det))  # Calcular factor de normalización
+    expo = -0.5 * float(diff.T @ inv @ diff)  # Calcular exponente
+    return float(norm * np.exp(expo))  # Devolver valor de PDF
 
 
-mu2 = np.array([0.0, 0.0])
-cov2 = np.array([
-    [2.0, 1.2],
-    [1.2, 1.0],
-], dtype=float)
-pts = covariance_ellipse_points(mu2, cov2, k=2.0, n=180)
-inv2 = np.linalg.inv(cov2)
+mu = np.array([0.0, 0.0])  # Definir media
+cov = np.eye(2)  # Definir covarianza (identidad)
+pdf0 = multivariate_gaussian_pdf(np.array([0.0, 0.0]), mu, cov)  # Calcular PDF en origen
+assert np.isclose(pdf0, 1.0 / (2.0 * np.pi), atol=1e-6)  # Verificar valor teórico
+assert pdf0 > 0.0  # Verificar que sea positivo
 
-q = np.einsum('...i,ij,...j->...', pts - mu2, inv2, pts - mu2)
-assert np.allclose(q, 4.0, atol=1e-6)
+def covariance_ellipse_points(mu: np.ndarray, cov: np.ndarray, k: float = 2.0, n: int = 200) -> np.ndarray:  # Definir función para generar puntos en elipse de covarianza
+    mu = np.asarray(mu, dtype=float)  # Convertir mu a array numpy
+    cov = np.asarray(cov, dtype=float)  # Convertir cov a array numpy
+    assert mu.shape == (2,)  # Verificar que mu sea 2D
+    assert cov.shape == (2, 2)  # Verificar que cov sea matriz 2x2
+    assert np.allclose(cov, cov.T)  # Verificar que cov sea simétrica
+
+    eigvals, eigvecs = np.linalg.eigh(cov)  # Calcular eigenvalores y eigenvectores
+    assert np.all(eigvals > 0)  # Verificar que eigenvalores sean positivos
+
+    t = np.linspace(0.0, 2.0 * np.pi, n, endpoint=False)  # Generar ángulos
+    circle = np.stack([np.cos(t), np.sin(t)], axis=0)  # Crear círculo unitario
+
+    transform = eigvecs @ np.diag(np.sqrt(eigvals))  # Crear matriz de transformación
+    pts = (mu.reshape(2, 1) + (k * transform @ circle)).T  # Transformar y trasladar puntos
+    return pts  # Devolver puntos de la elipse
+
+
+mu2 = np.array([0.0, 0.0])  # Definir media para elipse
+cov2 = np.array([  # Definir covarianza no diagonal
+    [2.0, 1.2],  # Varianza x=2.0, covarianza xy=1.2
+    [1.2, 1.0],  # Covarianza yx=1.2, varianza y=1.0
+], dtype=float)  # Matriz de covarianza 2x2
+pts = covariance_ellipse_points(mu2, cov2, k=2.0, n=180)  # Generar puntos de elipse
+inv2 = np.linalg.inv(cov2)  # Calcular inversa de covarianza
+
+q = np.einsum('...i,ij,...j->...', pts - mu2, inv2, pts - mu2)  # Calcular forma cuadrática
+assert np.allclose(q, 4.0, atol=1e-6)  # Verificar que puntos satisfagan (x-μ)^T Σ^{-1} (x-μ) ≈ k^2
 ```
 
 ---
@@ -2713,7 +2713,7 @@ import numpy as np  # NumPy: grid 2D, álgebra lineal y evaluación vectorizada
 import matplotlib.pyplot as plt  # Matplotlib: contornos 2D y trazado de elipses
 
 
-def multivariate_gaussian_pdf_grid(xx: np.ndarray, yy: np.ndarray, mu: np.ndarray, cov: np.ndarray) -> np.ndarray:
+def multivariate_gaussian_pdf_grid(xx: np.ndarray, yy: np.ndarray, mu: np.ndarray, cov: np.ndarray) -> np.ndarray:  # Definir función para evaluar PDF en grid 2D
     # xx, yy: grids 2D (H,W) típicamente creados con np.meshgrid
     xx = np.asarray(xx, dtype=float)  # Asegura dtype float para evitar ints en exp/log
     yy = np.asarray(yy, dtype=float)  # Mismo contrato: (H,W)
@@ -2742,7 +2742,7 @@ def multivariate_gaussian_pdf_grid(xx: np.ndarray, yy: np.ndarray, mu: np.ndarra
     return pdf  # Devuelve matriz 2D lista para contour/contourf
 
 
-def covariance_ellipse_points(mu: np.ndarray, cov: np.ndarray, k: float = 2.0, n: int = 200) -> np.ndarray:
+def covariance_ellipse_points(mu: np.ndarray, cov: np.ndarray, k: float = 2.0, n: int = 200) -> np.ndarray:  # Definir función para generar puntos en elipse de covarianza
     # Esta función genera puntos sobre la elipse: (x-μ)^T Σ^{-1} (x-μ) = k^2
     mu = np.asarray(mu, dtype=float)  # mu:(2,) asegura float
     cov = np.asarray(cov, dtype=float)  # cov:(2,2) asegura float
@@ -2765,13 +2765,13 @@ def covariance_ellipse_points(mu: np.ndarray, cov: np.ndarray, k: float = 2.0, n
 
 mu = np.array([0.0, 0.0], dtype=float)  # μ:(2,) centramos en el origen para comparar solo Σ
 
-covs = [
+covs = [  # Definir lista de matrices de covarianza para visualizar
     np.eye(2, dtype=float),  # Σ1: isotrópica (círculo)
     np.array([[3.0, 0.0], [0.0, 1.0]], dtype=float),  # Σ2: elíptica (varianza distinta por eje)
     np.array([[2.0, 1.2], [1.2, 1.0]], dtype=float),  # Σ3: correlacionada (término fuera de diagonal)
 ]  # Lista de covarianzas a comparar
 
-labels = [
+labels = [  # Definir etiquetas para los subgráficos
     "Σ = I (isotrópica)",  # Texto para subplot 1
     "Σ = diag(3,1) (elíptica)",  # Texto para subplot 2
     "Σ con correlación (elipse rotada)",  # Texto para subplot 3
@@ -2825,13 +2825,13 @@ plt.savefig('gaussian_covariance_contours.png', dpi=160)  # Guarda la figura (ú
 ```python
 import numpy as np  # NumPy: arrays, exp/log y validación numérica
 
-def logsumexp(z: np.ndarray) -> float:
+def logsumexp(z: np.ndarray) -> float:  # Definir función log-sum-exp numéricamente estable
     z = np.asarray(z, dtype=float)  # Asegura float para que exp/log sean numéricamente consistentes
     m = np.max(z)  # m = max(z) sirve como “ancla” para evitar overflow en exp
     return float(m + np.log(np.sum(np.exp(z - m))))  # Log-Sum-Exp: m + log(sum(exp(z-m)))
 
 
-def log_softmax(z: np.ndarray) -> np.ndarray:
+def log_softmax(z: np.ndarray) -> np.ndarray:  # Definir función log-softmax numéricamente estable
     z = np.asarray(z, dtype=float)  # Asegura float y copia segura
     return z - logsumexp(z)  # log_softmax(z) = z - log(sum(exp(z)))
 
@@ -2900,23 +2900,23 @@ assert np.argmax(p_stable) == np.argmax(z_big)  # Debe preservar el orden de log
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def softmax(z: np.ndarray) -> np.ndarray:
-    z = np.asarray(z, dtype=float)
-    z_shift = z - np.max(z)
-    expz = np.exp(z_shift)
-    return expz / np.sum(expz)
+def softmax(z: np.ndarray) -> np.ndarray:  # Definir función softmax
+    z = np.asarray(z, dtype=float)  # Convertir a array numpy
+    z_shift = z - np.max(z)  # Restar máximo para estabilidad numérica
+    expz = np.exp(z_shift)  # Calcular exponenciales
+    return expz / np.sum(expz)  # Normalizar para que sume 1
 
 
-z = np.array([2.0, 1.0, 0.0])
-p = softmax(z)
-assert np.isclose(np.sum(p), 1.0)
+z = np.array([2.0, 1.0, 0.0])  # Definir logits
+p = softmax(z)  # Calcular softmax
+assert np.isclose(np.sum(p), 1.0)  # Verificar que sume 1
 
-c = 100.0
-p2 = softmax(z + c)
-assert np.allclose(p, p2)
-assert np.argmax(p) == np.argmax(z)
+c = 100.0  # Definir constante grande
+p2 = softmax(z + c)  # Calcular softmax con constante añadida
+assert np.allclose(p, p2)  # Verificar invarianza a constante
+assert np.argmax(p) == np.argmax(z)  # Verificar que preserva orden
 ```
 
 ---
@@ -2942,20 +2942,20 @@ assert np.argmax(p) == np.argmax(z)
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def binary_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
-    y_true = np.asarray(y_true, dtype=float)
-    y_pred = np.asarray(y_pred, dtype=float)
-    y_pred = np.clip(y_pred, eps, 1.0 - eps)
-    return float(-np.mean(y_true * np.log(y_pred) + (1.0 - y_true) * np.log(1.0 - y_pred)))
+def binary_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:  # Definir función de entropía cruzada binaria
+    y_true = np.asarray(y_true, dtype=float)  # Convertir y_true a array numpy
+    y_pred = np.asarray(y_pred, dtype=float)  # Convertir y_pred a array numpy
+    y_pred = np.clip(y_pred, eps, 1.0 - eps)  # Clipping para evitar log(0) y log(1)
+    return float(-np.mean(y_true * np.log(y_pred) + (1.0 - y_true) * np.log(1.0 - y_pred)))  # Calcular BCE
 
 
-y_true = np.array([1.0, 0.0, 1.0, 0.0])
-y_pred_good = np.array([0.999, 0.001, 0.999, 0.001])
-assert binary_cross_entropy(y_true, y_pred_good) < 0.01
+y_true = np.array([1.0, 0.0, 1.0, 0.0])  # Definir etiquetas verdaderas
+y_pred_good = np.array([0.999, 0.001, 0.999, 0.001])  # Definir predicciones buenas
+assert binary_cross_entropy(y_true, y_pred_good) < 0.01  # Verificar que pérdida sea pequeña
 
-assert np.isclose(binary_cross_entropy(np.array([1.0]), np.array([0.9])), -np.log(0.9), atol=1e-12)
+assert np.isclose(binary_cross_entropy(np.array([1.0]), np.array([0.9])), -np.log(0.9), atol=1e-12)  # Verificar caso simple
 ```
 
 ---
@@ -2979,22 +2979,22 @@ assert np.isclose(binary_cross_entropy(np.array([1.0]), np.array([0.9])), -np.lo
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def categorical_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
-    y_true = np.asarray(y_true, dtype=float)
-    y_pred = np.asarray(y_pred, dtype=float)
-    y_pred = np.clip(y_pred, eps, 1.0)
-    return float(-np.mean(np.sum(y_true * np.log(y_pred), axis=1)))
+def categorical_cross_entropy(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:  # Definir función de entropía cruzada categórica
+    y_true = np.asarray(y_true, dtype=float)  # Convertir y_true a array numpy
+    y_pred = np.asarray(y_pred, dtype=float)  # Convertir y_pred a array numpy
+    y_pred = np.clip(y_pred, eps, 1.0)  # Clipping para evitar log(0)
+    return float(-np.mean(np.sum(y_true * np.log(y_pred), axis=1)))  # Calcular pérdida promedio
 
 
-y_true = np.array([[0, 1, 0], [1, 0, 0]], dtype=float)
-y_pred_bad = np.array([[0.34, 0.33, 0.33], [0.34, 0.33, 0.33]], dtype=float)
-y_pred_good = np.array([[0.05, 0.90, 0.05], [0.90, 0.05, 0.05]], dtype=float)
+y_true = np.array([[0, 1, 0], [1, 0, 0]], dtype=float)  # Definir etiquetas verdaderas (one-hot)
+y_pred_bad = np.array([[0.34, 0.33, 0.33], [0.34, 0.33, 0.33]], dtype=float)  # Predicciones malas (casi uniformes)
+y_pred_good = np.array([[0.05, 0.90, 0.05], [0.90, 0.05, 0.05]], dtype=float)  # Predicciones buenas (confiadas)
 
-loss_bad = categorical_cross_entropy(y_true, y_pred_bad)
-loss_good = categorical_cross_entropy(y_true, y_pred_good)
-assert loss_good < loss_bad
+loss_bad = categorical_cross_entropy(y_true, y_pred_bad)  # Calcular pérdida para predicciones malas
+loss_good = categorical_cross_entropy(y_true, y_pred_good)  # Calcular pérdida para predicciones buenas
+assert loss_good < loss_bad  # Verificar que mejores predicciones tengan menor pérdida
 ```
 
 ---
@@ -3022,27 +3022,27 @@ assert loss_good < loss_bad
 #### Solución
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-P = np.array([
-    [0.9, 0.1],
-    [0.2, 0.8],
-], dtype=float)
-assert np.allclose(P.sum(axis=1), 1.0)
+P = np.array([  # Definir matriz de transición
+    [0.9, 0.1],  # De estado 0: 90% queda en 0, 10% va a 1
+    [0.2, 0.8],  # De estado 1: 20% va a 0, 80% queda en 1
+], dtype=float)  # Matriz 2x2 de probabilidades
+assert np.allclose(P.sum(axis=1), 1.0)  # Verificar que filas sumen 1
 
-k = 50
-pi0 = np.array([1.0, 0.0])
-pi = pi0.copy()
-for _ in range(k):
-    pi = pi @ P
-    assert np.isclose(np.sum(pi), 1.0)
-    assert np.all(pi >= 0)
+k = 50  # Número de pasos
+pi0 = np.array([1.0, 0.0])  # Distribución inicial
+pi = pi0.copy()  # Copiar distribución inicial
+for _ in range(k):  # Iterar k pasos
+    pi = pi @ P  # Actualizar distribución
+    assert np.isclose(np.sum(pi), 1.0)  # Verificar que sume 1
+    assert np.all(pi >= 0)  # Verificar que sea no negativa
 
-pi_power = pi0 @ np.linalg.matrix_power(P, k)
-assert np.allclose(pi, pi_power, atol=1e-12)
+pi_power = pi0 @ np.linalg.matrix_power(P, k)  # Calcular directamente
+assert np.allclose(pi, pi_power, atol=1e-12)  # Verificar equivalencia
 
-pi_star = pi.copy()
-assert np.allclose(pi_star, pi_star @ P, atol=1e-6)
+pi_star = pi.copy()  # Guardar distribución estacionaria
+assert np.allclose(pi_star, pi_star @ P, atol=1e-6)  # Verificar estacionariedad
 ```
 
 ## 🔨 Entregables del Módulo
@@ -3055,84 +3055,84 @@ Módulo de probabilidad esencial para ML.
 Implementaciones desde cero con NumPy.
 """
 
-import numpy as np
-from typing import Tuple
+import numpy as np  # Importar librería para computación numérica
+from typing import Tuple  # Importar tipo para tuplas
 
-def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:
+def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:  # Definir función PDF gaussiana univariada
     """Densidad de probabilidad Gaussiana univariada."""
-    pass
+    pass  # Implementar
 
-def multivariate_gaussian_pdf(x: np.ndarray,
-                               mu: np.ndarray,
-                               cov: np.ndarray) -> float:
+def multivariate_gaussian_pdf(x: np.ndarray,  # Definir función PDF gaussiana multivariada
+                               mu: np.ndarray,  # Vector de medias
+                               cov: np.ndarray) -> float:  # Matriz de covarianza
     """Densidad de probabilidad Gaussiana multivariada."""
-    pass
+    pass  # Implementar
 
-def mle_gaussian(data: np.ndarray) -> Tuple[float, float]:
+def mle_gaussian(data: np.ndarray) -> Tuple[float, float]:  # Definir función MLE para gaussiana
     """Estimación MLE de parámetros de Gaussiana."""
-    pass
+    pass  # Implementar
 
-def softmax(z: np.ndarray) -> np.ndarray:
+def softmax(z: np.ndarray) -> np.ndarray:  # Definir función softmax
     """Función softmax numéricamente estable."""
-    pass
+    pass  # Implementar
 
-def cross_entropy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+def cross_entropy(y_true: np.ndarray, y_pred: np.ndarray) -> float:  # Definir función de entropía cruzada
     """Binary cross-entropy loss."""
-    pass
+    pass  # Implementar
 
-def categorical_cross_entropy(y_true: np.ndarray,
-                               y_pred: np.ndarray) -> float:
+def categorical_cross_entropy(y_true: np.ndarray,  # Definir función de entropía cruzada categórica
+                               y_pred: np.ndarray) -> float:  # Predicciones de probabilidad
     """Categorical cross-entropy loss para multiclase."""
-    pass
+    pass  # Implementar
 ```
 
 ### E2: Tests
 
 ```python
 # tests/test_probability.py
-import numpy as np
-import pytest
-from src.probability import (
-    gaussian_pdf, mle_gaussian, softmax,
-    cross_entropy, categorical_cross_entropy
-)
+import numpy as np  # Importar librería para computación numérica
+import pytest  # Importar framework de testing
+from src.probability import (  # Importar funciones a probar
+    gaussian_pdf, mle_gaussian, softmax,  # Funciones de probabilidad
+    cross_entropy, categorical_cross_entropy  # Funciones de pérdida
+)  # Cerrar importación
 
-def test_gaussian_pdf_standard():
+def test_gaussian_pdf_standard():  # Definir test para PDF gaussiano estándar
     """PDF de Gaussiana estándar en x=0 debe ser ~0.3989."""
-    result = gaussian_pdf(np.array([0.0]), mu=0, sigma=1)
-    expected = 1 / np.sqrt(2 * np.pi)  # ~0.3989
-    assert np.isclose(result[0], expected, rtol=1e-5)
+    result = gaussian_pdf(np.array([0.0]), mu=0, sigma=1)  # Calcular PDF en x=0
+    expected = 1 / np.sqrt(2 * np.pi)  # ~0.3989  # Valor esperado
+    assert np.isclose(result[0], expected, rtol=1e-5)  # Verificar coincidencia
 
-def test_softmax_sums_to_one():
+def test_softmax_sums_to_one():  # Definir test para suma de softmax
     """Softmax debe sumar 1."""
-    z = np.random.randn(10)
-    probs = softmax(z)
-    assert np.isclose(np.sum(probs), 1.0)
+    z = np.random.randn(10)  # Generar logits aleatorios
+    probs = softmax(z)  # Calcular softmax
+    assert np.isclose(np.sum(probs), 1.0)  # Verificar que suma sea 1
 
-def test_softmax_preserves_order():
+def test_softmax_preserves_order():  # Definir test para orden de softmax
     """Mayor logit → mayor probabilidad."""
-    z = np.array([1.0, 2.0, 3.0])
-    probs = softmax(z)
-    assert probs[2] > probs[1] > probs[0]
+    z = np.array([1.0, 2.0, 3.0])  # Definir logits ordenados
+    probs = softmax(z)  # Calcular softmax
+    assert probs[2] > probs[1] > probs[0]  # Verificar orden preservado
 
-def test_mle_gaussian_accuracy():
+def test_mle_gaussian_accuracy():  # Definir test para MLE gaussiano
     """MLE debe recuperar parámetros con suficientes datos."""
-    np.random.seed(42)
-    true_mu, true_sigma = 10.0, 3.0
-    data = np.random.normal(true_mu, true_sigma, size=10000)
+    np.random.seed(42)  # Fijar semilla para reproducibilidad
+    true_mu, true_sigma = 10.0, 3.0  # Definir parámetros verdaderos
+    data = np.random.normal(true_mu, true_sigma, size=10000)  # Generar datos
 
-    est_mu, est_sigma = mle_gaussian(data)
+    est_mu, est_sigma = mle_gaussian(data)  # Estimar parámetros
 
-    assert np.isclose(est_mu, true_mu, rtol=0.05)
-    assert np.isclose(est_sigma, true_sigma, rtol=0.05)
+    assert np.isclose(est_mu, true_mu, rtol=0.05)  # Verificar media estimada
+    assert np.isclose(est_sigma, true_sigma, rtol=0.05)  # Verificar sigma estimado
 
-def test_cross_entropy_perfect_prediction():
+def test_cross_entropy_perfect_prediction():  # Definir test para entropía cruzada
     """CE debe ser ~0 para predicciones perfectas."""
-    y_true = np.array([1, 0, 1])
-    y_pred = np.array([0.999, 0.001, 0.999])
+    y_true = np.array([1, 0, 1])  # Definir etiquetas verdaderas
+    y_pred = np.array([0.999, 0.001, 0.999])  # Definir predicciones casi perfectas
 
-    loss = cross_entropy(y_true, y_pred)
-    assert loss < 0.01
+    loss = cross_entropy(y_true, y_pred)  # Calcular pérdida
+    assert loss < 0.01  # Verificar que pérdida sea pequeña
 ```
 
 ---

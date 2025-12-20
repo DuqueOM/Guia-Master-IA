@@ -63,27 +63,27 @@ Enlaces rápidos:
 
 ```python
 # ❌ Así NO se hace en Machine Learning
-def dot_product_slow(a: list, b: list) -> float:
+def dot_product_slow(a: list, b: list) -> float:  # Definir función lenta con loop
     """Producto punto con loop - LENTO."""
-    result = 0
-    for i in range(len(a)):
-        result += a[i] * b[i]
-    return result
+    result = 0  # Inicializar resultado
+    for i in range(len(a)):  # Iterar sobre elementos
+        result += a[i] * b[i]  # Multiplicar y acumular
+    return result  # Retornar resultado
 
 # Para vectores de 1 millón de elementos:
-# Tiempo: ~200ms
+# Tiempo: ~200ms  # Tiempo de ejecución lento
 ```
 
 ```python
 # ✅ Así SÍ se hace en Machine Learning
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-def dot_product_fast(a: np.ndarray, b: np.ndarray) -> float:
+def dot_product_fast(a: np.ndarray, b: np.ndarray) -> float:  # Definir función rápida vectorizada
     """Producto punto vectorizado - RÁPIDO."""
-    return np.dot(a, b)
+    return np.dot(a, b)  # Usar función optimizada de NumPy
 
 # Para vectores de 1 millón de elementos:
-# Tiempo: ~2ms (100x más rápido)
+# Tiempo: ~2ms (100x más rápido)  # Tiempo de ejecución rápido
 ```
 
 ### Conexión con el Pathway
@@ -141,18 +141,18 @@ En el mundo real de ML, los datos vienen en CSVs sucios, no en arrays NumPy perf
 4. **Convertir** a NumPy para el modelo
 
 ```python
-import pandas as pd
-import numpy as np
+import pandas as pd  # Importar librería para manipulación de datos
+import numpy as np  # Importar librería para computación numérica
 
 # ========== CARGA DE DATOS ==========
 # Cargar CSV
-df = pd.read_csv('data/iris.csv')
+df = pd.read_csv('data/iris.csv')  # Cargar dataset iris desde archivo CSV
 
 # Primeras filas
-print(df.head())
+print(df.head())  # Mostrar primeras 5 filas del DataFrame
 
 # Información del DataFrame
-print(df.info())
+print(df.info())  # Mostrar información sobre tipos de datos y valores nulos
 #  Column         Non-Null Count  Dtype
 # ---  ------         --------------  -----
 #  0   sepal_length   150 non-null    float64
@@ -162,90 +162,90 @@ print(df.info())
 #  4   species        150 non-null    object
 
 # Estadísticas básicas
-print(df.describe())
+print(df.describe())  # Mostrar estadísticas descriptivas del DataFrame
 ```
 
 #### Limpieza de Datos
 
 ```python
-import pandas as pd
+import pandas as pd  # Importar librería para manipulación de datos
 
 # Crear DataFrame con datos sucios
-df = pd.DataFrame({
-    'edad': [25, 30, None, 45, 50],
-    'salario': [50000, 60000, 70000, None, 90000],
-    'ciudad': ['Madrid', 'Barcelona', 'Madrid', 'Sevilla', None]
-})
+df = pd.DataFrame({  # Crear DataFrame con valores nulos
+    'edad': [25, 30, None, 45, 50],  # Columna edad con un valor nulo
+    'salario': [50000, 60000, 70000, None, 90000],  # Columna salario con un valor nulo
+    'ciudad': ['Madrid', 'Barcelona', 'Madrid', 'Sevilla', None]  # Columna ciudad con un valor nulo
+})  # Cerrar creación de DataFrame
 
 # ========== DETECTAR NULOS ==========
-print(df.isnull().sum())
+print(df.isnull().sum())  # Mostrar conteo de valores nulos por columna
 # edad       1
 # salario    1
 # ciudad     1
 
 # ========== ELIMINAR FILAS CON NULOS ==========
 df_clean = df.dropna()  # Elimina filas con cualquier nulo
-print(f"Filas después de dropna: {len(df_clean)}")  # 2
+print(f"Filas después de dropna: {len(df_clean)}")  # 2  # Mostrar número de filas restantes
 
 # ========== RELLENAR NULOS ==========
-df_filled = df.copy()
-df_filled['edad'] = df_filled['edad'].fillna(df_filled['edad'].mean())
-df_filled['salario'] = df_filled['salario'].fillna(df_filled['salario'].median())
-df_filled['ciudad'] = df_filled['ciudad'].fillna('Desconocido')
+df_filled = df.copy()  # Crear copia para no modificar original
+df_filled['edad'] = df_filled['edad'].fillna(df_filled['edad'].mean())  # Rellenar edad con media
+df_filled['salario'] = df_filled['salario'].fillna(df_filled['salario'].median())  # Rellenar salario con mediana
+df_filled['ciudad'] = df_filled['ciudad'].fillna('Desconocido')  # Rellenar ciudad con texto
 
-print(df_filled)
+print(df_filled)  # Mostrar DataFrame limpio
 ```
 
 #### Selección y Filtrado
 
 ```python
-import pandas as pd
+import pandas as pd  # Importar librería para manipulación de datos
 
-df = pd.read_csv('data/iris.csv')
+df = pd.read_csv('data/iris.csv')  # Cargar dataset iris
 
 # ========== SELECCIONAR COLUMNAS ==========
 # Una columna (Serie)
-sepal_length = df['sepal_length']
+sepal_length = df['sepal_length']  # Seleccionar columna sepal_length
 
 # Múltiples columnas (DataFrame)
-features = df[['sepal_length', 'sepal_width']]
+features = df[['sepal_length', 'sepal_width']]  # Seleccionar múltiples columnas
 
 # ========== FILTRAR FILAS ==========
 # Condición simple
-setosa = df[df['species'] == 'setosa']
+setosa = df[df['species'] == 'setosa']  # Filtrar filas donde species es 'setosa'
 
 # Múltiples condiciones
-large_setosa = df[(df['species'] == 'setosa') & (df['sepal_length'] > 5)]
+large_setosa = df[(df['species'] == 'setosa') & (df['sepal_length'] > 5)]  # Filtrar con múltiples condiciones
 
 # ========== LOC e ILOC ==========
 # loc: por etiquetas
-df.loc[0:5, ['sepal_length', 'species']]
+df.loc[0:5, ['sepal_length', 'species']]  # Seleccionar por etiquetas de filas y columnas
 
 # iloc: por posición (como NumPy)
-df.iloc[0:5, 0:2]
+df.iloc[0:5, 0:2]  # Seleccionar por posición numérica
 ```
 
 #### De Pandas a NumPy (Día 6)
 
 ```python
-import pandas as pd
-import numpy as np
+import pandas as pd  # Importar librería para manipulación de datos
+import numpy as np  # Importar librería para computación numérica
 
-df = pd.read_csv('data/iris.csv')
+df = pd.read_csv('data/iris.csv')  # Cargar dataset
 
 # ========== SEPARAR FEATURES Y TARGET ==========
 # Features (X) - todas las columnas numéricas
-X = df[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']].to_numpy()
-print(f"X shape: {X.shape}")  # (150, 4)
-print(f"X dtype: {X.dtype}")  # float64
+X = df[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']].to_numpy()  # Convertir a NumPy
+print(f"X shape: {X.shape}")  # (150, 4)  # Mostrar shape de X
+print(f"X dtype: {X.dtype}")  # float64  # Mostrar dtype de X
 
 # Target (y) - convertir categorías a números
-y = df['species'].map({'setosa': 0, 'versicolor': 1, 'virginica': 2}).to_numpy()
-print(f"y shape: {y.shape}")  # (150,)
+y = df['species'].map({'setosa': 0, 'versicolor': 1, 'virginica': 2}).to_numpy()  # Mapear categorías a números
+print(f"y shape: {y.shape}")  # (150,)  # Mostrar shape de y
 
 # ========== VERIFICAR ==========
-print(f"Tipo X: {type(X)}")  # <class 'numpy.ndarray'>
-print(f"Tipo y: {type(y)}")  # <class 'numpy.ndarray'>
+print(f"Tipo X: {type(X)}")  # <class 'numpy.ndarray'>  # Verificar tipo de X
+print(f"Tipo y: {type(y)}")  # <class 'numpy.ndarray'>  # Verificar tipo de y
 
 # Ahora X e y están listos para algoritmos de ML
 ```
@@ -383,10 +383,10 @@ NumPy (contiguo):     [ 1.0 ][ 2.0 ][ 3.0 ][ 4.0 ] ...  (mismo dtype)
 import numpy as np  # Importa NumPy para demostrar cómo axis afecta agregaciones
 
 # Lista de Python
-lista = [1, 2, 3, 4, 5]
+lista = [1, 2, 3, 4, 5]  # Crear lista de Python
 
 # Array de NumPy
-array = np.array([1, 2, 3, 4, 5])
+array = np.array([1, 2, 3, 4, 5])  # Crear array de NumPy
 
 # Diferencias clave:
 # 1. Tipo homogéneo (todos los elementos del mismo tipo)
@@ -475,23 +475,23 @@ array = np.array([1, 2, 3, 4, 5])
 ### 2. Creación de Arrays
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 # Desde lista
-a = np.array([1, 2, 3])
+a = np.array([1, 2, 3])  # Crear array desde lista de Python
 
 # Arrays especiales
-zeros = np.zeros((3, 4))        # Matriz 3x4 de ceros
-ones = np.ones((2, 3))          # Matriz 2x3 de unos
-identity = np.eye(4)            # Matriz identidad 4x4
-random = np.random.randn(3, 3)  # Matriz 3x3 valores normales
+zeros = np.zeros((3, 4))        # Matriz 3x4 de ceros  # Crear matriz de ceros
+ones = np.ones((2, 3))          # Matriz 2x3 de unos  # Crear matriz de unos
+identity = np.eye(4)            # Matriz identidad 4x4  # Crear matriz identidad
+random = np.random.randn(3, 3)  # Matriz 3x3 valores normales  # Crear matriz con valores aleatorios
 
 # Secuencias
-rango = np.arange(0, 10, 2)     # [0, 2, 4, 6, 8]
-linspace = np.linspace(0, 1, 5) # [0, 0.25, 0.5, 0.75, 1]
+rango = np.arange(0, 10, 2)     # [0, 2, 4, 6, 8]  # Crear rango con paso
+linspace = np.linspace(0, 1, 5) # [0, 0.25, 0.5, 0.75, 1]  # Crear secuencia equiespaciada
 
-print(f"Shape de zeros: {zeros.shape}")  # (3, 4)
-print(f"Dtype de zeros: {zeros.dtype}")  # float64
+print(f"Shape de zeros: {zeros.shape}")  # (3, 4)  # Mostrar shape
+print(f"Dtype de zeros: {zeros.dtype}")  # float64  # Mostrar tipo de dato
 ```
 
 <details>
@@ -566,26 +566,26 @@ print(f"Dtype de zeros: {zeros.dtype}")  # float64
 ### 3. Indexing y Slicing
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 # Crear matriz 2D
-matrix = np.array([
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
-])
+matrix = np.array([  # Crear matriz 3x3
+    [1, 2, 3],  # Fila 0
+    [4, 5, 6],  # Fila 1
+    [7, 8, 9]  # Fila 2
+])  # Crear matriz
 
 # Acceso a elementos
-print(matrix[0, 0])      # 1 (fila 0, columna 0)
-print(matrix[1, 2])      # 6 (fila 1, columna 2)
+print(matrix[0, 0])      # 1 (fila 0, columna 0)  # Acceder a elemento específico
+print(matrix[1, 2])      # 6 (fila 1, columna 2)  # Acceder a elemento específico
 
 # Slicing
-print(matrix[0, :])      # [1, 2, 3] (toda la fila 0)
-print(matrix[:, 1])      # [2, 5, 8] (toda la columna 1)
-print(matrix[0:2, 1:3])  # [[2, 3], [5, 6]] (submatriz)
+print(matrix[0, :])      # [1, 2, 3] (toda la fila 0)  # Seleccionar fila completa
+print(matrix[:, 1])      # [2, 5, 8] (toda la columna 1)  # Seleccionar columna completa
+print(matrix[0:2, 1:3])  # [[2, 3], [5, 6]] (submatriz)  # Seleccionar submatriz
 
 # Indexing booleano
-print(matrix[matrix > 5])  # [6, 7, 8, 9]
+print(matrix[matrix > 5])  # [6, 7, 8, 9]  # Filtrar elementos mayores que 5
 ```
 
 <details>
@@ -671,41 +671,41 @@ Objetivo: entender **por qué** funciona sin loops.
 3) Resultado final: ambos se ven como `(3, 3)` y se suman elemento a elemento.
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-A = np.array([[1], [2], [3]])        # shape: (3, 1)
-B = np.array([[10, 20, 30]])         # shape: (1, 3)
+A = np.array([[1], [2], [3]])        # shape: (3, 1)  # Crear columna
+B = np.array([[10, 20, 30]])         # shape: (1, 3)  # Crear fila
 
 # Broadcasting:
 # A se repite horizontalmente 3 veces
 # B se repite verticalmente 3 veces
-C = A + B                             # shape: (3, 3)
+C = A + B                             # shape: (3, 3)  # Sumar con broadcasting
 
-print("A:\n", A)
-print("B:\n", B)
-print("C = A + B:\n", C)
+print("A:\n", A)  # Mostrar matriz A
+print("B:\n", B)  # Mostrar matriz B
+print("C = A + B:\n", C)  # Mostrar resultado
 ```
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 # Broadcasting: operar arrays de diferentes shapes
 
 # Escalar + Array
-a = np.array([1, 2, 3])
-print(a + 10)  # [11, 12, 13]
+a = np.array([1, 2, 3])  # Crear array 1D
+print(a + 10)  # [11, 12, 13]  # Sumar escalar a cada elemento
 
 # Vector + Matriz (broadcasting automático)
-matrix = np.array([
-    [1, 2, 3],
-    [4, 5, 6]
-])
-vector = np.array([10, 20, 30])
+matrix = np.array([  # Crear matriz 2x3
+    [1, 2, 3],  # Primera fila
+    [4, 5, 6]  # Segunda fila
+])  # Crear matriz
+vector = np.array([10, 20, 30])  # Crear vector 1D
 
 # El vector se "expande" para coincidir con la matriz
-print(matrix + vector)
-# [[11, 22, 33],
-#  [14, 25, 36]]
+print(matrix + vector)  # Sumar vector a cada fila de la matriz
+# [[11, 22, 33],  # Resultado: primera fila + vector
+#  [14, 25, 36]]  # Resultado: segunda fila + vector
 
 # Regla de broadcasting:
 # Las dimensiones deben ser iguales O una de ellas debe ser 1
@@ -798,24 +798,24 @@ sum(axis=1) = [1+2+3, 4+5+6] = [6, 15]
 ```
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-matrix = np.array([
-    [1, 2, 3],
-    [4, 5, 6]
-])
+matrix = np.array([  # Crear matriz 2x3
+    [1, 2, 3],  # Fila 0
+    [4, 5, 6]  # Fila 1
+])  # Crear matriz
 
 # Agregaciones globales
-print(np.sum(matrix))   # 21 (suma de todos)
-print(np.mean(matrix))  # 3.5 (promedio de todos)
-print(np.std(matrix))   # 1.707... (desviación estándar)
+print(np.sum(matrix))   # 21 (suma de todos)  # Sumar todos los elementos
+print(np.mean(matrix))  # 3.5 (promedio de todos)  # Calcular promedio
+print(np.std(matrix))   # 1.707... (desviación estándar)  # Calcular desviación estándar
 
 # Agregaciones por eje
 # axis=0: colapsar filas (operar columnas)
-print(np.sum(matrix, axis=0))  # [5, 7, 9]
+print(np.sum(matrix, axis=0))  # [5, 7, 9]  # Sumar por columnas
 
 # axis=1: colapsar columnas (operar filas)
-print(np.sum(matrix, axis=1))  # [6, 15]
+print(np.sum(matrix, axis=1))  # [6, 15]  # Sumar por filas
 
 # Visualización de ejes:
 # ┌─────────────┐
@@ -914,27 +914,27 @@ print(np.sum(matrix, axis=1))  # [6, 15]
 ### 6. Operaciones Matriciales
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-A = np.array([[1, 2], [3, 4]])
-B = np.array([[5, 6], [7, 8]])
+A = np.array([[1, 2], [3, 4]])  # Crear matriz A 2x2
+B = np.array([[5, 6], [7, 8]])  # Crear matriz B 2x2
 
 # Operaciones elemento a elemento
-print(A + B)   # Suma
-print(A * B)   # Multiplicación elemento a elemento (Hadamard)
-print(A / B)   # División elemento a elemento
+print(A + B)   # Suma  # Sumar matrices elemento a elemento
+print(A * B)   # Multiplicación elemento a elemento (Hadamard)  # Multiplicar elemento a elemento
+print(A / B)   # División elemento a elemento  # Dividir elemento a elemento
 
 # Producto matricial (lo que usarás en ML)
-print(A @ B)           # Operador @ (Python 3.5+)
-print(np.matmul(A, B)) # Función matmul
-print(np.dot(A, B))    # Función dot
+print(A @ B)           # Operador @ (Python 3.5+)  # Producto matricial con operador @
+print(np.matmul(A, B)) # Función matmul  # Producto matricial con matmul
+print(np.dot(A, B))    # Función dot  # Producto matricial con dot
 
 # Resultado:
 # [[19, 22],
 #  [43, 50]]
 
 # Transpuesta
-print(A.T)
+print(A.T)  # Mostrar transpuesta de A
 # [[1, 3],
 #  [2, 4]]
 ```
@@ -1022,25 +1022,25 @@ print(A.T)
 ### 7. Vectorización: Eliminar Loops
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 # ❌ CON LOOP (lento)
-def normalize_loop(data: list) -> list:
+def normalize_loop(data: list) -> list:  # Definir función de normalización con loop
     """Normalizar datos con loop."""
-    mean = sum(data) / len(data)
-    std = (sum((x - mean)**2 for x in data) / len(data)) ** 0.5
-    return [(x - mean) / std for x in data]
+    mean = sum(data) / len(data)  # Calcular media
+    std = (sum((x - mean)**2 for x in data) / len(data)) ** 0.5  # Calcular desviación estándar
+    return [(x - mean) / std for x in data]  # Normalizar cada elemento
 
 # ✅ VECTORIZADO (rápido)
-def normalize_vectorized(data: np.ndarray) -> np.ndarray:
+def normalize_vectorized(data: np.ndarray) -> np.ndarray:  # Definir función de normalización vectorizada
     """Normalizar datos vectorizado."""
-    return (data - np.mean(data)) / np.std(data)
+    return (data - np.mean(data)) / np.std(data)  # Normalización vectorizada
 
 # Ejemplo
-data = np.random.randn(1000000)
+data = np.random.randn(1000000)  # Generar datos aleatorios
 
 # La versión vectorizada es ~100x más rápida
-normalized = normalize_vectorized(data)
+normalized = normalize_vectorized(data)  # Normalizar datos vectorizados
 ```
 
 <details>
@@ -1125,27 +1125,27 @@ normalized = normalize_vectorized(data)
 ### 8. Funciones Universales (ufuncs)
 
 ```python
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
-x = np.array([1, 2, 3, 4, 5])
+x = np.array([1, 2, 3, 4, 5])  # Crear array de ejemplo
 
 # Funciones matemáticas (aplicadas elemento a elemento)
-print(np.exp(x))      # e^x
-print(np.log(x))      # ln(x)
-print(np.sqrt(x))     # √x
-print(np.sin(x))      # sin(x)
+print(np.exp(x))      # e^x  # Calcular exponencial
+print(np.log(x))      # ln(x)  # Calcular logaritmo natural
+print(np.sqrt(x))     # √x  # Calcular raíz cuadrada
+print(np.sin(x))      # sin(x)  # Calcular seno
 
 # Importante para ML:
 # Sigmoid: σ(x) = 1 / (1 + e^(-x))
-def sigmoid(x: np.ndarray) -> np.ndarray:
+def sigmoid(x: np.ndarray) -> np.ndarray:  # Definir función sigmoid
     return 1 / (1 + np.exp(-x))  # Sigmoid: mapea R -> (0,1) elemento a elemento
 
 # ReLU: max(0, x)
-def relu(x: np.ndarray) -> np.ndarray:
+def relu(x: np.ndarray) -> np.ndarray:  # Definir función ReLU
     return np.maximum(0, x)  # ReLU: max(0,x) elemento a elemento; anula negativos
 
-print(sigmoid(np.array([-2, -1, 0, 1, 2])))
-# [0.119, 0.269, 0.5, 0.731, 0.881]
+print(sigmoid(np.array([-2, -1, 0, 1, 2])))  # Probar sigmoid con valores
+# [0.119, 0.269, 0.5, 0.731, 0.881]  # Resultados de sigmoid
 ```
 
 <details>
@@ -1480,7 +1480,7 @@ La meta aquí NO es “aprender clases por aprender clases”, sino entrenar los
 
 ```python
 from dataclasses import dataclass  # dataclass: clase “contenedor” para configs, con menos boilerplate
-import numpy as np
+import numpy as np  # Importar librería para computación numérica
 
 @dataclass(frozen=True)  # frozen=True: hace la config inmutable (evita cambiar hiperparámetros por accidente)
 class LinearConfig:  # Config de una capa lineal
@@ -1504,8 +1504,8 @@ class Linear:  # “Capa” lineal: implementa y = xW + b
         assert x.ndim == 2, f"x debe ser 2D (N,D). Recibido ndim={x.ndim}, shape={x.shape}"  # Falla temprano
 
         # Assert 2: la dimensión D de x debe coincidir con in_features
-        assert x.shape[1] == self.cfg.in_features, (
-            f"D mismatch: x.shape[1]={x.shape[1]} pero cfg.in_features={self.cfg.in_features}"
+        assert x.shape[1] == self.cfg.in_features, (  # Verificar que dimensiones coincidan
+            f"D mismatch: x.shape[1]={x.shape[1]} pero cfg.in_features={self.cfg.in_features}"  # Mensaje de error detallado
         )  # Evita bugs silenciosos en matmul
 
         # Forward: (N, D) @ (D, K) = (N, K)
@@ -1515,19 +1515,19 @@ class Linear:  # “Capa” lineal: implementa y = xW + b
         y = y + self.b  # Bias por neurona
 
         # Assert 3: y debe tener shape (N, K)
-        assert y.shape == (x.shape[0], self.cfg.out_features), (
-            f"Salida mal shapeada: y.shape={y.shape} pero esperado {(x.shape[0], self.cfg.out_features)}"
+        assert y.shape == (x.shape[0], self.cfg.out_features), (  # Verificar shape de salida
+            f"Salida mal shapeada: y.shape={y.shape} pero esperado {(x.shape[0], self.cfg.out_features)}"  # Mensaje de error detallado
         )  # Garantiza contrato de la capa
 
         return y  # Retorna activaciones lineales (logits si fuera clasificación)
 
     def __repr__(self) -> str:  # Debugging: qué eres y qué shapes manejas
-        return (
+        return (  # Construir string de representación
             "Linear("  # Prefijo con nombre de clase
             f"in={self.cfg.in_features}, out={self.cfg.out_features}, "  # Hiperparámetros clave
             f"W.shape={self.W.shape}, b.shape={self.b.shape}, "  # Estado interno crítico
             f"W.dtype={self.W.dtype}, b.dtype={self.b.dtype}"  # Dtypes para detectar casts raros
-            ")"
+            ")"  # Cerrar paréntesis de representación
         )  # String de diagnóstico
 
 
@@ -1696,12 +1696,12 @@ import numpy as np  # Importa NumPy para operaciones numéricas
 from numpy.typing import NDArray  # Tipado estático: NDArray permite anotar arrays de NumPy con mypy
 
 # Type hints para arrays
-def normalize(data: NDArray[np.float64]) -> NDArray[np.float64]:
+def normalize(data: NDArray[np.float64]) -> NDArray[np.float64]:  # Definir función de normalización con type hints
     """Normaliza un array de floats."""
     return (data - np.mean(data)) / np.std(data)  # Estandariza: resta la media y divide por la desviación estándar
 
 # Type hints genéricos
-def dot_product(a: np.ndarray, b: np.ndarray) -> float:
+def dot_product(a: np.ndarray, b: np.ndarray) -> float:  # Definir función de producto punto con type hints
     """Calcula el producto punto de dos vectores."""
     return float(np.dot(a, b))  # np.dot devuelve un escalar NumPy; float() lo convierte a float de Python
 
@@ -1718,7 +1718,7 @@ import numpy as np  # NumPy para operaciones vectorizadas y producto punto rápi
 import time  # time.time() para medir tiempos de ejecución (benchmark simple)
 from typing import List  # Tipado: lista de floats para la implementación “con Python puro”
 
-def benchmark_dot_product():
+def benchmark_dot_product():  # Definir función de benchmark para comparar rendimiento
     """Compara rendimiento de lista vs NumPy."""
     size = 1_000_000  # Tamaño del vector: suficientemente grande para notar diferencias de rendimiento
 
@@ -1745,7 +1745,7 @@ def benchmark_dot_product():
     # Verificar resultados iguales
     assert abs(result_list - result_numpy) < 1e-6  # Confirma que ambos métodos producen el mismo resultado
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # Verificar si se ejecuta como script principal
     benchmark_dot_product()  # Ejecuta el benchmark solo cuando el archivo se corre como script
 
 # Output típico:
@@ -1787,35 +1787,33 @@ Reglas de uso:
   #### Solución
 
 ```python
-import pandas as pd
+import pandas as pd  # Importar librería para manipulación de datos
 
-df = pd.DataFrame(
-    {
-        "edad": [25, 30, 30, 45, 50],
-        "salario": [50000, 60000, 61000, 80000, 90000],
-        "ciudad": ["Madrid", "Barcelona", "Madrid", "Sevilla", "Madrid"],
-    }
-)
+df = pd.DataFrame(  # Crear DataFrame
+    {  # Definir diccionario de columnas
+        "edad": [25, 30, 30, 45, 50],  # Columna de edades
+        "salario": [50000, 60000, 61000, 80000, 90000],  # Columna de salarios
+        "ciudad": ["Madrid", "Barcelona", "Madrid", "Sevilla", "Madrid"],  # Columna de ciudades
+    }  # Cerrar diccionario de columnas
 
-salario = df["salario"]
-media_salario = float(salario.mean())
+salario = df["salario"]  # Seleccionar columna salario
+media_salario = float(salario.mean())  # Calcular media y convertir a float
 
-df["salario_k"] = df["salario"] / 1000
-df_sorted = df.sort_values("salario", ascending=False)
+df["salario_k"] = df["salario"] / 1000  # Crear nueva columna con salario en miles
+df_sorted = df.sort_values("salario", ascending=False)  # Ordenar por salario descendente
 
-resumen = (
-    df.groupby("ciudad", as_index=False)
-    .agg(
-        salario_mean=("salario", "mean"),
-        n=("salario", "size"),
-    )
-    .sort_values("salario_mean", ascending=False)
-)
+resumen = (  # Iniciar cadena de operaciones
+    df.groupby("ciudad", as_index=False)  # Agrupar por ciudad
+    .agg(  # Agregar con múltiples funciones
+        salario_mean=("salario", "mean"),  # Media de salario por ciudad
+        n=("salario", "size"),  # Conteo de registros por ciudad
+    .sort_values("salario_mean", ascending=False)  # Ordenar por media descendente
+)  # Cerrar cadena de operaciones
 
-assert isinstance(media_salario, float)
-assert "salario_k" in df.columns
-assert df_sorted.iloc[0]["salario"] == df["salario"].max()
-assert set(resumen.columns) == {"ciudad", "salario_mean", "n"}
+assert isinstance(media_salario, float)  # Verificar que media sea float
+assert "salario_k" in df.columns  # Verificar que columna exista
+assert df_sorted.iloc[0]["salario"] == df["salario"].max()  # Verificar que primer elemento sea el máximo
+assert set(resumen.columns) == {"ciudad", "salario_mean", "n"}  # Verificar columnas del resumen
 ```
 
   ---
@@ -1993,8 +1991,8 @@ assert np.array_equal(a, np.array([0, 1, 1]))  # 1/2->0, 2/2->1, 3/2->1 (truncad
 Dada la matriz:
 
 ```python
-import numpy as np
-X = np.arange(20).reshape(4, 5)
+import numpy as np  # Importar librería para computación numérica
+X = np.arange(20).reshape(4, 5)  # Crear matriz 4x5 con números 0-19
 ```
 
 1) **Básico**
@@ -2245,8 +2243,8 @@ assert np.array_equal(flat, a)  # Verifica que el contenido (y el orden) se cons
 Sea:
 
 ```python
-import numpy as np
-X = np.array([[1, 2, 3], [4, 5, 6]])
+import numpy as np  # Importar librería para computación numérica
+X = np.array([[1, 2, 3], [4, 5, 6]])  # Crear matriz 2x3
 ```
 
 1) **Básico**
@@ -2402,17 +2400,17 @@ assert np.allclose(Xz.std(axis=0), np.ones(2), atol=1e-6)  # Std ~1 por feature
 ```python
 import numpy as np  # NumPy: operaciones vectorizadas y funciones matemáticas (exp, sqrt, sum)
 
-def euclidean_distance_vectorized(a: np.ndarray, b: np.ndarray) -> float:
+def euclidean_distance_vectorized(a: np.ndarray, b: np.ndarray) -> float:  # Definir función de distancia euclidiana vectorizada
     diff = a - b  # Resta vectorizada: diferencia componente a componente
     return float(np.sqrt(np.sum(diff * diff)))  # Distancia L2: sqrt(sum((a-b)^2)); float() devuelve un escalar nativo
 
-def sigmoid(x: np.ndarray) -> np.ndarray:
+def sigmoid(x: np.ndarray) -> np.ndarray:  # Definir función sigmoid
     return 1 / (1 + np.exp(-x))  # Sigmoid: 1/(1+exp(-x)), mapea R -> (0,1) elemento a elemento
 
-def relu(x: np.ndarray) -> np.ndarray:
+def relu(x: np.ndarray) -> np.ndarray:  # Definir función ReLU
     return np.maximum(0, x)  # ReLU: max(0,x), anula valores negativos y deja positivos
 
-def softmax(x: np.ndarray) -> np.ndarray:
+def softmax(x: np.ndarray) -> np.ndarray:  # Definir función softmax
     x = np.asarray(x)  # Asegura np.ndarray (por si llega lista) para operaciones vectorizadas
     x_shift = x - np.max(x)  # Estabilidad numérica: resta el máximo para evitar overflow en exp
     exps = np.exp(x_shift)  # Exponencial elemento a elemento (estable tras el shift)
@@ -2489,15 +2487,15 @@ class BenchmarkResult:  # Estructura para guardar un resultado de benchmark de f
     speedup: float  # Aceleración: time_list / time_numpy
 
 
-def benchmark(
-    func_list: Callable,  # Implementación “con listas” (más cercana a Python puro)
-    func_numpy: Callable,  # Implementación “con NumPy” (vectorizada/optimizada)
+def benchmark(  # Definir función de benchmark para comparar implementaciones
+    func_list: Callable,  # Implementación "con listas" (más cercana a Python puro)
+    func_numpy: Callable,  # Implementación "con NumPy" (vectorizada/optimizada)
     args_list: Tuple,  # Argumentos posicionales para func_list (se expanden con *)
     args_numpy: Tuple,  # Argumentos posicionales para func_numpy
     operation_name: str,  # Nombre legible para imprimir/reportar
     iterations: int = 100  # Cuántas repeticiones para promediar (reduce ruido)
-) -> BenchmarkResult:
-    """Ejecuta benchmark comparativo."""
+) -> BenchmarkResult:  # Retornar resultado estructurado del benchmark
+    """Ejecuta benchmark comparativo."""  # Agregado: descripción de la función
 
     # Benchmark lista
     start = time.time()  # Tiempo inicial (lista)
@@ -2516,60 +2514,57 @@ def benchmark(
         time_list=time_list,  # Tiempo promedio con listas
         time_numpy=time_numpy,  # Tiempo promedio con NumPy
         speedup=time_list / time_numpy  # Speedup: cuántas veces NumPy es más rápido que listas
-    )
+    )  # Retornar resultado del benchmark
 
 
 # === IMPLEMENTAR TUS FUNCIONES AQUÍ ===
 
-def dot_product_list(a: List[float], b: List[float]) -> float:
+def dot_product_list(a: List[float], b: List[float]) -> float:  # Definir función de producto punto con listas
     """Producto punto con listas."""
     # TODO: Implementar el producto punto sum(a_i * b_i) recorriendo ambas listas
-    pass
+    pass  # Implementar
 
-
-def dot_product_numpy(a: np.ndarray, b: np.ndarray) -> float:
+def dot_product_numpy(a: np.ndarray, b: np.ndarray) -> float:  # Definir función de producto punto con NumPy
     """Producto punto con NumPy."""
     # TODO: Implementar usando np.dot(a, b) (o a @ b si son 1D)
-    pass
+    pass  # Implementar
 
-
-def normalize_list(data: List[float]) -> List[float]:
+def normalize_list(data: List[float]) -> List[float]:  # Definir función de normalización con listas
     """Normalizar con listas."""
     # TODO: Implementar (x - mean) / std calculando mean y std manualmente (Python puro)
-    pass
+    pass  # Implementar
 
-
-def normalize_numpy(data: np.ndarray) -> np.ndarray:
+def normalize_numpy(data: np.ndarray) -> np.ndarray:  # Definir función de normalización con NumPy
     """Normalizar con NumPy."""
     # TODO: Implementar (data - data.mean()) / data.std() de forma vectorizada
-    pass
+    pass  # Implementar
 
 
-def euclidean_distance_list(a: List[float], b: List[float]) -> float:
+def euclidean_distance_list(a: List[float], b: List[float]) -> float:  # Definir función de distancia euclidiana con listas
     """Distancia euclidiana con listas."""
     # TODO: Implementar sqrt(sum((a_i - b_i)^2)) recorriendo ambas listas
-    pass
+    pass  # Implementar
 
 
-def euclidean_distance_numpy(a: np.ndarray, b: np.ndarray) -> float:
+def euclidean_distance_numpy(a: np.ndarray, b: np.ndarray) -> float:  # Definir función de distancia euclidiana con NumPy
     """Distancia euclidiana con NumPy."""
     # TODO: Implementar usando vectorización: np.sqrt(np.sum((a-b)**2)) o np.linalg.norm(a-b)
-    pass
+    pass  # Implementar
 
 
-def matrix_sum_list(A: List[List[float]], B: List[List[float]]) -> List[List[float]]:
+def matrix_sum_list(A: List[List[float]], B: List[List[float]]) -> List[List[float]]:  # Definir función de suma de matrices con listas
     """Suma de matrices con listas."""
     # TODO: Implementar suma elemento a elemento usando loops (filas/columnas)
-    pass
+    pass  # Implementar
 
 
-def matrix_sum_numpy(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+def matrix_sum_numpy(A: np.ndarray, B: np.ndarray) -> np.ndarray:  # Definir función de suma de matrices con NumPy
     """Suma de matrices con NumPy."""
     # TODO: Implementar A + B (broadcasting/operación vectorizada)
-    pass
+    pass  # Implementar
 
 
-def main():
+def main():  # Definir función principal que ejecuta todos los benchmarks
     """Ejecutar todos los benchmarks."""
     size = 10000  # Tamaño de los vectores para las pruebas (no tan grande para que corra rápido)
 
@@ -2591,28 +2586,28 @@ def main():
     results = []  # Acumulador de BenchmarkResult (uno por operación)
 
     results.append(benchmark(  # Ejecuta y guarda benchmark del producto punto
-        dot_product_list, dot_product_numpy,
-        (list_a, list_b), (array_a, array_b),
-        "Producto Punto"
-    ))
+        dot_product_list, dot_product_numpy,  # Funciones a comparar
+        (list_a, list_b), (array_a, array_b),  # Argumentos para cada función
+        "Producto Punto"  # Nombre de la operación
+    ))  # Cerrar llamada a benchmark para producto punto
 
     results.append(benchmark(  # Ejecuta y guarda benchmark de normalización
-        normalize_list, normalize_numpy,
-        (list_a,), (array_a,),
-        "Normalización"
-    ))
+        normalize_list, normalize_numpy,  # Funciones a comparar
+        (list_a,), (array_a,),  # Argumentos para cada función
+        "Normalización"  # Nombre de la operación
+    ))  # Cerrar llamada a benchmark para normalización
 
     results.append(benchmark(  # Ejecuta y guarda benchmark de distancia euclidiana
-        euclidean_distance_list, euclidean_distance_numpy,
-        (list_a, list_b), (array_a, array_b),
-        "Distancia Euclidiana"
-    ))
+        euclidean_distance_list, euclidean_distance_numpy,  # Funciones a comparar
+        (list_a, list_b), (array_a, array_b),  # Argumentos para cada función
+        "Distancia Euclidiana"  # Nombre de la operación
+    ))  # Cerrar llamada a benchmark para distancia euclidiana
 
     results.append(benchmark(  # Ejecuta y guarda benchmark de suma de matrices
-        matrix_sum_list, matrix_sum_numpy,
-        (list_matrix_a, list_matrix_b), (array_matrix_a, array_matrix_b),
-        "Suma de Matrices"
-    ))
+        matrix_sum_list, matrix_sum_numpy,  # Funciones a comparar
+        (list_matrix_a, list_matrix_b), (array_matrix_a, array_matrix_b),  # Argumentos
+        "Suma de Matrices"  # Nombre de la operación
+    ))  # Cerrar llamada a benchmark para suma de matrices
 
     # Mostrar resultados
     print("\n" + "="*60)  # Separador visual
@@ -2628,7 +2623,7 @@ def main():
     print(f"\nSpeedup promedio: {sum(r.speedup for r in results)/len(results):.1f}x")  # Promedio de speedups
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # Verificar si se ejecuta como script principal
     main()  # Punto de entrada: ejecuta benchmarks al correr el script
 ```
 
@@ -2705,12 +2700,12 @@ print(original)  # [1, 2, 3, 4, 5] - Original intacto porque slice_copy no compa
 import numpy as np  # Importa NumPy para ejemplificar el caso std=0 y cómo estabilizar divisiones con epsilon
 
 # PROBLEMA: División por cero cuando std = 0
-data = np.array([5, 5, 5, 5, 5])
+data = np.array([5, 5, 5, 5, 5])  # Crear array con valores idénticos
 std = np.std(data)  # 0.0 porque todos los valores son idénticos (varianza cero)
 normalized = (data - np.mean(data)) / std  # RuntimeWarning: divide by zero (división por 0)
 
 # SOLUCIÓN: Añadir epsilon
-epsilon = 1e-8
+epsilon = 1e-8  # Definir epsilon pequeño
 normalized_safe = (data - np.mean(data)) / (std + epsilon)  # Evita división por cero y estabiliza el cálculo
 
 # REGLA: Siempre usar epsilon en divisiones (especialmente en softmax, normalizaciones)
@@ -2726,12 +2721,12 @@ a = np.array([1, 2, 3])  # dtype: int64 (enteros)
 b = a / 2  # dtype: float64 (OK): en Python 3 la división / produce float
 
 # PERO en operaciones in-place:
-a = np.array([1, 2, 3])
+a = np.array([1, 2, 3])  # Crear array de enteros
 a /= 2  # In-place: intenta guardar floats en int64 => trunca (pierde decimales)
 print(a)  # [0, 1, 1] - ¡TRUNCADO! por conversión implícita a entero
 
 # SOLUCIÓN: Especificar dtype al crear
-a = np.array([1, 2, 3], dtype=np.float64)
+a = np.array([1, 2, 3], dtype=np.float64)  # Crear array con tipo float64
 a /= 2  # Ahora sí: al ser float64, conserva decimales en la operación in-place
 print(a)  # [0.5, 1.0, 1.5] - Correcto (sin truncamiento)
 
@@ -2785,7 +2780,7 @@ import numpy as np  # NumPy para operaciones vectorizadas (sum, sqrt) sobre arra
 from numpy.typing import NDArray  # Tipado: NDArray permite anotar ndarrays con dtype para mypy
 
 
-def dot_product(a: NDArray[np.float64], b: NDArray[np.float64]) -> float:
+def dot_product(a: NDArray[np.float64], b: NDArray[np.float64]) -> float:  # Definir función de producto punto con type hints
     """
     Calcula el producto punto de dos vectores.
 
@@ -2804,7 +2799,7 @@ def dot_product(a: NDArray[np.float64], b: NDArray[np.float64]) -> float:
     return float(np.sum(a * b))  # Multiplica elemento a elemento y suma; float() convierte escalar NumPy a float nativo
 
 
-def norm_l2(v: NDArray[np.float64]) -> float:
+def norm_l2(v: NDArray[np.float64]) -> float:  # Definir función de norma L2 con type hints
     """Calcula la norma L2 (euclidiana) de un vector."""
     return float(np.sqrt(np.sum(v ** 2)))  # sqrt(sum(v^2)): definición de norma L2
 ```
@@ -2819,22 +2814,22 @@ import pytest  # pytest para asserts avanzados y verificación de excepciones
 from src.linear_algebra import dot_product, norm_l2  # Funciones bajo prueba
 
 
-class TestDotProduct:
+class TestDotProduct:  # Definir clase de tests para producto punto
     """Tests para la función dot_product."""
 
-    def test_dot_product_basic(self) -> None:
+    def test_dot_product_basic(self) -> None:  # Definir test básico para producto punto
         """Test básico: [1,2,3] · [4,5,6] = 32"""
         a = np.array([1.0, 2.0, 3.0])  # Primer vector
         b = np.array([4.0, 5.0, 6.0])  # Segundo vector
         assert dot_product(a, b) == 32.0  # Verifica 1*4 + 2*5 + 3*6
 
-    def test_dot_product_orthogonal(self) -> None:
+    def test_dot_product_orthogonal(self) -> None:  # Definir test para vectores ortogonales
         """Vectores ortogonales tienen producto punto = 0"""
         a = np.array([1.0, 0.0])  # Vector unitario en x
         b = np.array([0.0, 1.0])  # Vector unitario en y
         assert dot_product(a, b) == 0.0  # Ortogonales => producto punto 0
 
-    def test_dot_product_shape_mismatch(self) -> None:
+    def test_dot_product_shape_mismatch(self) -> None:  # Definir test para shapes incompatibles
         """Debe lanzar ValueError si shapes no coinciden"""
         a = np.array([1.0, 2.0])  # Shape (2,)
         b = np.array([1.0, 2.0, 3.0])  # Shape (3,)
@@ -2842,15 +2837,15 @@ class TestDotProduct:
             dot_product(a, b)  # Debe fallar (validación de shapes)
 
 
-class TestNormL2:
+class TestNormL2:  # Definir clase de tests para norma L2
     """Tests para la función norm_l2."""
 
-    def test_norm_unit_vector(self) -> None:
+    def test_norm_unit_vector(self) -> None:  # Definir test para vector unitario
         """Vector unitario tiene norma 1"""
         v = np.array([1.0, 0.0, 0.0])  # Vector unitario en 3D
         assert norm_l2(v) == 1.0  # Norma de un vector unitario es 1
 
-    def test_norm_345(self) -> None:
+    def test_norm_345(self) -> None:  # Definir test para triángulo 3-4-5
         """Triángulo 3-4-5: norma de [3,4] = 5"""
         v = np.array([3.0, 4.0])  # Vector (3,4)
         assert norm_l2(v) == 5.0  # sqrt(3^2 + 4^2) = 5

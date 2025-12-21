@@ -28,6 +28,14 @@ Al terminar este módulo podrás:
 - **Validar** tu implementación con Shadow Mode (sklearn) como ground truth.
 - **Explicar** Entropía/Gini, Information Gain y el contraste **Bagging vs Boosting** (Random Forest vs Gradient Boosting) a nivel conceptual.
 
+### 🧪 Ver para Entender (Laboratorios Interactivos)
+
+- Guía central: [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+- Regresión lineal (táctil):
+  - `streamlit run interactive_labs/m05_supervised/visualizacion_regresion.py`
+- Overfitting / Bias–Variance (grado 1→20):
+  - `streamlit run interactive_labs/m05_supervised/overfitting_bias_variance_app.py`
+
 ### Cápsula (obligatoria): Vectorización extrema (prohibido usar loops)
 
 Regla práctica para todo el módulo:

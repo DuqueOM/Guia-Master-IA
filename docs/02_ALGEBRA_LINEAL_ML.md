@@ -26,6 +26,14 @@ Al terminar este módulo podrás:
 - **Explicar** eigenvalues/eigenvectors como “direcciones principales” y conectarlo con PCA.
 - **Explicar** SVD y por qué es el método preferido para PCA numéricamente estable.
 
+### 🧪 Ver para Entender (Laboratorios Interactivos)
+
+- Guía central: [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+- App (Streamlit): `2×2` deformando el espacio + eigenvectors
+  - `streamlit run interactive_labs/m02_linear_algebra/transformacion_lineal_app.py`
+- Animación (Manim): transformación lineal (shear)
+  - `manim -pqh interactive_labs/m02_linear_algebra/animacion_matriz.py AnimacionMatriz`
+
 ### Ajuste recomendado (Semanas 3–5, sin cambiar fechas): +2 días de Transformaciones Lineales
 
 Antes de “entrar” a PCA/SVD, dedica 2 días extra a que una matriz deje de ser una tabla y se vuelva una **deformación geométrica**.

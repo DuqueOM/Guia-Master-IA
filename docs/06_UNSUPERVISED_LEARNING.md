@@ -25,6 +25,12 @@ Al terminar este módulo podrás:
 - **Implementar** PCA con SVD y usar varianza explicada para elegir `n_components`.
 - **Diagnosticar** cuándo K-Means/PCA fallan y proponer alternativas.
 
+### 🧪 Ver para Entender (Laboratorios Interactivos)
+
+- Guía central: [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+- PCA: rotación manual 3D → proyección 2D (intuición de varianza máxima) + referencia SVD:
+  - `streamlit run interactive_labs/m06_unsupervised/pca_rotation_plotly_app.py`
+
 Enlaces rápidos:
 
 - [GLOSARIO.md](GLOSARIO.md)

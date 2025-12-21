@@ -113,6 +113,10 @@ Este ritmo te permite mantener las **24 semanas** sin quemarte, pero subiendo la
 
 ## 📖 Módulos Obligatorios
 
+### 🧪 Ver para Entender (Laboratorios Interactivos)
+
+ - [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+
 ### ⚡ Enlaces rápidos (bloques 0→100)
 
 Estos atajos te llevan directo a la sección **"Cómo usar este módulo (modo 0→100)"** dentro de cada módulo:

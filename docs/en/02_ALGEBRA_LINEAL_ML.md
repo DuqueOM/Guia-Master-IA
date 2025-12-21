@@ -26,6 +26,14 @@ By the end of this module you can:
 - **Explain** eigenvalues/eigenvectors as “principal directions” and connect them to PCA.
 - **Explain** SVD and why it is the preferred, numerically stable method for PCA.
 
+### Interactive Labs (See to Understand)
+
+- Central guide: [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+- Streamlit app: `2×2` transforms the plane + eigenvectors
+  - `streamlit run interactive_labs/m02_linear_algebra/transformacion_lineal_app.py`
+- Manim animation: linear transformation (shear)
+  - `manim -pqh interactive_labs/m02_linear_algebra/animacion_matriz.py AnimacionMatriz`
+
 ### Capsule (required): Manual Computational Graph (bridge to M03/M07)
 
 Before you code backprop, you must be able to do this on paper:

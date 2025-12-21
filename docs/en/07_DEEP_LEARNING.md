@@ -27,6 +27,12 @@ By the end of this module you can:
 - Implement the forward pass of a simple CNN (convolution + pooling) in NumPy to master shapes.
 - Train an equivalent CNN using PyTorch (`torch.nn`) **without** implementing a manual CNN backward pass.
 
+### Interactive Labs (See to Understand)
+
+- Central guide: [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+- Playground (PyTorch + Streamlit): train a small MLP live (XOR) + decision boundary:
+  - `streamlit run interactive_labs/m07_deep_learning/pytorch_training_playground_app.py`
+
 Quick references:
 
 - [Module 03: Calculus (Chain Rule)](03_CALCULO_MULTIVARIANTE.md)

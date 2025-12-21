@@ -25,6 +25,12 @@ By the end of this module you can:
 - Implement PCA via SVD and use explained variance to pick `n_components`.
 - Diagnose failure modes and propose alternatives.
 
+### Interactive Labs (See to Understand)
+
+- Central guide: [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+- PCA: manual 3D rotation → 2D projection (variance intuition) + SVD reference:
+  - `streamlit run interactive_labs/m06_unsupervised/pca_rotation_plotly_app.py`
+
 Quick references (Spanish source):
 
 - [Glossary](GLOSARIO.md)

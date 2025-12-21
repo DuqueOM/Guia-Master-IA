@@ -29,6 +29,12 @@ Dominio absoluto de las **3 materias de la Línea de Machine Learning** del MS i
 
 ---
 
+## 🧪 Ver para Entender (Laboratorios Interactivos)
+
+👉 **[Abrir laboratorios →](INTERACTIVE_LABS.md)**
+
+---
+
 ## 🧠 Planes Estratégicos v4.0 y v5.0
 
 - [PLAN_V4_ESTRATEGICO.md](PLAN_V4_ESTRATEGICO.md): estrategia de ejecución diaria, diario de errores, dry-run de backprop, puente a PyTorch.

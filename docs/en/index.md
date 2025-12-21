@@ -22,6 +22,7 @@ This English version is **adapted and concise**, and mirrors the core curriculum
 ## Quick links
 
 - Full index (English): **[00_INDICE.md](00_INDICE.md)**
+- Interactive labs (English): **[INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)**
 - Study plan (English): **[PLAN_ESTUDIOS.md](PLAN_ESTUDIOS.md)**
 - Checklist (English): **[CHECKLIST.md](CHECKLIST.md)**
 - Glossary (English): **[GLOSARIO.md](GLOSARIO.md)**

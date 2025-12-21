@@ -64,6 +64,7 @@ FINAL_FILENAME = "GUIA_MS_AI_ML_SPECIALIST_v3.3.pdf"
 ORDERED_FILES = [
     "index.md",
     "00_INDICE.md",
+    "INTERACTIVE_LABS.md",
     "PLAN_ESTUDIOS.md",
     "01_PYTHON_CIENTIFICO.md",
     "02_ALGEBRA_LINEAL_ML.md",
@@ -225,6 +226,7 @@ EMOJI_TO_SYMBOL = {
 FILE_TITLES = {
     "index.md": "PORTADA",
     "00_INDICE.md": "ÍNDICE GENERAL",
+    "INTERACTIVE_LABS.md": "LABORATORIOS INTERACTIVOS",
     "PLAN_ESTUDIOS.md": "PLAN DE ESTUDIOS",
     "01_PYTHON_CIENTIFICO.md": "MÓDULO 01 - PYTHON + PANDAS + NUMPY",
     "02_ALGEBRA_LINEAL_ML.md": "MÓDULO 02 - ÁLGEBRA LINEAL PARA ML",
@@ -826,6 +828,21 @@ class PDFGenerator:
                 else:
                     lang = "text"
                 items.append(AppendixItem(f"visualizations/{p.name}", p, lang))
+
+        if (PROJECT_DIR / "interactive_labs").exists():
+            for p in sorted((PROJECT_DIR / "interactive_labs").rglob("*")):
+                if not p.is_file():
+                    continue
+                if p.suffix not in {".py", ".md", ".txt"}:
+                    continue
+                rel = p.relative_to(PROJECT_DIR).as_posix()
+                if p.suffix == ".py":
+                    lang = "python"
+                elif p.suffix == ".md":
+                    lang = "markdown"
+                else:
+                    lang = "text"
+                items.append(AppendixItem(rel, p, lang))
 
         rubrica_csv = PROJECT_DIR / "rubrica.csv"
         if rubrica_csv.exists():

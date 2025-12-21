@@ -80,15 +80,18 @@
 │  ✅ Programming logic (if/else, loops)                           │
 │  ✅ High-school math (basic algebra)                             │
 │  ✅ Desire to understand “how it works inside”                   │
-│  ⚠️  NOT required: numpy, pandas, sklearn, prior ML              │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📖 Mandatory modules
+## Mandatory modules
 
-### ⚡ Quick links (0→100 blocks)
+### Interactive Labs (See to Understand)
+
+- [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+
+### Quick links (0→100 blocks)
 
 These shortcuts take you directly to the **“How to use this module (0→100 mode)”** section inside each module:
 

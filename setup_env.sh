@@ -20,10 +20,13 @@ source venv/bin/activate
 # Instalar dependencias
 echo "📥 Instalando dependencias..."
 pip install --upgrade pip
-pip install numpy matplotlib scipy scikit-learn pandas seaborn jupyter jupyterlab ipython plotly ipywidgets
+pip install -r requirements.txt
 
 echo "📄 Instalando dependencias para generación de PDF (markdown, PyPDF2, weasyprint)..."
 pip install markdown markdown-katex PyPDF2 weasyprint pygments
+
+echo "🧪 Instalando dependencias para laboratorios interactivos (Streamlit/Manim)..."
+pip install -r requirements-visual.txt
 
 # Instalar herramientas de desarrollo
 echo "🔧 Instalando herramientas de desarrollo..."
@@ -46,6 +49,9 @@ echo "  source venv/bin/activate"
 echo ""
 echo "Para instalar PyTorch (M07 / Semana 20 y proyecto final):"
 echo "  pip install torch torchvision"
+
+echo "Para instalar SOLO dependencias visuales (labs):"
+echo "  pip install -r requirements-visual.txt"
 echo ""
 echo "Para ejecutar tests:"
 echo "  pytest tests/ -v"

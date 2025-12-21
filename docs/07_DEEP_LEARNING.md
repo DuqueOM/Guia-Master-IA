@@ -27,6 +27,12 @@ Al terminar este módulo podrás:
 - **Implementar** forward pass de una CNN simple (convolución + pooling) en NumPy para dominar dimensiones.
 - **Entrenar** una CNN equivalente usando PyTorch (`torch.nn`) sin implementar backward manual.
 
+### 🧪 Ver para Entender (Laboratorios Interactivos)
+
+- Guía central: [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+- Playground (PyTorch + Streamlit): entrenar una MLP en vivo (XOR) + frontera de decisión:
+  - `streamlit run interactive_labs/m07_deep_learning/pytorch_training_playground_app.py`
+
 Enlaces rápidos:
 
 - [03_CALCULO_MULTIVARIANTE.md](03_CALCULO_MULTIVARIANTE.md) (Chain Rule)

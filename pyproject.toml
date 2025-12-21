@@ -30,6 +30,10 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
 ]
+visual = [
+    "streamlit>=1.32.0",
+    "manim>=0.18.0",
+]
 pytorch = [
     "torch>=2.0.0",
     "torchvision>=0.15.0",

@@ -28,6 +28,14 @@ By the end of this module you can:
 - Use **Shadow Mode (sklearn)** as a ground truth reference.
 - Explain **Entropy vs Gini**, **Information Gain**, and the difference **Bagging vs Boosting** (concept-level).
 
+### Interactive Labs (See to Understand)
+
+- Central guide: [INTERACTIVE_LABS.md](INTERACTIVE_LABS.md)
+- Linear Regression intuition (tactile):
+  - `streamlit run interactive_labs/m05_supervised/visualizacion_regresion.py`
+- Overfitting / Bias–Variance (degree 1→20):
+  - `streamlit run interactive_labs/m05_supervised/overfitting_bias_variance_app.py`
+
 ### Capsule (required): Extreme vectorization (no Python loops)
 
 Practical rule for the whole module:

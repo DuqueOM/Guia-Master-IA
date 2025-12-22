@@ -1,0 +1,685 @@
+{
+  "analysis": {
+    "total_hours": 266,
+    "total_weeks": 24,
+    "avg_hours_per_week": 11.083333333333334,
+    "min_hours_week": 10,
+    "max_hours_week": 12,
+    "hours_by_module": {
+      "M01": 20,
+      "M02": 34,
+      "M03": 22,
+      "M04": 12,
+      "M05": 35,
+      "M06": 43,
+      "M07": 54,
+      "M08": 46
+    },
+    "hours_by_category": {
+      "theory": 52,
+      "practice": 139,
+      "exam": 8,
+      "project": 43,
+      "lab": 24
+    }
+  },
+  "weeks": [
+    {
+      "number": 1,
+      "module": "M01",
+      "topic": "Python Cient\u00edfico: NumPy",
+      "total_hours": 10,
+      "activities": [
+        {
+          "name": "Lectura teor\u00eda NumPy",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Notebooks NumPy",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Ejercicios",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Quiz",
+          "hours": 1,
+          "category": "exam"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "module": "M01",
+      "topic": "Pandas DataFrames",
+      "total_hours": 10,
+      "activities": [
+        {
+          "name": "Lectura teor\u00eda Pandas",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Notebooks Pandas",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Mini-proyecto EDA",
+          "hours": 4,
+          "category": "project"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "module": "M02",
+      "topic": "Vectores y Matrices",
+      "total_hours": 12,
+      "activities": [
+        {
+          "name": "Lectura \u00e1lgebra lineal",
+          "hours": 3,
+          "category": "theory"
+        },
+        {
+          "name": "Ejercicios escritos",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Implementaci\u00f3n from scratch",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Lab interactivo",
+          "hours": 2,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "module": "M02",
+      "topic": "Eigenvalues/Eigenvectors",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura eigendecomposition",
+          "hours": 3,
+          "category": "theory"
+        },
+        {
+          "name": "Derivaciones manuales",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Implementaci\u00f3n",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Visualizaciones",
+          "hours": 2,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "module": "M02",
+      "topic": "SVD y Aplicaciones",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura SVD",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Implementaci\u00f3n SVD",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Lab interactivo",
+          "hours": 3,
+          "category": "lab"
+        },
+        {
+          "name": "Ejercicios PCA preview",
+          "hours": 2,
+          "category": "practice"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "module": "M03",
+      "topic": "Derivadas y Gradientes",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura c\u00e1lculo",
+          "hours": 3,
+          "category": "theory"
+        },
+        {
+          "name": "Derivaciones manuales",
+          "hours": 3,
+          "category": "theory"
+        },
+        {
+          "name": "Implementaci\u00f3n gradientes",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Backprop manual",
+          "hours": 2,
+          "category": "practice"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "module": "M03",
+      "topic": "Optimizaci\u00f3n",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura GD/SGD",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Implementaci\u00f3n GD",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Lab optimizaci\u00f3n",
+          "hours": 3,
+          "category": "lab"
+        },
+        {
+          "name": "Ejercicios",
+          "hours": 2,
+          "category": "practice"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "module": "M04",
+      "topic": "Probabilidad y Bayes",
+      "total_hours": 12,
+      "activities": [
+        {
+          "name": "Lectura probabilidad",
+          "hours": 3,
+          "category": "theory"
+        },
+        {
+          "name": "Lab 1: MLE/MAP",
+          "hours": 3,
+          "category": "lab"
+        },
+        {
+          "name": "Lab 2: MCMC",
+          "hours": 3,
+          "category": "lab"
+        },
+        {
+          "name": "Lab 3: Markov",
+          "hours": 2,
+          "category": "lab"
+        },
+        {
+          "name": "Simulacro te\u00f3rico",
+          "hours": 1,
+          "category": "exam"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "module": "M05",
+      "topic": "Regresi\u00f3n Lineal/Log\u00edstica",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura regresi\u00f3n",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "From scratch",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Paridad Sklearn",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Validaci\u00f3n",
+          "hours": 2,
+          "category": "practice"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "module": "M05",
+      "topic": "\u00c1rboles, RF, SVM",
+      "total_hours": 12,
+      "activities": [
+        {
+          "name": "Lectura \u00e1rboles",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Implementaci\u00f3n Gini",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Random Forest",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "SVM",
+          "hours": 2,
+          "category": "practice"
+        },
+        {
+          "name": "Comparativa",
+          "hours": 2,
+          "category": "project"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "module": "M05",
+      "topic": "\u00c9tica + XAI",
+      "total_hours": 12,
+      "activities": [
+        {
+          "name": "Lectura \u00e9tica IA",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "SHAP tutorial",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "LIME tutorial",
+          "hours": 2,
+          "category": "practice"
+        },
+        {
+          "name": "Reporte interpretabilidad",
+          "hours": 3,
+          "category": "project"
+        },
+        {
+          "name": "Simulacro CSCA5622",
+          "hours": 2,
+          "category": "exam"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "module": "M06",
+      "topic": "K-Means, Clustering",
+      "total_hours": 10,
+      "activities": [
+        {
+          "name": "Lectura clustering",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "K-Means from scratch",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Jer\u00e1rquico",
+          "hours": 2,
+          "category": "practice"
+        },
+        {
+          "name": "Lab interactivo",
+          "hours": 2,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "module": "M06",
+      "topic": "PCA",
+      "total_hours": 10,
+      "activities": [
+        {
+          "name": "Lectura PCA",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "PCA from scratch",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "t-SNE visualizaci\u00f3n",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Ejercicios",
+          "hours": 2,
+          "category": "practice"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "module": "M06",
+      "topic": "GMM y EM",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura EM",
+          "hours": 3,
+          "category": "theory"
+        },
+        {
+          "name": "Derivaci\u00f3n matem\u00e1tica",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "GMM implementaci\u00f3n",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Visualizaci\u00f3n",
+          "hours": 2,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "module": "M06",
+      "topic": "Sistemas de Recomendaci\u00f3n",
+      "total_hours": 12,
+      "activities": [
+        {
+          "name": "Lectura RecSys",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Matrix Factorization",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Proyecto MovieLens",
+          "hours": 4,
+          "category": "project"
+        },
+        {
+          "name": "Simulacro CSCA5632",
+          "hours": 2,
+          "category": "exam"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "module": "M07",
+      "topic": "Perceptr\u00f3n, MLP",
+      "total_hours": 10,
+      "activities": [
+        {
+          "name": "Lectura MLPs",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Backprop manual",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Implementaci\u00f3n",
+          "hours": 4,
+          "category": "practice"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "module": "M07",
+      "topic": "Keras APIs",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura Keras",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Sequential API",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Functional API",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Modelo h\u00edbrido",
+          "hours": 3,
+          "category": "project"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "module": "M07",
+      "topic": "CNNs",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura CNNs",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Conv from scratch",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "CIFAR-10",
+          "hours": 4,
+          "category": "project"
+        },
+        {
+          "name": "Visualizaci\u00f3n filtros",
+          "hours": 2,
+          "category": "lab"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "module": "M07",
+      "topic": "RNNs, LSTMs",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura RNNs",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "RNN from scratch",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "LSTM Keras",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Secuencias",
+          "hours": 2,
+          "category": "project"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "module": "M07",
+      "topic": "Regularizaci\u00f3n, Transfer",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Lectura regularizaci\u00f3n",
+          "hours": 2,
+          "category": "theory"
+        },
+        {
+          "name": "Dropout, BatchNorm",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Transfer Learning",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Simulacro CSCA5642",
+          "hours": 2,
+          "category": "exam"
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "module": "M08",
+      "topic": "EDA + Preprocessing",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "Exploraci\u00f3n datos",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "Limpieza texto",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Notebook 01",
+          "hours": 4,
+          "category": "project"
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "module": "M08",
+      "topic": "Baseline Models",
+      "total_hours": 11,
+      "activities": [
+        {
+          "name": "TF-IDF",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "LogReg, NB",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Notebook 02",
+          "hours": 4,
+          "category": "project"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "module": "M08",
+      "topic": "Deep Learning NLP",
+      "total_hours": 12,
+      "activities": [
+        {
+          "name": "Embeddings",
+          "hours": 3,
+          "category": "practice"
+        },
+        {
+          "name": "BiLSTM",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Notebook 03",
+          "hours": 5,
+          "category": "project"
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "module": "M08",
+      "topic": "BERT + Reporte",
+      "total_hours": 12,
+      "activities": [
+        {
+          "name": "Fine-tuning BERT",
+          "hours": 4,
+          "category": "practice"
+        },
+        {
+          "name": "Notebook 04",
+          "hours": 4,
+          "category": "project"
+        },
+        {
+          "name": "REPORT.md",
+          "hours": 4,
+          "category": "project"
+        }
+      ]
+    }
+  ]
+}

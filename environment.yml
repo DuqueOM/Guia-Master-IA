@@ -1,0 +1,74 @@
+# =============================================================================
+# Guía Master IA - Conda Environment
+# =============================================================================
+# Crear entorno: conda env create -f environment.yml
+# Activar:       conda activate guia-master-ia
+# Actualizar:    conda env update -f environment.yml --prune
+# =============================================================================
+
+name: guia-master-ia
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Python
+  - python=3.11
+
+  # Core científico
+  - numpy>=1.24.0,<2.0.0
+  - pandas>=2.0.0
+  - scipy>=1.10.0
+
+  # Visualización
+  - matplotlib>=3.7.0
+  - seaborn>=0.12.0
+  - plotly>=5.18.0
+
+  # Machine Learning
+  - scikit-learn>=1.3.0
+
+  # Jupyter
+  - jupyterlab>=4.0.0
+  - ipywidgets>=8.1.0
+  - notebook>=7.0.0
+
+  # Utilidades
+  - tqdm>=4.66.0
+  - requests>=2.31.0
+  - pillow>=10.0.0
+
+  # Desarrollo
+  - pytest>=7.4.0
+  - pytest-cov>=4.1.0
+
+  # Pip para paquetes no disponibles en conda
+  - pip
+
+  - pip:
+    # Deep Learning
+    - tensorflow>=2.15.0,<2.18.0
+
+    # NLP
+    - nltk>=3.8.0
+    - transformers>=4.35.0
+    - tokenizers>=0.15.0
+    - datasets>=2.15.0
+
+    # XAI
+    - shap>=0.44.0
+    - lime>=0.2.0
+
+    # Sistemas de Recomendación
+    - scikit-surprise>=1.1.3
+
+    # Streamlit
+    - streamlit>=1.29.0
+
+    # Testing notebooks
+    - nbval>=0.11.0
+
+    # Linting
+    - ruff>=0.1.0
+    - mypy>=1.7.0

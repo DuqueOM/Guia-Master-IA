@@ -1,0 +1,33 @@
+# Requirements específicos para el Proyecto Capstone NLP
+# Instalar con: pip install -r requirements_capstone.txt
+
+# NLP Core
+nltk>=3.8.1
+spacy>=3.5.0
+regex>=2023.0
+
+# Visualización de texto
+wordcloud>=1.9.2
+
+# Deep Learning
+tensorflow>=2.12.0
+
+# Transformers (BERT)
+transformers>=4.30.0
+datasets>=2.12.0
+
+# ML tradicional (ya en requirements.txt base)
+# scikit-learn>=1.2.0
+# pandas>=2.0.0
+# numpy>=1.24.0
+# matplotlib>=3.7.0
+
+# Evaluación
+seaborn>=0.12.0
+
+# Jupyter widgets
+ipywidgets>=8.0.0
+tqdm>=4.65.0
+
+# Opcional: SpaCy modelo inglés
+# python -m spacy download en_core_web_sm

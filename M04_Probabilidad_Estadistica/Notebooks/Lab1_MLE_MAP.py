@@ -104,8 +104,8 @@ def mle_gaussian(data: NDArray[np.float64]) -> tuple[float, float]:
         - σ̂²_MLE (varianza muestral sesgada, dividiendo por n)
     """
     n = len(data)
-    mu_mle = np.mean(data)
-    sigma2_mle = np.sum((data - mu_mle) ** 2) / n  # Sesgado (divide por n)
+    mu_mle = float(np.mean(data))
+    sigma2_mle = float(np.sum((data - mu_mle) ** 2) / n)  # Sesgado (divide por n)
     return mu_mle, sigma2_mle
 
 
@@ -366,24 +366,24 @@ def simulate_estimator_bias_variance(
     """
     Simula múltiples datasets para calcular sesgo y varianza de MLE y MAP.
     """
-    mle_estimates = []
-    map_estimates = []
+    mle_estimates_list: list[float] = []
+    map_estimates_list: list[float] = []
 
     for _ in range(n_simulations):
         data = rng.binomial(1, true_theta, n_samples)
-        mle_estimates.append(mle_bernoulli(data))
-        map_estimates.append(map_bernoulli(data, alpha, beta))
+        mle_estimates_list.append(mle_bernoulli(data))
+        map_estimates_list.append(map_bernoulli(data, alpha, beta))
 
-    mle_estimates = np.array(mle_estimates)
-    map_estimates = np.array(map_estimates)
+    mle_arr = np.array(mle_estimates_list)
+    map_arr = np.array(map_estimates_list)
 
     # Sesgo
-    bias_mle = np.mean(mle_estimates) - true_theta
-    bias_map = np.mean(map_estimates) - true_theta
+    bias_mle = float(np.mean(mle_arr) - true_theta)
+    bias_map = float(np.mean(map_arr) - true_theta)
 
     # Varianza
-    var_mle = np.var(mle_estimates)
-    var_map = np.var(map_estimates)
+    var_mle = float(np.var(mle_arr))
+    var_map = float(np.var(map_arr))
 
     return bias_mle, var_mle, bias_map, var_map
 

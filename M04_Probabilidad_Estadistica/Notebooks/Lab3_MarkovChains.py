@@ -222,7 +222,7 @@ def stationary_distribution_analytical(P: NDArray[np.float64]) -> NDArray[np.flo
     pi = np.real(eigenvectors[:, idx])
     pi = pi / pi.sum()  # Normalizar para que sume 1
 
-    return pi
+    return np.asarray(pi, dtype=np.float64)
 
 
 def stationary_distribution_power(
@@ -236,7 +236,7 @@ def stationary_distribution_power(
     """
     P_power = matrix_power(P, n_iterations)
     # Cualquier fila de P^n es aproximadamente π
-    return P_power[0]
+    return np.asarray(P_power[0], dtype=np.float64)
 
 
 def stationary_distribution_simulation(
@@ -510,7 +510,7 @@ def pagerank(
             break
         rank = new_rank
 
-    return rank / rank.sum()
+    return np.asarray(rank / rank.sum(), dtype=np.float64)
 
 
 # %% Ejemplo de PageRank

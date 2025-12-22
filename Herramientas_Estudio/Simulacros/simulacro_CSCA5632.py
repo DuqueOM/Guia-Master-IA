@@ -368,7 +368,7 @@ def validar_simulacro() -> dict[str, bool]:
     X_pca_val = rng.standard_normal((50, 5))
     X_t, comp, var = pca(X_pca_val, n_components=2)
     resultados["B2_pca_shape"] = X_t.shape == (50, 2)
-    resultados["B2_pca_variance"] = len(var) == 2 and np.all(var >= 0)
+    resultados["B2_pca_variance"] = len(var) == 2 and bool(np.all(var >= 0))
 
     # Validar B3 (Matrix Factorization)
     P_val, Q_val = matrix_factorization_sgd(R_test, k=2, n_epochs=50)

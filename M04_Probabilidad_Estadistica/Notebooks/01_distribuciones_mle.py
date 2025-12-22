@@ -32,7 +32,7 @@ def gaussian_pdf(x: np.ndarray, mu: float, sigma: float) -> np.ndarray:
     """
     coef = 1.0 / (sigma * np.sqrt(2 * np.pi))  # Coeficiente de normalización
     exponent = -((x - mu) ** 2) / (2 * sigma**2)  # Exponente
-    return coef * np.exp(exponent)  # PDF completa
+    return np.asarray(coef * np.exp(exponent))  # PDF completa
 
 
 # Ejemplo: N(0, 1) - Gaussiana estándar
@@ -72,7 +72,7 @@ def softmax_stable(z: np.ndarray) -> np.ndarray:
     """
     z_shifted = z - np.max(z)  # Estabilidad numérica: evita exp(grande)
     exp_z = np.exp(z_shifted)  # Exponencial de cada elemento
-    return exp_z / np.sum(exp_z)  # Normalización para que sume 1
+    return np.asarray(exp_z / np.sum(exp_z))  # Normalización para que sume 1
 
 
 logits = np.array([2.0, 1.0, 0.1])  # Logits (scores sin normalizar)

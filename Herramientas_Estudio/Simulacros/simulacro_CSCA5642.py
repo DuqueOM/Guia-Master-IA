@@ -119,7 +119,7 @@ def softmax(z: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     # TODO: Implementar con estabilidad numérica
     exp_z = np.exp(z - np.max(z, axis=-1, keepdims=True))
-    return exp_z / np.sum(exp_z, axis=-1, keepdims=True)
+    return np.asarray(exp_z / np.sum(exp_z, axis=-1, keepdims=True), dtype=np.float64)
 
 
 def mlp_forward(

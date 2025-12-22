@@ -582,7 +582,7 @@ print("\n=== R-hat Diagnostic ===\n")
 
 # Ejecutar múltiples cadenas con diferentes inicializaciones
 n_chains = 4
-chains = []
+chains: list[NDArray[np.float64]] = []
 
 for _ in range(n_chains):
     x_init_value = float(rng.uniform(-10, 10))  # Inicialización aleatoria

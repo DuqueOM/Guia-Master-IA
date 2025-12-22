@@ -9,6 +9,8 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15+-orange.svg)](https://tensorflow.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Study Time](https://img.shields.io/badge/Study%20Time-6%20Months-brightgreen.svg)]()
+[![Pathway](https://img.shields.io/badge/Pathway-CU%20Boulder%20MS--AI-purple.svg)](https://www.colorado.edu/cs/academics/graduate-programs/professional-master-science-artificial-intelligence)
 
 ---
 

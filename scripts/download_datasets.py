@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import string
 import sys
 import urllib.request
 from pathlib import Path
@@ -80,6 +81,14 @@ def compute_sha256(filepath: Path) -> str:
     return sha256_hash.hexdigest()
 
 
+def is_valid_sha256(value: str) -> bool:
+    """Devuelve True si value parece un SHA256 (64 chars hex)."""
+    if len(value) != 64:
+        return False
+    hex_chars = set(string.hexdigits)
+    return all(c in hex_chars for c in value)
+
+
 def load_cache() -> dict[str, str]:
     """Carga cache de checksums verificados."""
     if CACHE_FILE.exists():
@@ -133,6 +142,12 @@ def verify_checksum(filepath: Path, expected_sha256: str) -> bool:
     if not filepath.exists():
         return False
 
+    if not is_valid_sha256(expected_sha256):
+        print(
+            f"ℹ️  Checksum no disponible/invalidado para {filepath.name}; omitiendo verificación"
+        )
+        return True
+
     actual = compute_sha256(filepath)
     if actual == expected_sha256:
         print(f"✅ Checksum verificado: {filepath.name}")
@@ -169,16 +184,20 @@ def download_dataset(
     dest = DATA_DIR / info["filename"]
     cache = load_cache()
 
+    expected_sha256 = info["sha256"]
+    has_checksum = is_valid_sha256(expected_sha256)
+
     # Verificar si ya existe y está verificado
     if dest.exists() and not force:
-        if name in cache and cache[name] == info["sha256"]:
+        if has_checksum and name in cache and cache[name] == expected_sha256:
             print(f"✅ {name}: Ya descargado y verificado")
             return True
 
         # Verificar checksum
-        if verify_checksum(dest, info["sha256"]):
-            cache[name] = info["sha256"]
-            save_cache(cache)
+        if verify_checksum(dest, expected_sha256):
+            if has_checksum:
+                cache[name] = expected_sha256
+                save_cache(cache)
             return True
 
     # Modo offline
@@ -193,14 +212,15 @@ def download_dataset(
     # Descargar
     if download_file(info["url"], dest, info["description"]):
         # Verificar después de descarga
-        if verify_checksum(dest, info["sha256"]):
-            cache[name] = info["sha256"]
-            save_cache(cache)
+        if verify_checksum(dest, expected_sha256):
+            if has_checksum:
+                cache[name] = expected_sha256
+                save_cache(cache)
             return True
-        else:
-            print(f"❌ {name}: Checksum falló después de descarga")
-            dest.unlink()  # Eliminar archivo corrupto
-            return False
+
+        print(f"❌ {name}: Checksum falló después de descarga")
+        dest.unlink()  # Eliminar archivo corrupto
+        return False
 
     return False
 
@@ -334,8 +354,13 @@ Ejemplos:
         for name, info in DATASETS.items():
             dest = DATA_DIR / info["filename"]
             if dest.exists():
-                if not verify_checksum(dest, info["sha256"]):
-                    all_ok = False
+                if is_valid_sha256(info["sha256"]):
+                    if not verify_checksum(dest, info["sha256"]):
+                        all_ok = False
+                else:
+                    print(
+                        f"ℹ️  {name}: checksum no disponible/invalidado; omitiendo verificación"
+                    )
             else:
                 print(f"⚠️  {name}: No existe")
         return 0 if all_ok else 1

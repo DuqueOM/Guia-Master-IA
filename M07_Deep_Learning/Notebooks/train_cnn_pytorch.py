@@ -1,10 +1,39 @@
+"""
+Notebook M07: CNN con PyTorch - Clasificación de Imágenes
+==========================================================
+
+Módulo 7 - Semana 17: Deep Learning
+Curso Alineado: CSCA 5642 - Deep Learning
+
+Objetivos:
+1. Implementar una CNN simple con PyTorch
+2. Entrenar en MNIST/Fashion-MNIST
+3. Entender la conexión entre convoluciones y álgebra lineal
+
+Dependencias:
+    pip install torch torchvision
+
+💡 PUENTES TEÓRICO-PRÁCTICOS:
+-----------------------------
+- M02 (Álgebra Lineal): Las convoluciones son productos internos locales.
+  Un kernel 3×3 calcula el producto punto con cada parche de la imagen.
+
+- M03 (Cálculo): El backpropagation calcula ∂L/∂W usando la regla de la cadena.
+  optimizer.step() aplica: W = W - α × ∂L/∂W
+
+- M04 (Probabilidad): Softmax convierte logits a distribución de probabilidad:
+  P(clase_i) = exp(z_i) / Σ exp(z_j)
+
+Ejecutar: python train_cnn_pytorch.py --epochs 5 --dataset mnist
+"""
+
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 
 
-def _require_torch():
+def _require_torch() -> None:
     try:
         import torch  # noqa: F401
         import torchvision  # noqa: F401

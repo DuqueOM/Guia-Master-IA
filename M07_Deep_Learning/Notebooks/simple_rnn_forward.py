@@ -1,3 +1,35 @@
+"""
+Notebook M07: RNN Forward Pass desde Cero
+==========================================
+
+Módulo 7 - Semana 17: Deep Learning
+Curso Alineado: CSCA 5642 - Deep Learning
+
+Objetivos:
+1. Implementar el forward pass de una RNN vanilla desde cero
+2. Entender la propagación de estado oculto a través del tiempo
+3. Conectar con fundamentos de álgebra lineal y cálculo
+
+💡 PUENTES TEÓRICO-PRÁCTICOS:
+-----------------------------
+- M02 (Álgebra Lineal): La RNN aplica transformaciones lineales en cada paso:
+  h_t = tanh(W_xh @ x_t + W_hh @ h_{t-1} + b)
+  Cada @ es una multiplicación matriz-vector que viste en M02.
+
+- M03 (Cálculo): El gradiente se propaga hacia atrás en el tiempo (BPTT).
+  La regla de la cadena se aplica a través de todos los timesteps:
+  ∂L/∂W = Σ_t ∂L/∂h_t × ∂h_t/∂W
+
+- M04 (Probabilidad): En secuencias, modelamos P(x_t | x_{1:t-1}) condicionando
+  en el estado oculto h_t que resume toda la historia.
+
+⚠️ PROBLEMA DEL GRADIENTE EVANESCENTE:
+  Como ∂h_t/∂h_{t-k} = Π W_hh × diag(1 - tanh²), si ||W_hh|| < 1,
+  los gradientes decaen exponencialmente → LSTM/GRU resuelven esto.
+
+Ejecutar: python simple_rnn_forward.py --batch 4 --time 6 --hidden 16
+"""
+
 from __future__ import annotations
 
 import argparse

@@ -120,9 +120,72 @@ if SURPRISE_AVAILABLE:
     plt.show()
 
 # %% [markdown]
-# ## 2. Factorización de Matrices: Implementación desde Cero
+# ## 1.5 Visualización de Sparsity (Matriz Usuario × Item)
 #
-# ### 2.1 Teoría
+# > **💡 Conexión con M02 - Álgebra Lineal**: La matriz de ratings R es una matriz
+# > **dispersa (sparse)** donde la mayoría de entradas son desconocidas.
+# > En M02 estudiamos matrices densas vs dispersas. Aquí, el 98%+ está vacía.
+
+# %%
+if SURPRISE_AVAILABLE:
+    # Crear matriz para visualización (subset pequeño)
+    n_users_sample, n_items_sample = 50, 100
+    unique_users = df_ratings["user_id"].unique()[:n_users_sample]
+    unique_items = df_ratings["item_id"].unique()[:n_items_sample]
+
+    # Matriz de ratings (NaN para valores faltantes)
+    rating_matrix = np.full((n_users_sample, n_items_sample), np.nan)
+    user_map = {u: i for i, u in enumerate(unique_users)}
+    item_map = {it: i for i, it in enumerate(unique_items)}
+
+    for _, row in df_ratings.iterrows():
+        if row["user_id"] in user_map and row["item_id"] in item_map:
+            rating_matrix[user_map[row["user_id"]], item_map[row["item_id"]]] = row[
+                "rating"
+            ]
+
+    # Visualizar sparsity
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    # Gráfico 1: Patrón de sparsity
+    mask = ~np.isnan(rating_matrix)
+    axes[0].imshow(mask, cmap="Blues", aspect="auto")
+    axes[0].set_xlabel("Items (películas)")
+    axes[0].set_ylabel("Usuarios")
+    axes[0].set_title("Patrón de Sparsity (Azul = Rating conocido)")
+    sparsity = 1 - np.sum(mask) / mask.size
+    axes[0].text(
+        0.02,
+        0.98,
+        f"Sparsity: {sparsity*100:.1f}%",
+        transform=axes[0].transAxes,
+        fontsize=12,
+        verticalalignment="top",
+        bbox={"boxstyle": "round", "facecolor": "white"},
+    )
+
+    # Gráfico 2: Heatmap de ratings
+    rating_display = np.ma.masked_where(np.isnan(rating_matrix), rating_matrix)
+    im = axes[1].imshow(rating_display, cmap="YlOrRd", aspect="auto", vmin=1, vmax=5)
+    axes[1].set_xlabel("Items (películas)")
+    axes[1].set_ylabel("Usuarios")
+    axes[1].set_title("Matriz Usuario × Item (valores conocidos)")
+    plt.colorbar(im, ax=axes[1], label="Rating")
+
+    plt.tight_layout()
+    plt.show()
+
+    print("\n📊 Estadísticas de Sparsity:")
+    print(f"   Matriz completa: {trainset.n_users * trainset.n_items:,} entradas")
+    print(f"   Ratings conocidos: {trainset.n_ratings:,}")
+    print(
+        f"   Sparsity global: {(1 - trainset.n_ratings / (trainset.n_users * trainset.n_items)) * 100:.2f}%"
+    )
+
+# %% [markdown]
+# ## 2. Matrix Factorization: Teoría vs Práctica
+#
+# ### 2.1 Teoría Matemática
 #
 # La idea es descomponer la matriz de ratings R (usuarios × items) en dos matrices:
 # - P (usuarios × factores): preferencias latentes de usuarios
@@ -132,6 +195,38 @@ if SURPRISE_AVAILABLE:
 #
 # Además, usamos biases para capturar tendencias:
 # $$ \hat{r}_{ui} = \mu + b_u + b_i + p_u \cdot q_i $$
+#
+# ### 2.2 💡 SVD Clásico vs SVD para Recomendación
+#
+# > **⚠️ DISTINCIÓN CRÍTICA**:
+# >
+# > | Aspecto | SVD Clásico (M02) | TruncatedSVD (sklearn) | SVD Recomendación |
+# > |---------|-------------------|------------------------|-------------------|
+# > | Fórmula | $A = U\Sigma V^T$ | Aproximación low-rank | $R \approx PQ^T$ |
+# > | Valores faltantes | ❌ Requiere matriz completa | ❌ Trata NaN como 0 | ✅ Los ignora |
+# > | Uso típico | Álgebra lineal | Reducción dimensionalidad | Sistemas recomendación |
+# > | Implementación | `np.linalg.svd()` | `sklearn.TruncatedSVD` | Surprise, LightFM |
+#
+# **¿Por qué NO usar TruncatedSVD de sklearn para recomendación?**
+# - Trata valores faltantes como 0 (un rating muy bajo)
+# - Esto sesga las predicciones hacia items populares
+
+# %%
+# Demo: Comparación TruncatedSVD vs SVD para Recomendación
+if SURPRISE_AVAILABLE:
+    from sklearn.decomposition import TruncatedSVD
+
+    # TruncatedSVD trata NaN como 0 (INCORRECTO para recomendación)
+    rating_matrix_filled = np.nan_to_num(rating_matrix, nan=0.0)
+    truncated = TruncatedSVD(n_components=10, random_state=42)
+    U_trunc = truncated.fit_transform(rating_matrix_filled)
+
+    print("⚠️ TruncatedSVD (sklearn) NO es apropiado para recomendación:")
+    print(f"   - Trata {int(np.sum(np.isnan(rating_matrix)))} valores NaN como 0")
+    print(f"   - Varianza explicada: {truncated.explained_variance_ratio_.sum():.1%}")
+    print(
+        "\n✅ En cambio, SVD de Surprise IGNORA valores faltantes durante el entrenamiento."
+    )
 
 
 # %%

@@ -1,23 +1,170 @@
-# 🎓 Guía Master IA - Ecosistema Educativo Híbrido
+# 🎓 Guía Master IA - Preparación MS in AI CU Boulder
 
-> **Preparación de 6 meses para el MS in AI de CU Boulder**
-> Metodología: **Teoría (.md) → Práctica (.ipynb/.py) → Visualización (Streamlit/Manim)**
+> **Programa de 6 meses (24 semanas) para dominar los fundamentos del MS in Artificial Intelligence**
+>
+> 🎯 **Objetivo**: Aprobar CSCA 5622, CSCA 5632 y CSCA 5642 con confianza
+>
+> 📚 **Metodología**: Teoría (.md) → Práctica (.py) → Visualización (Streamlit)
 
----
-
-## 🎯 Objetivo
-
-Dominio absoluto de los **3 cursos clave del MS-AI Pathway**:
-
-| Track | Curso (Código) | Módulo | Semanas |
-|-------|----------------|--------|---------|
-| **Supervised Learning** | CSCA 5622 | M05 | 9-11 |
-| **Unsupervised Learning** | CSCA 5632 | M06 | 12-15 |
-| **Deep Learning** | CSCA 5642 | M07 | 16-20 |
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15+-orange.svg)](https://tensorflow.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## 🗺️ Estructura del Ecosistema (24 Semanas)
+## 🚀 Cómo Empezar (Quick Start)
+
+### Paso 1: Clonar el Repositorio
+
+```bash
+git clone https://github.com/DuqueOM/Guia-Master-IA.git
+cd Guia-Master-IA
+```
+
+### Paso 2: Crear Entorno Virtual
+
+```bash
+# Crear entorno virtual
+python -m venv venv
+
+# Activar entorno
+source venv/bin/activate      # Linux/macOS
+# venv\Scripts\activate       # Windows
+```
+
+### Paso 3: Instalar Dependencias
+
+```bash
+# Instalación básica (CPU)
+pip install -r requirements.txt
+
+# Con soporte GPU (NVIDIA CUDA)
+pip install -r requirements.txt
+pip install tensorflow[and-cuda]
+```
+
+### Paso 4: Verificar Instalación
+
+```bash
+python -c "import tensorflow as tf; print(f'TensorFlow {tf.__version__}')"
+python -c "import sklearn; print(f'Scikit-learn {sklearn.__version__}')"
+```
+
+### Paso 5: Comenzar el Estudio
+
+```bash
+# Abrir JupyterLab
+jupyter lab
+
+# O ejecutar un laboratorio interactivo
+streamlit run M02_Algebra_Lineal/Laboratorios_Interactivos/transformacion_lineal_app.py
+```
+
+---
+
+## 📅 Plan de Estudio: 24 Semanas (6 Meses)
+
+### 🗓️ Mes 1-2: Fundamentos Matemáticos (Semanas 1-8)
+
+| Semana | Módulo | Tema | Horas/Sem | Entregable |
+|--------|--------|------|-----------|------------|
+| **1** | M01 | Python Científico: NumPy Avanzado | 10h | Quiz NumPy |
+| **2** | M01 | Pandas: Manipulación de DataFrames | 10h | Mini-proyecto EDA |
+| **3** | M02 | Vectores, Matrices, Operaciones Básicas | 12h | Ejercicios escritos |
+| **4** | M02 | Eigenvalues, Eigenvectors, Diagonalización | 12h | Implementación from scratch |
+| **5** | M02 | SVD y Aplicaciones (PCA preview) | 12h | Lab interactivo SVD |
+| **6** | M03 | Derivadas, Gradientes, Regla de la Cadena | 10h | Derivación manual backprop |
+| **7** | M03 | Optimización: Gradiente Descendente | 10h | Implementación GD |
+| **8** | M04 | Probabilidad, Bayes, Distribuciones | 10h | Ejercicios MLE/MAP |
+
+**🎯 Checkpoint Mes 2**: Simulacro de examen teórico (M01-M04)
+
+---
+
+### 🗓️ Mes 3: Aprendizaje Supervisado + Ética (Semanas 9-11)
+
+| Semana | Módulo | Tema | Curso Alineado | Entregable |
+|--------|--------|------|----------------|------------|
+| **9** | M05 | Regresión Lineal/Logística from scratch | CSCA 5622 | Notebook validado |
+| **10** | M05 | Árboles de Decisión, Random Forest, SVM | CSCA 5622 | Comparativa modelos |
+| **11** | M05 | **Ética IA + XAI**: SHAP, LIME | CSCA 5622 | Reporte interpretabilidad |
+
+**🎯 Checkpoint Mes 3**: Proyecto mini - Clasificación con explicabilidad
+
+---
+
+### 🗓️ Mes 4: Aprendizaje No Supervisado + Recomendación (Semanas 12-15)
+
+| Semana | Módulo | Tema | Curso Alineado | Entregable |
+|--------|--------|------|----------------|------------|
+| **12** | M06 | K-Means, Clustering Jerárquico | CSCA 5632 | Implementación from scratch |
+| **13** | M06 | PCA, Reducción de Dimensionalidad | CSCA 5632 | Visualización t-SNE |
+| **14** | M06 | GMM, Algoritmo EM | CSCA 5632 | Derivación matemática |
+| **15** | M06 | **Sistemas de Recomendación** (SVD, MovieLens) | CSCA 5632 | Recomendador funcional |
+
+**🎯 Checkpoint Mes 4**: Proyecto - Sistema de recomendación end-to-end
+
+---
+
+### 🗓️ Mes 5: Deep Learning con Keras (Semanas 16-20)
+
+| Semana | Módulo | Tema | Curso Alineado | Entregable |
+|--------|--------|------|----------------|------------|
+| **16** | M07 | Perceptrón, MLP from scratch | CSCA 5642 | Backprop manual |
+| **17** | M07 | **Keras**: Sequential + Functional API | CSCA 5642 | Modelo híbrido |
+| **18** | M07 | CNNs: Convoluciones, Pooling, Arquitecturas | CSCA 5642 | Clasificador CIFAR-10 |
+| **19** | M07 | RNNs, LSTMs, GRUs | CSCA 5642 | Predicción secuencias |
+| **20** | M07 | Regularización, Callbacks, Transfer Learning | CSCA 5642 | Fine-tuning VGG/ResNet |
+
+**🎯 Checkpoint Mes 5**: Proyecto - CNN para clasificación de imágenes
+
+---
+
+### 🗓️ Mes 6: Proyecto Capstone NLP (Semanas 21-24)
+
+| Semana | Módulo | Tema | Entregable |
+|--------|--------|------|------------|
+| **21** | M08 | EDA + Preprocessing (Disaster Tweets) | Notebook 01 limpio |
+| **22** | M08 | Baseline Models (TF-IDF, LogReg, NB) | Notebook 02 + métricas |
+| **23** | M08 | Deep Learning (BiLSTM + GloVe) | Notebook 03 + curvas |
+| **24** | M08 | Transfer Learning (BERT) + **REPORTE FINAL** | Notebook 04 + REPORT.md |
+
+**🎯 Entrega Final**: Proyecto completo evaluado con [RUBRIC.md](M08_Proyecto_Integrador/RUBRIC.md)
+
+---
+
+## 📊 Resumen Visual del Programa
+
+```
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    PROGRAMA DE 24 SEMANAS                                 ║
+╠══════════════════════════════════════════════════════════════════════════╣
+║  MES 1-2        │  MES 3          │  MES 4          │  MES 5    │ MES 6  ║
+║  FUNDAMENTOS    │  SUPERVISADO    │  NO SUPERVISADO │  DEEP     │CAPSTONE║
+║  ────────────── │  ────────────── │  ────────────── │  LEARNING │  ───── ║
+║  M01: Python    │  M05: ML Core   │  M06: Clustering│  M07:     │  M08:  ║
+║  M02: Álgebra   │  + Ética/XAI    │  + PCA + GMM    │  Keras    │  NLP   ║
+║  M03: Cálculo   │                 │  + RecSys       │  CNN/RNN  │ Tweets ║
+║  M04: Prob/Est  │                 │                 │           │        ║
+║  ────────────── │  ────────────── │  ────────────── │  ──────── │  ───── ║
+║  Semanas 1-8    │  Semanas 9-11   │  Semanas 12-15  │  16-20    │  21-24 ║
+║                 │  CSCA 5622 ⭐   │  CSCA 5632 ⭐   │ CSCA 5642⭐│        ║
+╚══════════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## 🎯 Cursos Alineados (MS-AI Pathway)
+
+| Curso | Código | Módulo | Descripción |
+|-------|--------|--------|-------------|
+| **Supervised Learning** | CSCA 5622 | M05 | Regresión, Clasificación, Árboles, SVM, XAI |
+| **Unsupervised Learning** | CSCA 5632 | M06 | Clustering, PCA, GMM, Sistemas de Recomendación |
+| **Deep Learning** | CSCA 5642 | M07 | MLPs, CNNs, RNNs, Transfer Learning con Keras |
+
+---
+
+## 🗺️ Estructura del Repositorio
 
 ```
 Guia-Master-IA/

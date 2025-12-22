@@ -1,16 +1,124 @@
-numpy>=1.24.0
+# =============================================================================
+# Guía Master IA - Requirements (M01-M08)
+# =============================================================================
+# Preparación MS in AI - CU Boulder
+# Compatible con Python 3.10+
+#
+# Instalación:
+#   pip install -r requirements.txt
+#
+# Para GPU (NVIDIA CUDA):
+#   pip install -r requirements.txt
+#   pip install tensorflow[and-cuda]  # TensorFlow con soporte GPU
+#
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# CORE: Computación Científica (M01-M04)
+# -----------------------------------------------------------------------------
+numpy>=1.24.0,<2.0.0        # Pinned <2.0 para compatibilidad TensorFlow
+pandas>=2.0.0,<3.0.0
+scipy>=1.10.0,<2.0.0
+
+# -----------------------------------------------------------------------------
+# VISUALIZACIÓN (Todos los módulos)
+# -----------------------------------------------------------------------------
 matplotlib>=3.7.0
-plotly>=5.18.0
-ipywidgets>=8.1.0
-scipy>=1.10.0
-scikit-learn>=1.2.0
-pandas>=2.0.0
 seaborn>=0.12.0
+plotly>=5.18.0
+
+# -----------------------------------------------------------------------------
+# MACHINE LEARNING CLÁSICO (M05-M06)
+# -----------------------------------------------------------------------------
+scikit-learn>=1.3.0,<2.0.0
+
+# -----------------------------------------------------------------------------
+# DEEP LEARNING (M07-M08)
+# -----------------------------------------------------------------------------
+# TensorFlow/Keras - Framework principal (alineado CSCA 5642)
+# Nota: TensorFlow 2.15+ requiere numpy<2.0
+tensorflow>=2.15.0,<2.18.0
+
+# PyTorch - Track opcional/avanzado
+# Descomentar si necesitas PyTorch:
+# torch>=2.1.0
+# torchvision>=0.16.0
+# torchaudio>=2.1.0
+
+# -----------------------------------------------------------------------------
+# NLP - Procesamiento de Lenguaje Natural (M08 Capstone)
+# -----------------------------------------------------------------------------
+nltk>=3.8.0
+# spacy>=3.7.0                # Descomentar si usas spaCy (requiere modelo: python -m spacy download en_core_web_sm)
+transformers>=4.35.0          # HuggingFace para BERT
+tokenizers>=0.15.0
+datasets>=2.15.0              # HuggingFace datasets
+
+# -----------------------------------------------------------------------------
+# INTERPRETABILIDAD / XAI (M05 Ética)
+# -----------------------------------------------------------------------------
+shap>=0.44.0
+lime>=0.2.0
+
+# -----------------------------------------------------------------------------
+# SISTEMAS DE RECOMENDACIÓN (M06)
+# -----------------------------------------------------------------------------
+scikit-surprise>=1.1.3
+
+# -----------------------------------------------------------------------------
+# JUPYTER / DESARROLLO INTERACTIVO
+# -----------------------------------------------------------------------------
 jupyter>=1.0.0
 jupyterlab>=4.0.0
 ipython>=8.0.0
+ipywidgets>=8.1.0
+notebook>=7.0.0
+
+# -----------------------------------------------------------------------------
+# APLICACIONES INTERACTIVAS (Laboratorios)
+# -----------------------------------------------------------------------------
+streamlit>=1.29.0
+
+# -----------------------------------------------------------------------------
+# UTILIDADES
+# -----------------------------------------------------------------------------
+tqdm>=4.66.0                  # Barras de progreso
+python-dotenv>=1.0.0          # Variables de entorno
+requests>=2.31.0              # HTTP requests
+pillow>=10.0.0                # Procesamiento de imágenes
+
+# -----------------------------------------------------------------------------
+# DOCUMENTACIÓN Y REPORTES
+# -----------------------------------------------------------------------------
 markdown>=3.4.0
-markdown-katex>=202406.1035
-PyPDF2>=3.0.0
-weasyprint>=60.0
 pygments>=2.16.0
+
+# -----------------------------------------------------------------------------
+# CALIDAD DE CÓDIGO (Desarrollo)
+# -----------------------------------------------------------------------------
+# Descomentar para desarrollo:
+# ruff>=0.1.0
+# mypy>=1.7.0
+# pre-commit>=3.6.0
+# pytest>=7.4.0
+
+# =============================================================================
+# NOTAS DE COMPATIBILIDAD
+# =============================================================================
+#
+# 1. TensorFlow + NumPy:
+#    - TensorFlow 2.15-2.17 requiere numpy<2.0
+#    - Si ves errores de "module 'numpy' has no attribute", verifica versiones
+#
+# 2. CUDA/GPU:
+#    - TensorFlow: pip install tensorflow[and-cuda]
+#    - PyTorch: ver https://pytorch.org/get-started/locally/
+#
+# 3. Apple Silicon (M1/M2/M3):
+#    - TensorFlow: pip install tensorflow-macos tensorflow-metal
+#
+# 4. Conflictos conocidos:
+#    - protobuf: Si hay conflictos, fijar protobuf>=3.20.0,<5.0.0
+#    - h5py: Requerido por Keras, instalado automáticamente con TensorFlow
+#
+# =============================================================================
